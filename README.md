@@ -1,14 +1,16 @@
 # EnergyFlow Card for Home Assistant
 
-Een interactieve, modern vormgegeven energievisualisatie voor Home Assistant. De kaart toont de energiestromen (opwek, verbruik, accu, laadpaal) in een prachtige SVG-huisschets, compleet met een dynamische lucht die zich aanpast aan het tijdstip van de dag.
-
-![EnergyFlow Preview](hacs_preview.png)
+Een interactieve, modern vormgegeven energievisualisatie voor Home Assistant. De kaart toont de energiestromen (opwek, verbruik, accu, laadpaal) in een realistische SVG-gevel van een bakstenen woning, compleet met een dynamische lucht die zich aanpast aan het tijdstip van de dag.
 
 ## Kenmerken
-- **Vijf Huizenstijlen:** Kies uit `modern-villa`, `classic-jaren30`, `barnhouse`, `cubist-bungalow`, of `townhouse`.
-- **Dynamische Hemel:** De stand van de zon/maan en de kleur van de lucht veranderen mee met het actuele uur van de dag.
-- **Optionele Entiteiten:** Heb je geen zonnepanelen, thuisaccu of laadpaal? Laat ze simpelweg weg uit de configuratie; de kaart verbergt deze elementen en stroomlijnen automatisch, en lijnt de overgebleven kaarten netjes uit.
-- **Optel-ondersteuning (Multi-Entity):** Voer per onderdeel een enkele entiteit in óf een lijst van entiteiten; de kaart telt ze automatisch in real-time bij elkaar op (handig bij meerdere omvormers).
+
+- **Realistische bakstenen gevel:** Drievleugelige woning met linker-vleugel (zonnepanelen op dak), centrale entree en rechter-vleugel (laadpaal & auto).
+- **Dynamische hemel:** Zon en maan draaien om het huis. Luchtkleur, sterren en wolken passen zich aan het uur van de dag aan.
+- **Weerstypes:** Zonnig, bewolkt, regen, sneeuw, onweer en mist — inclusief animaties.
+- **Dag/nacht ramen:** Overdag grijzig-reflecterend, 's avonds warm gloeiend amber.
+- **Accu-kleuren:** Groene bolletjes bij laden, rode bolletjes bij ontladen.
+- **Optionele entiteiten:** Geen zonnepanelen, accu of laadpaal? Laat ze weg uit de configuratie — de kaart verbergt die elementen en stroomlijnen automatisch.
+- **Optel-ondersteuning (Multi-Entity):** Per onderdeel een enkele entiteit óf een lijst; de kaart telt automatisch op (handig bij meerdere omvormers).
 
 ---
 
@@ -16,45 +18,67 @@ Een interactieve, modern vormgegeven energievisualisatie voor Home Assistant. De
 
 ### Optie 1: Via HACS (Aanbevolen)
 1. Open HACS in Home Assistant.
-2. Klik rechtsboven op de drie puntjes en kies **Aangepaste repositories (Custom repositories)**.
-3. Plak de URL van jouw GitHub repository waar je deze code host.
+2. Klik rechtsboven op de drie puntjes → **Aangepaste repositories**.
+3. Plak de URL van jouw GitHub repository.
 4. Kies categorie **Lovelace (Plugin)** en klik op **Toevoegen**.
-5. Installeer de "EnergyFlow Card".
+5. Installeer de **EnergyFlow Card**.
 
 ### Optie 2: Handmatige Installatie
 1. Download [energy-flow-card.js](dist/energy-flow-card.js).
-2. Kopieer het bestand naar de `/config/www/` map van je Home Assistant-installatie.
-3. Voeg de resource toe aan je dashboard:
-   - Ga in Home Assistant naar **Instellingen** -> **Dashboards** -> Drie puntjes rechtsboven -> **Bronnen**.
-   - Klik op **Bron toevoegen**.
-   - Voer `/local/energy-flow-card.js` in als URL en selecteer **JavaScript-module** als type.
+2. Kopieer het bestand naar `/config/www/` op je Home Assistant-installatie.
+3. Voeg de resource toe:
+   - **Instellingen** → **Dashboards** → ⋮ rechtsboven → **Bronnen** → **Bron toevoegen**
+   - URL: `/local/energy-flow-card.js` — type: **JavaScript-module**
+4. Ververs de browser hard (`Ctrl+Shift+R`) na het toevoegen.
 
 ---
 
 ## Lovelace Dashboard Configuratie
 
-Voeg de kaart toe aan je dashboard met de volgende YAML-code:
-
 ```yaml
 type: custom:energy-flow-card
-title: "Mijn Energie"
-house_style: "classic-jaren30"     # Opties: modern-villa, classic-jaren30, barnhouse, cubist-bungalow, townhouse
+title: "Mijn Energie"   # Optioneel — weglaten = geen titelbalk
 entities:
-  # Zonnepanelen (Optioneel: accepteert een enkele sensor of een lijst)
+  # Zonnepanelen (Optioneel — accepteert een enkele sensor of een lijst)
   solar:
     - sensor.omvormer_dak_voor
     - sensor.omvormer_dak_achter
-    
+
   # Huisverbruik (Optioneel)
   load: sensor.smart_meter_power_consumption
-  
+
   # Thuisaccu (Optioneel)
+  # Conventie: negatief = laden, positief = ontladen
   battery_power: sensor.battery_power
   battery_soc: sensor.battery_state_of_charge
-  
+
   # Laadpaal (Optioneel)
   charger: sensor.ev_charger_power
-  
-  # Stroomnet (Optioneel. Indien weggelaten, berekent de kaart dit als: load + charger - solar - battery_power)
+
+  # Stroomnet (Optioneel — indien weggelaten berekent de kaart: load + charger - solar - battery_power)
   grid: sensor.smart_meter_grid_power
+
+  # Dagelijks totalen (Optioneel — tonen in de onderste kaartjes)
+  solar_energy_today: sensor.solar_energy_today
+  grid_import_today: sensor.grid_import_today
+  grid_export_today: sensor.grid_export_today
+  home_today: sensor.home_energy_today
+  battery_charge_today: sensor.battery_charged_today
+  battery_discharge_today: sensor.battery_discharged_today
+  ev_today: sensor.ev_charged_today
+
+  # Weer (Optioneel — voor het weerpictogram en animaties)
+  weather: weather.home
+
+  # Zon opkomst/ondergang (Optioneel — automatisch via sun.sun als aanwezig)
+  # sun.sun wordt automatisch gelezen, geen configuratie nodig
 ```
+
+---
+
+## Update naar nieuwe versie
+
+Als je de kaart via HACS hebt geïnstalleerd:
+1. **HACS** → **Frontend** → zoek **EnergyFlow Card**
+2. Klik ⋮ → **Update** — of klik rechtsboven op **Controleer op updates**
+3. Na de update: browser hard-refresh (`Ctrl+Shift+R`) of cache wissen via **Instellingen → Dashboards → ⋮ → Cache wissen**

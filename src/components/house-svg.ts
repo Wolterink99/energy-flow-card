@@ -199,9 +199,9 @@ export function renderHouseSvg({
     timeHour = (rawTimeHour / sunriseHour) * 6.0;
   }
 
-  // HACS convention: batteryPower < 0 = charging (absorbing), batteryPower > 0 = discharging (delivering)
-  const batteryCharging    = batteryPower < -0.05;
-  const batteryDischarging = batteryPower > 0.05;
+  // Na normalisatie in energy-flow-card.ts: batteryPower > 0 = laden, < 0 = ontladen
+  const batteryCharging    = batteryPower > 0.05;
+  const batteryDischarging = batteryPower < -0.05;
   const gridImporting      = grid > 0.05;
   const gridExporting      = grid < -0.05;
   const evActive           = charger > 0.1;

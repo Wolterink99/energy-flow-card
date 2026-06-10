@@ -101,9 +101,16 @@ export class EnergyFlowCard extends LitElement {
     // Parse states
     const solar = this.getEntityValue(entities.solar);
     const load = this.getEntityValue(entities.load);
-    const batteryPower = this.getEntityValue(entities.battery_power);
+    const rawBatteryPower = this.getEntityValue(entities.battery_power);
     const soc = entities.battery_soc ? this.getEntityValue(entities.battery_soc) : 0;
     const charger = this.getEntityValue(entities.charger);
+
+    // Normalize battery sign convention:
+    // battery_invert: true  (default) → sensor positief = laden  (SolarEdge, Huawei, GoodWe)
+    // battery_invert: false           → sensor negatief = laden  (Victron, sommige SMA)
+    // Na normalisatie: batteryPower > 0 = laden, batteryPower < 0 = ontladen
+    const batteryInvert = this.config.battery_invert !== false; // default true
+    const batteryPower = batteryInvert ? rawBatteryPower : -rawBatteryPower;
 
     // Helper to parse daily energy sensor states
     const parseEntityFloat = (entId?: string): number | null => {
@@ -143,13 +150,14 @@ export class EnergyFlowCard extends LitElement {
       }
     }
 
-    // Grid import/export: if custom entity provided use it, otherwise compute
-    // Convention: batteryPower < 0 = charging (absorbing), batteryPower > 0 = discharging (delivering)
+    // Grid import/export: gebruik sensor als geconfigureerd, anders berekend.
+    // Na normalisatie: batteryPower > 0 = laden, < 0 = ontladen
+    // grid > 0 = import (afname), grid < 0 = export (teruglevering)
     let grid = 0;
     if (entities.grid) {
       grid = this.getEntityValue(entities.grid);
     } else {
-      // grid > 0 = import, grid < 0 = export
+      // grid = huisverbruik + laadpaal - opwek - acculaden + accuontladen
       grid = load + charger - solar - batteryPower;
     }
 
@@ -168,8 +176,6 @@ export class EnergyFlowCard extends LitElement {
 
         <div class="sceneWrapper">
           ${renderHouseSvg({
-            houseStyle: this.config.house_style,
-            carType: this.config.car_type || 'hatchback',
             timeHour: decimalHour,
             timeOfDay,
             solar,
