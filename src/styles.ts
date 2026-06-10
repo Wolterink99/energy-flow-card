@@ -12,7 +12,7 @@ export const styles = css`
     border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color, #1e293b));
     box-shadow: var(--ha-card-box-shadow, none);
     color: var(--primary-text-color, #ffffff);
-    padding: 16px;
+    padding: 0;
     font-family: var(--paper-font-body1_-_font-family, 'Inter', system-ui, -apple-system, sans-serif);
     overflow: hidden;
   }
@@ -21,7 +21,7 @@ export const styles = css`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    padding: 12px 16px 8px 16px;
   }
 
   .card-title {
@@ -36,14 +36,17 @@ export const styles = css`
     width: 100%;
     position: relative;
     background: transparent;
+    display: block;
+    line-height: 0;
   }
 
   svg {
     display: block;
-    overflow: visible;
+    overflow: hidden;
     user-select: none;
     width: 100%;
     height: auto;
+    border-radius: var(--ha-card-border-radius, 12px);
   }
 
   /* Animations & Keyframes */
@@ -58,17 +61,17 @@ export const styles = css`
 
   @keyframes driftSlow {
     0%   { transform: translateX(-250px); }
-    100% { transform: translateX(1100px); }
+    100% { transform: translateX(1300px); }
   }
 
   @keyframes driftMedium {
     0%   { transform: translateX(-300px); }
-    100% { transform: translateX(1100px); }
+    100% { transform: translateX(1300px); }
   }
 
   @keyframes driftFast {
     0%   { transform: translateX(-350px); }
-    100% { transform: translateX(1100px); }
+    100% { transform: translateX(1300px); }
   }
 
   @keyframes twinkle {
@@ -95,21 +98,67 @@ export const styles = css`
     }
   }
 
-  .cloud1 { animation: driftSlow 65s infinite linear; }
-  .cloud2 { animation: driftMedium 45s infinite linear; }
-  .cloud3 { animation: driftFast 32s infinite linear; }
+  @keyframes rainFall {
+    0%   { transform: translateY(-40px); opacity: 0; }
+    10%  { opacity: 0.75; }
+    90%  { opacity: 0.75; }
+    100% { transform: translateY(640px); opacity: 0; }
+  }
+
+  @keyframes snowFall {
+    0%   { transform: translateY(-20px) translateX(0px); opacity: 0; }
+    10%  { opacity: 0.85; }
+    50%  { transform: translateY(300px) translateX(12px); }
+    90%  { opacity: 0.85; }
+    100% { transform: translateY(640px) translateX(-8px); opacity: 0; }
+  }
+
+  @keyframes lightningFlash {
+    0%   { opacity: 0; }
+    8%   { opacity: 1; }
+    12%  { opacity: 0; }
+    18%  { opacity: 0.8; }
+    24%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  .cloud1 { animation: driftSlow 110s infinite linear; }
+  .cloud2 { animation: driftMedium 80s infinite linear; }
+  .cloud3 { animation: driftFast 55s infinite linear; }
 
   .starFast { animation: twinkle 2.5s infinite ease-in-out; animation-delay: 0.2s; }
   .starMed { animation: twinkle 4s infinite ease-in-out; animation-delay: 1.1s; }
   .starSlow { animation: twinkle 6s infinite ease-in-out; animation-delay: 2.3s; }
 
   .inverterRing {
-    transform-origin: 320px 432.5px;
+    transform-origin: 395px 432.5px;
     animation: pulseInverterRing 3s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .chargingPulse {
     animation: chargingDash 1.2s infinite linear;
+  }
+
+  .rainDrop {
+    stroke: #93c5fd;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    animation: rainFall 0.7s infinite linear;
+  }
+
+  .snowFlake {
+    fill: #e2e8f0;
+    opacity: 0.85;
+    animation: snowFall 5s infinite ease-in-out;
+  }
+
+  .lightningBolt {
+    fill: none;
+    stroke: #fde047;
+    stroke-width: 3;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 8px #fde047);
+    animation: lightningFlash 4s infinite;
   }
 
   /* CSS Classes for Elements */
@@ -174,7 +223,7 @@ export const styles = css`
   }
 
   .hudTitle {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -189,8 +238,8 @@ export const styles = css`
 
   .hudValue {
     font-family: monospace;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     letter-spacing: -0.01em;
     fill: rgba(255, 255, 255, 0.85);
     pointer-events: none;
@@ -201,7 +250,7 @@ export const styles = css`
   }
 
   .hudSub {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 500;
     fill: rgba(255, 255, 255, 0.32);
     pointer-events: none;

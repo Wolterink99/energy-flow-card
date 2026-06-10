@@ -2,9 +2,9 @@ import { svg, TemplateResult } from 'lit';
 
 // Color tokens for active states
 const COLORS = {
-  solar:   { stroke: '#f59e0b', glow: 'rgba(245,158,11,0.5)' },
+  solar:   { stroke: '#10b981', glow: 'rgba(16,185,129,0.5)' },
   battery: { stroke: '#10b981', glow: 'rgba(16,185,129,0.5)' },
-  batteryD:{ stroke: '#f97316', glow: 'rgba(249,115,22,0.5)' },
+  batteryD:{ stroke: '#ef4444', glow: 'rgba(239,68,68,0.5)' },
   gridI:   { stroke: '#06b6d4', glow: 'rgba(6,182,212,0.5)' },
   gridE:   { stroke: '#22c55e', glow: 'rgba(34,197,94,0.5)' },
   ev:      { stroke: '#a855f7', glow: 'rgba(168,85,247,0.5)' },
@@ -24,12 +24,12 @@ interface SkyKeyframe {
 const SKY_KEYFRAMES: SkyKeyframe[] = [
   { hour: 0,    top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
   { hour: 4.5,  top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
-  { hour: 6.0,  top: '#1e1b4b', horizon: '#fdba74', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.35)' }, // Sunrise
-  { hour: 8.0,  top: '#0ea5e9', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.92)' }, // Daytime blue
-  { hour: 17.0, top: '#0284c7', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.92)' },
-  { hour: 19.5, top: '#3b0764', horizon: '#f97316', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.45)' }, // Early sunset
-  { hour: 21.0, top: '#18113c', horizon: '#ea580c', stars: 0.1, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.18)' }, // Late sunset
-  { hour: 22.5, top: '#020617', horizon: '#1e293b', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' }, // Twilight
+  { hour: 6.0,  top: '#1e1b4b', horizon: '#fdba74', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.35)' },
+  { hour: 8.0,  top: '#0ea5e9', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
+  { hour: 17.0, top: '#0284c7', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
+  { hour: 19.5, top: '#3b0764', horizon: '#f97316', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.45)' },
+  { hour: 21.0, top: '#18113c', horizon: '#ea580c', stars: 0.1, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.18)' },
+  { hour: 22.5, top: '#020617', horizon: '#1e293b', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
   { hour: 24,   top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' }
 ];
 
@@ -80,7 +80,6 @@ function getSkyState(hour: number) {
   }
   const range = upper.hour - lower.hour;
   const factor = range === 0 ? 0 : (hour - lower.hour) / range;
-  
   return {
     top: interpolateColor(lower.top, upper.top, factor),
     horizon: interpolateColor(lower.horizon, upper.horizon, factor),
@@ -93,8 +92,8 @@ function getSkyState(hour: number) {
 function getFlowSpeed(watts: number): number {
   const abs = Math.abs(watts);
   if (abs < 20) return 0;
-  if (abs < 1000) return 16.0; // Slow
-  return 6.0; // Calm
+  if (abs < 1000) return 16.0;
+  return 6.0;
 }
 
 function formatPowerAbs(watts: number): string {
@@ -103,11 +102,48 @@ function formatPowerAbs(watts: number): string {
   return `${Math.round(abs)} W`;
 }
 
+function renderHDCloud(className: string, x: number, y: number, scale = 1, color = '#ffffff', opacity = 0.9): TemplateResult {
+  return svg`
+    <g transform="translate(${x}, ${y}) scale(${scale})" opacity="${opacity}" style="transition: opacity 1.5s ease;">
+      <g class="${className}">
+        <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="rgba(15, 23, 42, 0.15)" transform="translate(0, 4) scale(1.02)" />
+        <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${color}" style="transition: fill 1.5s ease;" />
+      </g>
+    </g>
+  `;
+}
+
+function renderRain(): TemplateResult {
+  return svg`
+    <g style="pointer-events: none;">
+      ${Array.from({ length: 18 }).map((_, i) => svg`
+        <line x1="${25 + i * 55}" y1="0" x2="${8 + i * 55}" y2="40"
+          class="rainDrop"
+          style="animation-delay: ${(i % 5) * 0.12}s; animation-duration: ${0.6 + (i % 3) * 0.1}s;" />
+      `)}
+    </g>
+  `;
+}
+
+function renderSnow(): TemplateResult {
+  return svg`
+    <g style="pointer-events: none;">
+      ${Array.from({ length: 22 }).map((_, i) => svg`
+        <circle cx="${25 + i * 45}" cy="0" r="${1.8 + (i % 3) * 0.6}"
+          class="snowFlake"
+          style="animation-delay: ${(i % 6) * 0.5}s; animation-duration: ${4.5 + (i % 4) * 0.7}s;" />
+      `)}
+    </g>
+  `;
+}
+
 interface SvgParams {
-  houseStyle: string;
+  houseStyle?: string;   // kept for API compatibility, ignored
+  carType?: string;      // kept for API compatibility, ignored
   timeHour: number;
   timeOfDay: string;
   solar: number;
+  solarToday: number | null;
   load: number;
   batteryPower: number;
   soc: number;
@@ -116,14 +152,23 @@ interface SvgParams {
   showSolar: boolean;
   showBattery: boolean;
   showEV: boolean;
+  weather?: string;
+  sunriseHour?: number;
+  sunsetHour?: number;
+  gridImportToday?: number | null;
+  gridExportToday?: number | null;
+  homeToday?: number | null;
+  batteryChargeToday?: number | null;
+  batteryDischargeToday?: number | null;
+  evToday?: number | null;
   onNodeClick: (node: string) => void;
 }
 
 export function renderHouseSvg({
-  houseStyle,
-  timeHour,
+  timeHour: rawTimeHour,
   timeOfDay,
   solar,
+  solarToday,
   load,
   batteryPower,
   soc,
@@ -132,673 +177,644 @@ export function renderHouseSvg({
   showSolar,
   showBattery,
   showEV,
+  weather = 'sunny',
+  sunriseHour = 6.0,
+  sunsetHour = 21.0,
+  gridImportToday = null,
+  gridExportToday = null,
+  homeToday = null,
+  batteryChargeToday = null,
+  batteryDischargeToday = null,
+  evToday = null,
   onNodeClick
 }: SvgParams): TemplateResult {
-  const Y_GROUND = 480;
 
-  const batteryCharging    = batteryPower > 0;
-  const batteryDischarging = batteryPower < 0;
-  const gridImporting      = grid > 0;
-  const gridExporting      = grid < 0;
-  const evActive           = charger > 0;
+  // Normalize timeHour so sunrise=6.0 and sunset=21.0
+  let timeHour = rawTimeHour;
+  if (rawTimeHour >= sunriseHour && rawTimeHour <= sunsetHour) {
+    timeHour = 6.0 + ((rawTimeHour - sunriseHour) / (sunsetHour - sunriseHour)) * 15.0;
+  } else if (rawTimeHour > sunsetHour) {
+    timeHour = 21.0 + ((rawTimeHour - sunsetHour) / (24.0 - sunsetHour)) * 3.0;
+  } else {
+    timeHour = (rawTimeHour / sunriseHour) * 6.0;
+  }
+
+  // HACS convention: batteryPower < 0 = charging (absorbing), batteryPower > 0 = discharging (delivering)
+  const batteryCharging    = batteryPower < -0.05;
+  const batteryDischarging = batteryPower > 0.05;
+  const gridImporting      = grid > 0.05;
+  const gridExporting      = grid < -0.05;
+  const evActive           = charger > 0.1;
   const solarActive        = solar > 20;
   const homeActive         = load > 20;
 
-  const batColor   = batteryCharging ? COLORS.battery : COLORS.batteryD;
-  const gridColor  = gridImporting ? COLORS.gridI : COLORS.gridE;
+  const isExportingDischarge = batteryDischarging && gridExporting;
+  const batColor = (batteryCharging || isExportingDischarge) ? COLORS.battery : COLORS.batteryD;
+  const gridColor = gridImporting ? COLORS.gridI : COLORS.gridE;
 
   const skyState = getSkyState(timeHour);
+  const showLights = skyState.lights > 0.05 || weather === 'rainy' || weather === 'lightning';
 
-  // Time String
-  const hours = Math.floor(timeHour);
-  const minutes = Math.floor((timeHour % 1) * 60);
-  const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  // Sky colors with weather adaptation
+  let skyTop = skyState.top;
+  let skyHorizon = skyState.horizon;
+  let cloudColor = skyState.clouds;
+  let cloudOpacity = timeOfDay === 'night' ? 0.18 : 0.48;
 
-  const timeOfDayLabels: Record<string, string> = {
-    morning: 'Ochtend',
-    afternoon: 'Middag',
-    evening: 'Avond',
-    night: 'Nacht'
-  };
-  const timeOfDayLabel = timeOfDayLabels[timeOfDay] || 'Middag';
+  if (weather === 'cloudy') {
+    skyTop = interpolateColor(skyState.top, '#475569', 0.5);
+    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.5);
+    cloudColor = 'rgba(241, 245, 249, 0.55)';
+    cloudOpacity = 0.65;
+  } else if (weather === 'rainy' || weather === 'lightning') {
+    skyTop = interpolateColor(skyState.top, '#1e293b', 0.75);
+    skyHorizon = interpolateColor(skyState.horizon, '#475569', 0.75);
+    cloudColor = 'rgba(100, 116, 139, 0.5)';
+    cloudOpacity = 0.65;
+  } else if (weather === 'snowy') {
+    skyTop = interpolateColor(skyState.top, '#cbd5e1', 0.4);
+    skyHorizon = interpolateColor(skyState.horizon, '#f1f5f9', 0.4);
+    cloudColor = 'rgba(255, 255, 255, 0.6)';
+    cloudOpacity = 0.70;
+  } else if (weather === 'foggy') {
+    skyTop = interpolateColor(skyState.top, '#94a3b8', 0.6);
+    skyHorizon = interpolateColor(skyState.horizon, '#cbd5e1', 0.6);
+    cloudColor = 'rgba(226, 232, 240, 0.4)';
+    cloudOpacity = 0.50;
+  }
 
-  // Calculate Sun Arc Trajectory
-  const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0;
-  const sunPos = { cx: 450, cy: 600 };
+  // ── Sun trajectory (HACS viewBox: 960x590, content in translate(0,84) group) ──
+  // Ground at y=576 (=480*1.2), top of content at y=84 (=70*1.2)
+  // Sun arc: from edge to edge with a peak well above the house roof (~y=100)
+  const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy';
+  const sunPos = { cx: 480, cy: 600 };
   let sunOpacity = 0;
   let sunColor = '#fef08a';
   let sunGlow = 'rgba(254, 240, 138, 0.65)';
-  
+
   if (isSunVisible) {
     const tSun = (timeHour - 6.0) / 15.0;
-    sunPos.cx = 120 + tSun * 720;
-    sunPos.cy = 430 - Math.sin(tSun * Math.PI) * 350;
+    sunPos.cx = -60 + tSun * 1080;
+    sunPos.cy = 576 - Math.sin(tSun * Math.PI) * 528;
     sunOpacity = Math.max(0, Math.min(1.0, Math.sin(tSun * Math.PI) * 1.5));
     const fSun = Math.sin(tSun * Math.PI);
     sunColor = interpolateColor('#ea580c', '#fef08a', fSun);
     sunGlow = interpolateColor('rgba(234, 88, 12, 0.65)', 'rgba(254, 240, 138, 0.75)', fSun);
   }
 
-  // Calculate Moon Arc Trajectory
-  const isMoonVisible = timeHour > 21.0 || timeHour < 6.0;
-  const moonPos = { cx: 450, cy: 600 };
+  // ── Moon trajectory ──
+  const isMoonVisible = (timeHour > 21.0 || timeHour < 6.0) && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy';
+  const moonPos = { cx: 480, cy: 600 };
   let moonOpacity = 0;
-  
+
   if (isMoonVisible) {
-    const tMoon = timeHour >= 21.0 ? (timeHour - 21.0) / 9.0 : (timeHour + 3.0) / 9.0;
-    moonPos.cx = 120 + tMoon * 720;
-    moonPos.cy = 430 - Math.sin(tMoon * Math.PI) * 350;
-    moonOpacity = Math.max(0, Math.min(1.0, Math.sin(tMoon * Math.PI) * 1.5));
+    const tMoon = timeHour > 21.0 ? (timeHour - 21.0) / 9.0 : (timeHour + 3.0) / 9.0;
+    moonPos.cx = -60 + tMoon * 1080;
+    moonPos.cy = 576 - Math.sin(tMoon * Math.PI) * 480;
+    moonOpacity = Math.max(0, Math.min(0.9, Math.sin(tMoon * Math.PI) * 1.8));
   }
 
-  // Cable flow lines definitions
-  const solarPath = `M 490,235 L 580,295 L 580,510 L 320,510 L 320,430`;
-  const gridPath = `M 85,178 L 120,195 L 120,510 L 320,510 L 320,430`;
-  const batteryPath = `M 320,430 L 320,510 L 540,510 L 540,450`;
-  const evPath = `M 320,430 L 320,510 L 660,510 L 660,420 C 664,445 675,452 690,452`;
+  // ── Window appearance ──
+  // Day: reflective grey-blue; Night: warm amber glow
+  const isDay = timeHour >= 8.0 && timeHour <= 18.0;
+  const windowFill = isDay
+    ? 'url(#window-day)'
+    : (showLights ? 'url(#window-night)' : 'url(#window-dark)');
+  const windowFilter = isDay
+    ? 'none'
+    : (showLights ? 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))' : 'none');
 
-  const flowColor = '#10b981';
-  const flowGlow = 'rgba(16, 185, 129, 0.45)';
+  // ── Coordinate system ──
+  // HACS SVG: 960×590. We scale Card-2 coordinates (800×600 with translate(0,70)) by 1.2×.
+  // All coordinates below are in the 1.2-scaled space. The house group sits inside a
+  // `<g transform="scale(1.2) translate(0,0)">` that wraps from line ~580 to ~750.
 
-  const batteryActiveColor = soc < 20 ? '#ef4444' : batteryDischarging ? '#f97316' : '#10b981';
-  const batYTop = 472 - 36 * (soc / 100);
+  // Cable paths use the scaled coordinate space (multiply Card-2 coords by 1.2)
+  // Card-2: mkX=345, mkY=350; in translate(0,70) group → screen y = 420
+  // Scaled: mkX=414, mkY=504 (350+70)*1.2 = 504; OR think of it as 345*1.2=414, (350+70)*1.2=504
+  // But since these are inside the scale(1.2) group, we use unscaled coords: mkX=345, mkY=420
+  const mkX = 345;
+  const mkY = 420; // 350+70 – the translated y inside the group
+  const invX = 380;
+  const invY = 300; // 230+70
 
-  const inverterActive = (showSolar && solarActive) || (showBattery && (batteryCharging || batteryDischarging)) || gridImporting || gridExporting || (showEV && evActive);
-  const inverterLedColor = inverterActive ? '#10b981' : '#ef4444';
-  const showLights = skyState.lights > 0.05;
+  // ── HUD Cards configuration ──
+  let gridSub = gridExporting ? '↑ Teruglevering' : gridImporting ? '↓ Import' : 'Standby';
+  if (gridImportToday !== null && gridExportToday !== null) {
+    gridSub = `↓${gridImportToday.toFixed(1)} ↑${gridExportToday.toFixed(1)} kWh`;
+  } else if (gridImportToday !== null) {
+    gridSub = `Import: ${gridImportToday.toFixed(1)} kWh`;
+  } else if (gridExportToday !== null) {
+    gridSub = `Terug: ${gridExportToday.toFixed(1)} kWh`;
+  }
 
-  const renderParticles = (path: string, active: boolean, speed: number, reverse = false) => {
+  const homeSub = homeToday !== null ? `Vandaag: ${homeToday.toFixed(1)} kWh` : (homeActive ? 'Actief' : 'Standby');
+
+  let batterySub = `SoC: ${soc}%`;
+  if (batteryChargeToday !== null && batteryDischargeToday !== null) {
+    batterySub = `SoC: ${soc}% (↓${batteryChargeToday.toFixed(1)} ↑${batteryDischargeToday.toFixed(1)})`;
+  } else if (batteryChargeToday !== null) {
+    batterySub = `SoC: ${soc}% (↓${batteryChargeToday.toFixed(1)})`;
+  }
+
+  const evSub = evToday !== null ? `Vandaag: ${evToday.toFixed(1)} kWh` : (evActive ? 'Bezig met laden' : 'Standby');
+
+  // Bottom cards: grid, home, and conditionally battery, EV
+  interface CardConfig { id: string; title: string; value: string; sub: string; color: string; active: boolean; }
+  const bottomCards: CardConfig[] = [
+    { id: 'grid',  title: 'Stroomnet',    value: formatPowerAbs(grid),        sub: gridSub,    color: gridColor.stroke,       active: gridImporting || gridExporting },
+    { id: 'home',  title: 'Huisverbruik', value: formatPowerAbs(load),        sub: homeSub,    color: COLORS.home.stroke,     active: homeActive },
+  ];
+  if (showBattery) bottomCards.push({ id: 'battery', title: 'Thuisaccu', value: formatPowerAbs(batteryPower), sub: batterySub, color: batColor.stroke, active: batteryCharging || batteryDischarging });
+  if (showEV)      bottomCards.push({ id: 'ev', title: 'Laadpaal (EV)', value: formatPowerAbs(charger), sub: evSub, color: COLORS.ev.stroke, active: evActive });
+
+  const cardWidth = 170;
+  const totalWidth = bottomCards.length * cardWidth;
+  const remainingWidth = 960 - totalWidth;
+  const gap = remainingWidth / (bottomCards.length + 1);
+
+  // ── Particle and cable rendering ──
+  const renderParticles = (path: string, active: boolean, speed: number, color: string, glow: string, reverse = false) => {
     if (!active || speed === 0) return svg``;
     const count = 3;
     return svg`
       ${Array.from({ length: count }).map((_, i) => svg`
-        <circle
-          r="3.5"
-          fill="${flowColor}"
+        <circle r="3.5" fill="${color}"
           style="
             offset-path: path('${path}');
             animation: moveParticle ${speed}s linear infinite;
             animation-play-state: running;
             animation-delay: ${-(i / count) * speed}s;
             animation-direction: ${reverse ? 'reverse' : 'normal'};
-            filter: drop-shadow(0 0 5px ${flowGlow}) drop-shadow(0 0 2px ${flowColor});
-          "
-        />
+            filter: drop-shadow(0 0 5px ${glow}) drop-shadow(0 0 2px ${color});
+          " />
       `)}
     `;
   };
 
-  const renderCable = (path: string, active: boolean, speed: number, reverse = false) => {
+  const renderCable = (path: string, active: boolean, speed: number, color: string, glow: string, reverse = false) => {
     return svg`
       <path d="${path}" class="flowCable" />
-      <path
-        d="${path}"
-        fill="none"
-        stroke="${flowColor}"
-        stroke-width="3"
-        stroke-linecap="round"
+      <path d="${path}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"
         opacity="${active ? 0.25 : 0}"
-        style="filter: ${active ? 'blur(3.5px)' : 'none'}; transition: stroke 0.6s ease, opacity 0.6s ease;"
-      />
-      <path
-        d="${path}"
-        fill="none"
-        stroke="${flowColor}"
-        stroke-width="1.2"
-        stroke-linecap="round"
+        style="filter: ${active ? 'blur(3.5px)' : 'none'}; transition: stroke 0.6s ease, opacity 0.6s ease;" />
+      <path d="${path}" fill="none" stroke="${color}" stroke-width="1.2" stroke-linecap="round"
         opacity="${active ? 0.55 : 0}"
-        style="transition: stroke 0.6s ease, opacity 0.6s ease;"
-      />
-      ${renderParticles(path, active, speed, reverse)}
+        style="transition: stroke 0.6s ease, opacity 0.6s ease;" />
+      ${renderParticles(path, active, speed, color, glow, reverse)}
     `;
   };
 
-  // Build grid lines dynamically
-  const gridLinesX: TemplateResult[] = [];
-  const gridLinesY: TemplateResult[] = [];
-  for (let x = 0; x <= 960; x += 80) {
-    gridLinesX.push(svg`<line x1="${x}" y1="${Y_GROUND}" x2="${x}" y2="620" class="gridLine" />`);
-  }
-  for (let y = Y_GROUND + 20; y < 620; y += 20) {
-    gridLinesY.push(svg`<line x1="0" y1="${y}" x2="960" y2="${y}" class="gridLine" />`);
-  }
-
-  // Recalculate HUD cards positions
-  interface CardConfig {
-    id: string;
-    title: string;
-    value: string;
-    sub: string;
-    color: string;
-    stroke: string;
-    active: boolean;
-    line: string;
-  }
-  const activeCards: CardConfig[] = [
-    {
-      id: 'grid',
-      title: 'Stroomnet',
-      value: formatPowerAbs(grid),
-      sub: gridExporting ? '↑ Teruglevering' : gridImporting ? '↓ Import' : 'Standby',
-      color: gridColor.stroke,
-      stroke: gridColor.stroke,
-      active: gridImporting || gridExporting,
-      line: `M {{X_CENTER}} 550 L 120 195`
-    },
-    {
-      id: 'home',
-      title: 'Huisverbruik',
-      value: formatPowerAbs(load),
-      sub: homeActive ? 'Actief' : 'Standby',
-      color: COLORS.home.stroke,
-      stroke: COLORS.home.stroke,
-      active: homeActive,
-      line: `M {{X_CENTER}} 550 L 320 430`
-    }
-  ];
-
-  if (showBattery) {
-    activeCards.push({
-      id: 'battery',
-      title: 'Thuisaccu',
-      value: formatPowerAbs(batteryPower),
-      sub: `SoC: ${soc}%`,
-      color: batColor.stroke,
-      stroke: batColor.stroke,
-      active: batteryCharging || batteryDischarging,
-      line: `M {{X_CENTER}} 550 L 547.5 445`
-    });
-  }
-
-  if (showEV) {
-    activeCards.push({
-      id: 'ev',
-      title: 'Laadpaal (EV)',
-      value: formatPowerAbs(charger),
-      sub: evActive ? 'Bezig met laden' : 'Standby',
-      color: COLORS.ev.stroke,
-      stroke: COLORS.ev.stroke,
-      active: evActive,
-      line: `M {{X_CENTER}} 550 L 664 415`
-    });
-  }
-
-  const cardWidth = 150;
-  const totalWidth = activeCards.length * cardWidth;
-  const remainingWidth = 960 - totalWidth;
-  const gap = remainingWidth / (activeCards.length + 1);
+  // SoC bar calculations for battery
+  const batYTop = 405 - 40 * (soc / 100);
 
   return svg`
-    <svg viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 960 590" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${skyState.top}" />
-          <stop offset="100%" stop-color="${skyState.horizon}" />
+          <stop offset="0%" stop-color="${skyTop}" />
+          <stop offset="100%" stop-color="${skyHorizon}" />
         </linearGradient>
 
-        <linearGradient id="garden-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#0f3f26" />
-          <stop offset="100%" stop-color="#0a2919" />
-        </linearGradient>
-
-        <linearGradient id="driveway-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#334155" />
-          <stop offset="100%" stop-color="#1e293b" />
-        </linearGradient>
-
+        <!-- Solar panel gradient -->
         <linearGradient id="solar-panel-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#1e1b4b" />
           <stop offset="100%" stop-color="#312e81" />
         </linearGradient>
 
-        <linearGradient id="battery-body-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#f8fafc" />
-          <stop offset="100%" stop-color="#cbd5e1" />
+        <!-- Reflective daytime window gradient -->
+        <linearGradient id="window-day" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#94a3b8" />
+          <stop offset="35%" stop-color="#cbd5e1" />
+          <stop offset="40%" stop-color="#f8fafc" />
+          <stop offset="45%" stop-color="#cbd5e1" />
+          <stop offset="80%" stop-color="#64748b" />
+          <stop offset="100%" stop-color="#475569" />
         </linearGradient>
 
-        <linearGradient id="car-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#38bdf8" />
-          <stop offset="100%" stop-color="#0284c7" />
+        <!-- Warm amber night window -->
+        <linearGradient id="window-night" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fef3c7" />
+          <stop offset="100%" stop-color="#fcd34d" />
         </linearGradient>
 
-        <linearGradient id="lamp-light-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#fde047" stop-opacity="0.75" />
-          <stop offset="100%" stop-color="#fde047" stop-opacity="0" />
+        <!-- Dark window -->
+        <linearGradient id="window-dark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e293b" />
+          <stop offset="100%" stop-color="#0f172a" />
         </linearGradient>
 
-        <filter id="cloud-blur" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="8" />
-        </filter>
+        <!-- Brick texture pattern -->
+        <pattern id="brick-pat" width="60" height="40" patternUnits="userSpaceOnUse">
+          <!-- Layer 1: full orange-brown field -->
+          <rect width="60" height="40" fill="#8b4513" />
+          <!-- Brick row 1 (offset 0) -->
+          <rect x="0"  y="1"  width="27" height="17" fill="#c1440e" rx="0.5" />
+          <rect x="31" y="1"  width="29" height="17" fill="#b33a0a" rx="0.5" />
+          <!-- Brick row 2 (offset half) -->
+          <rect x="0"  y="22" width="13" height="17" fill="#bf3e0c" rx="0.5" />
+          <rect x="16" y="22" width="28" height="17" fill="#c64812" rx="0.5" />
+          <rect x="48" y="22" width="12" height="17" fill="#b83c0c" rx="0.5" />
+          <!-- Mortar lines -->
+          <line x1="0"  y1="19" x2="60" y2="19" stroke="#5a3214" stroke-width="1.5" />
+          <line x1="0"  y1="20" x2="60" y2="20" stroke="#5a3214" stroke-width="0.5" opacity="0.4" />
+          <line x1="0"  y1="40" x2="60" y2="40" stroke="#5a3214" stroke-width="1.5" />
+          <line x1="29" y1="1"  x2="29" y2="19" stroke="#5a3214" stroke-width="1.5" />
+          <line x1="14" y1="22" x2="14" y2="39" stroke="#5a3214" stroke-width="1.5" />
+          <line x1="46" y1="22" x2="46" y2="39" stroke="#5a3214" stroke-width="1.5" />
+        </pattern>
+
+        <!-- Roof tile pattern -->
+        <pattern id="tiles-pat" width="12" height="12" patternUnits="userSpaceOnUse">
+          <rect width="12" height="12" fill="#1e293b" />
+          <path d="M 0,12 Q 6,0 12,12" fill="none" stroke="#0f172a" stroke-width="1.2" />
+        </pattern>
+
+        <!-- Clip path for the whole scene -->
+        <clipPath id="scene-clip">
+          <rect width="960" height="590" rx="12" ry="12" />
+        </clipPath>
       </defs>
 
-      <!-- Sky -->
-      <rect width="960" height="620" fill="url(#sky-grad)" />
+      <g clip-path="url(#scene-clip)">
+        <!-- Sky background -->
+        <rect width="960" height="590" fill="url(#sky-grad)" />
 
-      <!-- Stars -->
-      ${skyState.stars > 0.05 ? svg`
-        <g opacity="${skyState.stars}">
-          <circle cx="100" cy="60" r="1.2" class="starFast" fill="#ffffff" />
-          <circle cx="180" cy="100" r="1.5" class="starSlow" fill="#ffffff" />
-          <circle cx="250" cy="45" r="1.0" class="starMed" fill="#ffffff" />
-          <circle cx="320" cy="85" r="1.8" class="starFast" fill="#ffffff" />
-          <circle cx="410" cy="70" r="1.2" class="starSlow" fill="#ffffff" />
-          <circle cx="530" cy="95" r="1.6" class="starMed" fill="#ffffff" />
-          <circle cx="590" cy="50" r="1.3" class="starFast" fill="#ffffff" />
-          <circle cx="680" cy="80" r="1.5" class="starSlow" fill="#ffffff" />
-          <circle cx="750" cy="40" r="1.1" class="starMed" fill="#ffffff" />
-          <circle cx="820" cy="110" r="1.7" class="starFast" fill="#ffffff" />
-          <circle cx="890" cy="65" r="1.3" class="starSlow" fill="#ffffff" />
-        </g>
-      ` : ''}
+        <!-- Stars -->
+        ${skyState.stars > 0.05 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' ? svg`
+          <g opacity="${skyState.stars}" style="pointer-events: none;">
+            <circle cx="96"  cy="60"  r="1.2" class="starFast" fill="#ffffff" />
+            <circle cx="216" cy="114" r="1.5" fill="#ffffff" />
+            <circle cx="408" cy="48"  r="1.0" class="starFast" fill="#ffffff" />
+            <circle cx="576" cy="132" r="1.8" fill="#ffffff" />
+            <circle cx="744" cy="78"  r="1.2" class="starFast" fill="#ffffff" />
+            <circle cx="876" cy="144" r="1.0" fill="#ffffff" />
+            <circle cx="312" cy="90"  r="1.4" class="starMed"  fill="#ffffff" />
+            <circle cx="660" cy="55"  r="1.1" class="starSlow" fill="#ffffff" />
+          </g>
+        ` : ''}
 
-      <!-- Sun -->
-      ${sunOpacity > 0 ? svg`
-        <g>
-          <circle cx="${sunPos.cx}" cy="${sunPos.cy}" r="55" fill="${sunColor}" opacity="${sunOpacity * 0.15}" style="filter: blur(8px);" />
-          <circle cx="${sunPos.cx}" cy="${sunPos.cy}" r="28" fill="${sunColor}" opacity="${sunOpacity}" style="filter: drop-shadow(0 0 16px ${sunGlow});" />
-        </g>
-      ` : ''}
+        <!-- Dynamic Sun -->
+        ${sunOpacity > 0 ? svg`
+          <g style="pointer-events: none;">
+            <circle cx="${sunPos.cx}" cy="${sunPos.cy}" r="54" fill="${sunColor}" opacity="${sunOpacity * 0.15}" style="filter: blur(8px);" />
+            <circle cx="${sunPos.cx}" cy="${sunPos.cy}" r="26" fill="${sunColor}" opacity="${sunOpacity}" style="filter: drop-shadow(0 0 14px ${sunGlow});" />
+          </g>
+        ` : ''}
 
-      <!-- Moon -->
-      ${moonOpacity > 0 ? svg`
-        <circle cx="${moonPos.cx}" cy="${moonPos.cy}" r="22" fill="#fffef0" opacity="${moonOpacity}" style="filter: drop-shadow(0 0 12px rgba(254, 243, 199, 0.6)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));" />
-      ` : ''}
+        <!-- Dynamic Moon -->
+        ${moonOpacity > 0 ? svg`
+          <g style="pointer-events: none;" opacity="${moonOpacity}">
+            <circle cx="${moonPos.cx}" cy="${moonPos.cy}" r="30" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
+            <circle cx="${moonPos.cx}" cy="${moonPos.cy}" r="17" fill="#f1f5f9" />
+            <circle cx="${moonPos.cx + 6}" cy="${moonPos.cy - 4}" r="16" fill="url(#sky-grad)" />
+          </g>
+        ` : ''}
 
-      <!-- Clouds -->
-      <g opacity="${timeOfDay === 'night' ? 0.35 : 0.85}">
-        <path class="cloud1" d="M 120,100 A 20,20 0 0,1 150,85 A 30,30 0 0,1 200,80 A 20,20 0 0,1 230,100 Z" fill="${skyState.clouds}" filter="url(#cloud-blur)" />
-        <path class="cloud2" d="M 450,110 A 16,16 0 0,1 475,98 A 24,24 0 0,1 515,94 A 16,16 0 0,1 539,110 Z" fill="${skyState.clouds}" filter="url(#cloud-blur)" />
-        <path class="cloud3" d="M 700,95 A 18,18 0 0,1 727,82 A 26,26 0 0,1 770,78 A 18,18 0 0,1 797,95 Z" fill="${skyState.clouds}" filter="url(#cloud-blur)" />
-      </g>
+        <!-- Cloud layers -->
+        ${renderHDCloud('cloud1', 72,  36,  0.65, cloudColor, cloudOpacity * 0.75)}
+        ${renderHDCloud('cloud2', 432, 84,  0.85, cloudColor, cloudOpacity * 0.85)}
+        ${renderHDCloud('cloud3', 744, 132, 1.0,  cloudColor, cloudOpacity)}
+        ${weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' ? svg`
+          ${renderHDCloud('cloud2', 240, 60,  0.75, cloudColor, cloudOpacity * 0.8)}
+          ${renderHDCloud('cloud1', 588, 108, 0.9,  cloudColor, cloudOpacity * 0.8)}
+        ` : ''}
 
-      <!-- SVG Sky Clock -->
-      <g transform="translate(480, 50)" text-anchor="middle" style="pointer-events: none;">
-        <text x="0" y="0" fill="#ffffff" font-size="26px" font-weight="700" font-family="monospace" opacity="0.9" style="filter: drop-shadow(0 0 8px rgba(255,255,255,0.45)); letter-spacing: 1px;">
-          ${timeString}
-        </text>
-        <text x="0" y="18" fill="rgba(255,255,255,0.5)" font-size="10px" font-weight="600" style="letter-spacing: 0.12em;">
-          ${timeOfDayLabel.toUpperCase()}
-        </text>
-      </g>
+        <!-- Lightning bolt -->
+        ${weather === 'lightning' ? svg`
+          <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
+        ` : ''}
 
-      <!-- Ground & Grid -->
-      <rect x="0" y="${Y_GROUND}" width="630" height="140" class="groundBackground" fill="url(#garden-grad)" />
-      <rect x="630" y="${Y_GROUND}" width="330" height="140" class="groundBackground" fill="url(#driveway-grad)" />
-      <line x1="630" y1="${Y_GROUND}" x2="630" y2="${Y_GROUND + 140}" stroke="#1e293b" stroke-width="2" opacity="0.6" />
-      <line x1="0" y1="${Y_GROUND}" x2="960" y2="${Y_GROUND}" class="horizonLine" />
-      ${gridLinesX}
-      ${gridLinesY}
+        <!-- Falling precipitation -->
+        ${weather === 'rainy' ? renderRain() : ''}
+        ${weather === 'snowy' ? renderSnow() : ''}
 
-      <!-- Grid Tower -->
-      <g stroke="#475569" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 70,480 L 105,290 L 85,160 L 95,120" />
-        <path d="M 170,480 L 135,290 L 155,160 L 145,120" />
-        <line x1="79" y1="380" x2="161" y2="380" />
-        <line x1="105" y1="290" x2="135" y2="290" />
-        <line x1="95" y1="220" x2="145" y2="220" />
-        <line x1="85" y1="160" x2="155" y2="160" />
-        <line x1="95" y1="120" x2="145" y2="120" />
-        <line x1="105" y1="100" x2="135" y2="100" />
-        <line x1="70" y1="480" x2="161" y2="380" />
-        <line x1="170" y1="480" x2="79" y2="380" />
-        <line x1="79" y1="380" x2="135" y2="290" />
-        <line x1="161" y1="380" x2="105" y2="290" />
-        <line x1="105" y1="290" x2="145" y2="220" />
-        <line x1="135" y1="290" x2="95" y2="220" />
-        <line x1="95" y1="220" x2="155" y2="160" />
-        <line x1="145" y1="220" x2="85" y2="160" />
-        <line x1="85" y1="160" x2="145" y2="120" />
-        <line x1="155" y1="160" x2="95" y2="120" />
-        <line x1="95" y1="120" x2="135" y2="100" />
-        <line x1="145" y1="120" x2="105" y2="100" />
-        <line x1="40" y1="160" x2="200" y2="160" />
-        <line x1="40" y1="160" x2="95" y2="220" />
-        <line x1="200" y1="160" x2="145" y2="220" />
-        <line x1="80" y1="100" x2="160" y2="100" />
-        <line x1="80" y1="100" x2="95" y2="120" />
-        <line x1="160" y1="100" x2="145" y2="120" />
-        <line x1="50" y1="160" x2="50" y2="175" stroke="#94a3b8" stroke-width="2.5" />
-        <circle cx="50" cy="178" r="2" fill="#94a3b8" />
-        <line x1="85" y1="160" x2="85" y2="175" stroke="#94a3b8" stroke-width="2.5" />
-        <circle cx="85" cy="178" r="2" fill="#94a3b8" />
-        <line x1="155" y1="160" x2="155" y2="175" stroke="#94a3b8" stroke-width="2.5" />
-        <circle cx="155" cy="178" r="2" fill="#94a3b8" />
-        <line x1="190" y1="160" x2="190" y2="175" stroke="#94a3b8" stroke-width="2.5" />
-        <circle cx="190" cy="178" r="2" fill="#94a3b8" />
-      </g>
-      <path d="M 50,178 Q 20,185 -10,188" stroke="#475569" stroke-width="1.2" fill="none" opacity="0.6" />
-      <path d="M 190,178 Q 220,185 240,188" stroke="#475569" stroke-width="1.2" fill="none" opacity="0.4" />
+        <!-- Fog overlay -->
+        ${weather === 'foggy' ? svg`
+          <rect width="960" height="590" fill="rgba(226, 232, 240, 0.22)" style="filter: blur(5px); pointer-events: none;" />
+        ` : ''}
 
-      <!-- EV (Conditional) -->
-      ${showEV ? svg`
-        <g id="garage-ev-car" opacity="${evActive ? 1.0 : 0.35}" style="transition: opacity 0.6s ease;">
-          <ellipse cx="755" cy="${Y_GROUND - 2}" rx="70" ry="6" fill="rgba(0,0,0,0.5)" opacity="0.8" />
-          <path
-            d="M 690,470 L 690,452 L 715,452 L 735,422 L 785,422 L 805,445 L 825,445 L 830,452 L 830,470 Z"
-            fill="url(#car-body-grad)"
-            stroke="rgba(255,255,255,0.2)"
-            stroke-width="1"
-          />
-          <polygon points="740,425 762,425 762,442 735,442" fill="#0f172a" opacity="0.8" />
-          <polygon points="766,425 782,425 800,442 766,442" fill="#0f172a" opacity="0.8" />
-          <circle cx="720" cy="465" r="15" fill="#111827" stroke="#4b5563" stroke-width="2.5" />
-          <circle cx="790" cy="465" r="15" fill="#111827" stroke="#4b5563" stroke-width="2.5" />
-          <circle cx="828" cy="455" r="2.5" fill="${evActive ? '#00f5ff' : '#64748b'}" style="filter: ${evActive ? 'drop-shadow(0 0 3px #00f5ff)' : 'none'}; transition: fill 0.5s ease;" />
-          <rect x="690" y="455" width="4" height="6" fill="${evActive ? '#ef4444' : '#475569'}" style="transition: fill 0.5s ease;" />
-        </g>
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- SCENE: Ground, Mast, House, Battery, Charger, EV               -->
+        <!-- All Card-2 coordinates scaled ×1.2 via SVG transform group     -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <g transform="scale(1.2)">
 
-        <g id="module-charger">
-          <rect x="660" y="420" width="8" height="60" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
-          <line x1="664" y1="420" x2="664" y2="480" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" />
-          <rect x="655" y="405" width="18" height="20" fill="#334155" stroke="#1e293b" stroke-width="1" rx="3" />
-          <circle
-            cx="664"
-            cy="415"
-            r="3"
-            fill="${evActive ? '#a855f7' : '#10b981'}"
-            style="filter: ${evActive ? 'drop-shadow(0 0 5px #a855f7)' : 'none'}; transition: fill 0.5s ease;"
-          />
-          <path
-            d="M 664,420 C 664,445 675,452 690,452"
-            fill="none"
-            stroke="#0f172a"
-            stroke-width="2.5"
-            stroke-linecap="round"
-          />
-          ${evActive ? svg`
-            <path
-              d="M 664,420 C 664,445 675,452 690,452"
-              fill="none"
-              stroke="#c084fc"
-              stroke-width="1.2"
-              stroke-dasharray="4,4"
-              stroke-linecap="round"
-              class="chargingPulse"
-            />
-          ` : ''}
-        </g>
-      ` : ''}
+          <!-- Ground (full width) -->
+          <rect x="0" y="480" width="800" height="120" fill="#0f3f26" />
+          <!-- Driveway -->
+          <rect x="490" y="480" width="310" height="20" fill="#334155" />
 
-      <!-- Dynamic House Component based on selected style -->
-      <g id="house-structure">
-        ${houseStyle === 'modern-villa' ? svg`
-          <!-- Villa -->
-          <rect x="320" y="455" width="260" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
-          <line x1="320" y1="467" x2="580" y2="467" stroke="#1a202c" stroke-width="0.5" opacity="0.4" />
-          <rect x="320" y="300" width="80" height="155" fill="#c2410c" stroke="#78350f" stroke-width="0.8" />
-          ${Array.from({ length: 7 }).map((_, i) => svg`<line x1="${330 + i * 10}" y1="300" x2="${330 + i * 10}" y2="455" stroke="#451a03" stroke-width="0.8" opacity="0.35" />`)}
-          <rect x="400" y="300" width="180" height="155" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8" />
-          ${[330, 360, 390, 420].map(y => svg`<line x1="400" y1="${y}" x2="580" y2="${y}" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />`)}
+          <!-- High-Voltage Electricity Mast -->
+          <g id="electricity-mast" transform="translate(-15, -22) scale(0.9)" class="interactiveGroup gridGroup" @click=${() => onNodeClick('grid')}>
+            <rect x="63" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
+            <rect x="163" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
 
-          <!-- Door -->
-          <g id="house-door">
-            <rect x="345" y="380" width="35" height="75" fill="#78350f" stroke="#451a03" stroke-width="1.5" rx="1.5" />
-            <line x1="372" y1="410" x2="372" y2="430" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-            <rect x="352" y="390" width="6" height="55" fill="${showLights ? '#fde047' : '#1e293b'}" stroke="#451a03" stroke-width="0.8" style="fill: ${showLights ? `rgba(253, 224, 71, ${skyState.lights})` : '#1e293b'}; filter: ${showLights ? `drop-shadow(0 0 4px rgba(253, 224, 71, ${skyState.lights}))` : 'none'}; transition: fill 0.5s ease;" />
-            <rect x="340" y="375" width="45" height="5" fill="#334155" stroke="#1e293b" stroke-width="0.8" rx="1" />
+            <!-- Sagging HV transmission lines -->
+            <path d="M -80,210 Q -15,230 50,250" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
+            <path d="M -80,215 Q 0,235 85,250" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
+            <path d="M -80,210 Q 30,230 155,250" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
+            <path d="M -80,215 Q 50,235 190,250" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
+            <path d="M -80,130 Q 20,150 120,170" fill="none" stroke="#475569" stroke-width="1.0" opacity="0.5" />
+
+            <g stroke="#475569" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M 70,480 L 105,290 L 85,160 L 95,120" />
+              <path d="M 170,480 L 135,290 L 155,160 L 145,120" />
+              <line x1="79" y1="380" x2="161" y2="380" />
+              <line x1="105" y1="290" x2="135" y2="290" />
+              <line x1="95" y1="220" x2="145" y2="220" />
+              <line x1="85" y1="160" x2="155" y2="160" />
+              <line x1="95" y1="120" x2="145" y2="120" />
+              <line x1="105" y1="100" x2="135" y2="100" />
+              <line x1="70" y1="480" x2="161" y2="380" />
+              <line x1="170" y1="480" x2="79" y2="380" />
+              <line x1="79" y1="380" x2="135" y2="290" />
+              <line x1="161" y1="380" x2="105" y2="290" />
+              <line x1="105" y1="290" x2="145" y2="220" />
+              <line x1="135" y1="290" x2="95" y2="220" />
+              <line x1="95" y1="220" x2="155" y2="160" />
+              <line x1="145" y1="220" x2="85" y2="160" />
+              <line x1="85" y1="160" x2="145" y2="120" />
+              <line x1="155" y1="160" x2="95" y2="120" />
+              <line x1="95" y1="120" x2="135" y2="100" />
+              <line x1="145" y1="120" x2="105" y2="100" />
+              <line x1="40" y1="160" x2="200" y2="160" />
+              <line x1="40" y1="160" x2="95" y2="220" />
+              <line x1="200" y1="160" x2="145" y2="220" />
+              <line x1="80" y1="100" x2="160" y2="100" />
+              <line x1="80" y1="100" x2="95" y2="120" />
+              <line x1="160" y1="100" x2="145" y2="120" />
+
+              <!-- Insulator strings -->
+              <path d="M 50,160 L 50,180" stroke="#64748b" stroke-width="1.5" />
+              <ellipse cx="50" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="50" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="50" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+
+              <path d="M 85,160 L 85,180" stroke="#64748b" stroke-width="1.5" />
+              <ellipse cx="85" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="85" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="85" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+
+              <path d="M 155,160 L 155,180" stroke="#64748b" stroke-width="1.5" />
+              <ellipse cx="155" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="155" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="155" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+
+              <path d="M 190,160 L 190,180" stroke="#64748b" stroke-width="1.5" />
+              <ellipse cx="190" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="190" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+              <ellipse cx="190" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+            </g>
           </g>
 
-          <!-- Roof -->
-          <polygon points="300,300 450,200 600,300" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" />
-          <line x1="300" y1="300" x2="450" y2="200" stroke="#0f172a" stroke-width="3.5" />
-          <line x1="600" y1="300" x2="450" y2="200" stroke="#0f172a" stroke-width="3.5" />
-          <rect x="295" y="297" width="310" height="6" fill="#64748b" rx="2" />
-          <path d="M 595,303 L 595,455 L 598,458" stroke="#64748b" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <!-- Transformer/Distribution Box -->
+          <g id="grid-transformer-box">
+            <rect x="77" y="435" width="32" height="45" fill="#334155" stroke="#1e293b" stroke-width="1.8" rx="3" />
+            <line x1="93" y1="435" x2="93" y2="480" stroke="#1e293b" stroke-width="1" />
+            <circle cx="85" cy="460" r="1.5" fill="#1e293b" />
+            <rect x="83" y="445" width="20" height="12" fill="#fef08a" stroke="#ca8a04" stroke-width="0.8" rx="1" />
+            <polygon points="92,447 96,447 93,451 97,451 91,455 94,451 91,451" fill="#ca8a04" />
+          </g>
 
-          <!-- Solar Panels (Conditional) -->
+          <!-- ── LEFT WING ── -->
+          <g id="left-wing" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
+            <rect x="180" y="370" width="140" height="110" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+            <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
+            <!-- Roof trim left edge -->
+            <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+            <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+            <!-- Roof trim top edge -->
+            <line x1="205" y1="330" x2="320" y2="330" stroke="#0f172a" stroke-width="8" />
+            <line x1="205" y1="330" x2="320" y2="330" stroke="#1e293b" stroke-width="4" />
+            <!-- Window -->
+            <rect x="230" y="390" width="40" height="45"
+              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
+              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+            <line x1="250" y1="390" x2="250" y2="435" stroke="#0f172a" stroke-width="1.2" />
+            <line x1="230" y1="412.5" x2="270" y2="412.5" stroke="#0f172a" stroke-width="1.2" />
+          </g>
+
+          <!-- ── RIGHT WING ── -->
+          <g id="right-wing" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
+            <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+            <!-- Roof trim left slope -->
+            <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+            <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+            <!-- Roof trim right slope -->
+            <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+            <line x1="692" y1="354" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+            <!-- Downstairs windows (2) -->
+            <rect x="465" y="385" width="40" height="45"
+              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
+              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+            <line x1="485" y1="385" x2="485" y2="430" stroke="#0f172a" stroke-width="1.2" />
+            <line x1="465" y1="407.5" x2="505" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+
+            <rect x="555" y="385" width="40" height="45"
+              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
+              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+            <line x1="575" y1="385" x2="575" y2="430" stroke="#0f172a" stroke-width="1.2" />
+            <line x1="555" y1="407.5" x2="595" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+
+            <!-- Upstairs window -->
+            <rect x="480" y="280" width="40" height="40"
+              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
+              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+            <line x1="500" y1="280" x2="500" y2="320" stroke="#0f172a" stroke-width="1.2" />
+            <line x1="480" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="1.2" />
+          </g>
+
+          <!-- ── CENTER ENTRANCE GABLE ── -->
+          <g id="center-portal" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
+            <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+            <!-- Roof trim -->
+            <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+            <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+            <line x1="452" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+            <line x1="452" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+            <!-- Front door – very dark green -->
+            <rect x="360" y="395" width="40" height="85" fill="#052e16" stroke="#021b0d" stroke-width="2" />
+            <circle cx="390" cy="435" r="2" fill="#fbbf24" />
+          </g>
+
+          <!-- ── SOLAR PANELS (conditional) ── -->
           ${showSolar ? svg`
-            <g transform="translate(450, 200) rotate(33.7)">
-              <rect x="15" y="-12" width="130" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-              <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="15" y1="-7" x2="145" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+            <g id="solar-panels" class="interactiveGroup solarGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('solar'); }}>
+              <g transform="translate(320, 340) rotate(-49.4)">
+                <!-- Mounting rods -->
+                <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
+                <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
+                <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#0f172a" stroke-width="2" />
+                <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#475569" stroke-width="1.2" />
+                <line x1="125" y1="-7" x2="125" y2="0" stroke="#0f172a" stroke-width="2" />
+                <line x1="125" y1="-7" x2="125" y2="0" stroke="#475569" stroke-width="1.2" />
+                <line x1="175" y1="-7" x2="175" y2="0" stroke="#0f172a" stroke-width="2" />
+                <line x1="175" y1="-7" x2="175" y2="0" stroke="#475569" stroke-width="1.2" />
+                <line x1="225" y1="-7" x2="225" y2="0" stroke="#0f172a" stroke-width="2" />
+                <line x1="225" y1="-7" x2="225" y2="0" stroke="#475569" stroke-width="1.2" />
+                <!-- Panel body -->
+                <rect x="10" y="-13" width="235" height="6" fill="url(#solar-panel-grad)" stroke="#1e40af" stroke-width="1.2" rx="1.5" />
+                <!-- Grid lines -->
+                <line x1="10"    y1="-10" x2="245"   y2="-10" stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="33.5"  y1="-13" x2="33.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="57"    y1="-13" x2="57"    y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="80.5"  y1="-13" x2="80.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="104"   y1="-13" x2="104"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="127.5" y1="-13" x2="127.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="151"   y1="-13" x2="151"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="174.5" y1="-13" x2="174.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="198"   y1="-13" x2="198"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                <line x1="221.5" y1="-13" x2="221.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+              </g>
             </g>
           ` : ''}
 
-          <!-- Windows -->
-          <rect x="410" y="380" width="130" height="70" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #334155; stroke-width: 2.5; filter: ${showLights ? `drop-shadow(0 0 ${16 * skyState.lights}px rgba(253, 224, 71, ${0.6 * skyState.lights}))` : 'none'};" rx="3" />
-          <line x1="475" y1="380" x2="475" y2="450" stroke="#0f172a" stroke-width="1.5" />
-          <line x1="410" y1="415" x2="540" y2="415" stroke="#0f172a" stroke-width="1.2" />
-          <rect x="440" y="310" width="70" height="45" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #334155; stroke-width: 2.0;" rx="2" />
-          <line x1="475" y1="310" x2="475" y2="355" stroke="#0f172a" stroke-width="1.2" />
-          <line x1="440" y1="332.5" x2="510" y2="332.5" stroke="#0f172a" stroke-width="1" />
-          <circle cx="450" cy="255" r="13" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #334155; stroke-width: 2.0;" />
-          <line x1="450" y1="242" x2="450" y2="268" stroke="#0f172a" stroke-width="1" />
-          <line x1="437" y1="255" x2="463" y2="255" stroke="#0f172a" stroke-width="1" />
-        ` : ''}
-
-        ${houseStyle === 'classic-jaren30' ? svg`
-          <!-- Jaren 30 -->
-          <rect x="320" y="455" width="260" height="25" fill="#3e2723" stroke="#1b0000" stroke-width="0.8" />
-          <rect x="320" y="300" width="260" height="155" fill="#c2410c" stroke="#7c2d12" stroke-width="0.8" />
-          <rect x="320" y="362" width="260" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" />
-          ${Array.from({ length: 22 }).map((_, i) => svg`<line x1="320" y1="${300 + i * 7}" x2="580" y2="${300 + i * 7}" stroke="#7c2d12" stroke-width="0.5" opacity="0.3" />`)}
-
-          <!-- Door -->
-          <g id="house-door">
-            <path d="M 345,455 L 345,395 A 17.5,17.5 0 0,1 380,395 L 380,455 Z" fill="#064e3b" stroke="#022c22" stroke-width="2" />
-            <circle cx="373" cy="425" r="2.2" fill="#fbbf24" />
-            <path d="M 345,395 A 17.5,17.5 0 0,1 380,395 Z" fill="${showLights ? 'rgba(253, 224, 71, 0.75)' : '#1e293b'}" stroke="#f8fafc" stroke-width="1" />
+          <!-- ── INVERTER (Omvormer) ── -->
+          <g id="inverter">
+            <rect x="373" y="295" width="14" height="18" fill="#1e293b" stroke="#475569" stroke-width="1" rx="1.5" />
+            <rect x="376" y="306" width="8" height="4" fill="#0f172a" rx="0.5" />
+            <circle cx="380" cy="301" r="1.5" fill="#f59e0b" />
           </g>
 
-          <!-- Roof -->
-          <polygon points="295,300 450,150 605,300" fill="#991b1b" stroke="#450a0a" stroke-width="1.5" />
-          <line x1="295" y1="300" x2="450" y2="150" stroke="#f8fafc" stroke-width="3.5" />
-          <line x1="605" y1="300" x2="450" y2="150" stroke="#f8fafc" stroke-width="3.5" />
-          <rect x="290" y="297" width="320" height="7" fill="#f8fafc" rx="2" stroke="#cbd5e1" stroke-width="0.8" />
-          <path d="M 605,304 L 605,455 L 608,458" stroke="#cbd5e1" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <!-- ── METERKAST (fuse box) ── -->
+          <rect x="${mkX - 5}" y="${mkY - 10}" width="10" height="20" fill="#1e293b" rx="1" />
+          <circle cx="${mkX}" cy="${mkY}" r="2.5" fill="#10b981" />
 
-          <!-- Solar Panels (Conditional) -->
-          ${showSolar ? svg`
-            <g transform="translate(450, 150) rotate(44.0)">
-              <rect x="15" y="-12" width="140" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-              <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="15" y1="-7" x2="145" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+          <!-- ── BATTERY (conditional) ── -->
+          ${showBattery ? svg`
+            <g id="house-battery" class="interactiveGroup batteryGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('battery'); }}>
+              <rect x="280" y="410" width="30" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" rx="3" />
+              <rect x="285" y="418" width="20" height="10" fill="#000" rx="1.5" />
+              <text x="295" y="426" fill="#10b981" font-size="8" font-weight="bold" text-anchor="middle">${soc}%</text>
+              <!-- SoC bar track -->
+              <rect x="294" y="435" width="2" height="40" fill="rgba(0,0,0,0.15)" rx="0.5" />
+              <!-- SoC bar fill -->
+              <rect x="294" y="${batYTop}" width="2" height="${475 - batYTop}" fill="${soc < 20 ? '#ef4444' : (batteryCharging ? '#10b981' : '#ef4444')}" rx="0.5" />
             </g>
           ` : ''}
 
-          <!-- Windows -->
-          <rect x="420" y="375" width="110" height="75" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #f8fafc; stroke-width: 3.0;" rx="1" />
-          <line x1="475" y1="375" x2="475" y2="450" stroke="#f8fafc" stroke-width="2" />
-          <line x1="420" y1="412.5" x2="530" y2="412.5" stroke="#f8fafc" stroke-width="1.5" />
-          <rect x="415" y="310" width="45" height="45" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #f8fafc; stroke-width: 2.5;" rx="1" />
-          <line x1="437.5" y1="310" x2="437.5" y2="355" stroke="#f8fafc" stroke-width="1.5" />
-          <line x1="415" y1="332.5" x2="460" y2="332.5" stroke="#f8fafc" stroke-width="1.5" />
-          <rect x="495" y="310" width="45" height="45" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #f8fafc; stroke-width: 2.5;" rx="1" />
-          <line x1="517.5" y1="310" x2="517.5" y2="355" stroke="#f8fafc" stroke-width="1.5" />
-          <line x1="495" y1="332.5" x2="540" y2="332.5" stroke="#f8fafc" stroke-width="1.5" />
-          <path d="M 437,270 L 437,252 A 13,13 0 0,1 463,252 L 463,270 Z" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #f8fafc; stroke-width: 2.0;" />
-          <line x1="450" y1="239" x2="450" y2="270" stroke="#f8fafc" stroke-width="1.2" />
-        ` : ''}
+          <!-- ── EV CHARGER (conditional) ── -->
+          ${showEV ? svg`
+            <g id="ev-charger" class="interactiveGroup evGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('ev'); }}>
+              <!-- Charging post – slightly thicker than Card-2 (width 14 instead of 10) -->
+              <rect x="448" y="425" width="14" height="55" fill="#1e293b" rx="2" />
+              <rect x="443" y="415" width="24" height="20" fill="#334155" stroke="#1e293b" stroke-width="1" rx="3" />
+              <circle cx="455" cy="425" r="4"
+                fill="${evActive ? '#a855f7' : '#10b981'}"
+                style="filter: ${evActive ? 'drop-shadow(0 0 6px #a855f7)' : 'none'}; transition: fill 0.5s ease;" />
+              <!-- Charging cable -->
+              <path d="M 455,440 C 460,460 475,470 495,465" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="4,3" />
+            </g>
 
-        ${houseStyle === 'barnhouse' ? svg`
-          <!-- Barnhouse -->
-          <rect x="320" y="455" width="260" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
-          <rect x="320" y="280" width="260" height="175" fill="#172554" stroke="#0f172a" stroke-width="1" />
-          ${Array.from({ length: 22 }).map((_, i) => svg`<line x1="${326 + i * 11}" y1="280" x2="${326 + i * 11}" y2="455" stroke="#020617" stroke-width="0.8" opacity="0.45" />`)}
-
-          <!-- Door -->
-          <g id="house-door">
-            <rect x="345" y="380" width="35" height="75" fill="#451a03" stroke="#020617" stroke-width="1.5" />
-            <line x1="352" y1="395" x2="352" y2="435" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
-          </g>
-
-          <!-- Roof -->
-          <polygon points="290,280 450,150 610,280" fill="#0f172a" stroke="#020617" stroke-width="2" />
-          <line x1="290" y1="280" x2="450" y2="150" stroke="#334155" stroke-width="2.5" />
-          <line x1="610" y1="280" x2="450" y2="150" stroke="#334155" stroke-width="2.5" />
-
-          <!-- Solar Panels (Conditional) -->
-          ${showSolar ? svg`
-            <g transform="translate(450, 150) rotate(39.0)">
-              <rect x="15" y="-12" width="135" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-              <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="15" y1="-7" x2="145" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+            <!-- EV Car (drawn SVG to avoid image dependency) -->
+            <g id="ev-car" class="interactiveGroup evGroup" opacity="${evActive ? 1.0 : 0.4}" style="transition: opacity 0.6s ease;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('ev'); }}>
+              <g transform="translate(490, 430)">
+                <!-- Car shadow -->
+                <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
+                <!-- Car body -->
+                <path d="M 0,44 C 0,44 4,28 18,28 C 32,28 50,8 75,6 C 100,4 118,16 132,28 C 148,40 158,44 160,44 L 158,52 L 2,52 Z"
+                  fill="#475569" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                <!-- Windows -->
+                <path d="M 32,28 C 44,14 68,10 86,10 C 102,10 114,22 120,27 L 116,37 L 28,37 Z" fill="#0f172a" opacity="0.85" />
+                <path d="M 38,29 L 68,29 L 68,36 L 34,36 Z" fill="rgba(255,255,255,0.12)" />
+                <path d="M 72,29 L 106,29 L 112,36 L 72,36 Z" fill="rgba(255,255,255,0.12)" />
+                <!-- Headlight -->
+                <path d="M 0,44 C 4,44 7,46 9,48 L 0,50 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
+                <!-- Taillight -->
+                <path d="M 160,44 C 157,44 156,46 155,48 L 160,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
+                <!-- Front wheel -->
+                <circle cx="32" cy="50" r="16" fill="#090d16" />
+                <circle cx="32" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                ${Array.from({ length: 6 }).map((_, idx) => {
+                  const angle = (idx * Math.PI) / 3;
+                  return svg`<line x1="32" y1="50" x2="${32 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                })}
+                <!-- Rear wheel -->
+                <circle cx="118" cy="50" r="16" fill="#090d16" />
+                <circle cx="118" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                ${Array.from({ length: 6 }).map((_, idx) => {
+                  const angle = (idx * Math.PI) / 3;
+                  return svg`<line x1="118" y1="50" x2="${118 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                })}
+              </g>
             </g>
           ` : ''}
 
-          <!-- Window Facade -->
-          <rect x="420" y="270" width="120" height="180" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #0f172a; stroke-width: 3.0;" rx="2" />
-          <polygon points="420,270 450,220 480,270" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #0f172a; stroke-width: 2.0;" />
-          <line x1="450" y1="220" x2="450" y2="450" stroke="#0f172a" stroke-width="2" />
-          <line x1="420" y1="330" x2="540" y2="330" stroke="#0f172a" stroke-width="1.5" />
-          <line x1="420" y1="390" x2="540" y2="390" stroke="#0f172a" stroke-width="1.5" />
-        ` : ''}
-
-        ${houseStyle === 'cubist-bungalow' ? svg`
-          <!-- Cubist Bungalow -->
-          <rect x="320" y="455" width="260" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
-          <rect x="320" y="320" width="100" height="135" fill="#64748b" stroke="#475569" stroke-width="1" />
-          <line x1="320" y1="380" x2="420" y2="380" stroke="#475569" stroke-width="0.8" opacity="0.5" />
-          <rect x="420" y="270" width="160" height="185" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
-          <rect x="315" y="315" width="110" height="6" fill="#334155" rx="1.5" />
-          <rect x="415" y="265" width="170" height="6" fill="#1e293b" rx="1.5" />
-
-          <!-- Door -->
-          <g id="house-door">
-            <rect x="345" y="380" width="35" height="75" fill="#3b2314" stroke="#1c1009" stroke-width="1.5" />
-            <line x1="372" y1="410" x2="372" y2="430" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-          </g>
-
-          <!-- Solar Panels (Conditional) -->
-          ${showSolar ? svg`
-            <g transform="translate(440, 250)">
-              <rect x="0" y="0" width="120" height="8" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.2" rx="1" transform="skewX(-15)" />
-              <line x1="30" y1="0" x2="30" y2="8" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="60" y1="0" x2="60" y2="8" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="90" y1="0" x2="90" y2="8" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-            </g>
-          ` : ''}
-
-          <!-- Windows -->
-          <rect x="440" y="360" width="120" height="80" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #0f172a; stroke-width: 2.5;" rx="1" />
-          <line x1="480" y1="360" x2="480" y2="440" stroke="#0f172a" stroke-width="1.5" />
-          <line x1="520" y1="360" x2="520" y2="440" stroke="#0f172a" stroke-width="1.5" />
-          <rect x="440" y="290" width="120" height="50" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #0f172a; stroke-width: 2.0;" rx="1" />
-          <line x1="500" y1="290" x2="500" y2="340" stroke="#0f172a" stroke-width="1.5" />
-        ` : ''}
-
-        ${houseStyle === 'townhouse' ? svg`
-          <!-- Townhouse -->
-          <rect x="320" y="455" width="260" height="25" fill="#292524" stroke="#1c1917" stroke-width="0.8" />
-          <polygon points="320,230 450,150 580,230" fill="#292524" stroke="#1c1917" stroke-width="1.2" opacity="0.8" />
-          <polygon points="320,230 350,230 350,200 380,200 380,170 410,170 410,140 490,140 490,170 520,170 520,200 550,200 550,230 580,230" fill="#44403c" stroke="#1c1917" stroke-width="1" />
-          <rect x="320" y="230" width="260" height="225" fill="#44403c" stroke="#1c1917" stroke-width="1" />
-          ${Array.from({ length: 32 }).map((_, i) => svg`<line x1="320" y1="${230 + i * 7}" x2="580" y2="${230 + i * 7}" stroke="#292524" stroke-width="0.5" opacity="0.35" />`)}
-
-          <!-- Door -->
-          <g id="house-door">
-            <rect x="345" y="380" width="35" height="75" fill="#7c2d12" stroke="#431407" stroke-width="1.8" rx="1" />
-            <line x1="372" y1="410" x2="372" y2="430" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-          </g>
-
-          <!-- Solar Panels (Conditional) -->
-          ${showSolar ? svg`
-            <g transform="translate(450, 150) rotate(31.6)">
-              <rect x="15" y="-12" width="120" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-              <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              <line x1="15" y1="-7" x2="145" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-            </g>
-          ` : ''}
-
-          <!-- Windows -->
-          <rect x="410" y="375" width="130" height="80" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #f8fafc; stroke-width: 2.5;" rx="1" />
-          <line x1="475" y1="375" x2="475" y2="455" stroke="#f8fafc" stroke-width="1.8" />
-          <line x1="410" y1="415" x2="540" y2="415" stroke="#f8fafc" stroke-width="1.2" />
-
-          ${[345, 430, 515].map(x => svg`
-            <rect x="${x}" y="290" width="35" height="60" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #f8fafc; stroke-width: 2.0;" rx="1" />
-            <line x1="${x + 17.5}" y1="290" x2="${x + 17.5}" y2="350" stroke="#f8fafc" stroke-width="1.2" />
-            <line x1="${x}" y1="320" x2="${x + 35}" y2="320" stroke="#f8fafc" stroke-width="1" />
-          `)}
-
-          ${[390, 480].map(x => svg`
-            <rect x="${x}" y="210" width="30" height="45" class="houseWindow" style="fill: ${showLights ? interpolateColor('#0f172a', '#fef08a', skyState.lights) : '#0f172a'}; stroke: #f8fafc; stroke-width: 1.8;" rx="1" />
-            <line x1="${x + 15}" y1="210" x2="${x + 15}" y2="255" stroke="#f8fafc" stroke-width="1" />
-          `)}
-        ` : ''}
-      </g>
-
-      <!-- Inverter / Meterkast -->
-      <g id="house-inverter">
-        <rect x="315" y="420" width="10" height="25" fill="#1e293b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" rx="1" />
-        <circle cx="320" cy="432.5" r="2.5" fill="${inverterLedColor}" style="transition: fill 0.6s ease;" />
-        ${inverterActive ? svg`<circle cx="320" cy="432.5" r="2.5" fill="none" stroke="${inverterLedColor}" stroke-width="1.5" class="inverterRing" />` : ''}
-      </g>
-
-      <!-- Tesla Powerwall Battery Cabinet (Conditional) -->
-      ${showBattery ? svg`
-        <g id="house-battery">
-          <rect x="530" y="410" width="35" height="70" fill="url(#battery-body-grad)" stroke="#cbd5e1" stroke-width="1" rx="4" />
-          <rect x="530" y="410" width="35" height="70" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" rx="4" />
-          <rect x="535" y="418" width="25" height="12" fill="rgba(0,0,0,0.72)" rx="1.5" />
-          <text x="547.5" y="427" text-anchor="middle" fill="${batteryActiveColor}" font-size="8.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
-            ${soc}%
-          </text>
-          <rect x="546.5" y="436" width="2" height="36" fill="rgba(0,0,0,0.4)" rx="0.5" />
-          <rect x="546.5" y="${batYTop}" width="2" height="${472 - batYTop}" fill="${batteryActiveColor}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="0.5" />
         </g>
-      ` : ''}
+        <!-- End of scale(1.2) group -->
 
-      <!-- Flow Lines Cables (Conditional) -->
-      ${showSolar ? renderCable(solarPath, solarActive, getFlowSpeed(solar)) : ''}
-      ${renderCable(gridPath, gridImporting || gridExporting, getFlowSpeed(grid), gridExporting)}
-      ${showBattery ? renderCable(batteryPath, batteryCharging || batteryDischarging, getFlowSpeed(batteryPower), batteryDischarging) : ''}
-      ${showEV ? renderCable(evPath, evActive, getFlowSpeed(charger)) : ''}
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- FLOW CABLES: drawn at full 960px scale using scaled coordinates -->
+        <!-- Multiply Card-2 cable coords by 1.2 to match scaled scene      -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        ${showSolar ? renderCable(
+          `M ${invX * 1.2},${invY * 1.2} L ${invX * 1.2},408 L ${mkX * 1.2},408 L ${mkX * 1.2},${mkY * 1.2}`,
+          solarActive, getFlowSpeed(solar), COLORS.solar.stroke, COLORS.solar.glow
+        ) : ''}
 
-      <!-- Dynamic Bottom HUD Cards & Indicator lines -->
-      ${activeCards.map((card, index) => {
-        const x = gap + index * (cardWidth + gap);
-        const xCenter = x + 75;
-        const linePath = card.line.replace('{{X_CENTER}}', xCenter.toString());
+        ${renderCable(
+          `M ${112 * 1.2},${468 * 1.2} L ${112 * 1.2},${530 * 1.2} L ${mkX * 1.2},${530 * 1.2} L ${mkX * 1.2},${mkY * 1.2}`,
+          gridImporting || gridExporting, getFlowSpeed(grid), gridColor.stroke, gridColor.glow, gridExporting
+        )}
 
-        return svg`
-          <g class="interactiveGroup" @click=${() => onNodeClick(card.id)}>
-            <path
-              d="${linePath}"
-              fill="none"
-              stroke="${card.active ? card.stroke : 'rgba(255,255,255,0.12)'}"
-              stroke-width="1"
-              stroke-dasharray="3,3"
-              style="transition: stroke 0.6s ease;"
-            />
-            <g transform="translate(${x}, 550)">
-              <rect x="0" y="0" width="150" height="55" class="hudCard ${card.active ? 'hudCardActive' : ''}" style="${card.active ? `color: ${card.color}` : ''}" />
-              <text x="12" y="18" class="hudTitle">${card.title}</text>
-              <text x="12" y="35" class="hudValue ${card.active ? 'hudActiveText' : ''}" style="${card.active ? `color: ${card.color}` : ''}">
-                ${card.active ? card.value : '—'}
+        ${showBattery ? renderCable(
+          `M ${310 * 1.2},${420 * 1.2} L ${mkX * 1.2},${mkY * 1.2}`,
+          batteryCharging || batteryDischarging, getFlowSpeed(batteryPower), batColor.stroke, batColor.glow,
+          batteryCharging   // reverse when charging (particles flow toward battery)
+        ) : ''}
+
+        ${showEV ? renderCable(
+          `M ${mkX * 1.2},${mkY * 1.2} L ${mkX * 1.2},${530 * 1.2} L ${546 * 1.2},${530 * 1.2} L ${546 * 1.2},${475 * 1.2}`,
+          evActive, getFlowSpeed(charger), COLORS.ev.stroke, COLORS.ev.glow
+        ) : ''}
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- SOLAR HUD card (top right sky area)                            -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        ${showSolar ? svg`
+          <g class="interactiveGroup solarGroup" @click=${() => onNodeClick('solar')}>
+            <g transform="translate(696, 90)">
+              <rect x="0" y="0" width="200" height="65"
+                class="hudCard ${solarActive ? 'hudCardActive' : ''}"
+                rx="8" ry="8"
+                style="${solarActive ? `color: ${COLORS.solar.stroke}` : ''}" />
+              <text x="12" y="20" class="hudTitle">Zonnepanelen</text>
+              <text x="12" y="39" class="hudValue ${solarActive ? 'hudActiveText' : ''}"
+                style="${solarActive ? `color: ${COLORS.solar.stroke}` : ''}">
+                ${solarActive ? formatPowerAbs(solar) : '—'}
               </text>
-              <text x="12" y="47" class="hudSub">${card.sub}</text>
+              <text x="12" y="53" class="hudSub">
+                ${solarToday !== null ? `Vandaag: ${solarToday.toFixed(1)} kWh` : (solarActive ? 'Opwek actief' : 'Geen opwek')}
+              </text>
             </g>
           </g>
-        `;
-      })}
+        ` : ''}
 
-      <!-- Solar HUD card on roof slope (Conditional) -->
-      ${showSolar ? svg`
-        <g class="interactiveGroup" @click=${() => onNodeClick('solar')}>
-          <polygon points="450,200 600,300 560,330 430,220" fill="transparent" />
-          <path
-            d="M 580 167 L 490 235"
-            fill="none"
-            stroke="${solarActive ? COLORS.solar.stroke : 'rgba(255,255,255,0.12)'}"
-            stroke-width="1"
-            stroke-dasharray="3,3"
-            style="transition: stroke 0.6s ease;"
-          />
-          <g transform="translate(580, 140)">
-            <rect x="0" y="0" width="150" height="55" class="hudCard ${solarActive ? 'hudCardActive' : ''}" style="${solarActive ? `color: ${COLORS.solar.stroke}` : ''}" />
-            <text x="12" y="18" class="hudTitle">Zonnepanelen</text>
-            <text x="12" y="35" class="hudValue ${solarActive ? 'hudActiveText' : ''}" style="${solarActive ? `color: ${COLORS.solar.stroke}` : ''}">
-              ${solarActive ? formatPowerAbs(solar) : '—'}
-            </text>
-            <text x="12" y="47" class="hudSub">Vandaag: 14.2 kWh</text>
-          </g>
-        </g>
-      ` : ''}
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- BOTTOM HUD CARDS (grid, home, battery, ev)                     -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        ${bottomCards.map((card, index) => {
+          const x = gap + index * (cardWidth + gap);
+          return svg`
+            <g class="interactiveGroup" @click=${() => onNodeClick(card.id)}>
+              <g transform="translate(${x}, 510)">
+                <rect x="0" y="0" width="170" height="65"
+                  class="hudCard ${card.active ? 'hudCardActive' : ''}"
+                  rx="8" ry="8"
+                  style="${card.active ? `color: ${card.color}` : ''}" />
+                <text x="12" y="20" class="hudTitle">${card.title}</text>
+                <text x="12" y="39" class="hudValue ${card.active ? 'hudActiveText' : ''}"
+                  style="${card.active ? `color: ${card.color}` : ''}">
+                  ${card.active ? card.value : '—'}
+                </text>
+                <text x="12" y="53" class="hudSub">${card.sub}</text>
+              </g>
+            </g>
+          `;
+        })}
+      </g>
     </svg>
   `;
 }
