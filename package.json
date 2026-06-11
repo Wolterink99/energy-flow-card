@@ -1,7 +1,7 @@
 {
   "name": "energy-flow-card",
-  "version": "1.0.0",
-  "description": "Custom Home Assistant Lovelace card for energy flow visualization",
+  "version": "2.0.1",
+  "description": "Een premium, dynamische energieverloop kaart voor Home Assistant met een 3D-stijl geanimeerd huis en live weersomstandigheden.",
   "main": "dist/energy-flow-card.js",
   "type": "module",
   "scripts": {

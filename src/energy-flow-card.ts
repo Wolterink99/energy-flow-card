@@ -105,12 +105,36 @@ export class EnergyFlowCard extends LitElement {
     const soc = entities.battery_soc ? this.getEntityValue(entities.battery_soc) : 0;
     const charger = this.getEntityValue(entities.charger);
 
+    // Parse grid early for battery polarity auto-detection (it will be finalized later if not configured)
+    let grid = 0;
+    if (entities.grid) {
+      grid = this.getEntityValue(entities.grid);
+    }
+
     // Normalize battery sign convention:
-    // battery_invert: true  (default) → sensor positief = laden  (SolarEdge, Huawei, GoodWe)
-    // battery_invert: false           → sensor negatief = laden  (Victron, sommige SMA)
-    // Na normalisatie: batteryPower > 0 = laden, batteryPower < 0 = ontladen
-    const batteryInvert = this.config.battery_invert !== false; // default true
-    const batteryPower = batteryInvert ? rawBatteryPower : -rawBatteryPower;
+    // - battery_invert: true  -> sensor positief = laden (SolarEdge, Huawei)
+    // - battery_invert: false -> sensor negatief = laden (Victron, SMA)
+    // - Not defined: auto-detect if grid sensor is configured, otherwise default to negatief = laden (standard Home Assistant convention)
+    let batteryPower = rawBatteryPower;
+    if (this.config.battery_invert !== undefined) {
+      const batteryInvert = this.config.battery_invert === true;
+      batteryPower = batteryInvert ? rawBatteryPower : -rawBatteryPower;
+    } else if (entities.grid) {
+      // Auto-detect by calculating expected battery flow: expected = solar + grid - load - charger
+      // (grid > 0 is import, grid < 0 is export)
+      const expected = solar + grid - load - charger;
+      if (Math.abs(rawBatteryPower) > 0.05 && Math.abs(expected) > 0.15) {
+        if (expected * rawBatteryPower < 0) {
+          batteryPower = -rawBatteryPower;
+        } else {
+          batteryPower = rawBatteryPower;
+        }
+      } else {
+        batteryPower = -rawBatteryPower;
+      }
+    } else {
+      batteryPower = -rawBatteryPower;
+    }
 
     // Helper to parse daily energy sensor states
     const parseEntityFloat = (entId?: string): number | null => {
@@ -150,13 +174,7 @@ export class EnergyFlowCard extends LitElement {
       }
     }
 
-    // Grid import/export: gebruik sensor als geconfigureerd, anders berekend.
-    // Na normalisatie: batteryPower > 0 = laden, < 0 = ontladen
-    // grid > 0 = import (afname), grid < 0 = export (teruglevering)
-    let grid = 0;
-    if (entities.grid) {
-      grid = this.getEntityValue(entities.grid);
-    } else {
+    if (!entities.grid) {
       // grid = huisverbruik + laadpaal - opwek - acculaden + accuontladen
       grid = load + charger - solar - batteryPower;
     }
