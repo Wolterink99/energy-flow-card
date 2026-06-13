@@ -389,10 +389,10 @@ export function renderHouseSvg({
 
   // Calculate pylon tips for the perspective pylons group
   const p1Tips = getPylonTips(mastX, -22, 0.9);
-  const p2Tips = getPylonTips(mastX + 145.6, 92.4, 0.62);
-  const p3Tips = getPylonTips(mastX + 249.6, 173.4, 0.42);
-  const p4Tips = getPylonTips(mastX + 316.4, 229.6, 0.28);
-  const p5Tips = getPylonTips(mastX + 358.4, 270.6, 0.18);
+  const p2Tips = getPylonTips(mastX + 145.6, 112.4, 0.62);
+  const p3Tips = getPylonTips(mastX + 249.6, 208.4, 0.42);
+  const p4Tips = getPylonTips(mastX + 316.4, 275.6, 0.28);
+  const p5Tips = getPylonTips(mastX + 358.4, 323.6, 0.18);
 
   // Sagging overhead wire from foreground pylon to transformer box, then underground to meterkast
   const overheadWire = drawSaggingWire(p1Tips[2], {x: 13, y: 365}, 35);
@@ -657,10 +657,10 @@ export function renderHouseSvg({
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
           <!-- Background Pylons (Right/Far) -->
-          ${renderSinglePylon(mastX + 358.4, 270.6, 0.18, 0.22, '#64748b')}
-          ${renderSinglePylon(mastX + 316.4, 229.6, 0.28, 0.38, '#5d6d82')}
-          ${renderSinglePylon(mastX + 249.6, 173.4, 0.42, 0.58, '#546479')}
-          ${renderSinglePylon(mastX + 145.6, 92.4, 0.62, 0.78, '#4c5c71')}
+          ${renderSinglePylon(mastX + 358.4, 323.6, 0.18, 0.22, '#64748b')}
+          ${renderSinglePylon(mastX + 316.4, 275.6, 0.28, 0.38, '#5d6d82')}
+          ${renderSinglePylon(mastX + 249.6, 208.4, 0.42, 0.58, '#546479')}
+          ${renderSinglePylon(mastX + 145.6, 112.4, 0.62, 0.78, '#4c5c71')}
 
           <!-- Parallax sagging power lines between pylons -->
           <!-- Segment P5 (Far) to P4 -->
