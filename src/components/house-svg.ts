@@ -978,7 +978,7 @@ export function renderHouseSvg({
             <!-- Solar panels are at design x=320, y=270 (inside translate group)
                  So SVG x = translateX+320, SVG y = translateY+270
                  Card goes LEFT of the panels at the same roof height -->
-            <g transform="translate(${translateX + 130}, ${translateY + 240})">
+            <g transform="translate(${translateX + 130}, ${translateY + 90})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${solarActive ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
@@ -1013,7 +1013,7 @@ export function renderHouseSvg({
 
         <!-- 1. Stroomnet — onder de masten (mast is altijd op SVG x=20) -->
         <g class="interactiveGroup gridGroup" @click=${() => onNodeClick('grid')}>
-          <g transform="translate(20, ${height - 155})">
+          <g transform="translate(20, ${height - 75})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${gridImporting || gridExporting ? 'hudCardActive' : ''}"
               rx="8" ry="8"
@@ -1030,7 +1030,7 @@ export function renderHouseSvg({
         <!-- 2. Thuisaccu — ruimte gereserveerd onder de accupositie (design x=280, SVG x=translateX+280) -->
         ${showBattery ? svg`
           <g class="interactiveGroup batteryGroup" @click=${() => onNodeClick('battery')}>
-            <g transform="translate(${translateX + 195}, ${height - 155})">
+            <g transform="translate(${translateX + 195}, ${height - 75})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${batteryCharging || batteryDischarging ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
@@ -1047,7 +1047,7 @@ export function renderHouseSvg({
 
         <!-- 3. Huisverbruik — onder de meterkast (mkX=345, gecentreerd: translateX+345-85=translateX+260) -->
         <g class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
-          <g transform="translate(${translateX + 260}, ${height - 155})">
+          <g transform="translate(${translateX + 260}, ${height - 75})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${homeActive ? 'hudCardActive' : ''}"
               rx="8" ry="8"
@@ -1064,7 +1064,7 @@ export function renderHouseSvg({
         <!-- 4. Laadpaal (EV) — onder de laadpaal (design x=455, gecentreerd: translateX+455-85=translateX+370) -->
         ${showEV ? svg`
           <g class="interactiveGroup evGroup" @click=${() => onNodeClick('ev')}>
-            <g transform="translate(${translateX + 370}, ${height - 155})">
+            <g transform="translate(${translateX + 370}, ${height - 75})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${evActive ? 'hudCardActive' : ''}"
                 rx="8" ry="8"

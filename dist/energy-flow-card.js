@@ -834,7 +834,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
             <!-- Solar panels are at design x=320, y=270 (inside translate group)
                  So SVG x = translateX+320, SVG y = translateY+270
                  Card goes LEFT of the panels at the same roof height -->
-            <g transform="translate(${F+130}, ${pt+240})">
+            <g transform="translate(${F+130}, ${pt+90})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${B?"hudCardActive":""}"
                 rx="8" ry="8"
@@ -869,7 +869,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
 
         <!-- 1. Stroomnet — onder de masten (mast is altijd op SVG x=20) -->
         <g class="interactiveGroup gridGroup" @click=${()=>w("grid")}>
-          <g transform="translate(20, ${S-155})">
+          <g transform="translate(20, ${S-75})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${Y||H?"hudCardActive":""}"
               rx="8" ry="8"
@@ -886,7 +886,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- 2. Thuisaccu — ruimte gereserveerd onder de accupositie (design x=280, SVG x=translateX+280) -->
         ${y?E`
           <g class="interactiveGroup batteryGroup" @click=${()=>w("battery")}>
-            <g transform="translate(${F+195}, ${S-155})">
+            <g transform="translate(${F+195}, ${S-75})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${U||K?"hudCardActive":""}"
                 rx="8" ry="8"
@@ -903,7 +903,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
 
         <!-- 3. Huisverbruik — onder de meterkast (mkX=345, gecentreerd: translateX+345-85=translateX+260) -->
         <g class="interactiveGroup homeGroup" @click=${()=>w("home")}>
-          <g transform="translate(${F+260}, ${S-155})">
+          <g transform="translate(${F+260}, ${S-75})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${R?"hudCardActive":""}"
               rx="8" ry="8"
@@ -920,7 +920,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- 4. Laadpaal (EV) — onder de laadpaal (design x=455, gecentreerd: translateX+455-85=translateX+370) -->
         ${u?E`
           <g class="interactiveGroup evGroup" @click=${()=>w("ev")}>
-            <g transform="translate(${F+370}, ${S-155})">
+            <g transform="translate(${F+370}, ${S-75})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${A?"hudCardActive":""}"
                 rx="8" ry="8"
