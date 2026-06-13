@@ -235,8 +235,8 @@ export function renderHouseSvg({
     cloudColor = 'rgba(100, 116, 139, 0.5)';
     cloudOpacity = 0.65;
   } else if (weather === 'snowy') {
-    skyTop = interpolateColor(skyState.top, '#cbd5e1', 0.4);
-    skyHorizon = interpolateColor(skyState.horizon, '#f1f5f9', 0.4);
+    skyTop = interpolateColor(skyState.top, '#475569', 0.5);
+    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.5);
     cloudColor = 'rgba(255, 255, 255, 0.6)';
     cloudOpacity = 0.70;
   } else if (weather === 'foggy') {
@@ -533,13 +533,19 @@ export function renderHouseSvg({
         ${renderHDCloud('cloud1', 72,  36,  0.65, cloudColor, cloudOpacity * 0.75)}
         ${renderHDCloud('cloud2', 432, 84,  0.85, cloudColor, cloudOpacity * 0.85)}
         ${renderHDCloud('cloud3', 744, 132, 1.0,  cloudColor, cloudOpacity)}
-        ${weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' ? svg`
+        ${weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy' ? svg`
           ${renderHDCloud('cloud2', 20, 20, 0.95, cloudColor, cloudOpacity * 0.95)}
           ${renderHDCloud('cloud1', 200, 50, 0.8, cloudColor, cloudOpacity * 0.9)}
           ${renderHDCloud('cloud3', 310, 30, 1.15, cloudColor, cloudOpacity * 0.95)}
           ${renderHDCloud('cloud2', 520, 70, 0.9, cloudColor, cloudOpacity * 0.9)}
           ${renderHDCloud('cloud1', 680, 40, 0.75, cloudColor, cloudOpacity * 0.95)}
           ${renderHDCloud('cloud3', 820, 80, 1.1, cloudColor, cloudOpacity * 0.95)}
+        ` : ''}
+        ${weather === 'rainy' || weather === 'lightning' || weather === 'snowy' ? svg`
+          ${renderHDCloud('cloud3', 100, 10, 1.3, cloudColor, cloudOpacity * 0.95)}
+          ${renderHDCloud('cloud2', 280, -10, 1.4, cloudColor, cloudOpacity * 0.95)}
+          ${renderHDCloud('cloud1', 450, 20, 1.25, cloudColor, cloudOpacity * 0.95)}
+          ${renderHDCloud('cloud3', 600, 0, 1.35, cloudColor, cloudOpacity * 0.95)}
         ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
