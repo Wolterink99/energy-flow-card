@@ -180,6 +180,64 @@ const getCloudLayerPath = (W: number, baseY: number): string => {
     L ${W},0 L 0,0 Z`;
 };
 
+const getPylonTips = (xOffset: number, yOffset: number, S: number) => {
+  return [
+    { x: xOffset + S * 50, y: yOffset + S * 180 },
+    { x: xOffset + S * 85, y: yOffset + S * 180 },
+    { x: xOffset + S * 155, y: yOffset + S * 180 },
+    { x: xOffset + S * 190, y: yOffset + S * 180 }
+  ];
+};
+
+const drawSaggingWire = (pStart: {x: number, y: number}, pEnd: {x: number, y: number}, sag: number) => {
+  const midX = (pStart.x + pEnd.x) / 2;
+  const midY = (pStart.y + pEnd.y) / 2 + sag;
+  return `M ${pStart.x},${pStart.y} Q ${midX},${midY} ${pEnd.x},${pEnd.y}`;
+};
+
+const renderSinglePylon = (x: number, y: number, scale: number, opacity: number, strokeColor: string) => {
+  return svg`
+    <g transform="translate(${x}, ${y}) scale(${scale})" opacity="${opacity}" stroke="${strokeColor}" fill="none" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+      <rect x="63" y="474" width="14" height="8" fill="#64748b" stroke="${strokeColor}" stroke-width="1.2" rx="1" />
+      <rect x="163" y="474" width="14" height="8" fill="#64748b" stroke="${strokeColor}" stroke-width="1.2" rx="1" />
+      <g stroke-width="2.8">
+        <path d="M 70,480 L 105,290 L 85,160 L 95,120" />
+        <path d="M 170,480 L 135,290 L 155,160 L 145,120" />
+        <line x1="79" y1="380" x2="161" y2="380" />
+        <line x1="105" y1="290" x2="135" y2="290" />
+        <line x1="95" y1="220" x2="145" y2="220" />
+        <line x1="85" y1="160" x2="155" y2="160" />
+        <line x1="95" y1="120" x2="145" y2="120" />
+        <line x1="105" y1="100" x2="135" y2="100" />
+        <line x1="70" y1="480" x2="161" y2="380" />
+        <line x1="170" y1="480" x2="79" y2="380" />
+        <line x1="79" y1="380" x2="135" y2="290" />
+        <line x1="161" y1="380" x2="105" y2="290" />
+        <line x1="105" y1="290" x2="145" y2="220" />
+        <line x1="135" y1="290" x2="95" y2="220" />
+        <line x1="95" y1="220" x2="155" y2="160" />
+        <line x1="145" y1="220" x2="85" y2="160" />
+        <line x1="85" y1="160" x2="145" y2="120" />
+        <line x1="155" y1="160" x2="95" y2="120" />
+        <line x1="95" y1="120" x2="135" y2="100" />
+        <line x1="145" y1="120" x2="105" y2="100" />
+        <line x1="40" y1="160" x2="200" y2="160" />
+        <line x1="40" y1="160" x2="95" y2="220" />
+        <line x1="200" y1="160" x2="145" y2="220" />
+        <line x1="80" y1="100" x2="160" y2="100" />
+        <line x1="80" y1="100" x2="95" y2="120" />
+        <line x1="160" y1="100" x2="145" y2="120" />
+
+        <!-- Insulators -->
+        <path d="M 50,160 L 50,180" stroke-width="1.5" />
+        <path d="M 85,160 L 85,180" stroke-width="1.5" />
+        <path d="M 155,160 L 155,180" stroke-width="1.5" />
+        <path d="M 190,160 L 190,180" stroke-width="1.5" />
+      </g>
+    </g>
+  `;
+};
+
 export function renderHouseSvg({
   containerWidth,
   containerHeight,
@@ -222,6 +280,10 @@ export function renderHouseSvg({
   // Resolve fluid dimensions (fall back to standard 800x600 if container is not measured yet)
   const width = containerWidth || 800;
   const height = containerHeight || 600;
+
+  // Horizontal translation to center the house group
+  const translateX = (width - 800) / 2;
+  const mastX = 20 - translateX;
 
   // Normalize timeHour so sunrise=6.0 and sunset=21.0
   let timeHour = rawTimeHour;
@@ -325,8 +387,16 @@ export function renderHouseSvg({
   const invX = 380;
   const invY = 230;
 
-  // 1-to-1 matching coordinates with dashboard
-  const gridPath = `M 13,390 L 13,440 L ${mkX},440 L ${mkX},${mkY}`;
+  // Calculate pylon tips for the perspective pylons group
+  const p1Tips = getPylonTips(mastX, -22, 0.9);
+  const p2Tips = getPylonTips(mastX + 145.6, 92.4, 0.62);
+  const p3Tips = getPylonTips(mastX + 249.6, 173.4, 0.42);
+  const p4Tips = getPylonTips(mastX + 316.4, 229.6, 0.28);
+  const p5Tips = getPylonTips(mastX + 358.4, 270.6, 0.18);
+
+  // Sagging overhead wire from foreground pylon to transformer box, then underground to meterkast
+  const overheadWire = drawSaggingWire(p1Tips[2], {x: 13, y: 365}, 35);
+  const gridPath = `${overheadWire} L 13,440 L ${mkX},440 L ${mkX},${mkY}`;
   const solarPath = `M ${invX},${invY} L ${invX},270 L ${mkX},270 L ${mkX},${mkY}`;
   const batteryPath = `M 310,350 L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},440 L 455,440 L 455,395`;
@@ -404,8 +474,6 @@ export function renderHouseSvg({
   }
   overcastPath += ` Z`;
 
-  // Horizontal translation to center the house group
-  const translateX = (width - 800) / 2;
   // Vertical translation to pin the ground and house to the bottom of the viewport
   const translateY = height - 530;
 
@@ -587,60 +655,60 @@ export function renderHouseSvg({
           <rect x="490" y="410" width="${translateX + 310}" height="20" fill="url(#driveway-grad)" />
           <line x1="${-translateX}" y1="410" x2="${width - translateX}" y2="410" class="horizonLine" />
 
-          <!-- High-Voltage Electricity Mast (Elektramast) in background -->
-          <g id="electricity-mast" class="interactiveGroup gridGroup" transform="translate(-95, -22) scale(0.9)" @click=${() => onNodeClick('grid')}>
-            <rect x="63" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
-            <rect x="163" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
+          <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
+          <!-- Background Pylons (Right/Far) -->
+          ${renderSinglePylon(mastX + 358.4, 270.6, 0.18, 0.22, '#64748b')}
+          ${renderSinglePylon(mastX + 316.4, 229.6, 0.28, 0.38, '#5d6d82')}
+          ${renderSinglePylon(mastX + 249.6, 173.4, 0.42, 0.58, '#546479')}
+          ${renderSinglePylon(mastX + 145.6, 92.4, 0.62, 0.78, '#4c5c71')}
 
-            <g stroke="#475569" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M 70,480 L 105,290 L 85,160 L 95,120" />
-              <path d="M 170,480 L 135,290 L 155,160 L 145,120" />
-              <line x1="79" y1="380" x2="161" y2="380" />
-              <line x1="105" y1="290" x2="135" y2="290" />
-              <line x1="95" y1="220" x2="145" y2="220" />
-              <line x1="85" y1="160" x2="155" y2="160" />
-              <line x1="95" y1="120" x2="145" y2="120" />
-              <line x1="105" y1="100" x2="135" y2="100" />
-              <line x1="70" y1="480" x2="161" y2="380" />
-              <line x1="170" y1="480" x2="79" y2="380" />
-              <line x1="79" y1="380" x2="135" y2="290" />
-              <line x1="161" y1="380" x2="105" y2="290" />
-              <line x1="105" y1="290" x2="145" y2="220" />
-              <line x1="135" y1="290" x2="95" y2="220" />
-              <line x1="95" y1="220" x2="155" y2="160" />
-              <line x1="145" y1="220" x2="85" y2="160" />
-              <line x1="85" y1="160" x2="145" y2="120" />
-              <line x1="155" y1="160" x2="95" y2="120" />
-              <line x1="95" y1="120" x2="135" y2="100" />
-              <line x1="145" y1="120" x2="105" y2="100" />
-              <line x1="40" y1="160" x2="200" y2="160" />
-              <line x1="40" y1="160" x2="95" y2="220" />
-              <line x1="200" y1="160" x2="145" y2="220" />
-              <line x1="80" y1="100" x2="160" y2="100" />
-              <line x1="80" y1="100" x2="95" y2="120" />
-              <line x1="160" y1="100" x2="145" y2="120" />
+          <!-- Parallax sagging power lines between pylons -->
+          <!-- Segment P5 (Far) to P4 -->
+          <path d="${drawSaggingWire(p5Tips[0], p4Tips[0], 5)} 
+                   ${drawSaggingWire(p5Tips[1], p4Tips[1], 5)} 
+                   ${drawSaggingWire(p5Tips[2], p4Tips[2], 5)} 
+                   ${drawSaggingWire(p5Tips[3], p4Tips[3], 5)}" 
+                fill="none" stroke="#64748b" stroke-width="0.5" opacity="0.15" />
+                
+          <!-- Segment P4 to P3 -->
+          <path d="${drawSaggingWire(p4Tips[0], p3Tips[0], 9)} 
+                   ${drawSaggingWire(p4Tips[1], p3Tips[1], 9)} 
+                   ${drawSaggingWire(p4Tips[2], p3Tips[2], 9)} 
+                   ${drawSaggingWire(p4Tips[3], p3Tips[3], 9)}" 
+                fill="none" stroke="#5d6d82" stroke-width="0.8" opacity="0.32" />
 
-              <!-- Insulator strings -->
-              <path d="M 50,160 L 50,180" stroke="#64748b" stroke-width="1.5" />
-              <ellipse cx="50" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="50" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="50" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              
-              <path d="M 85,160 L 85,180" stroke="#64748b" stroke-width="1.5" />
-              <ellipse cx="85" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="85" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="85" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+          <!-- Segment P3 to P2 -->
+          <path d="${drawSaggingWire(p3Tips[0], p2Tips[0], 14)} 
+                   ${drawSaggingWire(p3Tips[1], p2Tips[1], 14)} 
+                   ${drawSaggingWire(p3Tips[2], p2Tips[2], 14)} 
+                   ${drawSaggingWire(p3Tips[3], p2Tips[3], 14)}" 
+                fill="none" stroke="#546479" stroke-width="1.2" opacity="0.52" />
 
-              <path d="M 155,160 L 155,180" stroke="#64748b" stroke-width="1.5" />
-              <ellipse cx="155" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="155" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="155" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+          <!-- Segment P2 to P1 (Foreground) -->
+          <path d="${drawSaggingWire(p2Tips[0], p1Tips[0], 22)} 
+                   ${drawSaggingWire(p2Tips[1], p1Tips[1], 22)} 
+                   ${drawSaggingWire(p2Tips[2], p1Tips[2], 22)} 
+                   ${drawSaggingWire(p2Tips[3], p1Tips[3], 22)}" 
+                fill="none" stroke="#4c5c71" stroke-width="1.6" opacity="0.75" />
 
-              <path d="M 190,160 L 190,180" stroke="#64748b" stroke-width="1.5" />
-              <ellipse cx="190" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="190" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-              <ellipse cx="190" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            </g>
+          <!-- Wires going off-screen left from foreground P1 -->
+          <path d="${drawSaggingWire({x: -translateX, y: p1Tips[0].y - 35}, p1Tips[0], 30)} 
+                   ${drawSaggingWire({x: -translateX, y: p1Tips[1].y - 35}, p1Tips[1], 30)} 
+                   ${drawSaggingWire({x: -translateX, y: p1Tips[3].y - 35}, p1Tips[3], 30)}" 
+                fill="none" stroke="#4c5c71" stroke-width="1.8" opacity="0.8" />
+
+          <!-- Wires extending past P5 into the horizon -->
+          <path d="M ${p5Tips[0].x},${p5Tips[0].y} L ${p5Tips[0].x + 50},${p5Tips[0].y - 2} 
+                   M ${p5Tips[1].x},${p5Tips[1].y} L ${p5Tips[1].x + 50},${p5Tips[1].y - 2} 
+                   M ${p5Tips[2].x},${p5Tips[2].y} L ${p5Tips[2].x + 50},${p5Tips[2].y - 2} 
+                   M ${p5Tips[3].x},${p5Tips[3].y} L ${p5Tips[3].x + 50},${p5Tips[3].y - 2}" 
+                fill="none" stroke="#64748b" stroke-width="0.3" opacity="0.1" />
+
+          <!-- Interactive Foreground Mast (Pylon 1) -->
+          <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${() => onNodeClick('grid')}>
+            ${renderSinglePylon(mastX, -22, 0.9, 1.0, '#475569')}
+            <!-- Larger transparent tap target for tablets -->
+            <rect x="${mastX}" y="100" width="200" height="380" fill="transparent" style="cursor: pointer;" />
           </g>
 
           <!-- Transformer / Distribution Box -->
