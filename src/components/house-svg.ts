@@ -240,16 +240,16 @@ export function renderHouseSvg({
     cloudColor = 'rgba(255, 255, 255, 0.6)';
     cloudOpacity = 0.70;
   } else if (weather === 'foggy') {
-    skyTop = interpolateColor(skyState.top, '#94a3b8', 0.6);
-    skyHorizon = interpolateColor(skyState.horizon, '#cbd5e1', 0.6);
-    cloudColor = 'rgba(226, 232, 240, 0.4)';
+    skyTop = interpolateColor(skyState.top, '#64748b', 0.65);
+    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.65);
+    cloudColor = 'rgba(203, 213, 225, 0.4)';
     cloudOpacity = 0.50;
   }
 
   // ── Sun trajectory (HACS viewBox: 960x590, content in translate(0,84) group) ──
   // Ground at y=576 (=480*1.2), top of content at y=84 (=70*1.2)
   // Sun arc: from edge to edge with a peak well above the house roof (~y=100)
-  const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy';
+  const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' && weather !== 'snowy' && weather !== 'foggy';
   const sunPos = { cx: 480, cy: 600 };
   let sunOpacity = 0;
   let sunColor = '#fef08a';
@@ -266,7 +266,7 @@ export function renderHouseSvg({
   }
 
   // ── Moon trajectory ──
-  const isMoonVisible = (timeHour > 21.0 || timeHour < 6.0) && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy';
+  const isMoonVisible = (timeHour > 21.0 || timeHour < 6.0) && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' && weather !== 'snowy' && weather !== 'foggy';
   const moonPos = { cx: 480, cy: 600 };
   let moonOpacity = 0;
 
