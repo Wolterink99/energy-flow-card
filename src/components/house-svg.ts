@@ -1001,25 +1001,76 @@ export function renderHouseSvg({
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (using dynamic gaps & screen bottom alignment) -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${bottomCards.map((card, index) => {
-          const x = gap + index * (cardWidth + gap);
-          return svg`
-            <g class="interactiveGroup" @click=${() => onNodeClick(card.id)}>
-              <g transform="translate(${x}, ${height - 75})">
-                <rect x="0" y="0" width="170" height="65"
-                  class="hudCard ${card.active ? 'hudCardActive' : ''}"
-                  rx="8" ry="8"
-                  style="${card.active ? `color: ${card.color}` : ''}" />
-                <text x="12" y="20" class="hudTitle">${card.title}</text>
-                <text x="12" y="39" class="hudValue ${card.active ? 'hudActiveText' : ''}"
-                  style="${card.active ? `color: ${card.color}` : ''}">
-                  ${card.active ? card.value : '—'}
-                </text>
-                <text x="12" y="53" class="hudSub">${card.sub}</text>
-              </g>
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- BOTTOM HUD CARDS (Static positions aligned to house elements)   -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- 1. Stroomnet (Grid) -->
+        <g class="interactiveGroup gridGroup" @click=${() => onNodeClick('grid')}>
+          <g transform="translate(${translateX + 30}, ${height - 75})">
+            <rect x="0" y="0" width="170" height="65"
+              class="hudCard ${gridImporting || gridExporting ? 'hudCardActive' : ''}"
+              rx="8" ry="8"
+              style="${gridImporting || gridExporting ? `color: ${gridColor.stroke}` : ''}" />
+            <text x="12" y="20" class="hudTitle">Stroomnet</text>
+            <text x="12" y="39" class="hudValue ${gridImporting || gridExporting ? 'hudActiveText' : ''}"
+              style="${gridImporting || gridExporting ? `color: ${gridColor.stroke}` : ''}">
+              ${gridImporting || gridExporting ? formatPowerAbs(grid) : '—'}
+            </text>
+            <text x="12" y="53" class="hudSub">${gridSub}</text>
+          </g>
+        </g>
+
+        <!-- 2. Thuisaccu (Battery) - only if showBattery is true -->
+        ${showBattery ? svg`
+          <g class="interactiveGroup batteryGroup" @click=${() => onNodeClick('battery')}>
+            <g transform="translate(${translateX + 220}, ${height - 75})">
+              <rect x="0" y="0" width="170" height="65"
+                class="hudCard ${batteryCharging || batteryDischarging ? 'hudCardActive' : ''}"
+                rx="8" ry="8"
+                style="${batteryCharging || batteryDischarging ? `color: ${batColor.stroke}` : ''}" />
+              <text x="12" y="20" class="hudTitle">Thuisaccu</text>
+              <text x="12" y="39" class="hudValue ${batteryCharging || batteryDischarging ? 'hudActiveText' : ''}"
+                style="${batteryCharging || batteryDischarging ? `color: ${batColor.stroke}` : ''}">
+                ${batteryCharging || batteryDischarging ? formatPowerAbs(batteryPower) : 'Standby'}
+              </text>
+              <text x="12" y="53" class="hudSub">${batterySub}</text>
             </g>
-          `;
-        })}
+          </g>
+        ` : ''}
+
+        <!-- 3. Huisverbruik (Home) -->
+        <g class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
+          <g transform="translate(${translateX + 410}, ${height - 75})">
+            <rect x="0" y="0" width="170" height="65"
+              class="hudCard ${homeActive ? 'hudCardActive' : ''}"
+              rx="8" ry="8"
+              style="${homeActive ? `color: ${COLORS.home.stroke}` : ''}" />
+            <text x="12" y="20" class="hudTitle">Huisverbruik</text>
+            <text x="12" y="39" class="hudValue ${homeActive ? 'hudActiveText' : ''}"
+              style="${homeActive ? `color: ${COLORS.home.stroke}` : ''}">
+              ${homeActive ? formatPowerAbs(load) : '—'}
+            </text>
+            <text x="12" y="53" class="hudSub">${homeSub}</text>
+          </g>
+        </g>
+
+        <!-- 4. Laadpaal (EV) - only if showEV is true -->
+        ${showEV ? svg`
+          <g class="interactiveGroup evGroup" @click=${() => onNodeClick('ev')}>
+            <g transform="translate(${translateX + 600}, ${height - 75})">
+              <rect x="0" y="0" width="170" height="65"
+                class="hudCard ${evActive ? 'hudCardActive' : ''}"
+                rx="8" ry="8"
+                style="${evActive ? `color: ${COLORS.ev.stroke}` : ''}" />
+              <text x="12" y="20" class="hudTitle">Laadpaal (EV)</text>
+              <text x="12" y="39" class="hudValue ${evActive ? 'hudActiveText' : ''}"
+                style="${evActive ? `color: ${COLORS.ev.stroke}` : ''}">
+                ${evActive ? formatPowerAbs(charger) : '—'}
+              </text>
+              <text x="12" y="53" class="hudSub">${evSub}</text>
+            </g>
+          </g>
+        ` : ''}
       </g>
     </svg>
   `;
