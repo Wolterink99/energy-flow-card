@@ -531,7 +531,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           <rect x="${-S}" y="410" width="${W}" height="120" fill="url(#garden-grad)" />
           
           <!-- Driveway (stretching to the right screen edge) -->
-          <rect x="490" y="410" width="${S+310}" height="20" fill="url(#driveway-grad)" />
+          <rect x="440" y="410" width="${S+500}" height="20" fill="url(#driveway-grad)" rx="6" ry="6" />
           <line x1="${-S}" y1="410" x2="${W-S}" y2="410" class="horizonLine" />
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
@@ -830,7 +830,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${v?E`
           <g class="interactiveGroup solarGroup" @click=${()=>w("solar")}>
-            <g transform="translate(${W-190}, 75)">
+            <g transform="translate(${S+120}, ${bt+80})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${A?"hudCardActive":""}"
                 rx="8" ry="8"

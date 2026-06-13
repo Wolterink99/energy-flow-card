@@ -651,7 +651,7 @@ export function renderHouseSvg({
           <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
           
           <!-- Driveway (stretching to the right screen edge) -->
-          <rect x="490" y="410" width="${translateX + 310}" height="20" fill="url(#driveway-grad)" />
+          <rect x="440" y="410" width="${translateX + 500}" height="20" fill="url(#driveway-grad)" rx="6" ry="6" />
           <line x1="${-translateX}" y1="410" x2="${width - translateX}" y2="410" class="horizonLine" />
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
@@ -981,7 +981,7 @@ export function renderHouseSvg({
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${showSolar ? svg`
           <g class="interactiveGroup solarGroup" @click=${() => onNodeClick('solar')}>
-            <g transform="translate(${width - 190}, 75)">
+            <g transform="translate(${translateX + 120}, ${translateY + 80})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${solarActive ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
