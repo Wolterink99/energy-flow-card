@@ -34,6 +34,54 @@ export class EnergyFlowCard extends LitElement {
     super.disconnectedCallback();
   }
 
+  protected updated(changedProperties: Map<string | number | symbol, unknown>): void {
+    super.updated(changedProperties);
+    this.hideSidebarAndHeader();
+  }
+
+  private hideSidebarAndHeader(): void {
+    if (!this.config?.screensaver) return;
+    try {
+      const doc = document;
+      const homeAssistant = doc.querySelector('home-assistant');
+      if (!homeAssistant) return;
+      const main = homeAssistant.shadowRoot?.querySelector('home-assistant-main');
+      if (!main) return;
+      const mainShadow = main.shadowRoot;
+      if (!mainShadow) return;
+
+      const sidebar = mainShadow.querySelector('ha-sidebar');
+      if (sidebar) {
+        (sidebar as HTMLElement).style.width = '0px';
+        (sidebar as HTMLElement).style.display = 'none';
+      }
+
+      const contentContainer = mainShadow.querySelector('.content');
+      if (contentContainer) {
+        (contentContainer as HTMLElement).style.paddingLeft = '0px';
+        (contentContainer as HTMLElement).style.marginLeft = '0px';
+      }
+
+      const partialResolver = mainShadow.querySelector('partial-panel-resolver');
+      const lovelace = partialResolver?.querySelector('ha-panel-lovelace');
+      const huiRoot = lovelace?.shadowRoot?.querySelector('hui-root');
+      if (huiRoot) {
+        const header = huiRoot.shadowRoot?.querySelector('.header') || huiRoot.shadowRoot?.querySelector('app-header');
+        if (header) {
+          (header as HTMLElement).style.display = 'none';
+          (header as HTMLElement).style.height = '0px';
+        }
+        const mainContainer = huiRoot.shadowRoot?.querySelector('#view');
+        if (mainContainer) {
+          (mainContainer as HTMLElement).style.paddingTop = '0px';
+          (mainContainer as HTMLElement).style.marginTop = '0px';
+        }
+      }
+    } catch (e) {
+      console.warn('[energy-flow-card] Failed to hide sidebar/header via JS:', e);
+    }
+  }
+
   private getClouds(weather: string): any[] {
     if (this.clouds.length > 0 && this.lastWeather === weather) {
       return this.clouds;
@@ -384,7 +432,7 @@ if (!customElements.get('energy-flow-card')) {
   
   // Log message to HA browser console to confirm loading
   console.info(
-    `%c  ENERGY-FLOW-CARD  %c Version 2.3.2 `,
+    `%c  ENERGY-FLOW-CARD  %c Version 2.3.3 `,
     'color: white; background: #10b981; font-weight: 700;',
     'color: #10b981; background: #0f172a; font-weight: 700;'
   );
