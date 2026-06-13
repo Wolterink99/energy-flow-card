@@ -831,9 +831,10 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${v?E`
           <g class="interactiveGroup solarGroup" @click=${()=>w("solar")}>
-            <!-- Solar HUD card: positioned left of the solar panels on the roof -->
-            <!-- Solar panels are at translateX+320, translateY+80 area; card goes left of that -->
-            <g transform="translate(${F+130}, ${pt+155})">
+            <!-- Solar panels are at design x=320, y=270 (inside translate group)
+                 So SVG x = translateX+320, SVG y = translateY+270
+                 Card goes LEFT of the panels at the same roof height -->
+            <g transform="translate(${F+130}, ${pt+240})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${B?"hudCardActive":""}"
                 rx="8" ry="8"
@@ -856,14 +857,19 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (Static positions aligned to house elements)   -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <!-- ── HUD CARDS: positions are in SVG coordinate space (no translateX offset needed here) ── -->
-        <!-- The cards are rendered OUTSIDE the translateX/Y group, so use absolute SVG positions.      -->
-        <!-- House scene center = width/2. The house group is shifted by translateX so that the        -->
-        <!-- 800px design is centered: house element at design-x maps to SVG-x = translateX + design-x -->
+        <!-- ── HUD CARDS positie-uitleg ─────────────────────────────────────────────
+             De mast staat altijd op SVG x=20 (ongeacht schermgrootte),
+             want mastX = 20-translateX en de mast zit IN de translate-groep.
+             Huiselementen: SVG x = translateX + design_x
+               - Accu:     design x=280  → translateX+280
+               - Meterkast: mkX=345      → translateX+345
+               - Laadpaal:  design x=455 → translateX+455
+             Cards zijn 170px breed, gecentreerd op het element.
+        ──────────────────────────────────────────────────────────────────────────── -->
 
-        <!-- 1. Stroomnet (Grid) — below the pylons/mast (design-x ≈ 20+85=105, centered on mast)    -->
+        <!-- 1. Stroomnet — onder de masten (mast is altijd op SVG x=20) -->
         <g class="interactiveGroup gridGroup" @click=${()=>w("grid")}>
-          <g transform="translate(${F+20}, ${S-155})">
+          <g transform="translate(20, ${S-155})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${Y||H?"hudCardActive":""}"
               rx="8" ry="8"
@@ -877,10 +883,10 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           </g>
         </g>
 
-        <!-- 2. Thuisaccu (Battery) — below the battery (design-x=280, center at 280+85=365)          -->
+        <!-- 2. Thuisaccu — ruimte gereserveerd onder de accupositie (design x=280, SVG x=translateX+280) -->
         ${y?E`
           <g class="interactiveGroup batteryGroup" @click=${()=>w("battery")}>
-            <g transform="translate(${F+210}, ${S-155})">
+            <g transform="translate(${F+195}, ${S-155})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${U||K?"hudCardActive":""}"
                 rx="8" ry="8"
@@ -895,7 +901,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           </g>
         `:""}
 
-        <!-- 3. Huisverbruik (Home) — below the meterkast (design-x=mkX=345, center at 345+85=430)   -->
+        <!-- 3. Huisverbruik — onder de meterkast (mkX=345, gecentreerd: translateX+345-85=translateX+260) -->
         <g class="interactiveGroup homeGroup" @click=${()=>w("home")}>
           <g transform="translate(${F+260}, ${S-155})">
             <rect x="0" y="0" width="170" height="65"
@@ -911,10 +917,10 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           </g>
         </g>
 
-        <!-- 4. Laadpaal (EV) — below the charger pole (design-x=455, center at 455+85=540)          -->
+        <!-- 4. Laadpaal (EV) — onder de laadpaal (design x=455, gecentreerd: translateX+455-85=translateX+370) -->
         ${u?E`
           <g class="interactiveGroup evGroup" @click=${()=>w("ev")}>
-            <g transform="translate(${F+385}, ${S-155})">
+            <g transform="translate(${F+370}, ${S-155})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${A?"hudCardActive":""}"
                 rx="8" ry="8"
