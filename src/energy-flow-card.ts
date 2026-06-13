@@ -52,14 +52,13 @@ export class EnergyFlowCard extends LitElement {
     if (nodeId === 'battery') {
       entityKey = this.config?.entities.battery_power ? 'battery_power' : 'battery_soc';
     } else if (nodeId === 'home') {
-      entityKey = 'load';
+      entityKey = this.config?.entities.load ? 'load' : 'home_power';
     } else if (nodeId === 'ev') {
       entityKey = 'charger';
     } else if (nodeId === 'grid') {
-      // If no dedicated grid entity, fall back to solar entity for popup
-      entityKey = this.config?.entities.grid ? 'grid' : 'solar';
+      entityKey = this.config?.entities.grid ? 'grid' : ((this.config?.entities as any).grid_power ? 'grid_power' : 'solar');
     } else if (nodeId === 'solar') {
-      entityKey = this.config?.entities.solar_energy_today ? 'solar_energy_today' : 'solar';
+      entityKey = this.config?.entities.solar ? 'solar' : ((this.config?.entities as any).solar_power ? 'solar_power' : 'solar_energy_today');
     }
 
     const entityConfig = this.config?.entities ? this.config.entities[entityKey as keyof typeof this.config.entities] : undefined;
@@ -99,16 +98,16 @@ export class EnergyFlowCard extends LitElement {
     else timeOfDay = 'night';
 
     // Parse states
-    const solar = this.getEntityValue(entities.solar);
-    const load = this.getEntityValue(entities.load);
+    const solar = this.getEntityValue(entities.solar || (entities as any).solar_power);
+    const load = this.getEntityValue(entities.load || (entities as any).home_power);
     const rawBatteryPower = this.getEntityValue(entities.battery_power);
     const soc = entities.battery_soc ? this.getEntityValue(entities.battery_soc) : 0;
     const charger = this.getEntityValue(entities.charger);
 
     // Parse grid early for battery polarity auto-detection (it will be finalized later if not configured)
     let grid = 0;
-    if (entities.grid) {
-      grid = this.getEntityValue(entities.grid);
+    if (entities.grid || (entities as any).grid_power) {
+      grid = this.getEntityValue(entities.grid || (entities as any).grid_power);
     }
 
     // Normalize battery sign convention:
@@ -145,7 +144,7 @@ export class EnergyFlowCard extends LitElement {
       return isNaN(v) ? null : v;
     };
 
-    const solarToday = parseEntityFloat(entities.solar_energy_today);
+    const solarToday = parseEntityFloat(entities.solar_energy_today || (entities as any).solar_today);
     const gridImportToday = parseEntityFloat(entities.grid_import_today);
     const gridExportToday = parseEntityFloat(entities.grid_export_today);
     const homeToday = parseEntityFloat(entities.home_today);
@@ -174,13 +173,13 @@ export class EnergyFlowCard extends LitElement {
       }
     }
 
-    if (!entities.grid) {
+    if (!entities.grid && !(entities as any).grid_power) {
       // grid = huisverbruik + laadpaal - opwek - acculaden + accuontladen
       grid = load + charger - solar - batteryPower;
     }
 
     // Check configuration flags for layout
-    const showSolar = !!entities.solar;
+    const showSolar = !!entities.solar || !!(entities as any).solar_power;
     const showBattery = !!entities.battery_power;
     const showEV = !!entities.charger;
 
