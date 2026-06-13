@@ -1,4 +1,4 @@
-function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPropertyDescriptor(e,i):r;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)l=Reflect.decorate(t,e,i,r);else for(var n=t.length-1;n>=0;n--)(o=t[n])&&(l=(s<3?o(l):s>3?o(e,i,l):o(e,i))||l);return s>3&&l&&Object.defineProperty(e,i,l),l}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,i=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,r=Symbol(),o=new WeakMap;let s=class{constructor(t,e,i){if(this._$cssResult$=!0,i!==r)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(i&&void 0===t){const i=void 0!==e&&1===e.length;i&&(t=o.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),i&&o.set(e,t))}return t}toString(){return this.cssText}};const l=i?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new s("string"==typeof t?t:t+"",void 0,r))(e)})(t):t,{is:n,defineProperty:a,getOwnPropertyDescriptor:h,getOwnPropertyNames:c,getOwnPropertySymbols:d,getPrototypeOf:f}=Object,y=globalThis,p=y.trustedTypes,g=p?p.emptyScript:"",x=y.reactiveElementPolyfillSupport,u=(t,e)=>t,k={toAttribute(t,e){switch(e){case Boolean:t=t?g:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(t){i=null}}return i}},w=(t,e)=>!n(t,e),$={attribute:!0,type:String,converter:k,reflect:!1,useDefault:!1,hasChanged:w};Symbol.metadata??=Symbol("metadata"),y.litPropertyMetadata??=new WeakMap;let b=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=$){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const i=Symbol(),r=this.getPropertyDescriptor(t,i,e);void 0!==r&&a(this.prototype,t,r)}}static getPropertyDescriptor(t,e,i){const{get:r,set:o}=h(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:r,set(e){const s=r?.call(this);o?.call(this,e),this.requestUpdate(t,s,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??$}static _$Ei(){if(this.hasOwnProperty(u("elementProperties")))return;const t=f(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(u("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(u("properties"))){const t=this.properties,e=[...c(t),...d(t)];for(const i of e)this.createProperty(i,t[i])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,i]of e)this.elementProperties.set(t,i)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const i=this._$Eu(t,e);void 0!==i&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(l(t))}else void 0!==t&&e.push(l(t));return e}static _$Eu(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const i of e.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,r)=>{if(i)t.adoptedStyleSheets=r.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const i of r){const r=document.createElement("style"),o=e.litNonce;void 0!==o&&r.setAttribute("nonce",o),r.textContent=i.cssText,t.appendChild(r)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$ET(t,e){const i=this.constructor.elementProperties.get(t),r=this.constructor._$Eu(t,i);if(void 0!==r&&!0===i.reflect){const o=(void 0!==i.converter?.toAttribute?i.converter:k).toAttribute(e,i.type);this._$Em=t,null==o?this.removeAttribute(r):this.setAttribute(r,o),this._$Em=null}}_$AK(t,e){const i=this.constructor,r=i._$Eh.get(t);if(void 0!==r&&this._$Em!==r){const t=i.getPropertyOptions(r),o="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:k;this._$Em=r;const s=o.fromAttribute(e,t.type);this[r]=s??this._$Ej?.get(r)??s,this._$Em=null}}requestUpdate(t,e,i,r=!1,o){if(void 0!==t){const s=this.constructor;if(!1===r&&(o=this[t]),i??=s.getPropertyOptions(t),!((i.hasChanged??w)(o,e)||i.useDefault&&i.reflect&&o===this._$Ej?.get(t)&&!this.hasAttribute(s._$Eu(t,i))))return;this.C(t,e,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:i,reflect:r,wrapped:o},s){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,s??e??this[t]),!0!==o||void 0!==s)||(this._$AL.has(t)||(this.hasUpdated||i||(e=void 0),this._$AL.set(t,e)),!0===r&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,i]of t){const{wrapped:t}=i,r=this[e];!0!==t||this._$AL.has(e)||void 0===r||this.C(e,void 0,i,r)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};b.elementStyles=[],b.shadowRootOptions={mode:"open"},b[u("elementProperties")]=new Map,b[u("finalized")]=new Map,x?.({ReactiveElement:b}),(y.reactiveElementVersions??=[]).push("2.1.2");const m=globalThis,v=t=>t,_=m.trustedTypes,A=_?_.createPolicy("lit-html",{createHTML:t=>t}):void 0,E="$lit$",M=`lit$${Math.random().toFixed(9).slice(2)}$`,S="?"+M,C=`<${S}>`,L=document,P=()=>L.createComment(""),T=t=>null===t||"object"!=typeof t&&"function"!=typeof t,O=Array.isArray,R="[ \t\n\f\r]",U=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,H=/-->/g,N=/>/g,G=RegExp(`>|${R}(?:([^\\s"'>=/]+)(${R}*=${R}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),D=/'/g,I=/"/g,z=/^(?:script|style|textarea|title)$/i,F=t=>(e,...i)=>({_$litType$:t,strings:e,values:i}),W=F(1),j=F(2),B=Symbol.for("lit-noChange"),V=Symbol.for("lit-nothing"),Z=new WeakMap,Q=L.createTreeWalker(L,129);function X(t,e){if(!O(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==A?A.createHTML(e):e}const Y=(t,e)=>{const i=t.length-1,r=[];let o,s=2===e?"<svg>":3===e?"<math>":"",l=U;for(let e=0;e<i;e++){const i=t[e];let n,a,h=-1,c=0;for(;c<i.length&&(l.lastIndex=c,a=l.exec(i),null!==a);)c=l.lastIndex,l===U?"!--"===a[1]?l=H:void 0!==a[1]?l=N:void 0!==a[2]?(z.test(a[2])&&(o=RegExp("</"+a[2],"g")),l=G):void 0!==a[3]&&(l=G):l===G?">"===a[0]?(l=o??U,h=-1):void 0===a[1]?h=-2:(h=l.lastIndex-a[2].length,n=a[1],l=void 0===a[3]?G:'"'===a[3]?I:D):l===I||l===D?l=G:l===H||l===N?l=U:(l=G,o=void 0);const d=l===G&&t[e+1].startsWith("/>")?" ":"";s+=l===U?i+C:h>=0?(r.push(n),i.slice(0,h)+E+i.slice(h)+M+d):i+M+(-2===h?e:d)}return[X(t,s+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),r]};class q{constructor({strings:t,_$litType$:e},i){let r;this.parts=[];let o=0,s=0;const l=t.length-1,n=this.parts,[a,h]=Y(t,e);if(this.el=q.createElement(a,i),Q.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(r=Q.nextNode())&&n.length<l;){if(1===r.nodeType){if(r.hasAttributes())for(const t of r.getAttributeNames())if(t.endsWith(E)){const e=h[s++],i=r.getAttribute(t).split(M),l=/([.?@])?(.*)/.exec(e);n.push({type:1,index:o,name:l[2],strings:i,ctor:"."===l[1]?it:"?"===l[1]?rt:"@"===l[1]?ot:et}),r.removeAttribute(t)}else t.startsWith(M)&&(n.push({type:6,index:o}),r.removeAttribute(t));if(z.test(r.tagName)){const t=r.textContent.split(M),e=t.length-1;if(e>0){r.textContent=_?_.emptyScript:"";for(let i=0;i<e;i++)r.append(t[i],P()),Q.nextNode(),n.push({type:2,index:++o});r.append(t[e],P())}}}else if(8===r.nodeType)if(r.data===S)n.push({type:2,index:o});else{let t=-1;for(;-1!==(t=r.data.indexOf(M,t+1));)n.push({type:7,index:o}),t+=M.length-1}o++}}static createElement(t,e){const i=L.createElement("template");return i.innerHTML=t,i}}function J(t,e,i=t,r){if(e===B)return e;let o=void 0!==r?i._$Co?.[r]:i._$Cl;const s=T(e)?void 0:e._$litDirective$;return o?.constructor!==s&&(o?._$AO?.(!1),void 0===s?o=void 0:(o=new s(t),o._$AT(t,i,r)),void 0!==r?(i._$Co??=[])[r]=o:i._$Cl=o),void 0!==o&&(e=J(t,o._$AS(t,e.values),o,r)),e}class K{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,r=(t?.creationScope??L).importNode(e,!0);Q.currentNode=r;let o=Q.nextNode(),s=0,l=0,n=i[0];for(;void 0!==n;){if(s===n.index){let e;2===n.type?e=new tt(o,o.nextSibling,this,t):1===n.type?e=new n.ctor(o,n.name,n.strings,this,t):6===n.type&&(e=new st(o,this,t)),this._$AV.push(e),n=i[++l]}s!==n?.index&&(o=Q.nextNode(),s++)}return Q.currentNode=L,r}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class tt{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,r){this.type=2,this._$AH=V,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=r,this._$Cv=r?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=J(this,t,e),T(t)?t===V||null==t||""===t?(this._$AH!==V&&this._$AR(),this._$AH=V):t!==this._$AH&&t!==B&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>O(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==V&&T(this._$AH)?this._$AA.nextSibling.data=t:this.T(L.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,r="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=q.createElement(X(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===r)this._$AH.p(e);else{const t=new K(r,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=Z.get(t.strings);return void 0===e&&Z.set(t.strings,e=new q(t)),e}k(t){O(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,r=0;for(const o of t)r===e.length?e.push(i=new tt(this.O(P()),this.O(P()),this,this.options)):i=e[r],i._$AI(o),r++;r<e.length&&(this._$AR(i&&i._$AB.nextSibling,r),e.length=r)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=v(t).nextSibling;v(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class et{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,r,o){this.type=1,this._$AH=V,this._$AN=void 0,this.element=t,this.name=e,this._$AM=r,this.options=o,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=V}_$AI(t,e=this,i,r){const o=this.strings;let s=!1;if(void 0===o)t=J(this,t,e,0),s=!T(t)||t!==this._$AH&&t!==B,s&&(this._$AH=t);else{const r=t;let l,n;for(t=o[0],l=0;l<o.length-1;l++)n=J(this,r[i+l],e,l),n===B&&(n=this._$AH[l]),s||=!T(n)||n!==this._$AH[l],n===V?t=V:t!==V&&(t+=(n??"")+o[l+1]),this._$AH[l]=n}s&&!r&&this.j(t)}j(t){t===V?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class it extends et{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===V?void 0:t}}class rt extends et{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==V)}}class ot extends et{constructor(t,e,i,r,o){super(t,e,i,r,o),this.type=5}_$AI(t,e=this){if((t=J(this,t,e,0)??V)===B)return;const i=this._$AH,r=t===V&&i!==V||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,o=t!==V&&(i===V||r);r&&this.element.removeEventListener(this.name,this,i),o&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class st{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){J(this,t)}}const lt=m.litHtmlPolyfillSupport;lt?.(q,tt),(m.litHtmlVersions??=[]).push("3.3.3");const nt=globalThis;class at extends b{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,i)=>{const r=i?.renderBefore??e;let o=r._$litPart$;if(void 0===o){const t=i?.renderBefore??null;r._$litPart$=o=new tt(e.insertBefore(P(),t),t,void 0,i??{})}return o._$AI(t),o})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return B}}at._$litElement$=!0,at.finalized=!0,nt.litElementHydrateSupport?.({LitElement:at});const ht=nt.litElementPolyfillSupport;ht?.({LitElement:at}),(nt.litElementVersions??=[]).push("4.2.2");const ct={attribute:!0,type:String,converter:k,reflect:!1,hasChanged:w},dt=(t=ct,e,i)=>{const{kind:r,metadata:o}=i;let s=globalThis.litPropertyMetadata.get(o);if(void 0===s&&globalThis.litPropertyMetadata.set(o,s=new Map),"setter"===r&&((t=Object.create(t)).wrapped=!0),s.set(i.name,t),"accessor"===r){const{name:r}=i;return{set(i){const o=e.get.call(this);e.set.call(this,i),this.requestUpdate(r,o,t,!0,i)},init(e){return void 0!==e&&this.C(r,void 0,t,e),e}}}if("setter"===r){const{name:r}=i;return function(i){const o=this[r];e.call(this,i),this.requestUpdate(r,o,t,!0,i)}}throw Error("Unsupported decorator location: "+r)};function ft(t){return(e,i)=>"object"==typeof i?dt(t,e,i):((t,e,i)=>{const r=e.hasOwnProperty(i);return e.constructor.createProperty(i,t),r?Object.getOwnPropertyDescriptor(e,i):void 0})(t,e,i)}function yt(t){return ft({...t,state:!0,attribute:!1})}const pt=((t,...e)=>{const i=1===t.length?t[0]:e.reduce((e,i,r)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[r+1],t[0]);return new s(i,t,r)})`
+function t(t,e,i,r){var o,s=arguments.length,n=s<3?e:null===r?r=Object.getOwnPropertyDescriptor(e,i):r;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)n=Reflect.decorate(t,e,i,r);else for(var l=t.length-1;l>=0;l--)(o=t[l])&&(n=(s<3?o(n):s>3?o(e,i,n):o(e,i))||n);return s>3&&n&&Object.defineProperty(e,i,n),n}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,i=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,r=Symbol(),o=new WeakMap;let s=class{constructor(t,e,i){if(this._$cssResult$=!0,i!==r)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(i&&void 0===t){const i=void 0!==e&&1===e.length;i&&(t=o.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),i&&o.set(e,t))}return t}toString(){return this.cssText}};const n=i?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new s("string"==typeof t?t:t+"",void 0,r))(e)})(t):t,{is:l,defineProperty:a,getOwnPropertyDescriptor:h,getOwnPropertyNames:c,getOwnPropertySymbols:d,getPrototypeOf:f}=Object,y=globalThis,p=y.trustedTypes,g=p?p.emptyScript:"",x=y.reactiveElementPolyfillSupport,u=(t,e)=>t,k={toAttribute(t,e){switch(e){case Boolean:t=t?g:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(t){i=null}}return i}},w=(t,e)=>!l(t,e),$={attribute:!0,type:String,converter:k,reflect:!1,useDefault:!1,hasChanged:w};Symbol.metadata??=Symbol("metadata"),y.litPropertyMetadata??=new WeakMap;let b=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=$){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const i=Symbol(),r=this.getPropertyDescriptor(t,i,e);void 0!==r&&a(this.prototype,t,r)}}static getPropertyDescriptor(t,e,i){const{get:r,set:o}=h(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:r,set(e){const s=r?.call(this);o?.call(this,e),this.requestUpdate(t,s,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??$}static _$Ei(){if(this.hasOwnProperty(u("elementProperties")))return;const t=f(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(u("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(u("properties"))){const t=this.properties,e=[...c(t),...d(t)];for(const i of e)this.createProperty(i,t[i])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,i]of e)this.elementProperties.set(t,i)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const i=this._$Eu(t,e);void 0!==i&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(n(t))}else void 0!==t&&e.push(n(t));return e}static _$Eu(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const i of e.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,r)=>{if(i)t.adoptedStyleSheets=r.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const i of r){const r=document.createElement("style"),o=e.litNonce;void 0!==o&&r.setAttribute("nonce",o),r.textContent=i.cssText,t.appendChild(r)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$ET(t,e){const i=this.constructor.elementProperties.get(t),r=this.constructor._$Eu(t,i);if(void 0!==r&&!0===i.reflect){const o=(void 0!==i.converter?.toAttribute?i.converter:k).toAttribute(e,i.type);this._$Em=t,null==o?this.removeAttribute(r):this.setAttribute(r,o),this._$Em=null}}_$AK(t,e){const i=this.constructor,r=i._$Eh.get(t);if(void 0!==r&&this._$Em!==r){const t=i.getPropertyOptions(r),o="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:k;this._$Em=r;const s=o.fromAttribute(e,t.type);this[r]=s??this._$Ej?.get(r)??s,this._$Em=null}}requestUpdate(t,e,i,r=!1,o){if(void 0!==t){const s=this.constructor;if(!1===r&&(o=this[t]),i??=s.getPropertyOptions(t),!((i.hasChanged??w)(o,e)||i.useDefault&&i.reflect&&o===this._$Ej?.get(t)&&!this.hasAttribute(s._$Eu(t,i))))return;this.C(t,e,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:i,reflect:r,wrapped:o},s){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,s??e??this[t]),!0!==o||void 0!==s)||(this._$AL.has(t)||(this.hasUpdated||i||(e=void 0),this._$AL.set(t,e)),!0===r&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,i]of t){const{wrapped:t}=i,r=this[e];!0!==t||this._$AL.has(e)||void 0===r||this.C(e,void 0,i,r)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};b.elementStyles=[],b.shadowRootOptions={mode:"open"},b[u("elementProperties")]=new Map,b[u("finalized")]=new Map,x?.({ReactiveElement:b}),(y.reactiveElementVersions??=[]).push("2.1.2");const m=globalThis,v=t=>t,_=m.trustedTypes,A=_?_.createPolicy("lit-html",{createHTML:t=>t}):void 0,E="$lit$",M=`lit$${Math.random().toFixed(9).slice(2)}$`,S="?"+M,C=`<${S}>`,L=document,P=()=>L.createComment(""),T=t=>null===t||"object"!=typeof t&&"function"!=typeof t,O=Array.isArray,R="[ \t\n\f\r]",N=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,U=/-->/g,H=/>/g,G=RegExp(`>|${R}(?:([^\\s"'>=/]+)(${R}*=${R}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),D=/'/g,I=/"/g,z=/^(?:script|style|textarea|title)$/i,F=t=>(e,...i)=>({_$litType$:t,strings:e,values:i}),j=F(1),W=F(2),B=Symbol.for("lit-noChange"),V=Symbol.for("lit-nothing"),Z=new WeakMap,Q=L.createTreeWalker(L,129);function X(t,e){if(!O(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==A?A.createHTML(e):e}const Y=(t,e)=>{const i=t.length-1,r=[];let o,s=2===e?"<svg>":3===e?"<math>":"",n=N;for(let e=0;e<i;e++){const i=t[e];let l,a,h=-1,c=0;for(;c<i.length&&(n.lastIndex=c,a=n.exec(i),null!==a);)c=n.lastIndex,n===N?"!--"===a[1]?n=U:void 0!==a[1]?n=H:void 0!==a[2]?(z.test(a[2])&&(o=RegExp("</"+a[2],"g")),n=G):void 0!==a[3]&&(n=G):n===G?">"===a[0]?(n=o??N,h=-1):void 0===a[1]?h=-2:(h=n.lastIndex-a[2].length,l=a[1],n=void 0===a[3]?G:'"'===a[3]?I:D):n===I||n===D?n=G:n===U||n===H?n=N:(n=G,o=void 0);const d=n===G&&t[e+1].startsWith("/>")?" ":"";s+=n===N?i+C:h>=0?(r.push(l),i.slice(0,h)+E+i.slice(h)+M+d):i+M+(-2===h?e:d)}return[X(t,s+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),r]};class q{constructor({strings:t,_$litType$:e},i){let r;this.parts=[];let o=0,s=0;const n=t.length-1,l=this.parts,[a,h]=Y(t,e);if(this.el=q.createElement(a,i),Q.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(r=Q.nextNode())&&l.length<n;){if(1===r.nodeType){if(r.hasAttributes())for(const t of r.getAttributeNames())if(t.endsWith(E)){const e=h[s++],i=r.getAttribute(t).split(M),n=/([.?@])?(.*)/.exec(e);l.push({type:1,index:o,name:n[2],strings:i,ctor:"."===n[1]?it:"?"===n[1]?rt:"@"===n[1]?ot:et}),r.removeAttribute(t)}else t.startsWith(M)&&(l.push({type:6,index:o}),r.removeAttribute(t));if(z.test(r.tagName)){const t=r.textContent.split(M),e=t.length-1;if(e>0){r.textContent=_?_.emptyScript:"";for(let i=0;i<e;i++)r.append(t[i],P()),Q.nextNode(),l.push({type:2,index:++o});r.append(t[e],P())}}}else if(8===r.nodeType)if(r.data===S)l.push({type:2,index:o});else{let t=-1;for(;-1!==(t=r.data.indexOf(M,t+1));)l.push({type:7,index:o}),t+=M.length-1}o++}}static createElement(t,e){const i=L.createElement("template");return i.innerHTML=t,i}}function J(t,e,i=t,r){if(e===B)return e;let o=void 0!==r?i._$Co?.[r]:i._$Cl;const s=T(e)?void 0:e._$litDirective$;return o?.constructor!==s&&(o?._$AO?.(!1),void 0===s?o=void 0:(o=new s(t),o._$AT(t,i,r)),void 0!==r?(i._$Co??=[])[r]=o:i._$Cl=o),void 0!==o&&(e=J(t,o._$AS(t,e.values),o,r)),e}class K{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,r=(t?.creationScope??L).importNode(e,!0);Q.currentNode=r;let o=Q.nextNode(),s=0,n=0,l=i[0];for(;void 0!==l;){if(s===l.index){let e;2===l.type?e=new tt(o,o.nextSibling,this,t):1===l.type?e=new l.ctor(o,l.name,l.strings,this,t):6===l.type&&(e=new st(o,this,t)),this._$AV.push(e),l=i[++n]}s!==l?.index&&(o=Q.nextNode(),s++)}return Q.currentNode=L,r}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class tt{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,r){this.type=2,this._$AH=V,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=r,this._$Cv=r?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=J(this,t,e),T(t)?t===V||null==t||""===t?(this._$AH!==V&&this._$AR(),this._$AH=V):t!==this._$AH&&t!==B&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>O(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==V&&T(this._$AH)?this._$AA.nextSibling.data=t:this.T(L.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,r="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=q.createElement(X(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===r)this._$AH.p(e);else{const t=new K(r,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=Z.get(t.strings);return void 0===e&&Z.set(t.strings,e=new q(t)),e}k(t){O(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,r=0;for(const o of t)r===e.length?e.push(i=new tt(this.O(P()),this.O(P()),this,this.options)):i=e[r],i._$AI(o),r++;r<e.length&&(this._$AR(i&&i._$AB.nextSibling,r),e.length=r)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=v(t).nextSibling;v(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class et{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,r,o){this.type=1,this._$AH=V,this._$AN=void 0,this.element=t,this.name=e,this._$AM=r,this.options=o,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=V}_$AI(t,e=this,i,r){const o=this.strings;let s=!1;if(void 0===o)t=J(this,t,e,0),s=!T(t)||t!==this._$AH&&t!==B,s&&(this._$AH=t);else{const r=t;let n,l;for(t=o[0],n=0;n<o.length-1;n++)l=J(this,r[i+n],e,n),l===B&&(l=this._$AH[n]),s||=!T(l)||l!==this._$AH[n],l===V?t=V:t!==V&&(t+=(l??"")+o[n+1]),this._$AH[n]=l}s&&!r&&this.j(t)}j(t){t===V?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class it extends et{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===V?void 0:t}}class rt extends et{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==V)}}class ot extends et{constructor(t,e,i,r,o){super(t,e,i,r,o),this.type=5}_$AI(t,e=this){if((t=J(this,t,e,0)??V)===B)return;const i=this._$AH,r=t===V&&i!==V||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,o=t!==V&&(i===V||r);r&&this.element.removeEventListener(this.name,this,i),o&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class st{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){J(this,t)}}const nt=m.litHtmlPolyfillSupport;nt?.(q,tt),(m.litHtmlVersions??=[]).push("3.3.3");const lt=globalThis;class at extends b{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,i)=>{const r=i?.renderBefore??e;let o=r._$litPart$;if(void 0===o){const t=i?.renderBefore??null;r._$litPart$=o=new tt(e.insertBefore(P(),t),t,void 0,i??{})}return o._$AI(t),o})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return B}}at._$litElement$=!0,at.finalized=!0,lt.litElementHydrateSupport?.({LitElement:at});const ht=lt.litElementPolyfillSupport;ht?.({LitElement:at}),(lt.litElementVersions??=[]).push("4.2.2");const ct={attribute:!0,type:String,converter:k,reflect:!1,hasChanged:w},dt=(t=ct,e,i)=>{const{kind:r,metadata:o}=i;let s=globalThis.litPropertyMetadata.get(o);if(void 0===s&&globalThis.litPropertyMetadata.set(o,s=new Map),"setter"===r&&((t=Object.create(t)).wrapped=!0),s.set(i.name,t),"accessor"===r){const{name:r}=i;return{set(i){const o=e.get.call(this);e.set.call(this,i),this.requestUpdate(r,o,t,!0,i)},init(e){return void 0!==e&&this.C(r,void 0,t,e),e}}}if("setter"===r){const{name:r}=i;return function(i){const o=this[r];e.call(this,i),this.requestUpdate(r,o,t,!0,i)}}throw Error("Unsupported decorator location: "+r)};function ft(t){return(e,i)=>"object"==typeof i?dt(t,e,i):((t,e,i)=>{const r=e.hasOwnProperty(i);return e.constructor.createProperty(i,t),r?Object.getOwnPropertyDescriptor(e,i):void 0})(t,e,i)}function yt(t){return ft({...t,state:!0,attribute:!1})}const pt=((t,...e)=>{const i=1===t.length?t[0]:e.reduce((e,i,r)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[r+1],t[0]);return new s(i,t,r)})`
   :host {
     display: block;
     background: transparent;
@@ -266,14 +266,14 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
     fill: rgba(255, 255, 255, 0.32);
     pointer-events: none;
   }
-`,gt={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},xt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function ut(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function kt(t,e,i){if(t.startsWith("rgba")||e.startsWith("rgba")){const r=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},o=r(t);return`rgba(255, 255, 255, ${o+(r(e)-o)*i})`}const r=ut(t),o=ut(e);return function(t,e,i){const r=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${r(t)}${r(e)}${r(i)}`}(r.r+(o.r-r.r)*i,r.g+(o.g-r.g)*i,r.b+(o.b-r.b)*i)}function wt(t){let e=xt[0],i=xt[xt.length-1];for(let r=0;r<xt.length-1;r++)if(t>=xt[r].hour&&t<=xt[r+1].hour){e=xt[r],i=xt[r+1];break}const r=i.hour-e.hour,o=0===r?0:(t-e.hour)/r;return{top:kt(e.top,i.top,o),horizon:kt(e.horizon,i.horizon,o),stars:e.stars+(i.stars-e.stars)*o,lights:e.lights+(i.lights-e.lights)*o,clouds:kt(e.clouds,i.clouds,o)}}function $t(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function bt(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}function mt(t,e,i,r=1,o="#ffffff",s=.9){return j`
+`,gt={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},xt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function ut(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function kt(t,e,i){if(t.startsWith("rgba")||e.startsWith("rgba")){const r=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},o=r(t);return`rgba(255, 255, 255, ${o+(r(e)-o)*i})`}const r=ut(t),o=ut(e);return function(t,e,i){const r=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${r(t)}${r(e)}${r(i)}`}(r.r+(o.r-r.r)*i,r.g+(o.g-r.g)*i,r.b+(o.b-r.b)*i)}function wt(t){let e=xt[0],i=xt[xt.length-1];for(let r=0;r<xt.length-1;r++)if(t>=xt[r].hour&&t<=xt[r+1].hour){e=xt[r],i=xt[r+1];break}const r=i.hour-e.hour,o=0===r?0:(t-e.hour)/r;return{top:kt(e.top,i.top,o),horizon:kt(e.horizon,i.horizon,o),stars:e.stars+(i.stars-e.stars)*o,lights:e.lights+(i.lights-e.lights)*o,clouds:kt(e.clouds,i.clouds,o)}}function $t(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function bt(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}function mt(t,e,i,r=1,o="#ffffff",s=.9){return W`
     <g transform="translate(${e}, ${i}) scale(${r})" opacity="${s}" style="transition: opacity 1.5s ease;">
       <g class="${t}">
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="rgba(15, 23, 42, 0.15)" transform="translate(0, 4) scale(1.02)" />
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${o}" style="transition: fill 1.5s ease;" />
       </g>
     </g>
-  `}function vt({houseStyle:t="classic-jaren30",carType:e="hatchback",timeHour:i,timeOfDay:r,solar:o,solarToday:s,load:l,batteryPower:n,soc:a,charger:h,grid:c,showSolar:d,showBattery:f,showEV:y,weather:p="sunny",sunriseHour:g=6,sunsetHour:x=21,gridImportToday:u=null,gridExportToday:k=null,homeToday:w=null,batteryChargeToday:$=null,batteryDischargeToday:b=null,evToday:m=null,onNodeClick:v}){let _=i;_=i>=g&&i<=x?6+(i-g)/(x-g)*15:i>x?21+(i-x)/(24-x)*3:i/g*6;const A=n>.05,E=n<-.05,M=c>.05,S=c<-.05,C=h>.1,L=o>20,P=l>20,T=A||E&&S?gt.battery:gt.batteryD,O=M?gt.gridI:gt.gridE,R=wt(_),U=R.lights>.05||"rainy"===p||"lightning"===p;let H=R.top,N=R.horizon,G=R.clouds,D="night"===r?.18:.48;"cloudy"===p?(H=kt(R.top,"#475569",.5),N=kt(R.horizon,"#94a3b8",.5),G="rgba(241, 245, 249, 0.55)",D=.65):"rainy"===p||"lightning"===p?(H=kt(R.top,"#1e293b",.75),N=kt(R.horizon,"#475569",.75),G="rgba(100, 116, 139, 0.5)",D=.65):"snowy"===p?(H=kt(R.top,"#cbd5e1",.4),N=kt(R.horizon,"#f1f5f9",.4),G="rgba(255, 255, 255, 0.6)",D=.7):"foggy"===p&&(H=kt(R.top,"#94a3b8",.6),N=kt(R.horizon,"#cbd5e1",.6),G="rgba(226, 232, 240, 0.4)",D=.5);const I={cx:480,cy:600};let z=0,F="#fef08a",W="rgba(254, 240, 138, 0.65)";if(_>=6&&_<=21&&"rainy"!==p&&"lightning"!==p&&"cloudy"!==p){const t=(_-6)/15;I.cx=1080*t-60,I.cy=576-528*Math.sin(t*Math.PI),z=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);F=kt("#ea580c","#fef08a",e),W=kt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const B={cx:480,cy:600};let V=0;if((_>21||_<6)&&"rainy"!==p&&"lightning"!==p&&"cloudy"!==p){const t=_>21?(_-21)/9:(_+3)/9;B.cx=1080*t-60,B.cy=576-480*Math.sin(t*Math.PI),V=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const Z=_>=8&&_<=18,Q=Z?"url(#window-day)":U?"url(#window-night)":"url(#window-dark)",X=Z?"none":U?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",Y=t=>450+1.15*(t-450),q=t=>480+1.15*(t-480),J=Math.round(Y(345)),K=Math.round(q(420)),tt=Math.round(Y(380)),et=Math.round(q(300));let it=S?"↑ Teruglevering":M?"↓ Import":"Standby";null!==u&&null!==k?it=`↓${u.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==u?it=`Import: ${u.toFixed(1)} kWh`:null!==k&&(it=`Terug: ${k.toFixed(1)} kWh`);const rt=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:P?"Actief":"Standby";let ot=`SoC: ${a}%`;null!==$&&null!==b?ot=`SoC: ${a}% (↓${$.toFixed(1)} ↑${b.toFixed(1)})`:null!==$&&(ot=`SoC: ${a}% (↓${$.toFixed(1)})`);const st=null!==m?`Vandaag: ${m.toFixed(1)} kWh`:C?"Bezig met laden":"Standby",lt=[{id:"grid",title:"Stroomnet",value:bt(c),sub:it,color:O.stroke,active:M||S},{id:"home",title:"Huisverbruik",value:bt(l),sub:rt,color:gt.home.stroke,active:P}];f&&lt.push({id:"battery",title:"Thuisaccu",value:bt(n),sub:ot,color:T.stroke,active:A||E}),y&&lt.push({id:"ev",title:"Laadpaal (EV)",value:bt(h),sub:st,color:gt.ev.stroke,active:C});const nt=(960-170*lt.length)/(lt.length+1),at=(t,e,i,r,o,s=!1)=>j`
+  `}function vt({houseStyle:t="classic-jaren30",carType:e="hatchback",timeHour:i,timeOfDay:r,solar:o,solarToday:s,load:n,batteryPower:l,soc:a,charger:h,grid:c,showSolar:d,showBattery:f,showEV:y,weather:p="sunny",sunriseHour:g=6,sunsetHour:x=21,gridImportToday:u=null,gridExportToday:k=null,homeToday:w=null,batteryChargeToday:$=null,batteryDischargeToday:b=null,evToday:m=null,onNodeClick:v}){let _=i;_=i>=g&&i<=x?6+(i-g)/(x-g)*15:i>x?21+(i-x)/(24-x)*3:i/g*6;const A=l>.05,E=l<-.05,M=c>.05,S=c<-.05,C=h>.1,L=o>20,P=n>20,T=A||E&&S?gt.battery:gt.batteryD,O=M?gt.gridI:gt.gridE,R=wt(_),N=R.lights>.05||"rainy"===p||"lightning"===p;let U=R.top,H=R.horizon,G=R.clouds,D="night"===r?.18:.48;"cloudy"===p?(U=kt(R.top,"#475569",.5),H=kt(R.horizon,"#94a3b8",.5),G="rgba(241, 245, 249, 0.55)",D=.65):"rainy"===p||"lightning"===p?(U=kt(R.top,"#1e293b",.75),H=kt(R.horizon,"#475569",.75),G="rgba(100, 116, 139, 0.5)",D=.65):"snowy"===p?(U=kt(R.top,"#cbd5e1",.4),H=kt(R.horizon,"#f1f5f9",.4),G="rgba(255, 255, 255, 0.6)",D=.7):"foggy"===p&&(U=kt(R.top,"#94a3b8",.6),H=kt(R.horizon,"#cbd5e1",.6),G="rgba(226, 232, 240, 0.4)",D=.5);const I={cx:480,cy:600};let z=0,F="#fef08a",j="rgba(254, 240, 138, 0.65)";if(_>=6&&_<=21&&"rainy"!==p&&"lightning"!==p&&"cloudy"!==p){const t=(_-6)/15;I.cx=1080*t-60,I.cy=576-528*Math.sin(t*Math.PI),z=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);F=kt("#ea580c","#fef08a",e),j=kt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const B={cx:480,cy:600};let V=0;if((_>21||_<6)&&"rainy"!==p&&"lightning"!==p&&"cloudy"!==p){const t=_>21?(_-21)/9:(_+3)/9;B.cx=1080*t-60,B.cy=576-480*Math.sin(t*Math.PI),V=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const Z=_>=8&&_<=18,Q=Z?"url(#window-day)":N?"url(#window-night)":"url(#window-dark)",X=Z?"none":N?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",Y=t=>450+1.15*(t-450),q=t=>480+1.15*(t-480),J=Math.round(Y(345)),K=Math.round(q(420)),tt=Math.round(Y(380)),et=Math.round(q(300));let it=S?"↑ Teruglevering":M?"↓ Import":"Standby";null!==u&&null!==k?it=`↓${u.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==u?it=`Import: ${u.toFixed(1)} kWh`:null!==k&&(it=`Terug: ${k.toFixed(1)} kWh`);const rt=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:P?"Actief":"Standby";let ot=`SoC: ${a}%`;null!==$&&null!==b?ot=`SoC: ${a}% (↓${$.toFixed(1)} ↑${b.toFixed(1)})`:null!==$&&(ot=`SoC: ${a}% (↓${$.toFixed(1)})`);const st=null!==m?`Vandaag: ${m.toFixed(1)} kWh`:C?"Bezig met laden":"Standby",nt=[{id:"grid",title:"Stroomnet",value:bt(c),sub:it,color:O.stroke,active:M||S},{id:"home",title:"Huisverbruik",value:bt(n),sub:rt,color:gt.home.stroke,active:P}];f&&nt.push({id:"battery",title:"Thuisaccu",value:bt(l),sub:ot,color:T.stroke,active:A||E}),y&&nt.push({id:"ev",title:"Laadpaal (EV)",value:bt(h),sub:st,color:gt.ev.stroke,active:C});const lt=(960-170*nt.length)/(nt.length+1),at=(t,e,i,r,o,s=!1)=>W`
       <path d="${t}" class="flowCable" />
       <path d="${t}" fill="none" stroke="${r}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
@@ -281,26 +281,26 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
       <path d="${t}" fill="none" stroke="${r}" stroke-width="1.2" stroke-linecap="round"
         opacity="${e?.55:0}"
         style="transition: stroke 0.6s ease, opacity 0.6s ease;" />
-      ${((t,e,i,r,o,s=!1)=>e&&0!==i?j`
-      ${Array.from({length:3}).map((e,l)=>j`
+      ${((t,e,i,r,o,s=!1)=>e&&0!==i?W`
+      ${Array.from({length:3}).map((e,n)=>W`
         <circle r="3.5" fill="${r}"
           style="
             offset-path: path('${t}');
             animation: moveParticle ${i}s linear infinite;
             animation-play-state: running;
-            animation-delay: ${-l/3*i}s;
+            animation-delay: ${-n/3*i}s;
             animation-direction: ${s?"reverse":"normal"};
             filter: drop-shadow(0 0 5px ${o}) drop-shadow(0 0 2px ${r});
           " />
       `)}
-    `:j``)(t,e,i,r,o,s)}
-    `;return j`
+    `:W``)(t,e,i,r,o,s)}
+    `;return W`
     <svg viewBox="0 0 960 590" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${H}" />
-          <stop offset="100%" stop-color="${N}" />
+          <stop offset="0%" stop-color="${U}" />
+          <stop offset="100%" stop-color="${H}" />
         </linearGradient>
 
         <linearGradient id="garden-grad" x1="0" y1="0" x2="0" y2="1">
@@ -400,7 +400,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
         <rect width="960" height="590" fill="url(#sky-grad)" />
 
         <!-- Stars -->
-        ${R.stars>.05&&"rainy"!==p&&"lightning"!==p&&"cloudy"!==p?j`
+        ${R.stars>.05&&"rainy"!==p&&"lightning"!==p&&"cloudy"!==p?W`
           <g opacity="${R.stars}" style="pointer-events: none;">
             <circle cx="96"  cy="60"  r="1.2" class="starFast" fill="#ffffff" />
             <circle cx="216" cy="114" r="1.5" fill="#ffffff" />
@@ -414,15 +414,15 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
         `:""}
 
         <!-- Dynamic Sun -->
-        ${z>0?j`
+        ${z>0?W`
           <g style="pointer-events: none;">
             <circle cx="${I.cx}" cy="${I.cy}" r="54" fill="${F}" opacity="${.15*z}" style="filter: blur(8px);" />
-            <circle cx="${I.cx}" cy="${I.cy}" r="26" fill="${F}" opacity="${z}" style="filter: drop-shadow(0 0 14px ${W});" />
+            <circle cx="${I.cx}" cy="${I.cy}" r="26" fill="${F}" opacity="${z}" style="filter: drop-shadow(0 0 14px ${j});" />
           </g>
         `:""}
 
         <!-- Dynamic Moon -->
-        ${V>0?j`
+        ${V>0?W`
           <g style="pointer-events: none;" opacity="${V}">
             <circle cx="${B.cx}" cy="${B.cy}" r="30" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
             <circle cx="${B.cx}" cy="${B.cy}" r="17" fill="#f1f5f9" />
@@ -434,29 +434,29 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
         ${mt("cloud1",72,36,.65,G,.75*D)}
         ${mt("cloud2",432,84,.85,G,.85*D)}
         ${mt("cloud3",744,132,1,G,D)}
-        ${"cloudy"===p||"rainy"===p||"lightning"===p?j`
+        ${"cloudy"===p||"rainy"===p||"lightning"===p?W`
           ${mt("cloud2",240,60,.75,G,.8*D)}
           ${mt("cloud1",588,108,.9,G,.8*D)}
         `:""}
 
         <!-- Lightning bolt -->
-        ${"lightning"===p?j`
+        ${"lightning"===p?W`
           <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
         `:""}
 
         <!-- Falling precipitation -->
-        ${"rainy"===p?j`
+        ${"rainy"===p?W`
     <g style="pointer-events: none;">
-      ${Array.from({length:18}).map((t,e)=>j`
+      ${Array.from({length:18}).map((t,e)=>W`
         <line x1="${25+55*e}" y1="0" x2="${8+55*e}" y2="40"
           class="rainDrop"
           style="animation-delay: ${e%5*.12}s; animation-duration: ${.6+e%3*.1}s;" />
       `)}
     </g>
   `:""}
-        ${"snowy"===p?j`
+        ${"snowy"===p?W`
     <g style="pointer-events: none;">
-      ${Array.from({length:22}).map((t,e)=>j`
+      ${Array.from({length:22}).map((t,e)=>W`
         <circle cx="${25+45*e}" cy="0" r="${1.8+e%3*.6}"
           class="snowFlake"
           style="animation-delay: ${e%6*.5}s; animation-duration: ${4.5+e%4*.7}s;" />
@@ -465,7 +465,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
   `:""}
 
         <!-- Fog overlay -->
-        ${"foggy"===p?j`
+        ${"foggy"===p?W`
           <rect width="960" height="590" fill="rgba(226, 232, 240, 0.22)" style="filter: blur(5px); pointer-events: none;" />
         `:""}
 
@@ -546,7 +546,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
 
           <!-- ── HOUSE DESIGNS ── -->
           <g id="house-structure" class="interactiveGroup homeGroup" @click=${()=>v("home")}>
-            ${"modern-villa"===t?j`
+            ${"modern-villa"===t?W`
               <!-- Plinth / Foundation Base -->
               <rect x="290" y="455" width="20" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
               <rect x="345" y="455" width="245" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
@@ -555,7 +555,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
 
               <!-- Left Gevel Wall (Textured Cedar planks) -->
               <rect x="290" y="300" width="90" height="155" fill="#c2410c" stroke="#78350f" stroke-width="0.8" />
-              ${Array.from({length:8}).map((t,e)=>j`
+              ${Array.from({length:8}).map((t,e)=>W`
                 <line x1="${300+10*e}" y1="300" x2="${300+10*e}" y2="455" stroke="#451a03" stroke-width="0.8" opacity="0.35" />
               `)}
 
@@ -578,7 +578,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
               <g id="house-door">
                 <rect x="310" y="380" width="35" height="100" fill="#78350f" stroke="#451a03" stroke-width="1.5" rx="1.5" />
                 <line x1="337" y1="410" x2="337" y2="435" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-                <rect x="317" y="390" width="6" height="70" fill="${U?"#fde047":"#1e293b"}" stroke="#451a03" stroke-width="0.8" style="fill: ${U?`rgba(253, 224, 71, ${R.lights})`:"#1e293b"}; filter: ${U?`drop-shadow(0 0 4px rgba(253, 224, 71, ${R.lights}))`:"none"}; transition: fill 0.5s ease;" />
+                <rect x="317" y="390" width="6" height="70" fill="${N?"#fde047":"#1e293b"}" stroke="#451a03" stroke-width="0.8" style="fill: ${N?`rgba(253, 224, 71, ${R.lights})`:"#1e293b"}; filter: ${N?`drop-shadow(0 0 4px rgba(253, 224, 71, ${R.lights}))`:"none"}; transition: fill 0.5s ease;" />
                 <rect x="305" y="375" width="45" height="5" fill="#334155" stroke="#1e293b" stroke-width="0.8" rx="1" />
               </g>
 
@@ -624,92 +624,57 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
               <line x1="440" y1="242" x2="440" y2="268" stroke="#0f172a" stroke-width="1" />
             `:""}
 
-            ${"classic-jaren30"===t?j`
+            ${"classic-jaren30"===t?W`
               <!-- Plinth (Bottom dark brick) -->
               <rect x="290" y="450" width="300" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
               <!-- Main Wall (Red brick pentagon) -->
-              <!-- Main Wall (Red brick pentagon) -->
-              <polygon points="290,450 290,370 440,150 590,370 590,450" fill="url(#jaren30-brick-pat)" stroke="#7f1d1d" stroke-width="0.8" />
-
-              <!-- Left Side Entrance Extension -->
-              <rect x="260" y="450" width="30" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
-              <rect x="260" y="370" width="30" height="80" fill="url(#jaren30-brick-pat)" stroke="#7f1d1d" stroke-width="0.8" />
-              <polygon points="255,370 290,355 290,370" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
-              <line x1="255" y1="370" x2="290" y2="355" stroke="#f8fafc" stroke-width="2.5" />
-              <rect x="264" y="380" width="22" height="65" fill="#1e293b" stroke="#0f172a" stroke-width="1" rx="1" />
-              <rect x="272" y="385" width="6" height="30" fill="${U?"#fde047":"#0f172a"}" opacity="0.8" style="fill: ${U?`rgba(253, 224, 71, ${R.lights})`:"#0f172a"}; transition: fill 0.5s ease;" />
-
-              <!-- Soldier Course Accent Bands -->
-              <rect x="290" y="362" width="300" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
-              <rect x="300" y="359" width="280" height="8" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
-
-              <!-- Windows -->
-              <rect x="305" y="375" width="35" height="75" fill="${Q}" stroke="#0f172a" stroke-width="2.5" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
-              <rect x="307" y="377" width="31" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
-              <line x1="305" y1="412.5" x2="340" y2="412.5" stroke="#0f172a" stroke-width="1.5" />
-
-              <rect x="375" y="375" width="130" height="75" fill="${Q}" stroke="#0f172a" stroke-width="3.0" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
-              <rect x="377" y="377" width="126" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
-              <line x1="375" y1="412.5" x2="505" y2="412.5" stroke="#0f172a" stroke-width="2.0" />
-
-              <rect x="540" y="375" width="35" height="75" fill="${Q}" stroke="#0f172a" stroke-width="2.5" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
-              <rect x="542" y="377" width="31" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
-              <line x1="540" y1="412.5" x2="575" y2="412.5" stroke="#0f172a" stroke-width="1.5" />
-
-              <rect x="355" y="312" width="45" height="46" fill="${Q}" stroke="#0f172a" stroke-width="2.5" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
-              <line x1="377.5" y1="312" x2="377.5" y2="358" stroke="#0f172a" stroke-width="1.8" />
-              <rect x="355" y="302" width="45" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
-
-              <rect x="480" y="312" width="45" height="46" fill="${Q}" stroke="#0f172a" stroke-width="2.5" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
-              <line x1="502.5" y1="312" x2="502.5" y2="358" stroke="#0f172a" stroke-width="1.8" />
-              <rect x="480" y="302" width="45" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
-
-              <!-- Roof Framing -->
-              <rect x="280" y="367" width="320" height="6" fill="#f8fafc" rx="1" />
-              <line x1="290" y1="370" x2="440" y2="150" stroke="#f8fafc" stroke-width="5.0" stroke-linecap="round" />
-              <line x1="590" y1="370" x2="440" y2="150" stroke="#f8fafc" stroke-width="5.0" stroke-linecap="round" />
-
-              <polygon points="361.5,265 440,150 518.5,265" fill="#1e293b" stroke="#0f172a" stroke-width="1.2" />
-              ${Array.from({length:20}).map((t,e)=>{const i=150+6*e;if(i>265)return"";const r=78.5/115*(i-150);return j`<line x1="${440-r}" y1="${i}" x2="${440+r}" y2="${i}" stroke="#0f172a" stroke-width="0.8" opacity="0.45" />`})}
-
-              <!-- Chimney -->
-              <rect x="445" y="115" width="16" height="36" fill="#4a5568" stroke="#1a202c" stroke-width="1" />
-              <rect x="442" y="110" width="22" height="6" fill="#1a202c" rx="0.5" />
-
-              <!-- Solar Panels on steep roof -->
-              <g transform="translate(440, 150) rotate(55.7)">
-                <rect x="15" y="-12" width="140" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-                <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                <line x1="15" y1="-7" x2="155" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+              <!-- LEFT WING -->
+              <g id="left-wing">
+                <rect x="180" y="370" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
+                <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <line x1="205" y1="330" x2="320" y2="330" stroke="#0f172a" stroke-width="8" />
+                <line x1="205" y1="330" x2="320" y2="330" stroke="#1e293b" stroke-width="4" />
+                <rect x="230" y="390" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${X}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="250" y1="390" x2="250" y2="435" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="230" y1="412.5" x2="270" y2="412.5" stroke="#0f172a" stroke-width="1.2" />
               </g>
 
-              <!-- Front tree -->
-              <g id="front-garden-tree" style="pointer-events: none;">
-                <rect x="437" y="320" width="6" height="135" fill="#5c4033" rx="1" />
-                <line x1="440" y1="360" x2="432" y2="340" stroke="#5c4033" stroke-width="2" />
-                <line x1="440" y1="340" x2="447" y2="320" stroke="#5c4033" stroke-width="1.8" />
-                <ellipse cx="440" cy="270" rx="22" ry="75" fill="#15803d" opacity="0.92" />
-                <ellipse cx="440" cy="230" rx="16" ry="60" fill="#16a34a" opacity="0.94" />
-                <ellipse cx="440" cy="180" rx="10" ry="40" fill="#22c55e" opacity="0.95" />
+              <!-- RIGHT WING -->
+              <g id="right-wing">
+                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="692" y1="354" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <rect x="465" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${X}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="485" y1="385" x2="485" y2="430" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="465" y1="407.5" x2="505" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+                <rect x="555" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${X}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="575" y1="385" x2="575" y2="430" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="555" y1="407.5" x2="595" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+                <rect x="480" y="280" width="40" height="40" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${X}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="500" y1="280" x2="500" y2="320" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="480" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="1.2" />
               </g>
 
-              <!-- Hydrangea bushes -->
-              <g id="front-garden-hydrangeas" style="pointer-events: none;">
-                <circle cx="538" cy="450" r="10" fill="#15803d" />
-                <circle cx="550" cy="448" r="12" fill="#16a34a" />
-                <circle cx="565" cy="450" r="10" fill="#15803d" />
-                <circle cx="536" cy="443" r="5" fill="#fef08a" opacity="0.9" />
-                <circle cx="548" cy="439" r="7" fill="#ffffff" opacity="0.9" />
-                <circle cx="560" cy="442" r="6" fill="#fef08a" opacity="0.9" />
-                <circle cx="566" cy="445" r="4" fill="#ffffff" opacity="0.9" />
+              <!-- CENTER ENTRANCE GABLE -->
+              <g id="center-portal">
+                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <line x1="452" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="452" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <rect x="360" y="395" width="40" height="85" fill="#052e16" stroke="#021b0d" stroke-width="2" />
+                <circle cx="390" cy="435" r="2" fill="#fbbf24" />
               </g>
             `:""}
 
-            ${"barnhouse"===t?j`
+            ${"barnhouse"===t?W`
               <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
               <rect x="290" y="280" width="300" height="175" fill="#172554" stroke="#0f172a" stroke-width="1" />
-              ${Array.from({length:26}).map((t,e)=>j`
+              ${Array.from({length:26}).map((t,e)=>W`
                 <line x1="${300+11*e}" y1="280" x2="${300+11*e}" y2="455" stroke="#020617" stroke-width="0.8" opacity="0.45" />
               `)}
               <!-- Door -->
@@ -733,7 +698,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
               <line x1="395" y1="390" x2="515" y2="390" stroke="#0f172a" stroke-width="1.5" />
             `:""}
 
-            ${"cubist-bungalow"===t?j`
+            ${"cubist-bungalow"===t?W`
               <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
               <rect x="290" y="320" width="90" height="135" fill="#64748b" stroke="#475569" stroke-width="1" />
               <line x1="290" y1="380" x2="380" y2="380" stroke="#475569" stroke-width="0.8" opacity="0.5" />
@@ -766,12 +731,12 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
               <line x1="455" y1="290" x2="455" y2="340" stroke="#0f172a" stroke-width="1.5" />
             `:""}
 
-            ${"townhouse"===t?j`
+            ${"townhouse"===t?W`
               <rect x="290" y="455" width="300" height="25" fill="#292524" stroke="#1c1917" stroke-width="0.8" />
               <polygon points="290,230 440,150 590,230" fill="#292524" stroke="#1c1917" stroke-width="1.2" opacity="0.8" />
               <polygon points="290,230 320,230 320,200 350,200 350,170 380,170 380,140 500,140 500,170 530,170 530,200 560,200 560,230 590,230" fill="#44403c" stroke="#1c1917" stroke-width="1" />
               <rect x="290" y="230" width="300" height="225" fill="#44403c" stroke="#1c1917" stroke-width="1" />
-              ${Array.from({length:32}).map((t,e)=>j`
+              ${Array.from({length:32}).map((t,e)=>W`
                 <line x1="290" y1="${230+7*e}" x2="590" y2="${230+7*e}" stroke="#292524" stroke-width="0.5" opacity="0.35" />
               `)}
               <!-- Door -->
@@ -787,21 +752,21 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
               <rect x="395" y="375" width="130" height="80" fill="${Q}" stroke="#f8fafc" stroke-width="2.5" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
               <line x1="460" y1="375" x2="460" y2="455" stroke="#f8fafc" stroke-width="1.8" />
               <line x1="395" y1="415" x2="525" y2="415" stroke="#f8fafc" stroke-width="1.2" />
-              ${[335,420,505].map(t=>j`
+              ${[335,420,505].map(t=>W`
                 <rect x="${t}" y="290" width="35" height="60" fill="${Q}" stroke="#f8fafc" stroke-width="2.0" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
                 <line x1="${t+17.5}" y1="290" x2="${t+17.5}" y2="350" stroke="#f8fafc" stroke-width="1.2" />
               `)}
-              ${[370,460].map(t=>j`
+              ${[370,460].map(t=>W`
                 <rect x="${t}" y="210" width="30" height="45" fill="${Q}" stroke="#f8fafc" stroke-width="1.8" style="filter: ${X}; transition: fill 0.5s ease;" rx="1" />
                 <line x1="${t+15}" y1="210" x2="${t+15}" y2="255" stroke="#f8fafc" stroke-width="1" />
               `)}
             `:""}
 
             <!-- Fallback Default Brick House (for backward compatibility if no/invalid houseStyle) -->
-            ${"modern-villa"!==t&&"classic-jaren30"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?j`
+            ${"modern-villa"!==t&&"classic-jaren30"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?W`
               <!-- LEFT WING -->
               <g id="left-wing">
-                <rect x="180" y="370" width="140" height="110" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <rect x="180" y="370" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
@@ -814,7 +779,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
 
               <!-- RIGHT WING -->
               <g id="right-wing">
-                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
                 <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
@@ -832,7 +797,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
 
               <!-- CENTER ENTRANCE GABLE -->
               <g id="center-portal">
-                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
                 <line x1="452" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
@@ -844,10 +809,10 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
           </g>
 
           <!-- ── SOLAR PANELS (conditional) ── -->
-          ${d?j`
+          ${d?W`
             <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),v("solar")}}>
               <!-- Only render solar panels if it is the default wing house, since the custom styles have solar panels integrated on their roofs -->
-              ${"modern-villa"!==t&&"classic-jaren30"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?j`
+              ${"modern-villa"!==t&&"classic-jaren30"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?W`
                 <g transform="translate(320, 340) rotate(-49.4)">
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
@@ -887,7 +852,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
           <circle cx="345" cy="420" r="2.5" fill="#10b981" />
 
           <!-- ── BATTERY (conditional) ── -->
-          ${f?j`
+          ${f?W`
             <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),v("battery")}}>
               <!-- Render battery in Jaren 30 or other custom styles at x=320, or let it adapt -->
               <rect x="320" y="410" width="30" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" rx="3" />
@@ -901,7 +866,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
           `:""}
 
           <!-- ── EV CHARGER (conditional) ── -->
-          ${y?j`
+          ${y?W`
             <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),v("ev")}}>
               <rect x="448" y="425" width="14" height="55" fill="#1e293b" rx="2" />
               <rect x="443" y="415" width="24" height="20" fill="#334155" stroke="#1e293b" stroke-width="1" rx="3" />
@@ -914,7 +879,7 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
 
             <!-- EV Car -->
             <g id="ev-car" class="interactiveGroup evGroup" opacity="${C?1:.4}" style="transition: opacity 0.6s ease;" @click=${t=>{t.stopPropagation(),v("ev")}}>
-              ${"hatchback"===e?j`
+              ${"hatchback"===e?W`
                 <g transform="translate(490, 430)">
                   <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
                   <path d="M 0,44 C 0,44 4,28 18,28 C 32,28 50,8 75,6 C 100,4 118,16 132,28 C 148,40 158,44 160,44 L 158,52 L 2,52 Z"
@@ -926,13 +891,13 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
                   <path d="M 160,44 C 157,44 156,46 155,48 L 160,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
                   <circle cx="32" cy="50" r="16" fill="#090d16" />
                   <circle cx="32" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                  ${Array.from({length:6}).map((t,e)=>{const i=e*Math.PI/3;return j`<line x1="32" y1="50" x2="${32+10*Math.cos(i)}" y2="${50+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
+                  ${Array.from({length:6}).map((t,e)=>{const i=e*Math.PI/3;return W`<line x1="32" y1="50" x2="${32+10*Math.cos(i)}" y2="${50+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
                   <circle cx="118" cy="50" r="16" fill="#090d16" />
                   <circle cx="118" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                  ${Array.from({length:6}).map((t,e)=>{const i=e*Math.PI/3;return j`<line x1="118" y1="50" x2="${118+10*Math.cos(i)}" y2="${50+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
+                  ${Array.from({length:6}).map((t,e)=>{const i=e*Math.PI/3;return W`<line x1="118" y1="50" x2="${118+10*Math.cos(i)}" y2="${50+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
                 </g>
               `:""}
-              ${"sedan"===e?j`
+              ${"sedan"===e?W`
                 <g transform="translate(500, 432)">
                   <ellipse cx="70" cy="48" rx="74" ry="4.5" fill="rgba(0,0,0,0.45)" />
                   <path
@@ -951,13 +916,13 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
                   <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
                   <circle cx="30" cy="44" r="13.5" fill="#090d16" />
                   <circle cx="30" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                  ${Array.from({length:7}).map((t,e)=>{const i=2*e*Math.PI/7;return j`<line x1="30" y1="44" x2="${30+8.5*Math.cos(i)}" y2="${44+8.5*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
+                  ${Array.from({length:7}).map((t,e)=>{const i=2*e*Math.PI/7;return W`<line x1="30" y1="44" x2="${30+8.5*Math.cos(i)}" y2="${44+8.5*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
                   <circle cx="103" cy="44" r="13.5" fill="#090d16" />
                   <circle cx="103" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                  ${Array.from({length:7}).map((t,e)=>{const i=2*e*Math.PI/7;return j`<line x1="103" y1="44" x2="${103+8.5*Math.cos(i)}" y2="${44+8.5*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
+                  ${Array.from({length:7}).map((t,e)=>{const i=2*e*Math.PI/7;return W`<line x1="103" y1="44" x2="${103+8.5*Math.cos(i)}" y2="${44+8.5*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.2" />`})}
                 </g>
               `:""}
-              ${"suv"===e?j`
+              ${"suv"===e?W`
                 <g transform="translate(500, 422)">
                   <ellipse cx="70" cy="58" rx="74" ry="5.5" fill="rgba(0,0,0,0.45)" />
                   <path d="M 15,56 A 17,17 0 0,1 47,56" fill="none" stroke="#1f2937" stroke-width="3" />
@@ -978,10 +943,10 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
                   <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
                   <circle cx="31" cy="54" r="15.5" fill="#090d16" />
                   <circle cx="31" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                  ${Array.from({length:5}).map((t,e)=>{const i=2*e*Math.PI/5;return j`<line x1="31" y1="54" x2="${31+10*Math.cos(i)}" y2="${54+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.5" />`})}
+                  ${Array.from({length:5}).map((t,e)=>{const i=2*e*Math.PI/5;return W`<line x1="31" y1="54" x2="${31+10*Math.cos(i)}" y2="${54+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.5" />`})}
                   <circle cx="104" cy="54" r="15.5" fill="#090d16" />
                   <circle cx="104" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                  ${Array.from({length:5}).map((t,e)=>{const i=2*e*Math.PI/5;return j`<line x1="104" y1="54" x2="${104+10*Math.cos(i)}" y2="${54+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.5" />`})}
+                  ${Array.from({length:5}).map((t,e)=>{const i=2*e*Math.PI/5;return W`<line x1="104" y1="54" x2="${104+10*Math.cos(i)}" y2="${54+10*Math.sin(i)}" stroke="#cbd5e1" stroke-width="1.5" />`})}
                 </g>
               `:""}
             </g>
@@ -997,14 +962,14 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
 
         ${at(`M 192,455 L 192,493 L ${J},493 L ${J},${K}`,M||S,$t(c),O.stroke,O.glow,S)}
 
-        ${f?at(`M ${Y(310)},${q(420)} L ${J},${K}`,A||E,$t(n),T.stroke,T.glow,A):""}
+        ${f?at(`M ${Y(310)},${q(420)} L ${J},${K}`,A||E,$t(l),T.stroke,T.glow,A):""}
 
         ${y?at(`M ${J},${K} L ${J},503 L 664,503 L 664,415`,C,$t(h),gt.ev.stroke,gt.ev.glow):""}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- SOLAR HUD card (top right sky area)                            -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${d?j`
+        ${d?W`
           <g class="interactiveGroup solarGroup" @click=${()=>v("solar")}>
             <g transform="translate(696, 90)">
               <rect x="0" y="0" width="200" height="65"
@@ -1026,9 +991,9 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (grid, home, battery, ev)                     -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${lt.map((t,e)=>j`
+        ${nt.map((t,e)=>W`
             <g class="interactiveGroup" @click=${()=>v(t.id)}>
-              <g transform="translate(${nt+e*(170+nt)}, 510)">
+              <g transform="translate(${lt+e*(170+lt)}, 510)">
                 <rect x="0" y="0" width="170" height="65"
                   class="hudCard ${t.active?"hudCardActive":""}"
                   rx="8" ry="8"
@@ -1044,17 +1009,17 @@ function t(t,e,i,r){var o,s=arguments.length,l=s<3?e:null===r?r=Object.getOwnPro
           `)}
       </g>
     </svg>
-  `}class _t extends at{constructor(){super(...arguments),this.selectedNode=null}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const i=parseFloat(e.state);return isNaN(i)?0:i};return Array.isArray(t)?t.reduce((t,i)=>t+e(i),0):e(t)}handleNodeClick(t){console.info(`[energy-flow-card] Click registered on node: ${t}`),this.selectedNode=this.selectedNode===t?null:t;let e=t;"battery"===t?e=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?e="load":"ev"===t?e="charger":"grid"===t?e=this.config?.entities.grid?"grid":"solar":"solar"===t&&(e=this.config?.entities.solar_energy_today?"solar_energy_today":"solar");const i=this.config?.entities?this.config.entities[e]:void 0,r=Array.isArray(i)?i[0]:i;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${e}', resolved entity ID: '${r}'`),r){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${r}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:r},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}render(){if(!this.config||!this.hass)return W`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date,i=e.getHours()+e.getMinutes()/60;let r="afternoon";r=i>=5&&i<9?"morning":i>=9&&i<18?"afternoon":i>=18&&i<22?"evening":"night";const o=this.getEntityValue(t.solar),s=this.getEntityValue(t.load),l=this.getEntityValue(t.battery_power),n=t.battery_soc?this.getEntityValue(t.battery_soc):0,a=this.getEntityValue(t.charger);let h=0;t.grid&&(h=this.getEntityValue(t.grid));let c=l;if(void 0!==this.config.battery_invert){c=!0===this.config.battery_invert?l:-l}else if(t.grid){const t=o+h-s-a;c=Math.abs(l)>.05&&Math.abs(t)>.15?t*l<0?-l:l:-l}else c=-l;const d=t=>{if(!t)return null;const e=this.hass?.states[t];if(!e)return null;const i=parseFloat(e.state);return isNaN(i)?null:i},f=d(t.solar_energy_today),y=d(t.grid_import_today),p=d(t.grid_export_today),g=d(t.home_today),x=d(t.battery_charge_today),u=d(t.battery_discharge_today),k=d(t.ev_today);let w="sunny";t.weather&&this.hass?.states[t.weather]&&(w=this.hass.states[t.weather].state);let $=6,b=21;const m=this.hass?.states["sun.sun"];if(m)try{const t=new Date(m.attributes.next_rising),e=new Date(m.attributes.next_setting);$=t.getHours()+t.getMinutes()/60,b=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||(h=s+a-o-c);const v=!!t.solar,_=!!t.battery_power,A=!!t.charger,E=wt(i),M=`background: linear-gradient(to bottom, ${E.top} 0%, ${E.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;return W`
+  `}class _t extends at{constructor(){super(...arguments),this.selectedNode=null}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const i=parseFloat(e.state);return isNaN(i)?0:i};return Array.isArray(t)?t.reduce((t,i)=>t+e(i),0):e(t)}handleNodeClick(t){console.info(`[energy-flow-card] Click registered on node: ${t}`),this.selectedNode=this.selectedNode===t?null:t;let e=t;"battery"===t?e=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?e="load":"ev"===t?e="charger":"grid"===t?e=this.config?.entities.grid?"grid":"solar":"solar"===t&&(e=this.config?.entities.solar_energy_today?"solar_energy_today":"solar");const i=this.config?.entities?this.config.entities[e]:void 0,r=Array.isArray(i)?i[0]:i;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${e}', resolved entity ID: '${r}'`),r){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${r}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:r},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}render(){if(!this.config||!this.hass)return j`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date,i=e.getHours()+e.getMinutes()/60;let r="afternoon";r=i>=5&&i<9?"morning":i>=9&&i<18?"afternoon":i>=18&&i<22?"evening":"night";const o=this.getEntityValue(t.solar),s=this.getEntityValue(t.load),n=this.getEntityValue(t.battery_power),l=t.battery_soc?this.getEntityValue(t.battery_soc):0,a=this.getEntityValue(t.charger);let h=0;t.grid&&(h=this.getEntityValue(t.grid));let c=n;if(void 0!==this.config.battery_invert){c=!0===this.config.battery_invert?n:-n}else if(t.grid){const t=o+h-s-a;c=Math.abs(n)>.05&&Math.abs(t)>.15?t*n<0?-n:n:-n}else c=-n;const d=t=>{if(!t)return null;const e=this.hass?.states[t];if(!e)return null;const i=parseFloat(e.state);return isNaN(i)?null:i},f=d(t.solar_energy_today),y=d(t.grid_import_today),p=d(t.grid_export_today),g=d(t.home_today),x=d(t.battery_charge_today),u=d(t.battery_discharge_today),k=d(t.ev_today);let w="sunny";t.weather&&this.hass?.states[t.weather]&&(w=this.hass.states[t.weather].state);let $=6,b=21;const m=this.hass?.states["sun.sun"];if(m)try{const t=new Date(m.attributes.next_rising),e=new Date(m.attributes.next_setting);$=t.getHours()+t.getMinutes()/60,b=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||(h=s+a-o-c);const v=!!t.solar,_=!!t.battery_power,A=!!t.charger,E=wt(i),M=`background: linear-gradient(to bottom, ${E.top} 0%, ${E.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;return j`
       <ha-card style="${M}">
         <div class="card-container">
-          ${this.config.title?W`
+          ${this.config.title?j`
             <div class="card-header">
               <div class="card-title">${this.config.title}</div>
             </div>
           `:""}
 
           <div class="sceneWrapper">
-            ${vt({timeHour:i,timeOfDay:r,solar:o,solarToday:f,load:s,batteryPower:c,soc:n,charger:a,grid:h,showSolar:v,showBattery:_,showEV:A,weather:w,sunriseHour:$,sunsetHour:b,gridImportToday:y,gridExportToday:p,homeToday:g,batteryChargeToday:x,batteryDischargeToday:u,evToday:k,houseStyle:this.config?.house_style,carType:this.config?.car_type,onNodeClick:t=>this.handleNodeClick(t)})}
+            ${vt({timeHour:i,timeOfDay:r,solar:o,solarToday:f,load:s,batteryPower:c,soc:l,charger:a,grid:h,showSolar:v,showBattery:_,showEV:A,weather:w,sunriseHour:$,sunsetHour:b,gridImportToday:y,gridExportToday:p,homeToday:g,batteryChargeToday:x,batteryDischargeToday:u,evToday:k,houseStyle:this.config?.house_style,carType:this.config?.car_type,onNodeClick:t=>this.handleNodeClick(t)})}
           </div>
         </div>
       </ha-card>
