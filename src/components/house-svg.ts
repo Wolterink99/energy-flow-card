@@ -114,11 +114,12 @@ function renderHDCloud(className: string, x: number, y: number, scale = 1, color
   `;
 }
 
-function renderRain(): TemplateResult {
+function renderRain(width: number): TemplateResult {
+  const count = Math.ceil(width / 18);
   return svg`
     <g style="pointer-events: none;">
-      ${Array.from({ length: 45 }).map((_, i) => svg`
-        <line x1="${15 + i * 17.5}" y1="0" x2="${-2 + i * 17.5}" y2="40"
+      ${Array.from({ length: count }).map((_, i) => svg`
+        <line x1="${15 + i * 18}" y1="0" x2="${-2 + i * 18}" y2="40"
           class="rainDrop"
           style="animation-delay: ${(i % 7) * 0.12}s; animation-duration: ${0.9 + (i % 4) * 0.12}s;" />
       `)}
@@ -126,11 +127,11 @@ function renderRain(): TemplateResult {
   `;
 }
 
-// In standard 800x600 layout
-function renderSnow(): TemplateResult {
+function renderSnow(width: number): TemplateResult {
+  const count = Math.ceil(width / 20);
   return svg`
     <g style="pointer-events: none;">
-      ${Array.from({ length: 40 }).map((_, i) => svg`
+      ${Array.from({ length: count }).map((_, i) => svg`
         <circle cx="${15 + i * 20}" cy="0" r="${1.8 + (i % 4) * 0.6}"
           class="snowFlake"
           style="animation-delay: ${(i % 8) * 0.4}s; animation-duration: ${3.5 + (i % 5) * 0.6}s;" />
@@ -140,6 +141,8 @@ function renderSnow(): TemplateResult {
 }
 
 interface SvgParams {
+  containerWidth: number;
+  containerHeight: number;
   houseStyle?: string;
   carType?: string;
   timeHour: number;
@@ -168,6 +171,8 @@ interface SvgParams {
 }
 
 export function renderHouseSvg({
+  containerWidth,
+  containerHeight,
   carType = 'hatchback',
   timeHour: rawTimeHour,
   timeOfDay,
@@ -193,6 +198,10 @@ export function renderHouseSvg({
   evToday = null,
   onNodeClick
 }: SvgParams): TemplateResult {
+
+  // Resolve fluid dimensions (fall back to standard 800x600 if container is not measured yet)
+  const width = containerWidth || 800;
+  const height = containerHeight || 600;
 
   // Normalize timeHour so sunrise=6.0 and sunset=21.0
   let timeHour = rawTimeHour;
@@ -256,32 +265,32 @@ export function renderHouseSvg({
     ? 'none'
     : (showLights ? 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))' : 'none');
 
-  // ── Sun trajectory (using 800x600 viewBox) ──
+  // ── Sun trajectory (using dynamic width and height) ──
   const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' && weather !== 'snowy' && weather !== 'foggy';
-  const sunPos = { cx: 400, cy: 500 };
+  const sunPos = { cx: width / 2, cy: height };
   let sunOpacity = 0;
   let sunColor = '#fef08a';
   let sunGlow = 'rgba(254, 240, 138, 0.65)';
 
   if (isSunVisible) {
     const tSun = (timeHour - 6.0) / 15.0;
-    sunPos.cx = -50 + tSun * 900;
-    sunPos.cy = 480 - Math.sin(tSun * Math.PI) * 440;
+    sunPos.cx = -60 + tSun * (width + 120);
+    sunPos.cy = (height - 120) - Math.sin(tSun * Math.PI) * (height - 160);
     sunOpacity = Math.max(0, Math.min(1.0, Math.sin(tSun * Math.PI) * 1.5));
     const fSun = Math.sin(tSun * Math.PI);
     sunColor = interpolateColor('#ea580c', '#fef08a', fSun);
     sunGlow = interpolateColor('rgba(234, 88, 12, 0.65)', 'rgba(254, 240, 138, 0.75)', fSun);
   }
 
-  // ── Moon trajectory (using 800x600 viewBox) ──
+  // ── Moon trajectory (using dynamic width and height) ──
   const isMoonVisible = (timeHour > 21.0 || timeHour < 6.0) && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' && weather !== 'snowy' && weather !== 'foggy';
-  const moonPos = { cx: 400, cy: 500 };
+  const moonPos = { cx: width / 2, cy: height };
   let moonOpacity = 0;
 
   if (isMoonVisible) {
     const tMoon = timeHour > 21.0 ? (timeHour - 21.0) / 9.0 : (timeHour + 3.0) / 9.0;
-    moonPos.cx = -50 + tMoon * 900;
-    moonPos.cy = 480 - Math.sin(tMoon * Math.PI) * 400;
+    moonPos.cx = -60 + tMoon * (width + 120);
+    moonPos.cy = (height - 120) - Math.sin(tMoon * Math.PI) * (height - 200);
     moonOpacity = Math.max(0, Math.min(0.9, Math.sin(tMoon * Math.PI) * 1.8));
   }
 
@@ -328,7 +337,7 @@ export function renderHouseSvg({
 
   const cardWidth = 170;
   const totalWidth = bottomCards.length * cardWidth;
-  const remainingWidth = 800 - totalWidth;
+  const remainingWidth = width - totalWidth;
   const gap = remainingWidth / (bottomCards.length + 1);
 
   // ── Particle and cable rendering ──
@@ -363,8 +372,20 @@ export function renderHouseSvg({
     `;
   };
 
+  // Build fluid overcast background cloud path
+  let overcastPath = `M 0,-10 L ${width},-10 L ${width},12`;
+  for (let x = width; x > 0; x -= 30) {
+    overcastPath += ` Q ${x - 15},18 ${x - 30},12`;
+  }
+  overcastPath += ` Z`;
+
+  // Horizontal translation to center the house group
+  const translateX = (width - 800) / 2;
+  // Vertical translation to pin the ground and house to the bottom of the viewport
+  const translateY = height - 530;
+
   return svg`
-    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
@@ -428,23 +449,23 @@ export function renderHouseSvg({
 
         <!-- Clip path for the whole scene -->
         <clipPath id="scene-clip">
-          <rect width="800" height="600" rx="12" ry="12" />
+          <rect width="${width}" height="${height}" rx="12" ry="12" />
         </clipPath>
       </defs>
 
       <g clip-path="url(#scene-clip)">
         <!-- Sky background -->
-        <rect width="800" height="600" fill="url(#sky-grad)" />
+        <rect width="${width}" height="${height}" fill="url(#sky-grad)" />
 
-        <!-- Stars -->
+        <!-- Stars (dynamically distributed across width) -->
         ${skyState.stars > 0.05 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' ? svg`
           <g opacity="${skyState.stars}" style="pointer-events: none;">
-            <circle cx="80"  cy="50"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="210" cy="95"  r="1.2" fill="#ffffff" />
-            <circle cx="340" cy="40"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="480" cy="110" r="1.5" fill="#ffffff" />
-            <circle cx="620" cy="65"  r="1.2" class="starFast" fill="#ffffff" />
-            <circle cx="730" cy="120" r="1.0" fill="#ffffff" />
+            <circle cx="${width * 0.1}"  cy="${height * 0.08}"  r="1.0" class="starFast" fill="#ffffff" />
+            <circle cx="${width * 0.26}" cy="${height * 0.16}"  r="1.2" fill="#ffffff" />
+            <circle cx="${width * 0.42}" cy="${height * 0.07}"  r="1.0" class="starFast" fill="#ffffff" />
+            <circle cx="${width * 0.6}"  cy="${height * 0.18}"  r="1.5" fill="#ffffff" />
+            <circle cx="${width * 0.77}" cy="${height * 0.11}"  r="1.2" class="starFast" fill="#ffffff" />
+            <circle cx="${width * 0.91}" cy="${height * 0.2}"   r="1.0" fill="#ffffff" />
           </g>
         ` : ''}
 
@@ -466,13 +487,13 @@ export function renderHouseSvg({
         ` : ''}
 
         <!-- Falling precipitation -->
-        ${weather === 'rainy' ? renderRain() : ''}
-        ${weather === 'snowy' ? renderSnow() : ''}
+        ${weather === 'rainy' ? renderRain(width) : ''}
+        ${weather === 'snowy' ? renderSnow(width) : ''}
 
         <!-- Cloud layers -->
         <g opacity="${cloudOpacity}" style="pointer-events: none;">
           ${(weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy') ? svg`
-            <path d="M 0,-10 L 800,-10 L 800,12 Q 785,18 770,12 Q 755,18 740,12 Q 725,18 710,12 Q 695,18 680,12 Q 665,18 650,12 Q 635,18 620,12 Q 605,18 590,12 Q 575,18 560,12 Q 545,18 530,12 Q 515,18 500,12 Q 485,18 470,12 Q 455,18 440,12 Q 425,18 410,12 Q 395,18 380,12 Q 365,18 350,12 Q 335,18 320,12 Q 305,18 290,12 Q 275,18 260,12 Q 245,18 230,12 Q 215,18 200,12 Q 185,18 170,12 Q 155,18 140,12 Q 125,18 110,12 Q 95,18 80,12 Q 65,18 50,12 Q 35,18 20,12 Q 10,18 0,12 Z" fill="${cloudColor}" />
+            <path d="${overcastPath}" fill="${cloudColor}" />
           ` : ''}
           ${(clouds || []).map(c => renderHDCloud(
             'customDriftCloud',
@@ -485,23 +506,23 @@ export function renderHouseSvg({
           ))}
         </g>
 
-        <!-- Lightning bolts (background) -->
+        <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
         ${weather === 'lightning' ? svg`
-          <path d="M 420,60 L 390,150 L 430,150 L 370,260 L 400,260 L 350,380" class="lightningBolt" />
-          <path d="M 180,40 L 155,110 L 180,110 L 140,180" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
+          <path d="M ${width / 2 + 20},60 L ${width / 2 - 10},150 L ${width / 2 + 30},150 L ${width / 2 - 30},260 L ${width / 2},260 L ${width / 2 - 50},380" class="lightningBolt" />
+          <path d="M ${width * 0.225},40 L ${width * 0.194},110 L ${width * 0.225},110 L ${width * 0.175},180" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
         ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <!-- GROUND, MAST, HOUSE, AND CABLES: Translated inside y+70 group  -->
+        <!-- GROUND, MAST, HOUSE, AND CABLES: Translated inside dynamic group-->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <g transform="translate(0, 70)">
+        <g transform="translate(${translateX}, ${translateY})">
 
-          <!-- Ground (Full width grass base) -->
-          <rect x="0" y="410" width="800" height="120" fill="url(#garden-grad)" />
+          <!-- Ground (grass base spanning full screen width) -->
+          <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
           
-          <!-- Driveway (Thin concrete layer) -->
-          <rect x="490" y="410" width="310" height="20" fill="url(#driveway-grad)" />
-          <line x1="0" y1="410" x2="800" y2="410" class="horizonLine" />
+          <!-- Driveway (stretching to the right screen edge) -->
+          <rect x="490" y="410" width="${translateX + 310}" height="20" fill="url(#driveway-grad)" />
+          <line x1="${-translateX}" y1="410" x2="${width - translateX}" y2="410" class="horizonLine" />
 
           <!-- High-Voltage Electricity Mast (Elektramast) in background -->
           <g id="electricity-mast" class="interactiveGroup gridGroup" transform="translate(-15, -22) scale(0.9)" @click=${() => onNodeClick('grid')}>
@@ -821,25 +842,25 @@ export function renderHouseSvg({
           ) : ''}
 
         </g>
-        <!-- End of translate(0, 70) group -->
+        <!-- End of translate group -->
 
         <!-- Lightning Screen Flashes -->
         ${weather === 'lightning' ? svg`
-          <rect width="800" height="600" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
+          <rect width="${width}" height="${height}" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
         ` : ''}
 
         <!-- Fog overlay -->
         ${weather === 'foggy' ? svg`
-          <rect width="800" height="600" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
-          <rect width="800" height="600" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
+          <rect width="${width}" height="${height}" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
+          <rect width="${width}" height="${height}" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
         ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <!-- SOLAR HUD CARD (Top right sky area, using 800x600 layout)        -->
+        <!-- SOLAR HUD CARD (Top right sky area, dynamically aligned)        -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${showSolar ? svg`
           <g class="interactiveGroup solarGroup" @click=${() => onNodeClick('solar')}>
-            <g transform="translate(580, 75)">
+            <g transform="translate(${width - 190}, 75)">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${solarActive ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
@@ -857,13 +878,13 @@ export function renderHouseSvg({
         ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <!-- BOTTOM HUD CARDS (using 800x600 layout with dynamic gaps)        -->
+        <!-- BOTTOM HUD CARDS (using dynamic gaps & screen bottom alignment) -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${bottomCards.map((card, index) => {
           const x = gap + index * (cardWidth + gap);
           return svg`
             <g class="interactiveGroup" @click=${() => onNodeClick(card.id)}>
-              <g transform="translate(${x}, 525)">
+              <g transform="translate(${x}, ${height - 75})">
                 <rect x="0" y="0" width="170" height="65"
                   class="hudCard ${card.active ? 'hudCardActive' : ''}"
                   rx="8" ry="8"

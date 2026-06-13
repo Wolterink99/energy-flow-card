@@ -8,9 +8,31 @@ export class EnergyFlowCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private config?: EnergyFlowCardConfig;
   @state() private selectedNode: string | null = null;
+  @state() private cardWidth: number = 800;
+  @state() private cardHeight: number = 600;
 
+  private resizeObserver?: ResizeObserver;
   private clouds: any[] = [];
   private lastWeather: string = '';
+
+  public connectedCallback(): void {
+    super.connectedCallback();
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        this.cardWidth = width || 800;
+        this.cardHeight = height || 600;
+      }
+    });
+    this.resizeObserver.observe(this);
+  }
+
+  public disconnectedCallback(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    super.disconnectedCallback();
+  }
 
   private getClouds(weather: string): any[] {
     if (this.clouds.length > 0 && this.lastWeather === weather) {
@@ -226,6 +248,8 @@ export class EnergyFlowCard extends LitElement {
 
           <div class="sceneWrapper">
             ${renderHouseSvg({
+              containerWidth: this.cardWidth,
+              containerHeight: this.cardHeight,
               timeHour: decimalHour,
               timeOfDay,
               solar,
