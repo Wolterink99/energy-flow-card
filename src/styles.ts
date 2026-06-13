@@ -6,15 +6,25 @@ export const styles = css`
     background: transparent;
   }
 
+  ha-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
   .card-container {
-    background: var(--ha-card-background, var(--card-background-color, #0f172a));
-    border-radius: var(--ha-card-border-radius, 12px);
-    border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color, #1e293b));
-    box-shadow: var(--ha-card-box-shadow, none);
     color: var(--primary-text-color, #ffffff);
     padding: 0;
     font-family: var(--paper-font-body1_-_font-family, 'Inter', system-ui, -apple-system, sans-serif);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+    background: transparent;
   }
 
   .card-header {
@@ -36,7 +46,10 @@ export const styles = css`
     width: 100%;
     position: relative;
     background: transparent;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
     line-height: 0;
   }
 

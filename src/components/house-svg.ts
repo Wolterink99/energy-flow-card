@@ -68,7 +68,7 @@ function interpolateColor(color1: string, color2: string, factor: number): strin
   return toHex(r, g, b);
 }
 
-function getSkyState(hour: number) {
+export function getSkyState(hour: number) {
   let lower = SKY_KEYFRAMES[0];
   let upper = SKY_KEYFRAMES[SKY_KEYFRAMES.length - 1];
   for (let i = 0; i < SKY_KEYFRAMES.length - 1; i++) {
@@ -138,8 +138,8 @@ function renderSnow(): TemplateResult {
 }
 
 interface SvgParams {
-  houseStyle?: string;   // kept for API compatibility, ignored
-  carType?: string;      // kept for API compatibility, ignored
+  houseStyle?: string;
+  carType?: string;
   timeHour: number;
   timeOfDay: string;
   solar: number;
@@ -165,6 +165,8 @@ interface SvgParams {
 }
 
 export function renderHouseSvg({
+  houseStyle = 'modern-villa',
+  carType = 'hatchback',
   timeHour: rawTimeHour,
   timeOfDay,
   solar,
@@ -397,6 +399,23 @@ export function renderHouseSvg({
           <stop offset="100%" stop-color="#312e81" />
         </linearGradient>
 
+        <linearGradient id="car-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8" />
+          <stop offset="100%" stop-color="#0284c7" />
+        </linearGradient>
+
+        <linearGradient id="lamp-light-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fde047" stop-opacity="0.75" />
+          <stop offset="100%" stop-color="#fde047" stop-opacity="0" />
+        </linearGradient>
+
+        <pattern id="soldier-course" width="8" height="10" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="4" height="10" fill="#fcd34d" />
+          <rect x="4" y="0" width="4" height="10" fill="#b91c1c" />
+          <line x1="0" y1="0" x2="0" y2="10" stroke="#7f1d1d" stroke-width="0.5" />
+          <line x1="4" y1="0" x2="4" y2="10" stroke="#7f1d1d" stroke-width="0.5" />
+        </pattern>
+
         <!-- Reflective daytime window gradient -->
         <linearGradient id="window-day" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="#94a3b8" />
@@ -559,35 +578,24 @@ export function renderHouseSvg({
             <line x1="160" y1="100" x2="145" y2="120" />
 
             <!-- Insulator strings -->
-            <path d="M 50,160 L 50,180" stroke="#64748b" stroke-width="1.5" />
-            <ellipse cx="50" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="50" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="50" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-
-            <path d="M 85,160 L 85,180" stroke="#64748b" stroke-width="1.5" />
-            <ellipse cx="85" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="85" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="85" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-
-            <path d="M 155,160 L 155,180" stroke="#64748b" stroke-width="1.5" />
-            <ellipse cx="155" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="155" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="155" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-
-            <path d="M 190,160 L 190,180" stroke="#64748b" stroke-width="1.5" />
-            <ellipse cx="190" cy="166" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="190" cy="171" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
-            <ellipse cx="190" cy="176" rx="6" ry="2.5" fill="#a5f3fc" stroke="#3b82f6" stroke-width="0.5" opacity="0.85" />
+            <line x1="50" y1="160" x2="50" y2="175" stroke="#94a3b8" stroke-width="2.5" />
+            <circle cx="50" cy="178" r="2" fill="#94a3b8" />
+            <line x1="85" y1="160" x2="85" y2="175" stroke="#94a3b8" stroke-width="2.5" />
+            <circle cx="85" cy="178" r="2" fill="#94a3b8" />
+            <line x1="155" y1="160" x2="155" y2="175" stroke="#94a3b8" stroke-width="2.5" />
+            <circle cx="155" cy="178" r="2" fill="#94a3b8" />
+            <line x1="190" y1="160" x2="190" y2="175" stroke="#94a3b8" stroke-width="2.5" />
+            <circle cx="190" cy="178" r="2" fill="#94a3b8" />
           </g>
         </g>
 
         <!-- Transformer/Distribution Box -->
         <g id="grid-transformer-box">
-          <rect x="77" y="435" width="32" height="45" fill="#334155" stroke="#1e293b" stroke-width="1.8" rx="3" />
-          <line x1="93" y1="435" x2="93" y2="480" stroke="#1e293b" stroke-width="1" />
-          <circle cx="85" cy="460" r="1.5" fill="#1e293b" />
-          <rect x="83" y="445" width="20" height="12" fill="#fef08a" stroke="#ca8a04" stroke-width="0.8" rx="1" />
-          <polygon points="92,447 96,447 93,451 97,451 91,455 94,451 91,451" fill="#ca8a04" />
+          <rect x="180" y="442" width="24" height="38" fill="#334155" stroke="#1e293b" stroke-width="1.5" rx="2" />
+          <line x1="192" y1="442" x2="192" y2="480" stroke="#1e293b" stroke-width="0.8" />
+          <circle cx="188" cy="462" r="1.5" fill="#1e293b" />
+          <rect x="182" y="448" width="20" height="12" fill="#fef08a" stroke="#ca8a04" stroke-width="0.8" rx="1" />
+          <polygon points="191,449 195,449 192,453 196,453 190,457 193,453 190,453" fill="#ca8a04" />
         </g>
 
         <!-- ════════════════════════════════════════════════════════════════ -->
@@ -595,96 +603,356 @@ export function renderHouseSvg({
         <!-- ════════════════════════════════════════════════════════════════ -->
         <g transform="translate(450, 480) scale(1.15) translate(-450, -480)">
 
-          <!-- ── LEFT WING ── -->
-          <g id="left-wing" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
-            <rect x="180" y="370" width="140" height="110" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
-            <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
-            <!-- Roof trim left edge -->
-            <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-            <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-            <!-- Roof trim top edge -->
-            <line x1="205" y1="330" x2="320" y2="330" stroke="#0f172a" stroke-width="8" />
-            <line x1="205" y1="330" x2="320" y2="330" stroke="#1e293b" stroke-width="4" />
-            <!-- Window -->
-            <rect x="230" y="390" width="40" height="45"
-              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
-              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
-            <line x1="250" y1="390" x2="250" y2="435" stroke="#0f172a" stroke-width="1.2" />
-            <line x1="230" y1="412.5" x2="270" y2="412.5" stroke="#0f172a" stroke-width="1.2" />
-          </g>
+          <!-- ── HOUSE DESIGNS ── -->
+          <g id="house-structure" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
+            ${houseStyle === 'modern-villa' ? svg`
+              <!-- Plinth / Foundation Base -->
+              <rect x="290" y="455" width="20" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
+              <rect x="345" y="455" width="245" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
+              <line x1="290" y1="467" x2="310" y2="467" stroke="#1a202c" stroke-width="0.5" opacity="0.4" />
+              <line x1="345" y1="467" x2="590" y2="467" stroke="#1a202c" stroke-width="0.5" opacity="0.4" />
 
-          <!-- ── RIGHT WING ── -->
-          <g id="right-wing" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
-            <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
-            <!-- Roof trim left slope -->
-            <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-            <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-            <!-- Roof trim right slope -->
-            <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-            <line x1="692" y1="354" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-            <!-- Downstairs windows (2) -->
-            <rect x="465" y="385" width="40" height="45"
-              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
-              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
-            <line x1="485" y1="385" x2="485" y2="430" stroke="#0f172a" stroke-width="1.2" />
-            <line x1="465" y1="407.5" x2="505" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+              <!-- Left Gevel Wall (Textured Cedar planks) -->
+              <rect x="290" y="300" width="90" height="155" fill="#c2410c" stroke="#78350f" stroke-width="0.8" />
+              ${Array.from({ length: 8 }).map((_, i) => svg`
+                <line x1="${300 + i * 10}" y1="300" x2="${300 + i * 10}" y2="455" stroke="#451a03" stroke-width="0.8" opacity="0.35" />
+              `)}
 
-            <rect x="555" y="385" width="40" height="45"
-              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
-              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
-            <line x1="575" y1="385" x2="575" y2="430" stroke="#0f172a" stroke-width="1.2" />
-            <line x1="555" y1="407.5" x2="595" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+              <!-- Right Gevel Wall (White Stucco) -->
+              <rect x="380" y="300" width="210" height="155" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8" />
+              <line x1="380" y1="330" x2="590" y2="330" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
+              <line x1="380" y1="360" x2="590" y2="360" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
+              <line x1="380" y1="390" x2="590" y2="390" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
+              <line x1="380" y1="420" x2="590" y2="420" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
 
-            <!-- Upstairs window -->
-            <rect x="480" y="280" width="40" height="40"
-              fill="${windowFill}" stroke="#0f172a" stroke-width="2"
-              style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
-            <line x1="500" y1="280" x2="500" y2="320" stroke="#0f172a" stroke-width="1.2" />
-            <line x1="480" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="1.2" />
-          </g>
+              <!-- Entrance Plant Pot & Monstera -->
+              <g id="entrance-plant">
+                <polygon points="294,455 304,455 302,446 296,446" fill="#1e293b" />
+                <path d="M 298,446 Q 289,435 292,430 Q 297,430 298,440" fill="#22c55e" />
+                <path d="M 298,446 Q 305,432 302,427 Q 297,427 298,440" fill="#16a34a" />
+                <path d="M 298,446 Q 293,437 296,436" stroke="#15803d" stroke-width="2.0" fill="none" stroke-linecap="round" />
+              </g>
 
-          <!-- ── CENTER ENTRANCE GABLE ── -->
-          <g id="center-portal" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
-            <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
-            <!-- Roof trim -->
-            <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-            <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-            <line x1="452" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-            <line x1="452" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-            <!-- Front door – very dark green -->
-            <rect x="360" y="395" width="40" height="85" fill="#052e16" stroke="#021b0d" stroke-width="2" />
-            <circle cx="390" cy="435" r="2" fill="#fbbf24" />
+              <!-- Voordeur (Front Door - Starts on ground, y=480) -->
+              <g id="house-door">
+                <rect x="310" y="380" width="35" height="100" fill="#78350f" stroke="#451a03" stroke-width="1.5" rx="1.5" />
+                <line x1="337" y1="410" x2="337" y2="435" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
+                <rect x="317" y="390" width="6" height="70" fill="${showLights ? '#fde047' : '#1e293b'}" stroke="#451a03" stroke-width="0.8" style="fill: ${showLights ? `rgba(253, 224, 71, ${skyState.lights})` : '#1e293b'}; filter: ${showLights ? `drop-shadow(0 0 4px rgba(253, 224, 71, ${skyState.lights}))` : 'none'}; transition: fill 0.5s ease;" />
+                <rect x="305" y="375" width="45" height="5" fill="#334155" stroke="#1e293b" stroke-width="0.8" rx="1" />
+              </g>
+
+              <!-- Roof Structure -->
+              <polygon points="270,300 440,200 610,300" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" />
+              <line x1="270" y1="300" x2="440" y2="200" stroke="#0f172a" stroke-width="3.5" />
+              <line x1="610" y1="300" x2="440" y2="200" stroke="#0f172a" stroke-width="3.5" />
+              <rect x="265" y="297" width="350" height="6" fill="#64748b" rx="2" />
+              <path d="M 610,303 L 610,455 L 613,458" stroke="#64748b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+              <!-- Solar Panel Array -->
+              <g transform="translate(440, 200) rotate(30.5)">
+                <rect x="15" y="-12" width="130" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
+                <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                <line x1="15" y1="-7" x2="145" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+              </g>
+
+              <!-- Windows -->
+              <rect x="395" y="380" width="130" height="70" fill="${windowFill}" stroke="#334155" stroke-width="2.5" style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" rx="3" />
+              <g opacity="${skyState.lights}">
+                <line x1="460" y1="380" x2="460" y2="400" stroke="#334155" stroke-width="1" />
+                <path d="M 450,405 L 470,405 L 460,400 Z" fill="#334155" />
+                <circle cx="460" cy="406" r="4.5" fill="#ffffff" style="filter: drop-shadow(0 0 8px #fde047);" />
+                <polygon points="505,415 485,450 525,450" fill="url(#lamp-light-grad)" opacity="0.35" />
+                <line x1="505" y1="450" x2="505" y2="415" stroke="#334155" stroke-width="1" />
+                <polygon points="498,415 512,415 509,409 501,409" fill="#475569" />
+              </g>
+              <g opacity="${1.0 - skyState.lights}">
+                <polygon points="395,415 420,380 435,380 395,435" fill="rgba(255,255,255,0.06)" style="pointer-events: none;" />
+                <polygon points="445,450 495,380 510,380 460,450" fill="rgba(255,255,255,0.06)" style="pointer-events: none;" />
+              </g>
+              <line x1="460" y1="380" x2="460" y2="450" stroke="#0f172a" stroke-width="1.5" />
+              <line x1="395" y1="415" x2="525" y2="415" stroke="#0f172a" stroke-width="1.2" />
+
+              <rect x="405" y="310" width="30" height="45" fill="${windowFill}" stroke="#334155" stroke-width="2.0" style="filter: ${windowFilter};" rx="1.5" />
+              <line x1="420" y1="310" x2="420" y2="355" stroke="#0f172a" stroke-width="1.2" />
+              
+              <rect x="485" y="310" width="30" height="45" fill="${windowFill}" stroke="#334155" stroke-width="2.0" style="filter: ${windowFilter};" rx="1.5" />
+              <line x1="500" y1="310" x2="500" y2="355" stroke="#0f172a" stroke-width="1.2" />
+
+              <circle cx="440" cy="255" r="13" fill="${windowFill}" stroke="#334155" stroke-width="2.0" style="filter: ${windowFilter};" />
+              <line x1="440" y1="242" x2="440" y2="268" stroke="#0f172a" stroke-width="1" />
+            ` : ''}
+
+            ${houseStyle === 'classic-jaren30' ? svg`
+              <!-- Plinth (Bottom dark brick) -->
+              <rect x="290" y="450" width="300" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
+              <!-- Main Wall (Red brick pentagon) -->
+              <polygon points="290,450 290,370 440,150 590,370 590,450" fill="#b91c1c" stroke="#7f1d1d" stroke-width="0.8" />
+              <!-- Fine brick mortar lines -->
+              ${Array.from({ length: 50 }).map((_, i) => {
+                const y = 450 - i * 6;
+                if (y < 150) return '';
+                let x1 = 290;
+                let x2 = 590;
+                if (y < 370) {
+                  x1 = 290 + (370 - y) * 0.682;
+                  x2 = 590 - (370 - y) * 0.682;
+                }
+                return svg`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#7f1d1d" stroke-width="0.5" opacity="0.4" />`;
+              })}
+
+              <!-- Left Side Entrance Extension -->
+              <rect x="260" y="450" width="30" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
+              <rect x="260" y="370" width="30" height="80" fill="#b91c1c" stroke="#7f1d1d" stroke-width="0.8" />
+              ${Array.from({ length: 14 }).map((_, i) => {
+                const y = 450 - i * 6;
+                return svg`<line x1="260" y1="${y}" x2="290" y2="${y}" stroke="#7f1d1d" stroke-width="0.5" opacity="0.4" />`;
+              })}
+              <polygon points="255,370 290,355 290,370" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
+              <line x1="255" y1="370" x2="290" y2="355" stroke="#f8fafc" stroke-width="2.5" />
+              <rect x="264" y="380" width="22" height="65" fill="#1e293b" stroke="#0f172a" stroke-width="1" rx="1" />
+              <rect x="272" y="385" width="6" height="30" fill="${showLights ? '#fde047' : '#0f172a'}" opacity="0.8" style="fill: ${showLights ? `rgba(253, 224, 71, ${skyState.lights})` : '#0f172a'}; transition: fill 0.5s ease;" />
+
+              <!-- Soldier Course Accent Bands -->
+              <rect x="290" y="362" width="300" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+              <rect x="300" y="359" width="280" height="8" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+
+              <!-- Windows -->
+              <rect x="305" y="375" width="35" height="75" fill="${windowFill}" stroke="#0f172a" stroke-width="2.5" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <rect x="307" y="377" width="31" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
+              <line x1="305" y1="412.5" x2="340" y2="412.5" stroke="#0f172a" stroke-width="1.5" />
+
+              <rect x="375" y="375" width="130" height="75" fill="${windowFill}" stroke="#0f172a" stroke-width="3.0" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <rect x="377" y="377" width="126" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
+              <line x1="375" y1="412.5" x2="505" y2="412.5" stroke="#0f172a" stroke-width="2.0" />
+
+              <rect x="540" y="375" width="35" height="75" fill="${windowFill}" stroke="#0f172a" stroke-width="2.5" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <rect x="542" y="377" width="31" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
+              <line x1="540" y1="412.5" x2="575" y2="412.5" stroke="#0f172a" stroke-width="1.5" />
+
+              <rect x="355" y="312" width="45" height="46" fill="${windowFill}" stroke="#0f172a" stroke-width="2.5" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <line x1="377.5" y1="312" x2="377.5" y2="358" stroke="#0f172a" stroke-width="1.8" />
+              <rect x="355" y="302" width="45" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+
+              <rect x="480" y="312" width="45" height="46" fill="${windowFill}" stroke="#0f172a" stroke-width="2.5" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <line x1="502.5" y1="312" x2="502.5" y2="358" stroke="#0f172a" stroke-width="1.8" />
+              <rect x="480" y="302" width="45" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+
+              <!-- Roof Framing -->
+              <rect x="280" y="367" width="320" height="6" fill="#f8fafc" rx="1" />
+              <line x1="290" y1="370" x2="440" y2="150" stroke="#f8fafc" stroke-width="5.0" stroke-linecap="round" />
+              <line x1="590" y1="370" x2="440" y2="150" stroke="#f8fafc" stroke-width="5.0" stroke-linecap="round" />
+
+              <polygon points="361.5,265 440,150 518.5,265" fill="#1e293b" stroke="#0f172a" stroke-width="1.2" />
+              ${Array.from({ length: 20 }).map((_, idx) => {
+                const y = 150 + idx * 6;
+                if (y > 265) return '';
+                const dx = (y - 150) * (78.5 / 115);
+                const x1 = 440 - dx;
+                const x2 = 440 + dx;
+                return svg`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#0f172a" stroke-width="0.8" opacity="0.45" />`;
+              })}
+
+              <!-- Chimney -->
+              <rect x="445" y="115" width="16" height="36" fill="#4a5568" stroke="#1a202c" stroke-width="1" />
+              <rect x="442" y="110" width="22" height="6" fill="#1a202c" rx="0.5" />
+
+              <!-- Solar Panels on steep roof -->
+              <g transform="translate(440, 150) rotate(55.7)">
+                <rect x="15" y="-12" width="140" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
+                <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                <line x1="15" y1="-7" x2="155" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+              </g>
+
+              <!-- Front tree -->
+              <g id="front-garden-tree" style="pointer-events: none;">
+                <rect x="437" y="320" width="6" height="135" fill="#5c4033" rx="1" />
+                <line x1="440" y1="360" x2="432" y2="340" stroke="#5c4033" stroke-width="2" />
+                <line x1="440" y1="340" x2="447" y2="320" stroke="#5c4033" stroke-width="1.8" />
+                <ellipse cx="440" cy="270" rx="22" ry="75" fill="#15803d" opacity="0.92" />
+                <ellipse cx="440" cy="230" rx="16" ry="60" fill="#16a34a" opacity="0.94" />
+                <ellipse cx="440" cy="180" rx="10" ry="40" fill="#22c55e" opacity="0.95" />
+              </g>
+
+              <!-- Hydrangea bushes -->
+              <g id="front-garden-hydrangeas" style="pointer-events: none;">
+                <circle cx="538" cy="450" r="10" fill="#15803d" />
+                <circle cx="550" cy="448" r="12" fill="#16a34a" />
+                <circle cx="565" cy="450" r="10" fill="#15803d" />
+                <circle cx="536" cy="443" r="5" fill="#fef08a" opacity="0.9" />
+                <circle cx="548" cy="439" r="7" fill="#ffffff" opacity="0.9" />
+                <circle cx="560" cy="442" r="6" fill="#fef08a" opacity="0.9" />
+                <circle cx="566" cy="445" r="4" fill="#ffffff" opacity="0.9" />
+              </g>
+            ` : ''}
+
+            ${houseStyle === 'barnhouse' ? svg`
+              <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
+              <rect x="290" y="280" width="300" height="175" fill="#172554" stroke="#0f172a" stroke-width="1" />
+              ${Array.from({ length: 26 }).map((_, i) => svg`
+                <line x1="${300 + i * 11}" y1="280" x2="${300 + i * 11}" y2="455" stroke="#020617" stroke-width="0.8" opacity="0.45" />
+              `)}
+              <!-- Door -->
+              <g id="house-door">
+                <rect x="310" y="380" width="35" height="75" fill="#451a03" stroke="#020617" stroke-width="1.5" />
+                <line x1="317" y1="395" x2="317" y2="435" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
+              </g>
+              <!-- Roof -->
+              <polygon points="260,280 440,150 620,280" fill="#0f172a" stroke="#020617" stroke-width="2" />
+              <line x1="260" y1="280" x2="440" y2="150" stroke="#334155" stroke-width="2.5" />
+              <line x1="620" y1="280" x2="440" y2="150" stroke="#334155" stroke-width="2.5" />
+              <!-- Solar panels -->
+              <g transform="translate(440, 150) rotate(37.5)">
+                <rect x="15" y="-12" width="135" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
+              </g>
+              <!-- Tall window -->
+              <rect x="395" y="270" width="120" height="180" fill="${windowFill}" stroke="#0f172a" stroke-width="3.0" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="2" />
+              <polygon points="395,270 440,220 485,270" fill="${windowFill}" stroke="#0f172a" stroke-width="2.0" style="filter: ${windowFilter};" />
+              <line x1="440" y1="220" x2="440" y2="450" stroke="#0f172a" stroke-width="2" />
+              <line x1="395" y1="330" x2="515" y2="330" stroke="#0f172a" stroke-width="1.5" />
+              <line x1="395" y1="390" x2="515" y2="390" stroke="#0f172a" stroke-width="1.5" />
+            ` : ''}
+
+            ${houseStyle === 'cubist-bungalow' ? svg`
+              <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
+              <rect x="290" y="320" width="90" height="135" fill="#64748b" stroke="#475569" stroke-width="1" />
+              <line x1="290" y1="380" x2="380" y2="380" stroke="#475569" stroke-width="0.8" opacity="0.5" />
+              <rect x="380" y="270" width="210" height="185" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+              <rect x="285" y="315" width="100" height="6" fill="#334155" rx="1.5" />
+              <rect x="375" y="265" width="220" height="6" fill="#1e293b" rx="1.5" />
+              <!-- Door -->
+              <g id="house-door">
+                <rect x="310" y="380" width="35" height="75" fill="#3b2314" stroke="#1c1009" stroke-width="1.5" />
+                <line x1="337" y1="410" x2="337" y2="430" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
+              </g>
+              <!-- Solar panels -->
+              <g id="cubist-solar-mounting">
+                <line x1="445" y1="270" x2="545" y2="270" stroke="#334155" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="535" y1="270" x2="535" y2="242" stroke="#475569" stroke-width="2.0" />
+                <line x1="455" y1="270" x2="455" y2="263" stroke="#475569" stroke-width="2.0" />
+                <g transform="translate(440, 268) rotate(-15)">
+                  <rect x="0" y="-10" width="110" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="1" />
+                  <line x1="27.5" y1="-10" x2="27.5" y2="0" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                  <line x1="55" y1="-10" x2="55" y2="0" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                  <line x1="82.5" y1="-10" x2="82.5" y2="0" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                  <line x1="0" y1="-5" x2="110" y2="-5" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                </g>
+              </g>
+              <!-- Windows -->
+              <rect x="395" y="360" width="120" height="80" fill="${windowFill}" stroke="#0f172a" stroke-width="2.5" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <line x1="435" y1="360" x2="435" y2="440" stroke="#0f172a" stroke-width="1.5" />
+              <line x1="475" y1="360" x2="475" y2="440" stroke="#0f172a" stroke-width="1.5" />
+              <rect x="395" y="290" width="120" height="50" fill="${windowFill}" stroke="#0f172a" stroke-width="2.0" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <line x1="455" y1="290" x2="455" y2="340" stroke="#0f172a" stroke-width="1.5" />
+            ` : ''}
+
+            ${houseStyle === 'townhouse' ? svg`
+              <rect x="290" y="455" width="300" height="25" fill="#292524" stroke="#1c1917" stroke-width="0.8" />
+              <polygon points="290,230 440,150 590,230" fill="#292524" stroke="#1c1917" stroke-width="1.2" opacity="0.8" />
+              <polygon points="290,230 320,230 320,200 350,200 350,170 380,170 380,140 500,140 500,170 530,170 530,200 560,200 560,230 590,230" fill="#44403c" stroke="#1c1917" stroke-width="1" />
+              <rect x="290" y="230" width="300" height="225" fill="#44403c" stroke="#1c1917" stroke-width="1" />
+              ${Array.from({ length: 32 }).map((_, i) => svg`
+                <line x1="290" y1="${230 + i * 7}" x2="590" y2="${230 + i * 7}" stroke="#292524" stroke-width="0.5" opacity="0.35" />
+              `)}
+              <!-- Door -->
+              <g id="house-door">
+                <rect x="310" y="380" width="35" height="75" fill="#7c2d12" stroke="#431407" stroke-width="1.8" rx="1" />
+                <line x1="337" y1="410" x2="337" y2="430" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
+              </g>
+              <!-- Solar panels -->
+              <g transform="translate(440, 150) rotate(29.6)">
+                <rect x="15" y="-12" width="120" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
+              </g>
+              <!-- Windows -->
+              <rect x="395" y="375" width="130" height="80" fill="${windowFill}" stroke="#f8fafc" stroke-width="2.5" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+              <line x1="460" y1="375" x2="460" y2="455" stroke="#f8fafc" stroke-width="1.8" />
+              <line x1="395" y1="415" x2="525" y2="415" stroke="#f8fafc" stroke-width="1.2" />
+              ${[335, 420, 505].map((x) => svg`
+                <rect x="${x}" y="290" width="35" height="60" fill="${windowFill}" stroke="#f8fafc" stroke-width="2.0" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+                <line x1="${x + 17.5}" y1="290" x2="${x + 17.5}" y2="350" stroke="#f8fafc" stroke-width="1.2" />
+              `)}
+              ${[370, 460].map((x) => svg`
+                <rect x="${x}" y="210" width="30" height="45" fill="${windowFill}" stroke="#f8fafc" stroke-width="1.8" style="filter: ${windowFilter}; transition: fill 0.5s ease;" rx="1" />
+                <line x1="${x + 15}" y1="210" x2="${x + 15}" y2="255" stroke="#f8fafc" stroke-width="1" />
+              `)}
+            ` : ''}
+
+            <!-- Fallback Default Brick House (for backward compatibility if no/invalid houseStyle) -->
+            ${houseStyle !== 'modern-villa' && houseStyle !== 'classic-jaren30' && houseStyle !== 'barnhouse' && houseStyle !== 'cubist-bungalow' && houseStyle !== 'townhouse' ? svg`
+              <!-- LEFT WING -->
+              <g id="left-wing">
+                <rect x="180" y="370" width="140" height="110" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
+                <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <line x1="205" y1="330" x2="320" y2="330" stroke="#0f172a" stroke-width="8" />
+                <line x1="205" y1="330" x2="320" y2="330" stroke="#1e293b" stroke-width="4" />
+                <rect x="230" y="390" width="40" height="45" fill="${windowFill}" stroke="#0f172a" stroke-width="2" style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="250" y1="390" x2="250" y2="435" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="230" y1="412.5" x2="270" y2="412.5" stroke="#0f172a" stroke-width="1.2" />
+              </g>
+
+              <!-- RIGHT WING -->
+              <g id="right-wing">
+                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="692" y1="354" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <rect x="465" y="385" width="40" height="45" fill="${windowFill}" stroke="#0f172a" stroke-width="2" style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="485" y1="385" x2="485" y2="430" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="465" y1="407.5" x2="505" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+                <rect x="555" y="385" width="40" height="45" fill="${windowFill}" stroke="#0f172a" stroke-width="2" style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="575" y1="385" x2="575" y2="430" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="555" y1="407.5" x2="595" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
+                <rect x="480" y="280" width="40" height="40" fill="${windowFill}" stroke="#0f172a" stroke-width="2" style="filter: ${windowFilter}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <line x1="500" y1="280" x2="500" y2="320" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="480" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="1.2" />
+              </g>
+
+              <!-- CENTER ENTRANCE GABLE -->
+              <g id="center-portal">
+                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#brick-pat)" stroke="#0f172a" stroke-width="2" />
+                <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <line x1="452" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
+                <line x1="452" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
+                <rect x="360" y="395" width="40" height="85" fill="#052e16" stroke="#021b0d" stroke-width="2" />
+                <circle cx="390" cy="435" r="2" fill="#fbbf24" />
+              </g>
+            ` : ''}
           </g>
 
           <!-- ── SOLAR PANELS (conditional) ── -->
           ${showSolar ? svg`
             <g id="solar-panels" class="interactiveGroup solarGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('solar'); }}>
-              <g transform="translate(320, 340) rotate(-49.4)">
-                <!-- Mounting rods -->
-                <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
-                <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
-                <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#0f172a" stroke-width="2" />
-                <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#475569" stroke-width="1.2" />
-                <line x1="125" y1="-7" x2="125" y2="0" stroke="#0f172a" stroke-width="2" />
-                <line x1="125" y1="-7" x2="125" y2="0" stroke="#475569" stroke-width="1.2" />
-                <line x1="175" y1="-7" x2="175" y2="0" stroke="#0f172a" stroke-width="2" />
-                <line x1="175" y1="-7" x2="175" y2="0" stroke="#475569" stroke-width="1.2" />
-                <line x1="225" y1="-7" x2="225" y2="0" stroke="#0f172a" stroke-width="2" />
-                <line x1="225" y1="-7" x2="225" y2="0" stroke="#475569" stroke-width="1.2" />
-                <!-- Panel body -->
-                <rect x="10" y="-13" width="235" height="6" fill="url(#solar-panel-grad)" stroke="#1e40af" stroke-width="1.2" rx="1.5" />
-                <!-- Grid lines -->
-                <line x1="10"    y1="-10" x2="245"   y2="-10" stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="33.5"  y1="-13" x2="33.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="57"    y1="-13" x2="57"    y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="80.5"  y1="-13" x2="80.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="104"   y1="-13" x2="104"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="127.5" y1="-13" x2="127.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="151"   y1="-13" x2="151"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="174.5" y1="-13" x2="174.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="198"   y1="-13" x2="198"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                <line x1="221.5" y1="-13" x2="221.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-              </g>
+              <!-- Only render solar panels if it is the default wing house, since the custom styles have solar panels integrated on their roofs -->
+              ${houseStyle !== 'modern-villa' && houseStyle !== 'classic-jaren30' && houseStyle !== 'barnhouse' && houseStyle !== 'cubist-bungalow' && houseStyle !== 'townhouse' ? svg`
+                <g transform="translate(320, 340) rotate(-49.4)">
+                  <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
+                  <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
+                  <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#0f172a" stroke-width="2" />
+                  <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#475569" stroke-width="1.2" />
+                  <line x1="125" y1="-7" x2="125" y2="0" stroke="#0f172a" stroke-width="2" />
+                  <line x1="125" y1="-7" x2="125" y2="0" stroke="#475569" stroke-width="1.2" />
+                  <line x1="175" y1="-7" x2="175" y2="0" stroke="#0f172a" stroke-width="2" />
+                  <line x1="175" y1="-7" x2="175" y2="0" stroke="#475569" stroke-width="1.2" />
+                  <line x1="225" y1="-7" x2="225" y2="0" stroke="#0f172a" stroke-width="2" />
+                  <line x1="225" y1="-7" x2="225" y2="0" stroke="#475569" stroke-width="1.2" />
+                  <rect x="10" y="-13" width="235" height="6" fill="url(#solar-panel-grad)" stroke="#1e40af" stroke-width="1.2" rx="1.5" />
+                  <line x1="10"    y1="-10" x2="245"   y2="-10" stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="33.5"  y1="-13" x2="33.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="57"    y1="-13" x2="57"    y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="80.5"  y1="-13" x2="80.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="104"   y1="-13" x2="104"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="127.5" y1="-13" x2="127.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="151"   y1="-13" x2="151"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="174.5" y1="-13" x2="174.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="198"   y1="-13" x2="198"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                  <line x1="221.5" y1="-13" x2="221.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
+                </g>
+              ` : ''}
             </g>
           ` : ''}
 
@@ -702,13 +970,14 @@ export function renderHouseSvg({
           <!-- ── BATTERY (conditional) ── -->
           ${showBattery ? svg`
             <g id="house-battery" class="interactiveGroup batteryGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('battery'); }}>
-              <rect x="280" y="410" width="30" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" rx="3" />
-              <rect x="285" y="418" width="20" height="10" fill="#000" rx="1.5" />
-              <text x="295" y="426" fill="#10b981" font-size="8" font-weight="bold" text-anchor="middle">${soc}%</text>
+              <!-- Render battery in Jaren 30 or other custom styles at x=320, or let it adapt -->
+              <rect x="320" y="410" width="30" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" rx="3" />
+              <rect x="325" y="418" width="20" height="10" fill="#000" rx="1.5" />
+              <text x="335" y="426" fill="${soc < 20 ? '#ef4444' : (batteryCharging ? '#10b981' : '#f97316')}" font-size="8" font-weight="bold" text-anchor="middle">${soc}%</text>
               <!-- SoC bar track -->
-              <rect x="294" y="435" width="2" height="40" fill="rgba(0,0,0,0.15)" rx="0.5" />
+              <rect x="334" y="435" width="2" height="40" fill="rgba(0,0,0,0.15)" rx="0.5" />
               <!-- SoC bar fill -->
-              <rect x="294" y="${batYTop}" width="2" height="${475 - batYTop}" fill="${soc < 20 ? '#ef4444' : (batteryCharging ? '#10b981' : '#ef4444')}" rx="0.5" />
+              <rect x="334" y="${475 - 40 * (soc / 100)}" width="2" height="${40 * (soc / 100)}" fill="${soc < 20 ? '#ef4444' : (batteryCharging ? '#10b981' : '#f97316')}" rx="0.5" />
             </g>
           ` : ''}
 
@@ -724,37 +993,96 @@ export function renderHouseSvg({
               <path d="M 455,440 C 460,460 475,470 495,465" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="4,3" />
             </g>
 
-            <!-- EV Car (drawn SVG to avoid image dependency) -->
+            <!-- EV Car -->
             <g id="ev-car" class="interactiveGroup evGroup" opacity="${evActive ? 1.0 : 0.4}" style="transition: opacity 0.6s ease;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('ev'); }}>
-              <g transform="translate(490, 430)">
-                <!-- Car shadow -->
-                <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
-                <!-- Car body -->
-                <path d="M 0,44 C 0,44 4,28 18,28 C 32,28 50,8 75,6 C 100,4 118,16 132,28 C 148,40 158,44 160,44 L 158,52 L 2,52 Z"
-                  fill="#475569" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
-                <!-- Windows -->
-                <path d="M 32,28 C 44,14 68,10 86,10 C 102,10 114,22 120,27 L 116,37 L 28,37 Z" fill="#0f172a" opacity="0.85" />
-                <path d="M 38,29 L 68,29 L 68,36 L 34,36 Z" fill="rgba(255,255,255,0.12)" />
-                <path d="M 72,29 L 106,29 L 112,36 L 72,36 Z" fill="rgba(255,255,255,0.12)" />
-                <!-- Headlight -->
-                <path d="M 0,44 C 4,44 7,46 9,48 L 0,50 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
-                <!-- Taillight -->
-                <path d="M 160,44 C 157,44 156,46 155,48 L 160,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
-                <!-- Front wheel -->
-                <circle cx="32" cy="50" r="16" fill="#090d16" />
-                <circle cx="32" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                ${Array.from({ length: 6 }).map((_, idx) => {
-                  const angle = (idx * Math.PI) / 3;
-                  return svg`<line x1="32" y1="50" x2="${32 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
-                })}
-                <!-- Rear wheel -->
-                <circle cx="118" cy="50" r="16" fill="#090d16" />
-                <circle cx="118" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                ${Array.from({ length: 6 }).map((_, idx) => {
-                  const angle = (idx * Math.PI) / 3;
-                  return svg`<line x1="118" y1="50" x2="${118 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
-                })}
-              </g>
+              ${carType === 'hatchback' ? svg`
+                <g transform="translate(490, 430)">
+                  <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
+                  <path d="M 0,44 C 0,44 4,28 18,28 C 32,28 50,8 75,6 C 100,4 118,16 132,28 C 148,40 158,44 160,44 L 158,52 L 2,52 Z"
+                    fill="#475569" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                  <path d="M 32,28 C 44,14 68,10 86,10 C 102,10 114,22 120,27 L 116,37 L 28,37 Z" fill="#0f172a" opacity="0.85" />
+                  <path d="M 38,29 L 68,29 L 68,36 L 34,36 Z" fill="rgba(255,255,255,0.12)" />
+                  <path d="M 72,29 L 106,29 L 112,36 L 72,36 Z" fill="rgba(255,255,255,0.12)" />
+                  <path d="M 0,44 C 4,44 7,46 9,48 L 0,50 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
+                  <path d="M 160,44 C 157,44 156,46 155,48 L 160,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
+                  <circle cx="32" cy="50" r="16" fill="#090d16" />
+                  <circle cx="32" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 6 }).map((_, idx) => {
+                    const angle = (idx * Math.PI) / 3;
+                    return svg`<line x1="32" y1="50" x2="${32 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                  <circle cx="118" cy="50" r="16" fill="#090d16" />
+                  <circle cx="118" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 6 }).map((_, idx) => {
+                    const angle = (idx * Math.PI) / 3;
+                    return svg`<line x1="118" y1="50" x2="${118 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                </g>
+              ` : ''}
+              ${carType === 'sedan' ? svg`
+                <g transform="translate(500, 432)">
+                  <ellipse cx="70" cy="48" rx="74" ry="4.5" fill="rgba(0,0,0,0.45)" />
+                  <path
+                    d="M 0,38 C 0,38 8,24 22,24 C 36,24 50,4 75,3 C 100,2 115,16 125,24 L 138,28 C 140,32 140,38 138,42 L 136,46 L 2,46 Z"
+                    fill="url(#car-body-grad)"
+                    stroke="rgba(255,255,255,0.2)"
+                    stroke-width="1"
+                  />
+                  <path d="M 32,23 C 44,10 68,6 84,6 C 96,6 108,14 116,21 L 112,31 L 28,31 Z" fill="#0f172a" opacity="0.85" />
+                  <path d="M 38,24 L 66,24 L 66,29 L 34,29 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 70,24 L 102,24 L 108,29 L 70,29 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 0,38 C 4,38 6,40 8,42 L 0,44 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
+                  <path d="M 138,36 C 136,36 135,38 134,40 L 138,42 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
+                  <rect x="55" y="34" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <rect x="85" y="34" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
+                  <circle cx="30" cy="44" r="13.5" fill="#090d16" />
+                  <circle cx="30" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 7 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 7;
+                    return svg`<line x1="30" y1="44" x2="${30 + Math.cos(angle) * 8.5}" y2="${44 + Math.sin(angle) * 8.5}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                  <circle cx="103" cy="44" r="13.5" fill="#090d16" />
+                  <circle cx="103" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 7 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 7;
+                    return svg`<line x1="103" y1="44" x2="${103 + Math.cos(angle) * 8.5}" y2="${44 + Math.sin(angle) * 8.5}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                </g>
+              ` : ''}
+              ${carType === 'suv' ? svg`
+                <g transform="translate(500, 422)">
+                  <ellipse cx="70" cy="58" rx="74" ry="5.5" fill="rgba(0,0,0,0.45)" />
+                  <path d="M 15,56 A 17,17 0 0,1 47,56" fill="none" stroke="#1f2937" stroke-width="3" />
+                  <path d="M 88,56 A 17,17 0 0,1 120,56" fill="none" stroke="#1f2937" stroke-width="3" />
+                  <path
+                    d="M 0,48 C 0,48 4,30 18,30 C 32,30 45,6 70,4 C 95,2 112,18 122,28 L 138,32 C 140,36 140,46 138,50 L 136,56 L 2,56 Z"
+                    fill="url(#car-body-grad)"
+                    stroke="rgba(255,255,255,0.2)"
+                    stroke-width="1"
+                  />
+                  <path d="M 32,29 C 44,12 68,8 84,8 C 98,8 108,18 116,27 L 112,38 L 28,38 Z" fill="#0f172a" opacity="0.85" />
+                  <path d="M 38,30 L 66,30 L 66,36 L 34,36 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 70,30 L 102,30 L 108,36 L 70,36 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 0,48 C 4,48 6,50 8,52 L 0,54 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
+                  <path d="M 138,44 C 136,44 135,46 134,48 L 138,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
+                  <rect x="55" y="42" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <rect x="85" y="42" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
+                  <circle cx="31" cy="54" r="15.5" fill="#090d16" />
+                  <circle cx="31" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 5 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 5;
+                    return svg`<line x1="31" y1="54" x2="${31 + Math.cos(angle) * 10}" y2="${54 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.5" />`;
+                  })}
+                  <circle cx="104" cy="54" r="15.5" fill="#090d16" />
+                  <circle cx="104" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 5 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 5;
+                    return svg`<line x1="104" y1="54" x2="${104 + Math.cos(angle) * 10}" y2="${54 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.5" />`;
+                  })}
+                </g>
+              ` : ''}
             </g>
           ` : ''}
 
@@ -770,7 +1098,7 @@ export function renderHouseSvg({
         ) : ''}
 
         ${renderCable(
-          `M 93,468 L 93,530 L ${mkX},530 L ${mkX},${mkY}`,
+          `M 192,455 L 192,493 L ${mkX},493 L ${mkX},${mkY}`,
           gridImporting || gridExporting, getFlowSpeed(grid), gridColor.stroke, gridColor.glow, gridExporting
         )}
 
@@ -781,7 +1109,7 @@ export function renderHouseSvg({
         ) : ''}
 
         ${showEV ? renderCable(
-          `M ${mkX},${mkY} L ${mkX},${sy(530)} L ${sx(546)},${sy(530)} L ${sx(546)},${sy(475)}`,
+          `M ${mkX},${mkY} L ${mkX},503 L 664,503 L 664,415`,
           evActive, getFlowSpeed(charger), COLORS.ev.stroke, COLORS.ev.glow
         ) : ''}
 

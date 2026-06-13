@@ -2,7 +2,7 @@ import { LitElement, html, TemplateResult } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { HomeAssistant, EnergyFlowCardConfig } from './types';
 import { styles } from './styles';
-import { renderHouseSvg } from './components/house-svg';
+import { renderHouseSvg, getSkyState } from './components/house-svg';
 
 export class EnergyFlowCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
@@ -184,41 +184,48 @@ export class EnergyFlowCard extends LitElement {
     const showBattery = !!entities.battery_power;
     const showEV = !!entities.charger;
 
-    return html`
-      <div class="card-container">
-        ${this.config.title ? html`
-          <div class="card-header">
-            <div class="card-title">${this.config.title}</div>
-          </div>
-        ` : ''}
+    const skyState = getSkyState(decimalHour);
+    const dynamicBackground = `background: linear-gradient(to bottom, ${skyState.top} 0%, ${skyState.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;
 
-        <div class="sceneWrapper">
-          ${renderHouseSvg({
-            timeHour: decimalHour,
-            timeOfDay,
-            solar,
-            solarToday,
-            load,
-            batteryPower,
-            soc,
-            charger,
-            grid,
-            showSolar,
-            showBattery,
-            showEV,
-            weather: weatherState,
-            sunriseHour,
-            sunsetHour,
-            gridImportToday,
-            gridExportToday,
-            homeToday,
-            batteryChargeToday,
-            batteryDischargeToday,
-            evToday,
-            onNodeClick: (node) => this.handleNodeClick(node)
-          })}
+    return html`
+      <ha-card style="${dynamicBackground}">
+        <div class="card-container">
+          ${this.config.title ? html`
+            <div class="card-header">
+              <div class="card-title">${this.config.title}</div>
+            </div>
+          ` : ''}
+
+          <div class="sceneWrapper">
+            ${renderHouseSvg({
+              timeHour: decimalHour,
+              timeOfDay,
+              solar,
+              solarToday,
+              load,
+              batteryPower,
+              soc,
+              charger,
+              grid,
+              showSolar,
+              showBattery,
+              showEV,
+              weather: weatherState,
+              sunriseHour,
+              sunsetHour,
+              gridImportToday,
+              gridExportToday,
+              homeToday,
+              batteryChargeToday,
+              batteryDischargeToday,
+              evToday,
+              houseStyle: this.config?.house_style,
+              carType: this.config?.car_type,
+              onNodeClick: (node) => this.handleNodeClick(node)
+            })}
+          </div>
         </div>
-      </div>
+      </ha-card>
     `;
   }
 

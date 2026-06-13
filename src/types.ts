@@ -5,6 +5,8 @@ export interface EnergyFlowCardConfig {
   // battery_invert: false → negatief = laden, positief = ontladen (bijv. Victron, sommige SMA)
   // Standaard: true (positief = laden)
   battery_invert?: boolean;
+  house_style?: string;
+  car_type?: string;
   entities: {
     solar?: string | string[];
     solar_energy_today?: string;      // kWh opgewekt vandaag
