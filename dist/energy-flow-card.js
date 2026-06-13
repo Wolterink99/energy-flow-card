@@ -877,7 +877,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
               height: 100vh !important;
               width: calc(100vw + 56px) !important;
               margin-left: -56px !important;
-              z-index: 110 !important;
+              z-index: 0 !important;
             }
             ha-card {
               height: 100% !important;
@@ -906,4 +906,4 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           </div>
         </div>
       </ha-card>
-    `}getCardSize(){return 6}}Wt.styles=yt,t([vt({attribute:!1})],Wt.prototype,"hass",void 0),t([Vt()],Wt.prototype,"config",void 0),t([Vt()],Wt.prototype,"selectedNode",void 0),t([Vt()],Wt.prototype,"cardWidth",void 0),t([Vt()],Wt.prototype,"cardHeight",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",Wt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.3.1 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{Wt as EnergyFlowCard};
+    `}getCardSize(){return 6}}Wt.styles=yt,t([vt({attribute:!1})],Wt.prototype,"hass",void 0),t([Vt()],Wt.prototype,"config",void 0),t([Vt()],Wt.prototype,"selectedNode",void 0),t([Vt()],Wt.prototype,"cardWidth",void 0),t([Vt()],Wt.prototype,"cardHeight",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",Wt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.3.2 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{Wt as EnergyFlowCard};

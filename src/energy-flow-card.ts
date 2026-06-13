@@ -309,7 +309,7 @@ export class EnergyFlowCard extends LitElement {
               height: 100vh !important;
               width: calc(100vw + 56px) !important;
               margin-left: -56px !important;
-              z-index: 110 !important;
+              z-index: 0 !important;
             }
             ha-card {
               height: 100% !important;
@@ -384,7 +384,7 @@ if (!customElements.get('energy-flow-card')) {
   
   // Log message to HA browser console to confirm loading
   console.info(
-    `%c  ENERGY-FLOW-CARD  %c Version 2.3.1 `,
+    `%c  ENERGY-FLOW-CARD  %c Version 2.3.2 `,
     'color: white; background: #10b981; font-weight: 700;',
     'color: #10b981; background: #0f172a; font-weight: 700;'
   );
