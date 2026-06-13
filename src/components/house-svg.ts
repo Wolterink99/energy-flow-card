@@ -165,7 +165,7 @@ interface SvgParams {
 }
 
 export function renderHouseSvg({
-  houseStyle = 'modern-villa',
+  houseStyle = 'classic-jaren30',
   carType = 'hatchback',
   timeHour: rawTimeHour,
   timeOfDay,
@@ -458,6 +458,11 @@ export function renderHouseSvg({
           <line x1="46" y1="22" x2="46" y2="39" stroke="#5a3214" stroke-width="1.5" />
         </pattern>
 
+        <!-- Jaren 30 brick texture pattern -->
+        <pattern id="jaren30-brick-pat" width="60" height="40" patternUnits="userSpaceOnUse">
+          <image href="/hacsfiles/energy-flow-card/brick_texture_v3.png" width="60" height="40" preserveAspectRatio="none" />
+        </pattern>
+
         <!-- Roof tile pattern -->
         <pattern id="tiles-pat" width="12" height="12" patternUnits="userSpaceOnUse">
           <rect width="12" height="12" fill="#1e293b" />
@@ -687,27 +692,12 @@ export function renderHouseSvg({
               <!-- Plinth (Bottom dark brick) -->
               <rect x="290" y="450" width="300" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
               <!-- Main Wall (Red brick pentagon) -->
-              <polygon points="290,450 290,370 440,150 590,370 590,450" fill="#b91c1c" stroke="#7f1d1d" stroke-width="0.8" />
-              <!-- Fine brick mortar lines -->
-              ${Array.from({ length: 50 }).map((_, i) => {
-                const y = 450 - i * 6;
-                if (y < 150) return '';
-                let x1 = 290;
-                let x2 = 590;
-                if (y < 370) {
-                  x1 = 290 + (370 - y) * 0.682;
-                  x2 = 590 - (370 - y) * 0.682;
-                }
-                return svg`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#7f1d1d" stroke-width="0.5" opacity="0.4" />`;
-              })}
+              <!-- Main Wall (Red brick pentagon) -->
+              <polygon points="290,450 290,370 440,150 590,370 590,450" fill="url(#jaren30-brick-pat)" stroke="#7f1d1d" stroke-width="0.8" />
 
               <!-- Left Side Entrance Extension -->
               <rect x="260" y="450" width="30" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
-              <rect x="260" y="370" width="30" height="80" fill="#b91c1c" stroke="#7f1d1d" stroke-width="0.8" />
-              ${Array.from({ length: 14 }).map((_, i) => {
-                const y = 450 - i * 6;
-                return svg`<line x1="260" y1="${y}" x2="290" y2="${y}" stroke="#7f1d1d" stroke-width="0.5" opacity="0.4" />`;
-              })}
+              <rect x="260" y="370" width="30" height="80" fill="url(#jaren30-brick-pat)" stroke="#7f1d1d" stroke-width="0.8" />
               <polygon points="255,370 290,355 290,370" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
               <line x1="255" y1="370" x2="290" y2="355" stroke="#f8fafc" stroke-width="2.5" />
               <rect x="264" y="380" width="22" height="65" fill="#1e293b" stroke="#0f172a" stroke-width="1" rx="1" />
