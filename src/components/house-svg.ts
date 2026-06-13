@@ -694,6 +694,7 @@ export function renderHouseSvg({
               <!-- Main Wall (Red brick pentagon) -->
               <!-- LEFT WING -->
               <g id="left-wing">
+                <rect x="180" y="370" width="140" height="110" fill="#9a3412" />
                 <rect x="180" y="370" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
@@ -707,6 +708,7 @@ export function renderHouseSvg({
 
               <!-- RIGHT WING -->
               <g id="right-wing">
+                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="#9a3412" />
                 <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
@@ -725,6 +727,7 @@ export function renderHouseSvg({
 
               <!-- CENTER ENTRANCE GABLE -->
               <g id="center-portal">
+                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="#9a3412" />
                 <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
@@ -830,6 +833,7 @@ export function renderHouseSvg({
             ${houseStyle !== 'modern-villa' && houseStyle !== 'classic-jaren30' && houseStyle !== 'barnhouse' && houseStyle !== 'cubist-bungalow' && houseStyle !== 'townhouse' ? svg`
               <!-- LEFT WING -->
               <g id="left-wing">
+                <rect x="180" y="370" width="140" height="110" fill="#9a3412" />
                 <rect x="180" y="370" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
@@ -843,6 +847,7 @@ export function renderHouseSvg({
 
               <!-- RIGHT WING -->
               <g id="right-wing">
+                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="#9a3412" />
                 <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
@@ -861,6 +866,7 @@ export function renderHouseSvg({
 
               <!-- CENTER ENTRANCE GABLE -->
               <g id="center-portal">
+                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="#9a3412" />
                 <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
                 <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
@@ -876,7 +882,7 @@ export function renderHouseSvg({
           ${showSolar ? svg`
             <g id="solar-panels" class="interactiveGroup solarGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('solar'); }}>
               <!-- Only render solar panels if it is the default wing house, since the custom styles have solar panels integrated on their roofs -->
-              ${houseStyle !== 'modern-villa' && houseStyle !== 'classic-jaren30' && houseStyle !== 'barnhouse' && houseStyle !== 'cubist-bungalow' && houseStyle !== 'townhouse' ? svg`
+              ${houseStyle !== 'modern-villa' && houseStyle !== 'barnhouse' && houseStyle !== 'cubist-bungalow' && houseStyle !== 'townhouse' ? svg`
                 <g transform="translate(320, 340) rotate(-49.4)">
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
