@@ -289,7 +289,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
     fill: rgba(255, 255, 255, 0.32);
     pointer-events: none;
   }
-`,Vt={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},xt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function pt(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function ht(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const n=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},s=n(t);return`rgba(255, 255, 255, ${s+(n(e)-s)*r})`}const n=pt(t),s=pt(e);return function(t,e,r){const n=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${n(t)}${n(e)}${n(r)}`}(n.r+(s.r-n.r)*r,n.g+(s.g-n.g)*r,n.b+(s.b-n.b)*r)}function gt(t){let e=xt[0],r=xt[xt.length-1];for(let n=0;n<xt.length-1;n++)if(t>=xt[n].hour&&t<=xt[n+1].hour){e=xt[n],r=xt[n+1];break}const n=r.hour-e.hour,s=0===n?0:(t-e.hour)/n;return{top:ht(e.top,r.top,s),horizon:ht(e.horizon,r.horizon,s),stars:e.stars+(r.stars-e.stars)*s,lights:e.lights+(r.lights-e.lights)*s,clouds:ht(e.clouds,r.clouds,s)}}function Ot(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function kt(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}const qt=(t,e)=>{const r=t/4;return`M 0,${e} \n    Q ${.5*r},${e-30} ${r},${e} \n    T ${2*r},${e} \n    T ${3*r},${e} \n    T ${4*r},${e} \n    L ${t},0 L 0,0 Z`},Xt=(t,e,r)=>[{x:t+50*r,y:e+180*r},{x:t+85*r,y:e+180*r},{x:t+155*r,y:e+180*r},{x:t+190*r,y:e+180*r}],jt=(t,e,r)=>{const n=(t.x+e.x)/2,s=(t.y+e.y)/2+r;return`M ${t.x},${t.y} Q ${n},${s} ${e.x},${e.y}`},wt=(t,e,r,n,s)=>E`
+`,Vt={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4"},gridE:{stroke:"#22c55e"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},xt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function pt(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function ht(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const n=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},s=n(t);return`rgba(255, 255, 255, ${s+(n(e)-s)*r})`}const n=pt(t),s=pt(e);return function(t,e,r){const n=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${n(t)}${n(e)}${n(r)}`}(n.r+(s.r-n.r)*r,n.g+(s.g-n.g)*r,n.b+(s.b-n.b)*r)}function gt(t){let e=xt[0],r=xt[xt.length-1];for(let n=0;n<xt.length-1;n++)if(t>=xt[n].hour&&t<=xt[n+1].hour){e=xt[n],r=xt[n+1];break}const n=r.hour-e.hour,s=0===n?0:(t-e.hour)/n;return{top:ht(e.top,r.top,s),horizon:ht(e.horizon,r.horizon,s),stars:e.stars+(r.stars-e.stars)*s,lights:e.lights+(r.lights-e.lights)*s,clouds:ht(e.clouds,r.clouds,s)}}function Ot(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function kt(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}const qt=(t,e)=>{const r=t/4;return`M 0,${e} \n    Q ${.5*r},${e-30} ${r},${e} \n    T ${2*r},${e} \n    T ${3*r},${e} \n    T ${4*r},${e} \n    L ${t},0 L 0,0 Z`},Xt=(t,e,r)=>[{x:t+50*r,y:e+180*r},{x:t+85*r,y:e+180*r},{x:t+155*r,y:e+180*r},{x:t+190*r,y:e+180*r}],jt=(t,e,r)=>{const n=(t.x+e.x)/2,s=(t.y+e.y)/2+r;return`M ${t.x},${t.y} Q ${n},${s} ${e.x},${e.y}`},wt=(t,e,r,n,s)=>E`
     <g transform="translate(${t}, ${e}) scale(${r})" opacity="${n}" stroke="${s}" fill="none" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
       <rect x="63" y="474" width="14" height="8" fill="#64748b" stroke="${s}" stroke-width="1.2" rx="1" />
       <rect x="163" y="474" width="14" height="8" fill="#64748b" stroke="${s}" stroke-width="1.2" rx="1" />
@@ -530,8 +530,8 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           <!-- Ground (grass base spanning full screen width) -->
           <rect x="${-S}" y="410" width="${W}" height="120" fill="url(#garden-grad)" />
           
-          <!-- Driveway (stretching to the right screen edge) -->
-          <rect x="440" y="410" width="${S+500}" height="20" fill="url(#driveway-grad)" rx="6" ry="6" />
+          <!-- Driveway (stretching from middle wing to right screen edge) -->
+          <path d="M 320,410 Q 325,410 330,414 L 330,430 L ${S+500},430 L ${S+500},410 Z" fill="url(#driveway-grad)" />
           <line x1="${-S}" y1="410" x2="${W-S}" y2="410" class="horizonLine" />
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
@@ -805,7 +805,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
           ${v?xt("M 380,230 L 380,270 L 345,270 L 345,350",B,Ot(f),Vt.solar.stroke,Vt.solar.glow):""}
 
-          ${xt("M 13,410 L 13,440 L 345,440 L 345,350",Y||H,Ot(c),J.stroke,J.glow,H)}
+          <!-- Grid cable removed: no visible cable between transformer box and meterkast -->
 
           ${y?xt("M 310,350 L 345,350",U||K,Ot(o),G.stroke,G.glow,U):""}
 
@@ -830,7 +830,9 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${v?E`
           <g class="interactiveGroup solarGroup" @click=${()=>w("solar")}>
-            <g transform="translate(${S+120}, ${pt+80})">
+            <!-- Solar HUD card: positioned left of the solar panels on the roof -->
+            <!-- Solar panels are at translateX+320, translateY+80 area; card goes left of that -->
+            <g transform="translate(${S+130}, ${pt+155})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${B?"hudCardActive":""}"
                 rx="8" ry="8"
@@ -853,9 +855,11 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (Static positions aligned to house elements)   -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <!-- 1. Stroomnet (Grid) -->
+        <!-- 1. Stroomnet (Grid) — positioned below the pylons (mast area) -->
+        <!-- mastX is ~20 in translated space; in SVG space that is translateX+mastX -->
+        <!-- Card center aligned under pylon: translateX + mastX + 85 (half card) → x = translateX + mastX - 85 + 85 = translateX+mastX -->
         <g class="interactiveGroup gridGroup" @click=${()=>w("grid")}>
-          <g transform="translate(${S+30}, ${F-75})">
+          <g transform="translate(${S+z-85}, ${F-155})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${Y||H?"hudCardActive":""}"
               rx="8" ry="8"
@@ -869,10 +873,11 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           </g>
         </g>
 
-        <!-- 2. Thuisaccu (Battery) - only if showBattery is true -->
+        <!-- 2. Thuisaccu (Battery) — below battery position (translateX+280) -->
+        <!-- Reserve space here even when battery is not shown (for future use) -->
         ${y?E`
           <g class="interactiveGroup batteryGroup" @click=${()=>w("battery")}>
-            <g transform="translate(${S+220}, ${F-75})">
+            <g transform="translate(${S+280-85}, ${F-155})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${U||K?"hudCardActive":""}"
                 rx="8" ry="8"
@@ -887,9 +892,9 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           </g>
         `:""}
 
-        <!-- 3. Huisverbruik (Home) -->
+        <!-- 3. Huisverbruik (Home) — below the meterkast (mkX=345 in translated group) -->
         <g class="interactiveGroup homeGroup" @click=${()=>w("home")}>
-          <g transform="translate(${S+410}, ${F-75})">
+          <g transform="translate(${S+nt-85}, ${F-155})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${R?"hudCardActive":""}"
               rx="8" ry="8"
@@ -903,10 +908,10 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           </g>
         </g>
 
-        <!-- 4. Laadpaal (EV) - only if showEV is true -->
+        <!-- 4. Laadpaal (EV) — below the charger pole (x=455 in translated group) -->
         ${u?E`
           <g class="interactiveGroup evGroup" @click=${()=>w("ev")}>
-            <g transform="translate(${S+600}, ${F-75})">
+            <g transform="translate(${S+455-85}, ${F-155})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${A?"hudCardActive":""}"
                 rx="8" ry="8"
