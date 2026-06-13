@@ -96,6 +96,27 @@ export class EnergyFlowCard extends LitElement {
 
   private handleNodeClick(nodeId: string): void {
     console.info(`[energy-flow-card] Click registered on node: ${nodeId}`);
+    
+    // Check for custom tap action (e.g. grid_tap_action, solar_tap_action, etc.)
+    const actionKey = `${nodeId}_tap_action`;
+    const customAction = (this.config as any)[actionKey];
+    if (customAction) {
+      console.info(`[energy-flow-card] Executing custom action for node '${nodeId}':`, customAction);
+      const event = new CustomEvent('hass-action', {
+        detail: {
+          config: {
+            tap_action: customAction
+          },
+          action: 'tap',
+          action_config: customAction
+        },
+        bubbles: true,
+        composed: true
+      });
+      this.dispatchEvent(event);
+      return;
+    }
+
     this.selectedNode = this.selectedNode === nodeId ? null : nodeId;
     
     // Map node id to entity key, with smart fallbacks
@@ -363,7 +384,7 @@ if (!customElements.get('energy-flow-card')) {
   
   // Log message to HA browser console to confirm loading
   console.info(
-    `%c  ENERGY-FLOW-CARD  %c Version 2.2.8 `,
+    `%c  ENERGY-FLOW-CARD  %c Version 2.2.9 `,
     'color: white; background: #10b981; font-weight: 700;',
     'color: #10b981; background: #0f172a; font-weight: 700;'
   );
