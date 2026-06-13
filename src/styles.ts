@@ -167,7 +167,7 @@ export const styles = css`
   .starSlow { animation: twinkle 6s infinite ease-in-out; animation-delay: 2.3s; }
 
   .inverterRing {
-    transform-origin: 395px 432.5px;
+    transform-origin: 345px 420px;
     animation: pulseInverterRing 3s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
