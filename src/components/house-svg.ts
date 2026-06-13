@@ -1,4 +1,5 @@
 import { svg, TemplateResult } from 'lit';
+import { BRICK_TEXTURE_BASE64 } from './brick-texture-base64';
 
 // Color tokens for active states
 const COLORS = {
@@ -460,7 +461,7 @@ export function renderHouseSvg({
 
         <!-- Jaren 30 brick texture pattern -->
         <pattern id="jaren30-brick-pat" width="60" height="40" patternUnits="userSpaceOnUse">
-          <image href="/hacsfiles/energy-flow-card/brick_texture_v3.png" width="60" height="40" preserveAspectRatio="none" />
+          <image href="${BRICK_TEXTURE_BASE64}" width="60" height="40" preserveAspectRatio="none" />
         </pattern>
 
         <!-- Roof tile pattern -->
