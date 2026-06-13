@@ -394,7 +394,8 @@ export function renderHouseSvg({
   const p4Tips = getPylonTips(mastX + 316.4, 275.6, 0.28);
   const p5Tips = getPylonTips(mastX + 358.4, 323.6, 0.18);
 
-  // Grid path starts at the bottom-center of the transformer box (y = 410) and runs underground to the meterkast
+  // Cable paths between components and the meterkast
+  const gridPath = `M 13,410 L 13,440 L ${mkX},440 L ${mkX},${mkY}`;
   const solarPath = `M ${invX},${invY} L ${invX},270 L ${mkX},270 L ${mkX},${mkY}`;
   const batteryPath = `M 310,350 L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},440 L 455,440 L 455,395`;
@@ -645,8 +646,8 @@ export function renderHouseSvg({
           <!-- Ground (grass base spanning full screen width) -->
           <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
           
-          <!-- Driveway (stretching from middle wing to right screen edge) -->
-          <path d="M 320,410 Q 325,410 330,414 L 330,430 L ${translateX + 500},430 L ${translateX + 500},410 Z" fill="url(#driveway-grad)" />
+          <!-- Driveway: from center gable (x=320) to right edge, rounded left corners -->
+          <path d="M 320,410 Q 320,430 340,430 L ${width - translateX},430 L ${width - translateX},410 Z" fill="url(#driveway-grad)" />
           <line x1="${-translateX}" y1="410" x2="${width - translateX}" y2="410" class="horizonLine" />
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
@@ -941,7 +942,8 @@ export function renderHouseSvg({
             solarActive, getFlowSpeed(solar), COLORS.solar.stroke, COLORS.solar.glow
           ) : ''}
 
-          <!-- Grid cable removed: no visible cable between transformer box and meterkast -->
+          <!-- Grid cable: underground from transformer box to meterkast (no pylon-to-box cable) -->
+          ${renderCable(gridPath, gridImporting || gridExporting, getFlowSpeed(grid), gridColor.stroke, gridColor.glow, gridExporting)}
 
           ${showBattery ? renderCable(
             batteryPath,
@@ -998,11 +1000,14 @@ export function renderHouseSvg({
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (Static positions aligned to house elements)   -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <!-- 1. Stroomnet (Grid) — positioned below the pylons (mast area) -->
-        <!-- mastX is ~20 in translated space; in SVG space that is translateX+mastX -->
-        <!-- Card center aligned under pylon: translateX + mastX + 85 (half card) → x = translateX + mastX - 85 + 85 = translateX+mastX -->
+        <!-- ── HUD CARDS: positions are in SVG coordinate space (no translateX offset needed here) ── -->
+        <!-- The cards are rendered OUTSIDE the translateX/Y group, so use absolute SVG positions.      -->
+        <!-- House scene center = width/2. The house group is shifted by translateX so that the        -->
+        <!-- 800px design is centered: house element at design-x maps to SVG-x = translateX + design-x -->
+
+        <!-- 1. Stroomnet (Grid) — below the pylons/mast (design-x ≈ 20+85=105, centered on mast)    -->
         <g class="interactiveGroup gridGroup" @click=${() => onNodeClick('grid')}>
-          <g transform="translate(${translateX + mastX - 85}, ${height - 155})">
+          <g transform="translate(${translateX + 20}, ${height - 155})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${gridImporting || gridExporting ? 'hudCardActive' : ''}"
               rx="8" ry="8"
@@ -1016,11 +1021,10 @@ export function renderHouseSvg({
           </g>
         </g>
 
-        <!-- 2. Thuisaccu (Battery) — below battery position (translateX+280) -->
-        <!-- Reserve space here even when battery is not shown (for future use) -->
+        <!-- 2. Thuisaccu (Battery) — below the battery (design-x=280, center at 280+85=365)          -->
         ${showBattery ? svg`
           <g class="interactiveGroup batteryGroup" @click=${() => onNodeClick('battery')}>
-            <g transform="translate(${translateX + 280 - 85}, ${height - 155})">
+            <g transform="translate(${translateX + 210}, ${height - 155})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${batteryCharging || batteryDischarging ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
@@ -1035,9 +1039,9 @@ export function renderHouseSvg({
           </g>
         ` : ''}
 
-        <!-- 3. Huisverbruik (Home) — below the meterkast (mkX=345 in translated group) -->
+        <!-- 3. Huisverbruik (Home) — below the meterkast (design-x=mkX=345, center at 345+85=430)   -->
         <g class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
-          <g transform="translate(${translateX + mkX - 85}, ${height - 155})">
+          <g transform="translate(${translateX + 260}, ${height - 155})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${homeActive ? 'hudCardActive' : ''}"
               rx="8" ry="8"
@@ -1051,10 +1055,10 @@ export function renderHouseSvg({
           </g>
         </g>
 
-        <!-- 4. Laadpaal (EV) — below the charger pole (x=455 in translated group) -->
+        <!-- 4. Laadpaal (EV) — below the charger pole (design-x=455, center at 455+85=540)          -->
         ${showEV ? svg`
           <g class="interactiveGroup evGroup" @click=${() => onNodeClick('ev')}>
-            <g transform="translate(${translateX + 455 - 85}, ${height - 155})">
+            <g transform="translate(${translateX + 385}, ${height - 155})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${evActive ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
