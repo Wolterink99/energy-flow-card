@@ -166,7 +166,10 @@ export class EnergyFlowCard extends LitElement {
 
     // Get current browser time decimal representation (0.0 to 24.0)
     const now = new Date();
-    const decimalHour = now.getHours() + now.getMinutes() / 60;
+    let decimalHour = now.getHours() + now.getMinutes() / 60;
+    if (this.config.time_override !== undefined) {
+      decimalHour = this.config.time_override;
+    }
 
     // Determine time of day label
     let timeOfDay = 'afternoon';
@@ -232,8 +235,19 @@ export class EnergyFlowCard extends LitElement {
 
     // Weather state from Home Assistant
     let weatherState = 'sunny';
-    if (entities.weather && this.hass?.states[entities.weather]) {
-      weatherState = this.hass.states[entities.weather].state;
+    let weatherEntityId = entities.weather;
+    if (!weatherEntityId && this.hass) {
+      const detected = Object.keys(this.hass.states).find(id => id.startsWith('weather.'));
+      if (detected) {
+        weatherEntityId = detected;
+        console.info(`[energy-flow-card] Auto-detected weather entity: ${weatherEntityId}`);
+      }
+    }
+
+    if (this.config.weather_override) {
+      weatherState = this.config.weather_override;
+    } else if (weatherEntityId && this.hass?.states[weatherEntityId]) {
+      weatherState = this.hass.states[weatherEntityId].state;
     }
 
     // Sunrise/sunset from Home Assistant sun.sun
@@ -349,7 +363,7 @@ if (!customElements.get('energy-flow-card')) {
   
   // Log message to HA browser console to confirm loading
   console.info(
-    `%c  ENERGY-FLOW-CARD  %c Version 2.2.3 `,
+    `%c  ENERGY-FLOW-CARD  %c Version 2.2.4 `,
     'color: white; background: #10b981; font-weight: 700;',
     'color: #10b981; background: #0f172a; font-weight: 700;'
   );

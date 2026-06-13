@@ -29,6 +29,8 @@ export interface EnergyFlowCardConfig {
     [key: string]: any;
   };
   screensaver?: boolean;
+  weather_override?: string;
+  time_override?: number;
 }
 
 // Minimal Home Assistant interface declarations

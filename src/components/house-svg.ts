@@ -199,6 +199,16 @@ export function renderHouseSvg({
   onNodeClick
 }: SvgParams): TemplateResult {
 
+  // Map weather states to primary visual groups
+  let visualWeather = weather;
+  if (weather === 'pouring' || weather === 'lightning-rainy') {
+    visualWeather = 'rainy';
+  } else if (weather === 'snowy-rainy' || weather === 'hail') {
+    visualWeather = 'snowy';
+  } else if (weather === 'fog') {
+    visualWeather = 'foggy';
+  }
+
   // Resolve fluid dimensions (fall back to standard 800x600 if container is not measured yet)
   const width = containerWidth || 800;
   const height = containerHeight || 600;
@@ -227,7 +237,7 @@ export function renderHouseSvg({
   const gridColor = gridImporting ? COLORS.gridI : COLORS.gridE;
 
   const skyState = getSkyState(timeHour);
-  const showLights = skyState.lights > 0.05 || weather === 'rainy' || weather === 'lightning';
+  const showLights = skyState.lights > 0.05 || visualWeather === 'rainy' || visualWeather === 'lightning';
 
   // Sky colors with weather adaptation
   let skyTop = skyState.top;
@@ -235,25 +245,30 @@ export function renderHouseSvg({
   let cloudColor = skyState.clouds;
   let cloudOpacity = timeOfDay === 'night' ? 0.18 : 0.48;
 
-  if (weather === 'cloudy') {
+  if (visualWeather === 'cloudy') {
     cloudColor = '#cbd5e1';
     skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.15);
     cloudOpacity = 0.98;
-  } else if (weather === 'rainy' || weather === 'lightning') {
+  } else if (visualWeather === 'rainy' || visualWeather === 'lightning') {
     cloudColor = '#1f2937';
     skyTop = cloudColor;
     skyHorizon = interpolateColor(skyState.horizon, '#334155', 0.5);
     cloudOpacity = 0.99;
-  } else if (weather === 'snowy') {
+  } else if (visualWeather === 'snowy') {
     cloudColor = '#334155';
     skyTop = cloudColor;
     skyHorizon = interpolateColor(skyState.horizon, '#4a5568', 0.4);
     cloudOpacity = 0.98;
-  } else if (weather === 'foggy') {
+  } else if (visualWeather === 'foggy') {
     skyTop = interpolateColor(skyState.top, '#64748b', 0.65);
     skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.65);
     cloudColor = 'rgba(203, 213, 225, 0.4)';
     cloudOpacity = 0.50;
+  } else if (visualWeather === 'partlycloudy') {
+    skyTop = interpolateColor(skyState.top, '#475569', 0.15);
+    skyHorizon = interpolateColor(skyState.horizon, '#64748b', 0.15);
+    cloudColor = '#cbd5e1';
+    cloudOpacity = 0.65;
   }
 
   // ── Window appearance ──
@@ -266,7 +281,7 @@ export function renderHouseSvg({
     : (showLights ? 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))' : 'none');
 
   // ── Sun trajectory (using dynamic width and height) ──
-  const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' && weather !== 'snowy' && weather !== 'foggy';
+  const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'cloudy' && visualWeather !== 'snowy' && visualWeather !== 'foggy';
   const sunPos = { cx: width / 2, cy: height };
   let sunOpacity = 0;
   let sunColor = '#fef08a';
@@ -283,7 +298,7 @@ export function renderHouseSvg({
   }
 
   // ── Moon trajectory (using dynamic width and height) ──
-  const isMoonVisible = (timeHour > 21.0 || timeHour < 6.0) && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' && weather !== 'snowy' && weather !== 'foggy';
+  const isMoonVisible = (timeHour > 21.0 || timeHour < 6.0) && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'cloudy' && visualWeather !== 'snowy' && visualWeather !== 'foggy';
   const moonPos = { cx: width / 2, cy: height };
   let moonOpacity = 0;
 
@@ -458,7 +473,7 @@ export function renderHouseSvg({
         <rect width="${width}" height="${height}" fill="url(#sky-grad)" />
 
         <!-- Stars (dynamically distributed across width) -->
-        ${skyState.stars > 0.05 && weather !== 'rainy' && weather !== 'lightning' && weather !== 'cloudy' ? svg`
+        ${skyState.stars > 0.05 && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'cloudy' ? svg`
           <g opacity="${skyState.stars}" style="pointer-events: none;">
             <circle cx="${width * 0.1}"  cy="${height * 0.08}"  r="1.0" class="starFast" fill="#ffffff" />
             <circle cx="${width * 0.26}" cy="${height * 0.16}"  r="1.2" fill="#ffffff" />
@@ -487,17 +502,17 @@ export function renderHouseSvg({
         ` : ''}
 
         <!-- Falling precipitation -->
-        ${weather === 'rainy' ? renderRain(width) : ''}
-        ${weather === 'snowy' ? renderSnow(width) : ''}
+        ${visualWeather === 'rainy' ? renderRain(width) : ''}
+        ${visualWeather === 'snowy' ? renderSnow(width) : ''}
 
         <!-- Cloud layers -->
         <g opacity="${cloudOpacity}" style="pointer-events: none;">
-          ${(weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy') ? svg`
+          ${(visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy') ? svg`
             <path d="${overcastPath}" fill="${cloudColor}" />
           ` : ''}
           ${(clouds || []).map(c => {
             const minY = 20;
-            const isOvercast = (weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy');
+            const isOvercast = (visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy');
             const maxY = isOvercast ? (height - 420) : (height - 500);
             const deltaY = Math.max(20, maxY - minY);
             const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
@@ -515,7 +530,7 @@ export function renderHouseSvg({
         </g>
 
         <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
-        ${weather === 'lightning' ? svg`
+        ${visualWeather === 'lightning' ? svg`
           <path d="M ${width / 2 + 20},60 L ${width / 2 - 10},150 L ${width / 2 + 30},150 L ${width / 2 - 30},260 L ${width / 2},260 L ${width / 2 - 50},380" class="lightningBolt" />
           <path d="M ${width * 0.225},40 L ${width * 0.194},110 L ${width * 0.225},110 L ${width * 0.175},180" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
         ` : ''}
@@ -844,12 +859,12 @@ export function renderHouseSvg({
         <!-- End of translate group -->
 
         <!-- Lightning Screen Flashes -->
-        ${weather === 'lightning' ? svg`
+        ${visualWeather === 'lightning' ? svg`
           <rect width="${width}" height="${height}" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
         ` : ''}
 
         <!-- Fog overlay -->
-        ${weather === 'foggy' ? svg`
+        ${visualWeather === 'foggy' ? svg`
           <rect width="${width}" height="${height}" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
           <rect width="${width}" height="${height}" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
         ` : ''}
