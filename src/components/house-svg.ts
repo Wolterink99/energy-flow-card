@@ -117,10 +117,10 @@ function renderHDCloud(className: string, x: number, y: number, scale = 1, color
 function renderRain(): TemplateResult {
   return svg`
     <g style="pointer-events: none;">
-      ${Array.from({ length: 18 }).map((_, i) => svg`
-        <line x1="${25 + i * 55}" y1="0" x2="${8 + i * 55}" y2="40"
+      ${Array.from({ length: 45 }).map((_, i) => svg`
+        <line x1="${15 + i * 21}" y1="0" x2="${-2 + i * 21}" y2="40"
           class="rainDrop"
-          style="animation-delay: ${(i % 5) * 0.12}s; animation-duration: ${0.6 + (i % 3) * 0.1}s;" />
+          style="animation-delay: ${(i % 7) * 0.09}s; animation-duration: ${0.55 + (i % 4) * 0.07}s;" />
       `)}
     </g>
   `;
@@ -129,10 +129,10 @@ function renderRain(): TemplateResult {
 function renderSnow(): TemplateResult {
   return svg`
     <g style="pointer-events: none;">
-      ${Array.from({ length: 22 }).map((_, i) => svg`
-        <circle cx="${25 + i * 45}" cy="0" r="${1.8 + (i % 3) * 0.6}"
+      ${Array.from({ length: 40 }).map((_, i) => svg`
+        <circle cx="${15 + i * 24}" cy="0" r="${1.8 + (i % 4) * 0.6}"
           class="snowFlake"
-          style="animation-delay: ${(i % 6) * 0.5}s; animation-duration: ${4.5 + (i % 4) * 0.7}s;" />
+          style="animation-delay: ${(i % 8) * 0.4}s; animation-duration: ${3.5 + (i % 5) * 0.6}s;" />
       `)}
     </g>
   `;
@@ -534,22 +534,29 @@ export function renderHouseSvg({
         ${renderHDCloud('cloud2', 432, 84,  0.85, cloudColor, cloudOpacity * 0.85)}
         ${renderHDCloud('cloud3', 744, 132, 1.0,  cloudColor, cloudOpacity)}
         ${weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' ? svg`
-          ${renderHDCloud('cloud2', 240, 60,  0.75, cloudColor, cloudOpacity * 0.8)}
-          ${renderHDCloud('cloud1', 588, 108, 0.9,  cloudColor, cloudOpacity * 0.8)}
+          ${renderHDCloud('cloud2', 20, 20, 0.95, cloudColor, cloudOpacity * 0.95)}
+          ${renderHDCloud('cloud1', 200, 50, 0.8, cloudColor, cloudOpacity * 0.9)}
+          ${renderHDCloud('cloud3', 310, 30, 1.15, cloudColor, cloudOpacity * 0.95)}
+          ${renderHDCloud('cloud2', 520, 70, 0.9, cloudColor, cloudOpacity * 0.9)}
+          ${renderHDCloud('cloud1', 680, 40, 0.75, cloudColor, cloudOpacity * 0.95)}
+          ${renderHDCloud('cloud3', 820, 80, 1.1, cloudColor, cloudOpacity * 0.95)}
         ` : ''}
 
-        <!-- Lightning bolt -->
+        <!-- Lightning bolt & Full-Screen flashes -->
         ${weather === 'lightning' ? svg`
+          <rect width="960" height="590" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
           <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
+          <path d="M 220,50 L 190,130 L 220,130 L 170,220" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
         ` : ''}
 
         <!-- Falling precipitation -->
         ${weather === 'rainy' ? renderRain() : ''}
         ${weather === 'snowy' ? renderSnow() : ''}
 
-        <!-- Fog overlay -->
+        <!-- Fog overlay (Thicker layer with depth) -->
         ${weather === 'foggy' ? svg`
-          <rect width="960" height="590" fill="rgba(226, 232, 240, 0.22)" style="filter: blur(5px); pointer-events: none;" />
+          <rect width="960" height="590" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
+          <rect width="960" height="590" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
         ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->

@@ -1,6 +1,6 @@
 {
   "name": "energy-flow-card",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Een premium, dynamische energieverloop kaart voor Home Assistant met een 3D-stijl geanimeerd huis en live weersomstandigheden.",
   "main": "dist/energy-flow-card.js",
   "type": "module",
