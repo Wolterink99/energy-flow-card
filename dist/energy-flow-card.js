@@ -443,39 +443,6 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
           ${wt("cloud3",820,80,1.1,R,.95*G)}
         `:""}
 
-        <!-- Lightning bolt & Full-Screen flashes -->
-        ${"lightning"===x?E`
-          <rect width="960" height="590" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
-          <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
-          <path d="M 220,50 L 190,130 L 220,130 L 170,220" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
-        `:""}
-
-        <!-- Falling precipitation -->
-        ${"rainy"===x?E`
-    <g style="pointer-events: none;">
-      ${Array.from({length:45}).map((t,e)=>E`
-        <line x1="${15+21*e}" y1="0" x2="${21*e-2}" y2="40"
-          class="rainDrop"
-          style="animation-delay: ${e%7*.09}s; animation-duration: ${.55+e%4*.07}s;" />
-      `)}
-    </g>
-  `:""}
-        ${"snowy"===x?E`
-    <g style="pointer-events: none;">
-      ${Array.from({length:40}).map((t,e)=>E`
-        <circle cx="${15+24*e}" cy="0" r="${1.8+e%4*.6}"
-          class="snowFlake"
-          style="animation-delay: ${e%8*.4}s; animation-duration: ${3.5+e%5*.6}s;" />
-      `)}
-    </g>
-  `:""}
-
-        <!-- Fog overlay (Thicker layer with depth) -->
-        ${"foggy"===x?E`
-          <rect width="960" height="590" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
-          <rect width="960" height="590" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
-        `:""}
-
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- GROUND & ELECTRICITY MAST: Outside scaled group                 -->
         <!-- ════════════════════════════════════════════════════════════════ -->
@@ -1070,6 +1037,39 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
         ${v?ct(nt,b||j,gt(o),U.stroke,U.glow,b):""}
 
         ${y?ct(st,S,gt(a),ht.ev.stroke,ht.ev.glow):""}
+
+        <!-- Lightning bolt & Full-Screen flashes -->
+        ${"lightning"===x?E`
+          <rect width="960" height="590" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
+          <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
+          <path d="M 220,50 L 190,130 L 220,130 L 170,220" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
+        `:""}
+
+        <!-- Falling precipitation -->
+        ${"rainy"===x?E`
+    <g style="pointer-events: none;">
+      ${Array.from({length:45}).map((t,e)=>E`
+        <line x1="${15+21*e}" y1="0" x2="${21*e-2}" y2="40"
+          class="rainDrop"
+          style="animation-delay: ${e%7*.09}s; animation-duration: ${.55+e%4*.07}s;" />
+      `)}
+    </g>
+  `:""}
+        ${"snowy"===x?E`
+    <g style="pointer-events: none;">
+      ${Array.from({length:40}).map((t,e)=>E`
+        <circle cx="${15+24*e}" cy="0" r="${1.8+e%4*.6}"
+          class="snowFlake"
+          style="animation-delay: ${e%8*.4}s; animation-duration: ${3.5+e%5*.6}s;" />
+      `)}
+    </g>
+  `:""}
+
+        <!-- Fog overlay (Thicker layer with depth) -->
+        ${"foggy"===x?E`
+          <rect width="960" height="590" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
+          <rect width="960" height="590" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
+        `:""}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- SOLAR HUD card (top right sky area)                            -->

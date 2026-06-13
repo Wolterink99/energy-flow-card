@@ -542,23 +542,6 @@ export function renderHouseSvg({
           ${renderHDCloud('cloud3', 820, 80, 1.1, cloudColor, cloudOpacity * 0.95)}
         ` : ''}
 
-        <!-- Lightning bolt & Full-Screen flashes -->
-        ${weather === 'lightning' ? svg`
-          <rect width="960" height="590" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
-          <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
-          <path d="M 220,50 L 190,130 L 220,130 L 170,220" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
-        ` : ''}
-
-        <!-- Falling precipitation -->
-        ${weather === 'rainy' ? renderRain() : ''}
-        ${weather === 'snowy' ? renderSnow() : ''}
-
-        <!-- Fog overlay (Thicker layer with depth) -->
-        ${weather === 'foggy' ? svg`
-          <rect width="960" height="590" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
-          <rect width="960" height="590" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
-        ` : ''}
-
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- GROUND & ELECTRICITY MAST: Outside scaled group                 -->
         <!-- ════════════════════════════════════════════════════════════════ -->
@@ -1204,6 +1187,23 @@ export function renderHouseSvg({
           evPath,
           evActive, getFlowSpeed(charger), COLORS.ev.stroke, COLORS.ev.glow
         ) : ''}
+
+        <!-- Lightning bolt & Full-Screen flashes -->
+        ${weather === 'lightning' ? svg`
+          <rect width="960" height="590" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
+          <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
+          <path d="M 220,50 L 190,130 L 220,130 L 170,220" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
+        ` : ''}
+
+        <!-- Falling precipitation -->
+        ${weather === 'rainy' ? renderRain() : ''}
+        ${weather === 'snowy' ? renderSnow() : ''}
+
+        <!-- Fog overlay (Thicker layer with depth) -->
+        ${weather === 'foggy' ? svg`
+          <rect width="960" height="590" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
+          <rect width="960" height="590" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
+        ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- SOLAR HUD card (top right sky area)                            -->
