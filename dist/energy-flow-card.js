@@ -1,4 +1,4 @@
-function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,r):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)i=Reflect.decorate(t,e,r,s);else for(var o=t.length-1;o>=0;o--)(n=t[o])&&(i=(f<3?n(i):f>3?n(e,r,i):n(e,r))||i);return f>3&&i&&Object.defineProperty(e,r,i),i}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,r=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),n=new WeakMap;let f=class{constructor(t,e,r){if(this._$cssResult$=!0,r!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(r&&void 0===t){const r=void 0!==e&&1===e.length;r&&(t=n.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),r&&n.set(e,t))}return t}toString(){return this.cssText}};const i=r?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const r of t.cssRules)e+=r.cssText;return(t=>new f("string"==typeof t?t:t+"",void 0,s))(e)})(t):t,{is:o,defineProperty:l,getOwnPropertyDescriptor:a,getOwnPropertyNames:d,getOwnPropertySymbols:c,getPrototypeOf:v}=Object,x=globalThis,y=x.trustedTypes,h=y?y.emptyScript:"",k=x.reactiveElementPolyfillSupport,V=(t,e)=>t,p={toAttribute(t,e){switch(e){case Boolean:t=t?h:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let r=t;switch(e){case Boolean:r=null!==t;break;case Number:r=null===t?null:Number(t);break;case Object:case Array:try{r=JSON.parse(t)}catch(t){r=null}}return r}},u=(t,e)=>!o(t,e),g={attribute:!0,type:String,converter:p,reflect:!1,useDefault:!1,hasChanged:u};Symbol.metadata??=Symbol("metadata"),x.litPropertyMetadata??=new WeakMap;let O=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=g){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const r=Symbol(),s=this.getPropertyDescriptor(t,r,e);void 0!==s&&l(this.prototype,t,s)}}static getPropertyDescriptor(t,e,r){const{get:s,set:n}=a(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:s,set(e){const f=s?.call(this);n?.call(this,e),this.requestUpdate(t,f,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??g}static _$Ei(){if(this.hasOwnProperty(V("elementProperties")))return;const t=v(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(V("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(V("properties"))){const t=this.properties,e=[...d(t),...c(t)];for(const r of e)this.createProperty(r,t[r])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,r]of e)this.elementProperties.set(t,r)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const r=this._$Eu(t,e);void 0!==r&&this._$Eh.set(r,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const r=new Set(t.flat(1/0).reverse());for(const t of r)e.unshift(i(t))}else void 0!==t&&e.push(i(t));return e}static _$Eu(t,e){const r=e.attribute;return!1===r?void 0:"string"==typeof r?r:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const r of e.keys())this.hasOwnProperty(r)&&(t.set(r,this[r]),delete this[r]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,s)=>{if(r)t.adoptedStyleSheets=s.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const r of s){const s=document.createElement("style"),n=e.litNonce;void 0!==n&&s.setAttribute("nonce",n),s.textContent=r.cssText,t.appendChild(s)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,r){this._$AK(t,r)}_$ET(t,e){const r=this.constructor.elementProperties.get(t),s=this.constructor._$Eu(t,r);if(void 0!==s&&!0===r.reflect){const n=(void 0!==r.converter?.toAttribute?r.converter:p).toAttribute(e,r.type);this._$Em=t,null==n?this.removeAttribute(s):this.setAttribute(s,n),this._$Em=null}}_$AK(t,e){const r=this.constructor,s=r._$Eh.get(t);if(void 0!==s&&this._$Em!==s){const t=r.getPropertyOptions(s),n="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:p;this._$Em=s;const f=n.fromAttribute(e,t.type);this[s]=f??this._$Ej?.get(s)??f,this._$Em=null}}requestUpdate(t,e,r,s=!1,n){if(void 0!==t){const f=this.constructor;if(!1===s&&(n=this[t]),r??=f.getPropertyOptions(t),!((r.hasChanged??u)(n,e)||r.useDefault&&r.reflect&&n===this._$Ej?.get(t)&&!this.hasAttribute(f._$Eu(t,r))))return;this.C(t,e,r)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:r,reflect:s,wrapped:n},f){r&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,f??e??this[t]),!0!==n||void 0!==f)||(this._$AL.has(t)||(this.hasUpdated||r||(e=void 0),this._$AL.set(t,e)),!0===s&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,r]of t){const{wrapped:t}=r,s=this[e];!0!==t||this._$AL.has(e)||void 0===s||this.C(e,void 0,r,s)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};O.elementStyles=[],O.shadowRootOptions={mode:"open"},O[V("elementProperties")]=new Map,O[V("finalized")]=new Map,k?.({ReactiveElement:O}),(x.reactiveElementVersions??=[]).push("2.1.2");const w=globalThis,q=t=>t,X=w.trustedTypes,b=X?X.createPolicy("lit-html",{createHTML:t=>t}):void 0,j="$lit$",W=`lit$${Math.random().toFixed(9).slice(2)}$`,F="?"+W,S=`<${F}>`,z=document,P=()=>z.createComment(""),U=t=>null===t||"object"!=typeof t&&"function"!=typeof t,K=Array.isArray,Y="[ \t\n\f\r]",H=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,B=/-->/g,A=/>/g,R=RegExp(`>|${Y}(?:([^\\s"'>=/]+)(${Y}*=${Y}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),G=/'/g,J=/"/g,T=/^(?:script|style|textarea|title)$/i,L=t=>(e,...r)=>({_$litType$:t,strings:e,values:r}),C=L(1),E=L(2),M=Symbol.for("lit-noChange"),N=Symbol.for("lit-nothing"),D=new WeakMap,Q=z.createTreeWalker(z,129);function Z(t,e){if(!K(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==b?b.createHTML(e):e}const m=(t,e)=>{const r=t.length-1,s=[];let n,f=2===e?"<svg>":3===e?"<math>":"",i=H;for(let e=0;e<r;e++){const r=t[e];let o,l,a=-1,d=0;for(;d<r.length&&(i.lastIndex=d,l=i.exec(r),null!==l);)d=i.lastIndex,i===H?"!--"===l[1]?i=B:void 0!==l[1]?i=A:void 0!==l[2]?(T.test(l[2])&&(n=RegExp("</"+l[2],"g")),i=R):void 0!==l[3]&&(i=R):i===R?">"===l[0]?(i=n??H,a=-1):void 0===l[1]?a=-2:(a=i.lastIndex-l[2].length,o=l[1],i=void 0===l[3]?R:'"'===l[3]?J:G):i===J||i===G?i=R:i===B||i===A?i=H:(i=R,n=void 0);const c=i===R&&t[e+1].startsWith("/>")?" ":"";f+=i===H?r+S:a>=0?(s.push(o),r.slice(0,a)+j+r.slice(a)+W+c):r+W+(-2===a?e:c)}return[Z(t,f+(t[r]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),s]};class I{constructor({strings:t,_$litType$:e},r){let s;this.parts=[];let n=0,f=0;const i=t.length-1,o=this.parts,[l,a]=m(t,e);if(this.el=I.createElement(l,r),Q.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(s=Q.nextNode())&&o.length<i;){if(1===s.nodeType){if(s.hasAttributes())for(const t of s.getAttributeNames())if(t.endsWith(j)){const e=a[f++],r=s.getAttribute(t).split(W),i=/([.?@])?(.*)/.exec(e);o.push({type:1,index:n,name:i[2],strings:r,ctor:"."===i[1]?rt:"?"===i[1]?st:"@"===i[1]?nt:et}),s.removeAttribute(t)}else t.startsWith(W)&&(o.push({type:6,index:n}),s.removeAttribute(t));if(T.test(s.tagName)){const t=s.textContent.split(W),e=t.length-1;if(e>0){s.textContent=X?X.emptyScript:"";for(let r=0;r<e;r++)s.append(t[r],P()),Q.nextNode(),o.push({type:2,index:++n});s.append(t[e],P())}}}else if(8===s.nodeType)if(s.data===F)o.push({type:2,index:n});else{let t=-1;for(;-1!==(t=s.data.indexOf(W,t+1));)o.push({type:7,index:n}),t+=W.length-1}n++}}static createElement(t,e){const r=z.createElement("template");return r.innerHTML=t,r}}function $(t,e,r=t,s){if(e===M)return e;let n=void 0!==s?r._$Co?.[s]:r._$Cl;const f=U(e)?void 0:e._$litDirective$;return n?.constructor!==f&&(n?._$AO?.(!1),void 0===f?n=void 0:(n=new f(t),n._$AT(t,r,s)),void 0!==s?(r._$Co??=[])[s]=n:r._$Cl=n),void 0!==n&&(e=$(t,n._$AS(t,e.values),n,s)),e}class _{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:r}=this._$AD,s=(t?.creationScope??z).importNode(e,!0);Q.currentNode=s;let n=Q.nextNode(),f=0,i=0,o=r[0];for(;void 0!==o;){if(f===o.index){let e;2===o.type?e=new tt(n,n.nextSibling,this,t):1===o.type?e=new o.ctor(n,o.name,o.strings,this,t):6===o.type&&(e=new ft(n,this,t)),this._$AV.push(e),o=r[++i]}f!==o?.index&&(n=Q.nextNode(),f++)}return Q.currentNode=z,s}p(t){let e=0;for(const r of this._$AV)void 0!==r&&(void 0!==r.strings?(r._$AI(t,r,e),e+=r.strings.length-2):r._$AI(t[e])),e++}}class tt{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,r,s){this.type=2,this._$AH=N,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=r,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=$(this,t,e),U(t)?t===N||null==t||""===t?(this._$AH!==N&&this._$AR(),this._$AH=N):t!==this._$AH&&t!==M&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>K(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==N&&U(this._$AH)?this._$AA.nextSibling.data=t:this.T(z.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:r}=t,s="number"==typeof r?this._$AC(t):(void 0===r.el&&(r.el=I.createElement(Z(r.h,r.h[0]),this.options)),r);if(this._$AH?._$AD===s)this._$AH.p(e);else{const t=new _(s,this),r=t.u(this.options);t.p(e),this.T(r),this._$AH=t}}_$AC(t){let e=D.get(t.strings);return void 0===e&&D.set(t.strings,e=new I(t)),e}k(t){K(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let r,s=0;for(const n of t)s===e.length?e.push(r=new tt(this.O(P()),this.O(P()),this,this.options)):r=e[s],r._$AI(n),s++;s<e.length&&(this._$AR(r&&r._$AB.nextSibling,s),e.length=s)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=q(t).nextSibling;q(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class et{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,r,s,n){this.type=1,this._$AH=N,this._$AN=void 0,this.element=t,this.name=e,this._$AM=s,this.options=n,r.length>2||""!==r[0]||""!==r[1]?(this._$AH=Array(r.length-1).fill(new String),this.strings=r):this._$AH=N}_$AI(t,e=this,r,s){const n=this.strings;let f=!1;if(void 0===n)t=$(this,t,e,0),f=!U(t)||t!==this._$AH&&t!==M,f&&(this._$AH=t);else{const s=t;let i,o;for(t=n[0],i=0;i<n.length-1;i++)o=$(this,s[r+i],e,i),o===M&&(o=this._$AH[i]),f||=!U(o)||o!==this._$AH[i],o===N?t=N:t!==N&&(t+=(o??"")+n[i+1]),this._$AH[i]=o}f&&!s&&this.j(t)}j(t){t===N?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class rt extends et{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===N?void 0:t}}class st extends et{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==N)}}class nt extends et{constructor(t,e,r,s,n){super(t,e,r,s,n),this.type=5}_$AI(t,e=this){if((t=$(this,t,e,0)??N)===M)return;const r=this._$AH,s=t===N&&r!==N||t.capture!==r.capture||t.once!==r.once||t.passive!==r.passive,n=t!==N&&(r===N||s);s&&this.element.removeEventListener(this.name,this,r),n&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class ft{constructor(t,e,r){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=r}get _$AU(){return this._$AM._$AU}_$AI(t){$(this,t)}}const it=w.litHtmlPolyfillSupport;it?.(I,tt),(w.litHtmlVersions??=[]).push("3.3.3");const ot=globalThis;class lt extends O{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,r)=>{const s=r?.renderBefore??e;let n=s._$litPart$;if(void 0===n){const t=r?.renderBefore??null;s._$litPart$=n=new tt(e.insertBefore(P(),t),t,void 0,r??{})}return n._$AI(t),n})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return M}}lt._$litElement$=!0,lt.finalized=!0,ot.litElementHydrateSupport?.({LitElement:lt});const at=ot.litElementPolyfillSupport;at?.({LitElement:lt}),(ot.litElementVersions??=[]).push("4.2.2");const dt={attribute:!0,type:String,converter:p,reflect:!1,hasChanged:u},ct=(t=dt,e,r)=>{const{kind:s,metadata:n}=r;let f=globalThis.litPropertyMetadata.get(n);if(void 0===f&&globalThis.litPropertyMetadata.set(n,f=new Map),"setter"===s&&((t=Object.create(t)).wrapped=!0),f.set(r.name,t),"accessor"===s){const{name:s}=r;return{set(r){const n=e.get.call(this);e.set.call(this,r),this.requestUpdate(s,n,t,!0,r)},init(e){return void 0!==e&&this.C(s,void 0,t,e),e}}}if("setter"===s){const{name:s}=r;return function(r){const n=this[s];e.call(this,r),this.requestUpdate(s,n,t,!0,r)}}throw Error("Unsupported decorator location: "+s)};function vt(t){return(e,r)=>"object"==typeof r?ct(t,e,r):((t,e,r)=>{const s=e.hasOwnProperty(r);return e.constructor.createProperty(r,t),s?Object.getOwnPropertyDescriptor(e,r):void 0})(t,e,r)}function xt(t){return vt({...t,state:!0,attribute:!1})}const yt=((t,...e)=>{const r=1===t.length?t[0]:e.reduce((e,r,s)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(r)+t[s+1],t[0]);return new f(r,t,s)})`
+function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPropertyDescriptor(e,r):n;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)f=Reflect.decorate(t,e,r,n);else for(var o=t.length-1;o>=0;o--)(s=t[o])&&(f=(i<3?s(f):i>3?s(e,r,f):s(e,r))||f);return i>3&&f&&Object.defineProperty(e,r,f),f}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,r=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,n=Symbol(),s=new WeakMap;let i=class{constructor(t,e,r){if(this._$cssResult$=!0,r!==n)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(r&&void 0===t){const r=void 0!==e&&1===e.length;r&&(t=s.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),r&&s.set(e,t))}return t}toString(){return this.cssText}};const f=r?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const r of t.cssRules)e+=r.cssText;return(t=>new i("string"==typeof t?t:t+"",void 0,n))(e)})(t):t,{is:o,defineProperty:l,getOwnPropertyDescriptor:a,getOwnPropertyNames:d,getOwnPropertySymbols:c,getPrototypeOf:v}=Object,y=globalThis,x=y.trustedTypes,h=x?x.emptyScript:"",k=y.reactiveElementPolyfillSupport,p=(t,e)=>t,u={toAttribute(t,e){switch(e){case Boolean:t=t?h:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let r=t;switch(e){case Boolean:r=null!==t;break;case Number:r=null===t?null:Number(t);break;case Object:case Array:try{r=JSON.parse(t)}catch(t){r=null}}return r}},V=(t,e)=>!o(t,e),g={attribute:!0,type:String,converter:u,reflect:!1,useDefault:!1,hasChanged:V};Symbol.metadata??=Symbol("metadata"),y.litPropertyMetadata??=new WeakMap;let O=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=g){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const r=Symbol(),n=this.getPropertyDescriptor(t,r,e);void 0!==n&&l(this.prototype,t,n)}}static getPropertyDescriptor(t,e,r){const{get:n,set:s}=a(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:n,set(e){const i=n?.call(this);s?.call(this,e),this.requestUpdate(t,i,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??g}static _$Ei(){if(this.hasOwnProperty(p("elementProperties")))return;const t=v(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(p("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(p("properties"))){const t=this.properties,e=[...d(t),...c(t)];for(const r of e)this.createProperty(r,t[r])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,r]of e)this.elementProperties.set(t,r)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const r=this._$Eu(t,e);void 0!==r&&this._$Eh.set(r,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const r=new Set(t.flat(1/0).reverse());for(const t of r)e.unshift(f(t))}else void 0!==t&&e.push(f(t));return e}static _$Eu(t,e){const r=e.attribute;return!1===r?void 0:"string"==typeof r?r:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const r of e.keys())this.hasOwnProperty(r)&&(t.set(r,this[r]),delete this[r]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,n)=>{if(r)t.adoptedStyleSheets=n.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const r of n){const n=document.createElement("style"),s=e.litNonce;void 0!==s&&n.setAttribute("nonce",s),n.textContent=r.cssText,t.appendChild(n)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,r){this._$AK(t,r)}_$ET(t,e){const r=this.constructor.elementProperties.get(t),n=this.constructor._$Eu(t,r);if(void 0!==n&&!0===r.reflect){const s=(void 0!==r.converter?.toAttribute?r.converter:u).toAttribute(e,r.type);this._$Em=t,null==s?this.removeAttribute(n):this.setAttribute(n,s),this._$Em=null}}_$AK(t,e){const r=this.constructor,n=r._$Eh.get(t);if(void 0!==n&&this._$Em!==n){const t=r.getPropertyOptions(n),s="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:u;this._$Em=n;const i=s.fromAttribute(e,t.type);this[n]=i??this._$Ej?.get(n)??i,this._$Em=null}}requestUpdate(t,e,r,n=!1,s){if(void 0!==t){const i=this.constructor;if(!1===n&&(s=this[t]),r??=i.getPropertyOptions(t),!((r.hasChanged??V)(s,e)||r.useDefault&&r.reflect&&s===this._$Ej?.get(t)&&!this.hasAttribute(i._$Eu(t,r))))return;this.C(t,e,r)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:r,reflect:n,wrapped:s},i){r&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,i??e??this[t]),!0!==s||void 0!==i)||(this._$AL.has(t)||(this.hasUpdated||r||(e=void 0),this._$AL.set(t,e)),!0===n&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,r]of t){const{wrapped:t}=r,n=this[e];!0!==t||this._$AL.has(e)||void 0===n||this.C(e,void 0,r,n)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};O.elementStyles=[],O.shadowRootOptions={mode:"open"},O[p("elementProperties")]=new Map,O[p("finalized")]=new Map,k?.({ReactiveElement:O}),(y.reactiveElementVersions??=[]).push("2.1.2");const w=globalThis,q=t=>t,X=w.trustedTypes,b=X?X.createPolicy("lit-html",{createHTML:t=>t}):void 0,j="$lit$",W=`lit$${Math.random().toFixed(9).slice(2)}$`,F="?"+W,S=`<${F}>`,z=document,P=()=>z.createComment(""),U=t=>null===t||"object"!=typeof t&&"function"!=typeof t,K=Array.isArray,Y="[ \t\n\f\r]",H=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,A=/-->/g,B=/>/g,R=RegExp(`>|${Y}(?:([^\\s"'>=/]+)(${Y}*=${Y}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),G=/'/g,J=/"/g,L=/^(?:script|style|textarea|title)$/i,T=t=>(e,...r)=>({_$litType$:t,strings:e,values:r}),C=T(1),E=T(2),M=Symbol.for("lit-noChange"),D=Symbol.for("lit-nothing"),N=new WeakMap,Q=z.createTreeWalker(z,129);function m(t,e){if(!K(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==b?b.createHTML(e):e}const Z=(t,e)=>{const r=t.length-1,n=[];let s,i=2===e?"<svg>":3===e?"<math>":"",f=H;for(let e=0;e<r;e++){const r=t[e];let o,l,a=-1,d=0;for(;d<r.length&&(f.lastIndex=d,l=f.exec(r),null!==l);)d=f.lastIndex,f===H?"!--"===l[1]?f=A:void 0!==l[1]?f=B:void 0!==l[2]?(L.test(l[2])&&(s=RegExp("</"+l[2],"g")),f=R):void 0!==l[3]&&(f=R):f===R?">"===l[0]?(f=s??H,a=-1):void 0===l[1]?a=-2:(a=f.lastIndex-l[2].length,o=l[1],f=void 0===l[3]?R:'"'===l[3]?J:G):f===J||f===G?f=R:f===A||f===B?f=H:(f=R,s=void 0);const c=f===R&&t[e+1].startsWith("/>")?" ":"";i+=f===H?r+S:a>=0?(n.push(o),r.slice(0,a)+j+r.slice(a)+W+c):r+W+(-2===a?e:c)}return[m(t,i+(t[r]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),n]};class I{constructor({strings:t,_$litType$:e},r){let n;this.parts=[];let s=0,i=0;const f=t.length-1,o=this.parts,[l,a]=Z(t,e);if(this.el=I.createElement(l,r),Q.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(n=Q.nextNode())&&o.length<f;){if(1===n.nodeType){if(n.hasAttributes())for(const t of n.getAttributeNames())if(t.endsWith(j)){const e=a[i++],r=n.getAttribute(t).split(W),f=/([.?@])?(.*)/.exec(e);o.push({type:1,index:s,name:f[2],strings:r,ctor:"."===f[1]?rt:"?"===f[1]?nt:"@"===f[1]?st:et}),n.removeAttribute(t)}else t.startsWith(W)&&(o.push({type:6,index:s}),n.removeAttribute(t));if(L.test(n.tagName)){const t=n.textContent.split(W),e=t.length-1;if(e>0){n.textContent=X?X.emptyScript:"";for(let r=0;r<e;r++)n.append(t[r],P()),Q.nextNode(),o.push({type:2,index:++s});n.append(t[e],P())}}}else if(8===n.nodeType)if(n.data===F)o.push({type:2,index:s});else{let t=-1;for(;-1!==(t=n.data.indexOf(W,t+1));)o.push({type:7,index:s}),t+=W.length-1}s++}}static createElement(t,e){const r=z.createElement("template");return r.innerHTML=t,r}}function $(t,e,r=t,n){if(e===M)return e;let s=void 0!==n?r._$Co?.[n]:r._$Cl;const i=U(e)?void 0:e._$litDirective$;return s?.constructor!==i&&(s?._$AO?.(!1),void 0===i?s=void 0:(s=new i(t),s._$AT(t,r,n)),void 0!==n?(r._$Co??=[])[n]=s:r._$Cl=s),void 0!==s&&(e=$(t,s._$AS(t,e.values),s,n)),e}class _{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:r}=this._$AD,n=(t?.creationScope??z).importNode(e,!0);Q.currentNode=n;let s=Q.nextNode(),i=0,f=0,o=r[0];for(;void 0!==o;){if(i===o.index){let e;2===o.type?e=new tt(s,s.nextSibling,this,t):1===o.type?e=new o.ctor(s,o.name,o.strings,this,t):6===o.type&&(e=new it(s,this,t)),this._$AV.push(e),o=r[++f]}i!==o?.index&&(s=Q.nextNode(),i++)}return Q.currentNode=z,n}p(t){let e=0;for(const r of this._$AV)void 0!==r&&(void 0!==r.strings?(r._$AI(t,r,e),e+=r.strings.length-2):r._$AI(t[e])),e++}}class tt{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,r,n){this.type=2,this._$AH=D,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=r,this.options=n,this._$Cv=n?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=$(this,t,e),U(t)?t===D||null==t||""===t?(this._$AH!==D&&this._$AR(),this._$AH=D):t!==this._$AH&&t!==M&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>K(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==D&&U(this._$AH)?this._$AA.nextSibling.data=t:this.T(z.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:r}=t,n="number"==typeof r?this._$AC(t):(void 0===r.el&&(r.el=I.createElement(m(r.h,r.h[0]),this.options)),r);if(this._$AH?._$AD===n)this._$AH.p(e);else{const t=new _(n,this),r=t.u(this.options);t.p(e),this.T(r),this._$AH=t}}_$AC(t){let e=N.get(t.strings);return void 0===e&&N.set(t.strings,e=new I(t)),e}k(t){K(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let r,n=0;for(const s of t)n===e.length?e.push(r=new tt(this.O(P()),this.O(P()),this,this.options)):r=e[n],r._$AI(s),n++;n<e.length&&(this._$AR(r&&r._$AB.nextSibling,n),e.length=n)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=q(t).nextSibling;q(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class et{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,r,n,s){this.type=1,this._$AH=D,this._$AN=void 0,this.element=t,this.name=e,this._$AM=n,this.options=s,r.length>2||""!==r[0]||""!==r[1]?(this._$AH=Array(r.length-1).fill(new String),this.strings=r):this._$AH=D}_$AI(t,e=this,r,n){const s=this.strings;let i=!1;if(void 0===s)t=$(this,t,e,0),i=!U(t)||t!==this._$AH&&t!==M,i&&(this._$AH=t);else{const n=t;let f,o;for(t=s[0],f=0;f<s.length-1;f++)o=$(this,n[r+f],e,f),o===M&&(o=this._$AH[f]),i||=!U(o)||o!==this._$AH[f],o===D?t=D:t!==D&&(t+=(o??"")+s[f+1]),this._$AH[f]=o}i&&!n&&this.j(t)}j(t){t===D?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class rt extends et{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===D?void 0:t}}class nt extends et{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==D)}}class st extends et{constructor(t,e,r,n,s){super(t,e,r,n,s),this.type=5}_$AI(t,e=this){if((t=$(this,t,e,0)??D)===M)return;const r=this._$AH,n=t===D&&r!==D||t.capture!==r.capture||t.once!==r.once||t.passive!==r.passive,s=t!==D&&(r===D||n);n&&this.element.removeEventListener(this.name,this,r),s&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class it{constructor(t,e,r){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=r}get _$AU(){return this._$AM._$AU}_$AI(t){$(this,t)}}const ft=w.litHtmlPolyfillSupport;ft?.(I,tt),(w.litHtmlVersions??=[]).push("3.3.3");const ot=globalThis;class lt extends O{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,r)=>{const n=r?.renderBefore??e;let s=n._$litPart$;if(void 0===s){const t=r?.renderBefore??null;n._$litPart$=s=new tt(e.insertBefore(P(),t),t,void 0,r??{})}return s._$AI(t),s})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return M}}lt._$litElement$=!0,lt.finalized=!0,ot.litElementHydrateSupport?.({LitElement:lt});const at=ot.litElementPolyfillSupport;at?.({LitElement:lt}),(ot.litElementVersions??=[]).push("4.2.2");const dt={attribute:!0,type:String,converter:u,reflect:!1,hasChanged:V},ct=(t=dt,e,r)=>{const{kind:n,metadata:s}=r;let i=globalThis.litPropertyMetadata.get(s);if(void 0===i&&globalThis.litPropertyMetadata.set(s,i=new Map),"setter"===n&&((t=Object.create(t)).wrapped=!0),i.set(r.name,t),"accessor"===n){const{name:n}=r;return{set(r){const s=e.get.call(this);e.set.call(this,r),this.requestUpdate(n,s,t,!0,r)},init(e){return void 0!==e&&this.C(n,void 0,t,e),e}}}if("setter"===n){const{name:n}=r;return function(r){const s=this[n];e.call(this,r),this.requestUpdate(n,s,t,!0,r)}}throw Error("Unsupported decorator location: "+n)};function vt(t){return(e,r)=>"object"==typeof r?ct(t,e,r):((t,e,r)=>{const n=e.hasOwnProperty(r);return e.constructor.createProperty(r,t),n?Object.getOwnPropertyDescriptor(e,r):void 0})(t,e,r)}function yt(t){return vt({...t,state:!0,attribute:!1})}const xt=((t,...e)=>{const r=1===t.length?t[0]:e.reduce((e,r,n)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(r)+t[n+1],t[0]);return new i(r,t,n)})`
   :host {
     display: block;
     background: transparent;
@@ -266,41 +266,41 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
     fill: rgba(255, 255, 255, 0.32);
     pointer-events: none;
   }
-`,ht={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},kt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function Vt(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function pt(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const s=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},n=s(t);return`rgba(255, 255, 255, ${n+(s(e)-n)*r})`}const s=Vt(t),n=Vt(e);return function(t,e,r){const s=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${s(t)}${s(e)}${s(r)}`}(s.r+(n.r-s.r)*r,s.g+(n.g-s.g)*r,s.b+(n.b-s.b)*r)}function ut(t){let e=kt[0],r=kt[kt.length-1];for(let s=0;s<kt.length-1;s++)if(t>=kt[s].hour&&t<=kt[s+1].hour){e=kt[s],r=kt[s+1];break}const s=r.hour-e.hour,n=0===s?0:(t-e.hour)/s;return{top:pt(e.top,r.top,n),horizon:pt(e.horizon,r.horizon,n),stars:e.stars+(r.stars-e.stars)*n,lights:e.lights+(r.lights-e.lights)*n,clouds:pt(e.clouds,r.clouds,n)}}function gt(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function Ot(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}function wt(t,e,r,s=1,n="#ffffff",f=.9){return E`
-    <g transform="translate(${e}, ${r}) scale(${s})" opacity="${f}" style="transition: opacity 1.5s ease;">
+`,ht={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},kt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function pt(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function ut(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const n=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},s=n(t);return`rgba(255, 255, 255, ${s+(n(e)-s)*r})`}const n=pt(t),s=pt(e);return function(t,e,r){const n=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${n(t)}${n(e)}${n(r)}`}(n.r+(s.r-n.r)*r,n.g+(s.g-n.g)*r,n.b+(s.b-n.b)*r)}function Vt(t){let e=kt[0],r=kt[kt.length-1];for(let n=0;n<kt.length-1;n++)if(t>=kt[n].hour&&t<=kt[n+1].hour){e=kt[n],r=kt[n+1];break}const n=r.hour-e.hour,s=0===n?0:(t-e.hour)/n;return{top:ut(e.top,r.top,s),horizon:ut(e.horizon,r.horizon,s),stars:e.stars+(r.stars-e.stars)*s,lights:e.lights+(r.lights-e.lights)*s,clouds:ut(e.clouds,r.clouds,s)}}function gt(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function Ot(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}function wt(t,e,r,n=1,s="#ffffff",i=.9){return E`
+    <g transform="translate(${e}, ${r}) scale(${n})" opacity="${i}" style="transition: opacity 1.5s ease;">
       <g class="${t}">
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="rgba(15, 23, 42, 0.15)" transform="translate(0, 4) scale(1.02)" />
-        <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${n}" style="transition: fill 1.5s ease;" />
+        <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${s}" style="transition: fill 1.5s ease;" />
       </g>
     </g>
-  `}function qt({houseStyle:t="classic-jaren30",carType:e="hatchback",timeHour:r,timeOfDay:s,solar:n,solarToday:f,load:i,batteryPower:o,soc:l,charger:a,grid:d,showSolar:c,showBattery:v,showEV:x,weather:y="sunny",sunriseHour:h=6,sunsetHour:k=21,gridImportToday:V=null,gridExportToday:p=null,homeToday:u=null,batteryChargeToday:g=null,batteryDischargeToday:O=null,evToday:w=null,onNodeClick:q}){let X=r;X=r>=h&&r<=k?6+(r-h)/(k-h)*15:r>k?21+(r-k)/(24-k)*3:r/h*6;const b=o>.05,j=o<-.05,W=d>.05,F=d<-.05,S=a>.1,z=n>20,P=i>20,U=b||j&&F?ht.battery:ht.batteryD,K=W?ht.gridI:ht.gridE,Y=ut(X),H=Y.lights>.05||"rainy"===y||"lightning"===y;let B=Y.top,A=Y.horizon,R=Y.clouds,G="night"===s?.18:.48;"cloudy"===y?(B=pt(Y.top,"#475569",.5),A=pt(Y.horizon,"#94a3b8",.5),R="rgba(241, 245, 249, 0.55)",G=.65):"rainy"===y||"lightning"===y?(B=pt(Y.top,"#1e293b",.75),A=pt(Y.horizon,"#475569",.75),R="rgba(100, 116, 139, 0.5)",G=.65):"snowy"===y?(B=pt(Y.top,"#cbd5e1",.4),A=pt(Y.horizon,"#f1f5f9",.4),R="rgba(255, 255, 255, 0.6)",G=.7):"foggy"===y&&(B=pt(Y.top,"#94a3b8",.6),A=pt(Y.horizon,"#cbd5e1",.6),R="rgba(226, 232, 240, 0.4)",G=.5);const J={cx:480,cy:600};let T=0,L="#fef08a",C="rgba(254, 240, 138, 0.65)";if(X>=6&&X<=21&&"rainy"!==y&&"lightning"!==y&&"cloudy"!==y){const t=(X-6)/15;J.cx=1080*t-60,J.cy=576-528*Math.sin(t*Math.PI),T=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);L=pt("#ea580c","#fef08a",e),C=pt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const M={cx:480,cy:600};let N=0;if((X>21||X<6)&&"rainy"!==y&&"lightning"!==y&&"cloudy"!==y){const t=X>21?(X-21)/9:(X+3)/9;M.cx=1080*t-60,M.cy=576-480*Math.sin(t*Math.PI),N=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const D=X>=8&&X<=18,Q=D?"url(#window-day)":H?"url(#window-night)":"url(#window-dark)",Z=D?"none":H?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",m=t=>450+1.15*(t-450),I=t=>480+1.15*(t-480),$=Math.round(m(345)),_=Math.round(I(420)),tt=Math.round(m(380)),et=Math.round(I(300));let rt=F?"↑ Teruglevering":W?"↓ Import":"Standby";null!==V&&null!==p?rt=`↓${V.toFixed(1)} ↑${p.toFixed(1)} kWh`:null!==V?rt=`Import: ${V.toFixed(1)} kWh`:null!==p&&(rt=`Terug: ${p.toFixed(1)} kWh`);const st=null!==u?`Vandaag: ${u.toFixed(1)} kWh`:P?"Actief":"Standby";let nt=`SoC: ${l}%`;null!==g&&null!==O?nt=`SoC: ${l}% (↓${g.toFixed(1)} ↑${O.toFixed(1)})`:null!==g&&(nt=`SoC: ${l}% (↓${g.toFixed(1)})`);const ft=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:S?"Bezig met laden":"Standby",it=[{id:"grid",title:"Stroomnet",value:Ot(d),sub:rt,color:K.stroke,active:W||F},{id:"home",title:"Huisverbruik",value:Ot(i),sub:st,color:ht.home.stroke,active:P}];v&&it.push({id:"battery",title:"Thuisaccu",value:Ot(o),sub:nt,color:U.stroke,active:b||j}),x&&it.push({id:"ev",title:"Laadpaal (EV)",value:Ot(a),sub:ft,color:ht.ev.stroke,active:S});const ot=(960-170*it.length)/(it.length+1),lt=(t,e,r,s,n,f=!1)=>E`
+  `}function qt({houseStyle:t="classic-jaren30",carType:e="hatchback",timeHour:r,timeOfDay:n,solar:s,solarToday:i,load:f,batteryPower:o,soc:l,charger:a,grid:d,showSolar:c,showBattery:v,showEV:y,weather:x="sunny",sunriseHour:h=6,sunsetHour:k=21,gridImportToday:p=null,gridExportToday:u=null,homeToday:V=null,batteryChargeToday:g=null,batteryDischargeToday:O=null,evToday:w=null,onNodeClick:q}){let X=r;X=r>=h&&r<=k?6+(r-h)/(k-h)*15:r>k?21+(r-k)/(24-k)*3:r/h*6;const b=o>.05,j=o<-.05,W=d>.05,F=d<-.05,S=a>.1,z=s>20,P=f>20,U=b||j&&F?ht.battery:ht.batteryD,K=W?ht.gridI:ht.gridE,Y=Vt(X),H=Y.lights>.05||"rainy"===x||"lightning"===x;let A=Y.top,B=Y.horizon,R=Y.clouds,G="night"===n?.18:.48;"cloudy"===x?(A=ut(Y.top,"#475569",.5),B=ut(Y.horizon,"#94a3b8",.5),R="rgba(241, 245, 249, 0.55)",G=.65):"rainy"===x||"lightning"===x?(A=ut(Y.top,"#1e293b",.75),B=ut(Y.horizon,"#475569",.75),R="rgba(100, 116, 139, 0.5)",G=.65):"snowy"===x?(A=ut(Y.top,"#cbd5e1",.4),B=ut(Y.horizon,"#f1f5f9",.4),R="rgba(255, 255, 255, 0.6)",G=.7):"foggy"===x&&(A=ut(Y.top,"#94a3b8",.6),B=ut(Y.horizon,"#cbd5e1",.6),R="rgba(226, 232, 240, 0.4)",G=.5);const J={cx:480,cy:600};let L=0,T="#fef08a",C="rgba(254, 240, 138, 0.65)";if(X>=6&&X<=21&&"rainy"!==x&&"lightning"!==x&&"cloudy"!==x){const t=(X-6)/15;J.cx=1080*t-60,J.cy=576-528*Math.sin(t*Math.PI),L=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);T=ut("#ea580c","#fef08a",e),C=ut("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const M={cx:480,cy:600};let D=0;if((X>21||X<6)&&"rainy"!==x&&"lightning"!==x&&"cloudy"!==x){const t=X>21?(X-21)/9:(X+3)/9;M.cx=1080*t-60,M.cy=576-480*Math.sin(t*Math.PI),D=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const N=X>=8&&X<=18,Q=N?"url(#window-day)":H?"url(#window-night)":"url(#window-dark)",m=N?"none":H?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",Z=t=>450+1.15*(t-450),I=t=>480+1.15*(t-480),$="classic-jaren30"===t?510:545,_=$+17.5,tt=Math.round(Z(_)),et=Math.round(Z(355)),rt=Math.round(I(432.5));let nt=`M ${Math.round(Z(492))},${Math.round(I(249))} L ${Math.round(Z(492))},${Math.round(I(270))} L ${et},${Math.round(I(270))} L ${et},${rt}`;"modern-villa"===t?nt=`M ${Math.round(Z(496))},${Math.round(I(182))} L ${Math.round(Z(496))},${Math.round(I(300))} L ${et},${Math.round(I(300))} L ${et},${rt}`:"classic-jaren30"===t?nt=`M ${Math.round(Z(479))},${Math.round(I(208))} L ${Math.round(Z(479))},${Math.round(I(370))} L ${et},${Math.round(I(370))} L ${et},${rt}`:"barnhouse"===t?nt=`M ${Math.round(Z(505))},${Math.round(I(200))} L ${Math.round(Z(505))},${Math.round(I(280))} L ${et},${Math.round(I(280))} L ${et},${rt}`:"cubist-bungalow"===t?nt=`M ${Math.round(Z(485))},${Math.round(I(250))} L ${Math.round(Z(485))},${Math.round(I(270))} L ${et},${Math.round(I(270))} L ${et},${rt}`:"townhouse"===t&&(nt=`M ${Math.round(Z(505))},${Math.round(I(187))} L ${Math.round(Z(505))},${Math.round(I(230))} L ${et},${Math.round(I(230))} L ${et},${rt}`);const st=`M 192,455 L 192,493 L ${et},493 L ${et},${rt}`,it=`M ${et},${rt} L ${et},493 L ${tt},493 L ${tt},474`,ft=`M ${et},${rt} L ${et},503 L 664,503 L 664,415`;let ot=F?"↑ Teruglevering":W?"↓ Import":"Standby";null!==p&&null!==u?ot=`↓${p.toFixed(1)} ↑${u.toFixed(1)} kWh`:null!==p?ot=`Import: ${p.toFixed(1)} kWh`:null!==u&&(ot=`Terug: ${u.toFixed(1)} kWh`);const lt=null!==V?`Vandaag: ${V.toFixed(1)} kWh`:P?"Actief":"Standby";let at=`SoC: ${l}%`;null!==g&&null!==O?at=`SoC: ${l}% (↓${g.toFixed(1)} ↑${O.toFixed(1)})`:null!==g&&(at=`SoC: ${l}% (↓${g.toFixed(1)})`);const dt=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:S?"Bezig met laden":"Standby",ct=[{id:"grid",title:"Stroomnet",value:Ot(d),sub:ot,color:K.stroke,active:W||F},{id:"home",title:"Huisverbruik",value:Ot(f),sub:lt,color:ht.home.stroke,active:P}];v&&ct.push({id:"battery",title:"Thuisaccu",value:Ot(o),sub:at,color:U.stroke,active:b||j}),y&&ct.push({id:"ev",title:"Laadpaal (EV)",value:Ot(a),sub:dt,color:ht.ev.stroke,active:S});const vt=(960-170*ct.length)/(ct.length+1),yt=(t,e,r,n,s,i=!1)=>E`
       <path d="${t}" class="flowCable" />
-      <path d="${t}" fill="none" stroke="${s}" stroke-width="3" stroke-linecap="round"
+      <path d="${t}" fill="none" stroke="${n}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
         style="filter: ${e?"blur(3.5px)":"none"}; transition: stroke 0.6s ease, opacity 0.6s ease;" />
-      <path d="${t}" fill="none" stroke="${s}" stroke-width="1.2" stroke-linecap="round"
+      <path d="${t}" fill="none" stroke="${n}" stroke-width="1.2" stroke-linecap="round"
         opacity="${e?.55:0}"
         style="transition: stroke 0.6s ease, opacity 0.6s ease;" />
-      ${((t,e,r,s,n,f=!1)=>e&&0!==r?E`
-      ${Array.from({length:3}).map((e,i)=>E`
-        <circle r="3.5" fill="${s}"
+      ${((t,e,r,n,s,i=!1)=>e&&0!==r?E`
+      ${Array.from({length:3}).map((e,f)=>E`
+        <circle r="3.5" fill="${n}"
           style="
             offset-path: path('${t}');
             animation: moveParticle ${r}s linear infinite;
             animation-play-state: running;
-            animation-delay: ${-i/3*r}s;
-            animation-direction: ${f?"reverse":"normal"};
-            filter: drop-shadow(0 0 5px ${n}) drop-shadow(0 0 2px ${s});
+            animation-delay: ${-f/3*r}s;
+            animation-direction: ${i?"reverse":"normal"};
+            filter: drop-shadow(0 0 5px ${s}) drop-shadow(0 0 2px ${n});
           " />
       `)}
-    `:E``)(t,e,r,s,n,f)}
+    `:E``)(t,e,r,n,s,i)}
     `;return E`
     <svg viewBox="0 0 960 590" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${B}" />
-          <stop offset="100%" stop-color="${A}" />
+          <stop offset="0%" stop-color="${A}" />
+          <stop offset="100%" stop-color="${B}" />
         </linearGradient>
 
         <linearGradient id="garden-grad" x1="0" y1="0" x2="0" y2="1">
@@ -400,7 +400,7 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
         <rect width="960" height="590" fill="url(#sky-grad)" />
 
         <!-- Stars -->
-        ${Y.stars>.05&&"rainy"!==y&&"lightning"!==y&&"cloudy"!==y?E`
+        ${Y.stars>.05&&"rainy"!==x&&"lightning"!==x&&"cloudy"!==x?E`
           <g opacity="${Y.stars}" style="pointer-events: none;">
             <circle cx="96"  cy="60"  r="1.2" class="starFast" fill="#ffffff" />
             <circle cx="216" cy="114" r="1.5" fill="#ffffff" />
@@ -414,16 +414,16 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
         `:""}
 
         <!-- Dynamic Sun -->
-        ${T>0?E`
+        ${L>0?E`
           <g style="pointer-events: none;">
-            <circle cx="${J.cx}" cy="${J.cy}" r="54" fill="${L}" opacity="${.15*T}" style="filter: blur(8px);" />
-            <circle cx="${J.cx}" cy="${J.cy}" r="26" fill="${L}" opacity="${T}" style="filter: drop-shadow(0 0 14px ${C});" />
+            <circle cx="${J.cx}" cy="${J.cy}" r="54" fill="${T}" opacity="${.15*L}" style="filter: blur(8px);" />
+            <circle cx="${J.cx}" cy="${J.cy}" r="26" fill="${T}" opacity="${L}" style="filter: drop-shadow(0 0 14px ${C});" />
           </g>
         `:""}
 
         <!-- Dynamic Moon -->
-        ${N>0?E`
-          <g style="pointer-events: none;" opacity="${N}">
+        ${D>0?E`
+          <g style="pointer-events: none;" opacity="${D}">
             <circle cx="${M.cx}" cy="${M.cy}" r="30" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
             <circle cx="${M.cx}" cy="${M.cy}" r="17" fill="#f1f5f9" />
             <circle cx="${M.cx+6}" cy="${M.cy-4}" r="16" fill="url(#sky-grad)" />
@@ -434,18 +434,18 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
         ${wt("cloud1",72,36,.65,R,.75*G)}
         ${wt("cloud2",432,84,.85,R,.85*G)}
         ${wt("cloud3",744,132,1,R,G)}
-        ${"cloudy"===y||"rainy"===y||"lightning"===y?E`
+        ${"cloudy"===x||"rainy"===x||"lightning"===x?E`
           ${wt("cloud2",240,60,.75,R,.8*G)}
           ${wt("cloud1",588,108,.9,R,.8*G)}
         `:""}
 
         <!-- Lightning bolt -->
-        ${"lightning"===y?E`
+        ${"lightning"===x?E`
           <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
         `:""}
 
         <!-- Falling precipitation -->
-        ${"rainy"===y?E`
+        ${"rainy"===x?E`
     <g style="pointer-events: none;">
       ${Array.from({length:18}).map((t,e)=>E`
         <line x1="${25+55*e}" y1="0" x2="${8+55*e}" y2="40"
@@ -454,7 +454,7 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
       `)}
     </g>
   `:""}
-        ${"snowy"===y?E`
+        ${"snowy"===x?E`
     <g style="pointer-events: none;">
       ${Array.from({length:22}).map((t,e)=>E`
         <circle cx="${25+45*e}" cy="0" r="${1.8+e%3*.6}"
@@ -465,7 +465,7 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
   `:""}
 
         <!-- Fog overlay -->
-        ${"foggy"===y?E`
+        ${"foggy"===x?E`
           <rect width="960" height="590" fill="rgba(226, 232, 240, 0.22)" style="filter: blur(5px); pointer-events: none;" />
         `:""}
 
@@ -598,7 +598,7 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
               </g>
 
               <!-- Windows -->
-              <rect x="395" y="380" width="130" height="70" fill="${Q}" stroke="#334155" stroke-width="2.5" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" rx="3" />
+              <rect x="395" y="380" width="130" height="70" fill="${Q}" stroke="#334155" stroke-width="2.5" style="filter: ${m}; transition: fill 0.5s ease, filter 0.5s ease;" rx="3" />
               <g opacity="${Y.lights}">
                 <line x1="460" y1="380" x2="460" y2="400" stroke="#334155" stroke-width="1" />
                 <path d="M 450,405 L 470,405 L 460,400 Z" fill="#334155" />
@@ -614,63 +614,170 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
               <line x1="460" y1="380" x2="460" y2="450" stroke="#0f172a" stroke-width="1.5" />
               <line x1="395" y1="415" x2="525" y2="415" stroke="#0f172a" stroke-width="1.2" />
 
-              <rect x="405" y="310" width="30" height="45" fill="${Q}" stroke="#334155" stroke-width="2.0" style="filter: ${Z};" rx="1.5" />
+              <rect x="405" y="310" width="30" height="45" fill="${Q}" stroke="#334155" stroke-width="2.0" style="filter: ${m};" rx="1.5" />
               <line x1="420" y1="310" x2="420" y2="355" stroke="#0f172a" stroke-width="1.2" />
               
-              <rect x="485" y="310" width="30" height="45" fill="${Q}" stroke="#334155" stroke-width="2.0" style="filter: ${Z};" rx="1.5" />
+              <rect x="485" y="310" width="30" height="45" fill="${Q}" stroke="#334155" stroke-width="2.0" style="filter: ${m};" rx="1.5" />
               <line x1="500" y1="310" x2="500" y2="355" stroke="#0f172a" stroke-width="1.2" />
 
-              <circle cx="440" cy="255" r="13" fill="${Q}" stroke="#334155" stroke-width="2.0" style="filter: ${Z};" />
+              <circle cx="440" cy="255" r="13" fill="${Q}" stroke="#334155" stroke-width="2.0" style="filter: ${m};" />
               <line x1="440" y1="242" x2="440" y2="268" stroke="#0f172a" stroke-width="1" />
             `:""}
 
             ${"classic-jaren30"===t?E`
               <!-- Plinth (Bottom dark brick) -->
               <rect x="290" y="450" width="300" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
-              <!-- Main Wall (Red brick pentagon) -->
-              <!-- LEFT WING -->
-              <g id="left-wing">
-                <rect x="180" y="370" width="140" height="110" fill="#9a3412" />
-                <rect x="180" y="370" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
-                <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
-                <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <line x1="205" y1="330" x2="320" y2="330" stroke="#0f172a" stroke-width="8" />
-                <line x1="205" y1="330" x2="320" y2="330" stroke="#1e293b" stroke-width="4" />
-                <rect x="230" y="390" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="250" y1="390" x2="250" y2="435" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="230" y1="412.5" x2="270" y2="412.5" stroke="#0f172a" stroke-width="1.2" />
+              
+              <!-- Main Wall (Red brick pentagon shape under roof) -->
+              <polygon points="290,450 290,370 440,150 590,370 590,450" fill="#9a3412" />
+              <polygon points="290,450 290,370 440,150 590,370 590,450" fill="url(#jaren30-brick-pat)" stroke="#7f1d1d" stroke-width="0.8" />
+              
+              <!-- Fine horizontal brick mortar lines across the pentagon -->
+              ${Array.from({length:50}).map((t,e)=>{const r=450-6*e;if(r<150)return"";let n=290,s=590;return r<370&&(n=290+.682*(370-r),s=590-.682*(370-r)),E`<line x1="${n}" y1="${r}" x2="${s}" y2="${r}" stroke="#7f1d1d" stroke-width="0.5" opacity="0.4" />`})}
+
+              <!-- Left Side Entrance Extension (From Photo 3) -->
+              <rect x="260" y="450" width="30" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
+              <rect x="260" y="370" width="30" height="80" fill="#9a3412" />
+              <rect x="260" y="370" width="30" height="80" fill="url(#jaren30-brick-pat)" stroke="#7f1d1d" stroke-width="0.8" />
+              <!-- Left side extension horizontal mortar lines -->
+              ${Array.from({length:14}).map((t,e)=>{const r=450-6*e;return E`<line x1="260" y1="${r}" x2="290" y2="${r}" stroke="#7f1d1d" stroke-width="0.5" opacity="0.4" />`})}
+              <polygon points="255,370 290,355 290,370" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
+              <!-- White bargeboard on extension roof slope -->
+              <line x1="255" y1="370" x2="290" y2="355" stroke="#f8fafc" stroke-width="2.5" />
+              <!-- Side entrance door -->
+              <rect x="264" y="380" width="22" height="65" fill="#1e293b" stroke="#0f172a" stroke-width="1" rx="1" />
+              <rect x="272" y="385" width="6" height="30" fill="${H?"#fde047":"#0f172a"}" opacity="0.8" style="fill: ${H?`rgba(253, 224, 71, ${Y.lights})`:"#0f172a"}; transition: fill 0.5s ease;" />
+
+              <!-- Soldier Course Accent Bands (Alternating red/yellow bricks filled with pattern) -->
+              <!-- Ground floor windows header soldier course -->
+              <rect x="290" y="362" width="300" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+              <!-- First floor windows sill horizontal accent line -->
+              <rect x="300" y="359" width="280" height="8" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+
+              <!-- Downstairs Windows (Dark frames, white blinds from photos) -->
+              <!-- Left Narrow Window -->
+              <rect
+                x="305"
+                y="375"
+                width="35"
+                height="75"
+                fill="${Q}"
+                stroke="#0f172a"
+                stroke-width="2.5"
+                style="filter: ${m}; transition: fill 0.5s ease;"
+                rx="1"
+              />
+              <rect x="307" y="377" width="31" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
+              <line x1="305" y1="412.5" x2="340" y2="412.5" stroke="#0f172a" stroke-width="1.5" />
+
+              <!-- Center Large Window -->
+              <rect
+                x="375"
+                y="375"
+                width="130"
+                height="75"
+                fill="${Q}"
+                stroke="#0f172a"
+                stroke-width="3.0"
+                style="filter: ${m}; transition: fill 0.5s ease;"
+                rx="1"
+              />
+              <rect x="377" y="377" width="126" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
+              <line x1="375" y1="412.5" x2="505" y2="412.5" stroke="#0f172a" stroke-width="2.0" />
+
+              <!-- Right Narrow Window -->
+              <rect
+                x="540"
+                y="375"
+                width="35"
+                height="75"
+                fill="${Q}"
+                stroke="#0f172a"
+                stroke-width="2.5"
+                style="filter: ${m}; transition: fill 0.5s ease;"
+                rx="1"
+              />
+              <rect x="542" y="377" width="31" height="22" fill="#cbd5e1" opacity="0.9" rx="0.5" />
+              <line x1="540" y1="412.5" x2="575" y2="412.5" stroke="#0f172a" stroke-width="1.5" />
+
+              <!-- First Floor Windows - Double casement style with black frames, placed inside triangle -->
+              <rect
+                x="355"
+                y="312"
+                width="45"
+                height="46"
+                fill="${Q}"
+                stroke="#0f172a"
+                stroke-width="2.5"
+                style="filter: ${m}; transition: fill 0.5s ease;"
+                rx="1"
+              />
+              <line x1="377.5" y1="312" x2="377.5" y2="358" stroke="#0f172a" stroke-width="1.8" />
+              <!-- Left Window Lintel -->
+              <rect x="355" y="302" width="45" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+              
+              <rect
+                x="480"
+                y="312"
+                width="45"
+                height="46"
+                fill="${Q}"
+                stroke="#0f172a"
+                stroke-width="2.5"
+                style="filter: ${m}; transition: fill 0.5s ease;"
+                rx="1"
+              />
+              <line x1="502.5" y1="312" x2="502.5" y2="358" stroke="#0f172a" stroke-width="1.8" />
+              <!-- Right Window Lintel -->
+              <rect x="480" y="302" width="45" height="10" fill="url(#soldier-course)" stroke="#7f1d1d" stroke-width="0.8" />
+
+              <!-- Gable Roof Framing & peak details -->
+              <!-- White gutter/eave trim -->
+              <rect x="280" y="367" width="320" height="6" fill="#f8fafc" rx="1" />
+              <!-- White bargeboard trim framing the gable -->
+              <line x1="290" y1="370" x2="440" y2="150" stroke="#f8fafc" stroke-width="5.0" stroke-linecap="round" />
+              <line x1="590" y1="370" x2="440" y2="150" stroke="#f8fafc" stroke-width="5.0" stroke-linecap="round" />
+
+              <!-- Dark peak horizontal wooden cladding (from photo) -->
+              <polygon points="361.5,265 440,150 518.5,265" fill="#1e293b" stroke="#0f172a" stroke-width="1.2" />
+              ${Array.from({length:20}).map((t,e)=>{const r=150+6*e;if(r>265)return"";const n=78.5/115*(r-150);return E`<line x1="${440-n}" y1="${r}" x2="${440+n}" y2="${r}" stroke="#0f172a" stroke-width="0.8" opacity="0.45" />`})}
+
+              <!-- Chimney (seen in photos) -->
+              <rect x="445" y="115" width="16" height="36" fill="#4a5568" stroke="#1a202c" stroke-width="1" />
+              <rect x="442" y="110" width="22" height="6" fill="#1a202c" rx="0.5" />
+
+              <!-- Solar panels on roof side (highly visible in photos 2 & 3, rotated parallel to steep roof) -->
+              ${c?E`
+                <g transform="translate(440, 150) rotate(55.7)">
+                  <rect x="15" y="-12" width="140" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
+                  <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                  <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                  <line x1="15" y1="-7" x2="155" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
+                </g>
+              `:""}
+
+              <!-- Foreground thin tall tree in garden (centered, from photo) -->
+              <g id="front-garden-tree" style="pointer-events: none;">
+                <!-- Trunk -->
+                <rect x="437" y="320" width="6" height="135" fill="#5c4033" rx="1" />
+                <line x1="440" y1="360" x2="432" y2="340" stroke="#5c4033" stroke-width="2" />
+                <line x1="440" y1="340" x2="447" y2="320" stroke="#5c4033" stroke-width="1.8" />
+                <!-- Leaves -->
+                <ellipse cx="440" cy="270" rx="22" ry="75" fill="#15803d" opacity="0.92" />
+                <ellipse cx="440" cy="230" rx="16" ry="60" fill="#16a34a" opacity="0.94" />
+                <ellipse cx="440" cy="180" rx="10" ry="40" fill="#22c55e" opacity="0.95" />
               </g>
 
-              <!-- RIGHT WING -->
-              <g id="right-wing">
-                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="#9a3412" />
-                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
-                <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="692" y1="354" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <rect x="465" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="485" y1="385" x2="485" y2="430" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="465" y1="407.5" x2="505" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
-                <rect x="555" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="575" y1="385" x2="575" y2="430" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="555" y1="407.5" x2="595" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
-                <rect x="480" y="280" width="40" height="40" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="500" y1="280" x2="500" y2="320" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="480" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="1.2" />
-              </g>
-
-              <!-- CENTER ENTRANCE GABLE -->
-              <g id="center-portal">
-                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="#9a3412" />
-                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
-                <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <line x1="452" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="452" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <rect x="360" y="395" width="40" height="85" fill="#052e16" stroke="#021b0d" stroke-width="2" />
-                <circle cx="390" cy="435" r="2" fill="#fbbf24" />
+              <!-- Hydrangea bushes (Right, from photo) -->
+              <g id="front-garden-hydrangeas" style="pointer-events: none;">
+                <circle cx="538" cy="450" r="10" fill="#15803d" />
+                <circle cx="550" cy="448" r="12" fill="#16a34a" />
+                <circle cx="565" cy="450" r="10" fill="#15803d" />
+                <!-- Fluffy white hydrangea flowers -->
+                <circle cx="536" cy="443" r="5" fill="#fef08a" opacity="0.9" />
+                <circle cx="548" cy="439" r="7" fill="#ffffff" opacity="0.9" />
+                <circle cx="560" cy="442" r="6" fill="#fef08a" opacity="0.9" />
+                <circle cx="566" cy="445" r="4" fill="#ffffff" opacity="0.9" />
               </g>
             `:""}
 
@@ -694,8 +801,8 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
                 <rect x="15" y="-12" width="135" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
               </g>
               <!-- Tall window -->
-              <rect x="395" y="270" width="120" height="180" fill="${Q}" stroke="#0f172a" stroke-width="3.0" style="filter: ${Z}; transition: fill 0.5s ease;" rx="2" />
-              <polygon points="395,270 440,220 485,270" fill="${Q}" stroke="#0f172a" stroke-width="2.0" style="filter: ${Z};" />
+              <rect x="395" y="270" width="120" height="180" fill="${Q}" stroke="#0f172a" stroke-width="3.0" style="filter: ${m}; transition: fill 0.5s ease;" rx="2" />
+              <polygon points="395,270 440,220 485,270" fill="${Q}" stroke="#0f172a" stroke-width="2.0" style="filter: ${m};" />
               <line x1="440" y1="220" x2="440" y2="450" stroke="#0f172a" stroke-width="2" />
               <line x1="395" y1="330" x2="515" y2="330" stroke="#0f172a" stroke-width="1.5" />
               <line x1="395" y1="390" x2="515" y2="390" stroke="#0f172a" stroke-width="1.5" />
@@ -727,10 +834,10 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
                 </g>
               </g>
               <!-- Windows -->
-              <rect x="395" y="360" width="120" height="80" fill="${Q}" stroke="#0f172a" stroke-width="2.5" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
+              <rect x="395" y="360" width="120" height="80" fill="${Q}" stroke="#0f172a" stroke-width="2.5" style="filter: ${m}; transition: fill 0.5s ease;" rx="1" />
               <line x1="435" y1="360" x2="435" y2="440" stroke="#0f172a" stroke-width="1.5" />
               <line x1="475" y1="360" x2="475" y2="440" stroke="#0f172a" stroke-width="1.5" />
-              <rect x="395" y="290" width="120" height="50" fill="${Q}" stroke="#0f172a" stroke-width="2.0" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
+              <rect x="395" y="290" width="120" height="50" fill="${Q}" stroke="#0f172a" stroke-width="2.0" style="filter: ${m}; transition: fill 0.5s ease;" rx="1" />
               <line x1="455" y1="290" x2="455" y2="340" stroke="#0f172a" stroke-width="1.5" />
             `:""}
 
@@ -752,15 +859,15 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
                 <rect x="15" y="-12" width="120" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
               </g>
               <!-- Windows -->
-              <rect x="395" y="375" width="130" height="80" fill="${Q}" stroke="#f8fafc" stroke-width="2.5" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
+              <rect x="395" y="375" width="130" height="80" fill="${Q}" stroke="#f8fafc" stroke-width="2.5" style="filter: ${m}; transition: fill 0.5s ease;" rx="1" />
               <line x1="460" y1="375" x2="460" y2="455" stroke="#f8fafc" stroke-width="1.8" />
               <line x1="395" y1="415" x2="525" y2="415" stroke="#f8fafc" stroke-width="1.2" />
               ${[335,420,505].map(t=>E`
-                <rect x="${t}" y="290" width="35" height="60" fill="${Q}" stroke="#f8fafc" stroke-width="2.0" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
+                <rect x="${t}" y="290" width="35" height="60" fill="${Q}" stroke="#f8fafc" stroke-width="2.0" style="filter: ${m}; transition: fill 0.5s ease;" rx="1" />
                 <line x1="${t+17.5}" y1="290" x2="${t+17.5}" y2="350" stroke="#f8fafc" stroke-width="1.2" />
               `)}
               ${[370,460].map(t=>E`
-                <rect x="${t}" y="210" width="30" height="45" fill="${Q}" stroke="#f8fafc" stroke-width="1.8" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
+                <rect x="${t}" y="210" width="30" height="45" fill="${Q}" stroke="#f8fafc" stroke-width="1.8" style="filter: ${m}; transition: fill 0.5s ease;" rx="1" />
                 <line x1="${t+15}" y1="210" x2="${t+15}" y2="255" stroke="#f8fafc" stroke-width="1" />
               `)}
             `:""}
@@ -776,7 +883,7 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
                 <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
                 <line x1="205" y1="330" x2="320" y2="330" stroke="#0f172a" stroke-width="8" />
                 <line x1="205" y1="330" x2="320" y2="330" stroke="#1e293b" stroke-width="4" />
-                <rect x="230" y="390" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <rect x="230" y="390" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${m}; transition: fill 0.5s ease, filter 0.5s ease;" />
                 <line x1="250" y1="390" x2="250" y2="435" stroke="#0f172a" stroke-width="1.2" />
                 <line x1="230" y1="412.5" x2="270" y2="412.5" stroke="#0f172a" stroke-width="1.2" />
               </g>
@@ -789,13 +896,13 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
                 <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
                 <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
                 <line x1="692" y1="354" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <rect x="465" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <rect x="465" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${m}; transition: fill 0.5s ease, filter 0.5s ease;" />
                 <line x1="485" y1="385" x2="485" y2="430" stroke="#0f172a" stroke-width="1.2" />
                 <line x1="465" y1="407.5" x2="505" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
-                <rect x="555" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <rect x="555" y="385" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${m}; transition: fill 0.5s ease, filter 0.5s ease;" />
                 <line x1="575" y1="385" x2="575" y2="430" stroke="#0f172a" stroke-width="1.2" />
                 <line x1="555" y1="407.5" x2="595" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
-                <rect x="480" y="280" width="40" height="40" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+                <rect x="480" y="280" width="40" height="40" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${m}; transition: fill 0.5s ease, filter 0.5s ease;" />
                 <line x1="500" y1="280" x2="500" y2="320" stroke="#0f172a" stroke-width="1.2" />
                 <line x1="480" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="1.2" />
               </g>
@@ -818,7 +925,7 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
           ${c?E`
             <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),q("solar")}}>
               <!-- Only render solar panels if it is the default wing house, since the custom styles have solar panels integrated on their roofs -->
-              ${"modern-villa"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?E`
+              ${"modern-villa"!==t&&"classic-jaren30"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?E`
                 <g transform="translate(320, 340) rotate(-49.4)">
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
@@ -846,33 +953,30 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
             </g>
           `:""}
 
-          <!-- ── INVERTER (Omvormer) ── -->
-          <g id="inverter">
-            <rect x="373" y="295" width="14" height="18" fill="#1e293b" stroke="#475569" stroke-width="1" rx="1.5" />
-            <rect x="376" y="306" width="8" height="4" fill="#0f172a" rx="0.5" />
-            <circle cx="380" cy="301" r="1.5" fill="#f59e0b" />
+          <!-- ── METERKAST / INVERTER (fuse box & inverter combined) ── -->
+          <g id="house-inverter">
+            <rect x="350" y="420" width="10" height="25" fill="#1e293b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" rx="1" />
+            <circle cx="355" cy="432.5" r="2.5" fill="${z||b||j||W||F||S?"#10b981":"#ef4444"}" style="transition: fill 0.6s ease;" />
           </g>
-
-          <!-- ── METERKAST (fuse box) ── -->
-          <rect x="340" y="410" width="10" height="20" fill="#1e293b" rx="1" />
-          <circle cx="345" cy="420" r="2.5" fill="#10b981" />
 
           <!-- ── BATTERY (conditional) ── -->
           ${v?E`
             <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),q("battery")}}>
-              <!-- Render battery in Jaren 30 or other custom styles at x=320, or let it adapt -->
-              <rect x="320" y="410" width="30" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" rx="3" />
-              <rect x="325" y="418" width="20" height="10" fill="#000" rx="1.5" />
-              <text x="335" y="426" fill="${l<20?"#ef4444":b?"#10b981":"#f97316"}" font-size="8" font-weight="bold" text-anchor="middle">${l}%</text>
-              <!-- SoC bar track -->
-              <rect x="334" y="435" width="2" height="40" fill="rgba(0,0,0,0.15)" rx="0.5" />
-              <!-- SoC bar fill -->
-              <rect x="334" y="${475-l/100*40}" width="2" height="${l/100*40}" fill="${l<20?"#ef4444":b?"#10b981":"#f97316"}" rx="0.5" />
+              <rect x="${$}" y="410" width="35" height="70" fill="url(#battery-body-grad)" stroke="#cbd5e1" stroke-width="1" rx="4" />
+              <rect x="${$}" y="410" width="35" height="70" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" rx="4" />
+              
+              <rect x="${$+5}" y="418" width="25" height="12" fill="rgba(0,0,0,0.72)" rx="1.5" />
+              <text x="${$+17.5}" y="427" text-anchor="middle" fill="${l<20?"#ef4444":j?"#f97316":"#10b981"}" font-size="8.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
+                ${l}%
+              </text>
+              
+              <rect x="${$+16.5}" y="436" width="2" height="36" fill="rgba(0,0,0,0.4)" rx="0.5" />
+              <rect x="${$+16.5}" y="${472-l/100*36}" width="2" height="${l/100*36}" fill="${l<20?"#ef4444":j?"#f97316":"#10b981"}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="0.5" />
             </g>
           `:""}
 
           <!-- ── EV CHARGER (conditional) ── -->
-          ${x?E`
+          ${y?E`
             <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),q("ev")}}>
               <rect x="448" y="425" width="14" height="55" fill="#1e293b" rx="2" />
               <rect x="443" y="415" width="24" height="20" fill="#334155" stroke="#1e293b" stroke-width="1" rx="3" />
@@ -964,13 +1068,13 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- FLOW CABLES: Drawn outside the scaled group using scaled coords -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${c?lt(`M ${tt},${et} L ${tt},${I(408)} L ${$},${I(408)} L ${$},${_}`,z,gt(n),ht.solar.stroke,ht.solar.glow):""}
+        ${c?yt(nt,z,gt(s),ht.solar.stroke,ht.solar.glow):""}
 
-        ${lt(`M 192,455 L 192,493 L ${$},493 L ${$},${_}`,W||F,gt(d),K.stroke,K.glow,F)}
+        ${yt(st,W||F,gt(d),K.stroke,K.glow,F)}
 
-        ${v?lt(`M ${m(310)},${I(420)} L ${$},${_}`,b||j,gt(o),U.stroke,U.glow,b):""}
+        ${v?yt(it,b||j,gt(o),U.stroke,U.glow,b):""}
 
-        ${x?lt(`M ${$},${_} L ${$},503 L 664,503 L 664,415`,S,gt(a),ht.ev.stroke,ht.ev.glow):""}
+        ${y?yt(ft,S,gt(a),ht.ev.stroke,ht.ev.glow):""}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- SOLAR HUD card (top right sky area)                            -->
@@ -985,10 +1089,10 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
               <text x="12" y="20" class="hudTitle">Zonnepanelen</text>
               <text x="12" y="39" class="hudValue ${z?"hudActiveText":""}"
                 style="${z?`color: ${ht.solar.stroke}`:""}">
-                ${z?Ot(n):"—"}
+                ${z?Ot(s):"—"}
               </text>
               <text x="12" y="53" class="hudSub">
-                ${null!==f?`Vandaag: ${f.toFixed(1)} kWh`:z?"Opwek actief":"Geen opwek"}
+                ${null!==i?`Vandaag: ${i.toFixed(1)} kWh`:z?"Opwek actief":"Geen opwek"}
               </text>
             </g>
           </g>
@@ -997,9 +1101,9 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (grid, home, battery, ev)                     -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${it.map((t,e)=>E`
+        ${ct.map((t,e)=>E`
             <g class="interactiveGroup" @click=${()=>q(t.id)}>
-              <g transform="translate(${ot+e*(170+ot)}, 510)">
+              <g transform="translate(${vt+e*(170+vt)}, 510)">
                 <rect x="0" y="0" width="170" height="65"
                   class="hudCard ${t.active?"hudCardActive":""}"
                   rx="8" ry="8"
@@ -1015,7 +1119,7 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
           `)}
       </g>
     </svg>
-  `}class Xt extends lt{constructor(){super(...arguments),this.selectedNode=null}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}handleNodeClick(t){console.info(`[energy-flow-card] Click registered on node: ${t}`),this.selectedNode=this.selectedNode===t?null:t;let e=t;"battery"===t?e=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?e=this.config?.entities.load?"load":"home_power":"ev"===t?e="charger":"grid"===t?e=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(e=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const r=this.config?.entities?this.config.entities[e]:void 0,s=Array.isArray(r)?r[0]:r;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${e}', resolved entity ID: '${s}'`),s){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${s}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:s},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date,r=e.getHours()+e.getMinutes()/60;let s="afternoon";s=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const n=this.getEntityValue(t.solar||t.solar_power),f=this.getEntityValue(t.load||t.home_power),i=this.getEntityValue(t.battery_power),o=t.battery_soc?this.getEntityValue(t.battery_soc):0,l=this.getEntityValue(t.charger);let a=0;(t.grid||t.grid_power)&&(a=this.getEntityValue(t.grid||t.grid_power));let d=i;if(void 0!==this.config.battery_invert){d=!0===this.config.battery_invert?i:-i}else if(t.grid){const t=n+a-f-l;d=Math.abs(i)>.05&&Math.abs(t)>.15?t*i<0?-i:i:-i}else d=-i;const c=t=>{if(!t)return null;const e=this.hass?.states[t];if(!e)return null;const r=parseFloat(e.state);return isNaN(r)?null:r},v=c(t.solar_energy_today||t.solar_today),x=c(t.grid_import_today),y=c(t.grid_export_today),h=c(t.home_today),k=c(t.battery_charge_today),V=c(t.battery_discharge_today),p=c(t.ev_today);let u="sunny";t.weather&&this.hass?.states[t.weather]&&(u=this.hass.states[t.weather].state);let g=6,O=21;const w=this.hass?.states["sun.sun"];if(w)try{const t=new Date(w.attributes.next_rising),e=new Date(w.attributes.next_setting);g=t.getHours()+t.getMinutes()/60,O=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||t.grid_power||(a=f+l-n-d);const q=!!t.solar||!!t.solar_power,X=!!t.battery_power,b=!!t.charger,j=ut(r),W=`background: linear-gradient(to bottom, ${j.top} 0%, ${j.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;return C`
+  `}class Xt extends lt{constructor(){super(...arguments),this.selectedNode=null}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}handleNodeClick(t){console.info(`[energy-flow-card] Click registered on node: ${t}`),this.selectedNode=this.selectedNode===t?null:t;let e=t;"battery"===t?e=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?e=this.config?.entities.load?"load":"home_power":"ev"===t?e="charger":"grid"===t?e=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(e=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const r=this.config?.entities?this.config.entities[e]:void 0,n=Array.isArray(r)?r[0]:r;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${e}', resolved entity ID: '${n}'`),n){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${n}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:n},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date,r=e.getHours()+e.getMinutes()/60;let n="afternoon";n=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const s=this.getEntityValue(t.solar||t.solar_power),i=this.getEntityValue(t.load||t.home_power),f=this.getEntityValue(t.battery_power),o=t.battery_soc?this.getEntityValue(t.battery_soc):0,l=this.getEntityValue(t.charger);let a=0;(t.grid||t.grid_power)&&(a=this.getEntityValue(t.grid||t.grid_power));let d=f;if(void 0!==this.config.battery_invert){d=!0===this.config.battery_invert?f:-f}else if(t.grid){const t=s+a-i-l;d=Math.abs(f)>.05&&Math.abs(t)>.15?t*f<0?-f:f:-f}else d=-f;const c=t=>{if(!t)return null;const e=this.hass?.states[t];if(!e)return null;const r=parseFloat(e.state);return isNaN(r)?null:r},v=c(t.solar_energy_today||t.solar_today),y=c(t.grid_import_today),x=c(t.grid_export_today),h=c(t.home_today),k=c(t.battery_charge_today),p=c(t.battery_discharge_today),u=c(t.ev_today);let V="sunny";t.weather&&this.hass?.states[t.weather]&&(V=this.hass.states[t.weather].state);let g=6,O=21;const w=this.hass?.states["sun.sun"];if(w)try{const t=new Date(w.attributes.next_rising),e=new Date(w.attributes.next_setting);g=t.getHours()+t.getMinutes()/60,O=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||t.grid_power||(a=i+l-s-d);const q=!!t.solar||!!t.solar_power,X=!!t.battery_power,b=!!t.charger,j=Vt(r),W=`background: linear-gradient(to bottom, ${j.top} 0%, ${j.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;return C`
       <ha-card style="${W}">
         <div class="card-container">
           ${this.config.title?C`
@@ -1025,8 +1129,8 @@ function t(t,e,r,s){var n,f=arguments.length,i=f<3?e:null===s?s=Object.getOwnPro
           `:""}
 
           <div class="sceneWrapper">
-            ${qt({timeHour:r,timeOfDay:s,solar:n,solarToday:v,load:f,batteryPower:d,soc:o,charger:l,grid:a,showSolar:q,showBattery:X,showEV:b,weather:u,sunriseHour:g,sunsetHour:O,gridImportToday:x,gridExportToday:y,homeToday:h,batteryChargeToday:k,batteryDischargeToday:V,evToday:p,houseStyle:this.config?.house_style,carType:this.config?.car_type,onNodeClick:t=>this.handleNodeClick(t)})}
+            ${qt({timeHour:r,timeOfDay:n,solar:s,solarToday:v,load:i,batteryPower:d,soc:o,charger:l,grid:a,showSolar:q,showBattery:X,showEV:b,weather:V,sunriseHour:g,sunsetHour:O,gridImportToday:y,gridExportToday:x,homeToday:h,batteryChargeToday:k,batteryDischargeToday:p,evToday:u,houseStyle:this.config?.house_style,carType:this.config?.car_type,onNodeClick:t=>this.handleNodeClick(t)})}
           </div>
         </div>
       </ha-card>
-    `}getCardSize(){return 6}}Xt.styles=yt,t([vt({attribute:!1})],Xt.prototype,"hass",void 0),t([xt()],Xt.prototype,"config",void 0),t([xt()],Xt.prototype,"selectedNode",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",Xt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.0.0 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{Xt as EnergyFlowCard};
+    `}getCardSize(){return 6}}Xt.styles=xt,t([vt({attribute:!1})],Xt.prototype,"hass",void 0),t([yt()],Xt.prototype,"config",void 0),t([yt()],Xt.prototype,"selectedNode",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",Xt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.0.0 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{Xt as EnergyFlowCard};
