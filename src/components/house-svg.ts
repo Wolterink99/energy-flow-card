@@ -310,18 +310,7 @@ export function renderHouseSvg({
 
   const gridPath = `M 192,455 L 192,493 L ${mkX},493 L ${mkX},${mkY}`;
 
-  let solarPath = `M ${Math.round(sx(492))},${Math.round(sy(249))} L ${Math.round(sx(492))},${Math.round(sy(270))} L ${mkX},${Math.round(sy(270))} L ${mkX},${mkY}`;
-  if (houseStyle === 'modern-villa') {
-    solarPath = `M ${Math.round(sx(496))},${Math.round(sy(182))} L ${Math.round(sx(496))},${Math.round(sy(300))} L ${mkX},${Math.round(sy(300))} L ${mkX},${mkY}`;
-  } else if (houseStyle === 'classic-jaren30') {
-    solarPath = `M ${Math.round(sx(479))},${Math.round(sy(208))} L ${Math.round(sx(479))},${Math.round(sy(370))} L ${mkX},${Math.round(sy(370))} L ${mkX},${mkY}`;
-  } else if (houseStyle === 'barnhouse') {
-    solarPath = `M ${Math.round(sx(502))},${Math.round(sy(198))} L ${Math.round(sx(502))},${Math.round(sy(340))} L ${mkX},${Math.round(sy(340))} L ${mkX},${mkY}`;
-  } else if (houseStyle === 'cubist-bungalow') {
-    solarPath = `M ${Math.round(sx(492))},${Math.round(sy(254))} L ${Math.round(sx(492))},${Math.round(sy(300))} L ${mkX},${Math.round(sy(300))} L ${mkX},${mkY}`;
-  } else if (houseStyle === 'townhouse') {
-    solarPath = `M ${Math.round(sx(497))},${Math.round(sy(180))} L ${Math.round(sx(497))},${Math.round(sy(265))} L ${mkX},${Math.round(sy(265))} L ${mkX},${mkY}`;
-  }
+  const solarPath = `M ${Math.round(sx(479))},${Math.round(sy(208))} L ${Math.round(sx(479))},${Math.round(sy(370))} L ${mkX},${Math.round(sy(370))} L ${mkX},${mkY}`;
 
   const batteryPath = `M ${sx(310)},${sy(420)} L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},503 L 664,503 L 664,415`;
@@ -634,7 +623,7 @@ export function renderHouseSvg({
 
           <!-- ── HOUSE DESIGNS ── -->
           <g id="house-structure" class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
-            ${houseStyle === 'modern-villa' ? svg`
+            ${false ? svg`
               <!-- Plinth / Foundation Base -->
               <rect x="290" y="455" width="20" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
               <rect x="345" y="455" width="245" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
@@ -712,7 +701,7 @@ export function renderHouseSvg({
               <line x1="440" y1="242" x2="440" y2="268" stroke="#0f172a" stroke-width="1" />
             ` : ''}
 
-            ${houseStyle === 'classic-jaren30' ? svg`
+            ${svg`
               <!-- Plinth (Bottom dark brick) -->
               <rect x="290" y="450" width="300" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
               
@@ -875,9 +864,10 @@ export function renderHouseSvg({
                 <circle cx="560" cy="442" r="6" fill="#fef08a" opacity="0.9" />
                 <circle cx="566" cy="445" r="4" fill="#ffffff" opacity="0.9" />
               </g>
-            ` : ''}
+            `}
 
-            ${houseStyle === 'barnhouse' ? svg`
+
+            ${false ? svg`
               <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
               <rect x="290" y="280" width="300" height="175" fill="#172554" stroke="#0f172a" stroke-width="1" />
               ${Array.from({ length: 26 }).map((_, i) => svg`
@@ -904,7 +894,7 @@ export function renderHouseSvg({
               <line x1="395" y1="390" x2="515" y2="390" stroke="#0f172a" stroke-width="1.5" />
             ` : ''}
 
-            ${houseStyle === 'cubist-bungalow' ? svg`
+            ${false ? svg`
               <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
               <rect x="290" y="320" width="90" height="135" fill="#64748b" stroke="#475569" stroke-width="1" />
               <line x1="290" y1="380" x2="380" y2="380" stroke="#475569" stroke-width="0.8" opacity="0.5" />
@@ -937,7 +927,7 @@ export function renderHouseSvg({
               <line x1="455" y1="290" x2="455" y2="340" stroke="#0f172a" stroke-width="1.5" />
             ` : ''}
 
-            ${houseStyle === 'townhouse' ? svg`
+            ${false ? svg`
               <rect x="290" y="455" width="300" height="25" fill="#292524" stroke="#1c1917" stroke-width="0.8" />
               <polygon points="290,230 440,150 590,230" fill="#292524" stroke="#1c1917" stroke-width="1.2" opacity="0.8" />
               <polygon points="290,230 320,230 320,200 350,200 350,170 380,170 380,140 500,140 500,170 530,170 530,200 560,200 560,230 590,230" fill="#44403c" stroke="#1c1917" stroke-width="1" />
@@ -969,7 +959,7 @@ export function renderHouseSvg({
             ` : ''}
 
             <!-- Fallback Default Brick House (for backward compatibility if no/invalid houseStyle) -->
-            ${houseStyle !== 'modern-villa' && houseStyle !== 'classic-jaren30' && houseStyle !== 'barnhouse' && houseStyle !== 'cubist-bungalow' && houseStyle !== 'townhouse' ? svg`
+            ${false ? svg`
               <!-- LEFT WING -->
               <g id="left-wing">
                 <rect x="180" y="370" width="140" height="110" fill="#9a3412" />
@@ -1021,7 +1011,7 @@ export function renderHouseSvg({
           ${showSolar ? svg`
             <g id="solar-panels" class="interactiveGroup solarGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('solar'); }}>
               <!-- Only render solar panels if it is the default wing house, since the custom styles have solar panels integrated on their roofs -->
-              ${houseStyle !== 'modern-villa' && houseStyle !== 'classic-jaren30' && houseStyle !== 'barnhouse' && houseStyle !== 'cubist-bungalow' && houseStyle !== 'townhouse' ? svg`
+              ${false ? svg`
                 <g transform="translate(320, 340) rotate(-49.4)">
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />

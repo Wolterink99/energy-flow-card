@@ -1,4 +1,4 @@
-function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPropertyDescriptor(e,r):n;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)f=Reflect.decorate(t,e,r,n);else for(var o=t.length-1;o>=0;o--)(s=t[o])&&(f=(i<3?s(f):i>3?s(e,r,f):s(e,r))||f);return i>3&&f&&Object.defineProperty(e,r,f),f}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,r=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,n=Symbol(),s=new WeakMap;let i=class{constructor(t,e,r){if(this._$cssResult$=!0,r!==n)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(r&&void 0===t){const r=void 0!==e&&1===e.length;r&&(t=s.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),r&&s.set(e,t))}return t}toString(){return this.cssText}};const f=r?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const r of t.cssRules)e+=r.cssText;return(t=>new i("string"==typeof t?t:t+"",void 0,n))(e)})(t):t,{is:o,defineProperty:a,getOwnPropertyDescriptor:l,getOwnPropertyNames:d,getOwnPropertySymbols:c,getPrototypeOf:v}=Object,y=globalThis,x=y.trustedTypes,h=x?x.emptyScript:"",k=y.reactiveElementPolyfillSupport,u=(t,e)=>t,p={toAttribute(t,e){switch(e){case Boolean:t=t?h:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let r=t;switch(e){case Boolean:r=null!==t;break;case Number:r=null===t?null:Number(t);break;case Object:case Array:try{r=JSON.parse(t)}catch(t){r=null}}return r}},V=(t,e)=>!o(t,e),g={attribute:!0,type:String,converter:p,reflect:!1,useDefault:!1,hasChanged:V};Symbol.metadata??=Symbol("metadata"),y.litPropertyMetadata??=new WeakMap;let O=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=g){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const r=Symbol(),n=this.getPropertyDescriptor(t,r,e);void 0!==n&&a(this.prototype,t,n)}}static getPropertyDescriptor(t,e,r){const{get:n,set:s}=l(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:n,set(e){const i=n?.call(this);s?.call(this,e),this.requestUpdate(t,i,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??g}static _$Ei(){if(this.hasOwnProperty(u("elementProperties")))return;const t=v(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(u("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(u("properties"))){const t=this.properties,e=[...d(t),...c(t)];for(const r of e)this.createProperty(r,t[r])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,r]of e)this.elementProperties.set(t,r)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const r=this._$Eu(t,e);void 0!==r&&this._$Eh.set(r,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const r=new Set(t.flat(1/0).reverse());for(const t of r)e.unshift(f(t))}else void 0!==t&&e.push(f(t));return e}static _$Eu(t,e){const r=e.attribute;return!1===r?void 0:"string"==typeof r?r:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const r of e.keys())this.hasOwnProperty(r)&&(t.set(r,this[r]),delete this[r]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,n)=>{if(r)t.adoptedStyleSheets=n.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const r of n){const n=document.createElement("style"),s=e.litNonce;void 0!==s&&n.setAttribute("nonce",s),n.textContent=r.cssText,t.appendChild(n)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,r){this._$AK(t,r)}_$ET(t,e){const r=this.constructor.elementProperties.get(t),n=this.constructor._$Eu(t,r);if(void 0!==n&&!0===r.reflect){const s=(void 0!==r.converter?.toAttribute?r.converter:p).toAttribute(e,r.type);this._$Em=t,null==s?this.removeAttribute(n):this.setAttribute(n,s),this._$Em=null}}_$AK(t,e){const r=this.constructor,n=r._$Eh.get(t);if(void 0!==n&&this._$Em!==n){const t=r.getPropertyOptions(n),s="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:p;this._$Em=n;const i=s.fromAttribute(e,t.type);this[n]=i??this._$Ej?.get(n)??i,this._$Em=null}}requestUpdate(t,e,r,n=!1,s){if(void 0!==t){const i=this.constructor;if(!1===n&&(s=this[t]),r??=i.getPropertyOptions(t),!((r.hasChanged??V)(s,e)||r.useDefault&&r.reflect&&s===this._$Ej?.get(t)&&!this.hasAttribute(i._$Eu(t,r))))return;this.C(t,e,r)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:r,reflect:n,wrapped:s},i){r&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,i??e??this[t]),!0!==s||void 0!==i)||(this._$AL.has(t)||(this.hasUpdated||r||(e=void 0),this._$AL.set(t,e)),!0===n&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,r]of t){const{wrapped:t}=r,n=this[e];!0!==t||this._$AL.has(e)||void 0===n||this.C(e,void 0,r,n)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};O.elementStyles=[],O.shadowRootOptions={mode:"open"},O[u("elementProperties")]=new Map,O[u("finalized")]=new Map,k?.({ReactiveElement:O}),(y.reactiveElementVersions??=[]).push("2.1.2");const w=globalThis,q=t=>t,X=w.trustedTypes,b=X?X.createPolicy("lit-html",{createHTML:t=>t}):void 0,j="$lit$",W=`lit$${Math.random().toFixed(9).slice(2)}$`,F="?"+W,S=`<${F}>`,z=document,P=()=>z.createComment(""),U=t=>null===t||"object"!=typeof t&&"function"!=typeof t,K=Array.isArray,Y="[ \t\n\f\r]",H=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,A=/-->/g,B=/>/g,R=RegExp(`>|${Y}(?:([^\\s"'>=/]+)(${Y}*=${Y}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),G=/'/g,J=/"/g,L=/^(?:script|style|textarea|title)$/i,T=t=>(e,...r)=>({_$litType$:t,strings:e,values:r}),C=T(1),E=T(2),M=Symbol.for("lit-noChange"),D=Symbol.for("lit-nothing"),N=new WeakMap,Q=z.createTreeWalker(z,129);function m(t,e){if(!K(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==b?b.createHTML(e):e}const Z=(t,e)=>{const r=t.length-1,n=[];let s,i=2===e?"<svg>":3===e?"<math>":"",f=H;for(let e=0;e<r;e++){const r=t[e];let o,a,l=-1,d=0;for(;d<r.length&&(f.lastIndex=d,a=f.exec(r),null!==a);)d=f.lastIndex,f===H?"!--"===a[1]?f=A:void 0!==a[1]?f=B:void 0!==a[2]?(L.test(a[2])&&(s=RegExp("</"+a[2],"g")),f=R):void 0!==a[3]&&(f=R):f===R?">"===a[0]?(f=s??H,l=-1):void 0===a[1]?l=-2:(l=f.lastIndex-a[2].length,o=a[1],f=void 0===a[3]?R:'"'===a[3]?J:G):f===J||f===G?f=R:f===A||f===B?f=H:(f=R,s=void 0);const c=f===R&&t[e+1].startsWith("/>")?" ":"";i+=f===H?r+S:l>=0?(n.push(o),r.slice(0,l)+j+r.slice(l)+W+c):r+W+(-2===l?e:c)}return[m(t,i+(t[r]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),n]};class I{constructor({strings:t,_$litType$:e},r){let n;this.parts=[];let s=0,i=0;const f=t.length-1,o=this.parts,[a,l]=Z(t,e);if(this.el=I.createElement(a,r),Q.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(n=Q.nextNode())&&o.length<f;){if(1===n.nodeType){if(n.hasAttributes())for(const t of n.getAttributeNames())if(t.endsWith(j)){const e=l[i++],r=n.getAttribute(t).split(W),f=/([.?@])?(.*)/.exec(e);o.push({type:1,index:s,name:f[2],strings:r,ctor:"."===f[1]?rt:"?"===f[1]?nt:"@"===f[1]?st:et}),n.removeAttribute(t)}else t.startsWith(W)&&(o.push({type:6,index:s}),n.removeAttribute(t));if(L.test(n.tagName)){const t=n.textContent.split(W),e=t.length-1;if(e>0){n.textContent=X?X.emptyScript:"";for(let r=0;r<e;r++)n.append(t[r],P()),Q.nextNode(),o.push({type:2,index:++s});n.append(t[e],P())}}}else if(8===n.nodeType)if(n.data===F)o.push({type:2,index:s});else{let t=-1;for(;-1!==(t=n.data.indexOf(W,t+1));)o.push({type:7,index:s}),t+=W.length-1}s++}}static createElement(t,e){const r=z.createElement("template");return r.innerHTML=t,r}}function $(t,e,r=t,n){if(e===M)return e;let s=void 0!==n?r._$Co?.[n]:r._$Cl;const i=U(e)?void 0:e._$litDirective$;return s?.constructor!==i&&(s?._$AO?.(!1),void 0===i?s=void 0:(s=new i(t),s._$AT(t,r,n)),void 0!==n?(r._$Co??=[])[n]=s:r._$Cl=s),void 0!==s&&(e=$(t,s._$AS(t,e.values),s,n)),e}class _{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:r}=this._$AD,n=(t?.creationScope??z).importNode(e,!0);Q.currentNode=n;let s=Q.nextNode(),i=0,f=0,o=r[0];for(;void 0!==o;){if(i===o.index){let e;2===o.type?e=new tt(s,s.nextSibling,this,t):1===o.type?e=new o.ctor(s,o.name,o.strings,this,t):6===o.type&&(e=new it(s,this,t)),this._$AV.push(e),o=r[++f]}i!==o?.index&&(s=Q.nextNode(),i++)}return Q.currentNode=z,n}p(t){let e=0;for(const r of this._$AV)void 0!==r&&(void 0!==r.strings?(r._$AI(t,r,e),e+=r.strings.length-2):r._$AI(t[e])),e++}}class tt{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,r,n){this.type=2,this._$AH=D,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=r,this.options=n,this._$Cv=n?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=$(this,t,e),U(t)?t===D||null==t||""===t?(this._$AH!==D&&this._$AR(),this._$AH=D):t!==this._$AH&&t!==M&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>K(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==D&&U(this._$AH)?this._$AA.nextSibling.data=t:this.T(z.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:r}=t,n="number"==typeof r?this._$AC(t):(void 0===r.el&&(r.el=I.createElement(m(r.h,r.h[0]),this.options)),r);if(this._$AH?._$AD===n)this._$AH.p(e);else{const t=new _(n,this),r=t.u(this.options);t.p(e),this.T(r),this._$AH=t}}_$AC(t){let e=N.get(t.strings);return void 0===e&&N.set(t.strings,e=new I(t)),e}k(t){K(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let r,n=0;for(const s of t)n===e.length?e.push(r=new tt(this.O(P()),this.O(P()),this,this.options)):r=e[n],r._$AI(s),n++;n<e.length&&(this._$AR(r&&r._$AB.nextSibling,n),e.length=n)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=q(t).nextSibling;q(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class et{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,r,n,s){this.type=1,this._$AH=D,this._$AN=void 0,this.element=t,this.name=e,this._$AM=n,this.options=s,r.length>2||""!==r[0]||""!==r[1]?(this._$AH=Array(r.length-1).fill(new String),this.strings=r):this._$AH=D}_$AI(t,e=this,r,n){const s=this.strings;let i=!1;if(void 0===s)t=$(this,t,e,0),i=!U(t)||t!==this._$AH&&t!==M,i&&(this._$AH=t);else{const n=t;let f,o;for(t=s[0],f=0;f<s.length-1;f++)o=$(this,n[r+f],e,f),o===M&&(o=this._$AH[f]),i||=!U(o)||o!==this._$AH[f],o===D?t=D:t!==D&&(t+=(o??"")+s[f+1]),this._$AH[f]=o}i&&!n&&this.j(t)}j(t){t===D?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class rt extends et{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===D?void 0:t}}class nt extends et{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==D)}}class st extends et{constructor(t,e,r,n,s){super(t,e,r,n,s),this.type=5}_$AI(t,e=this){if((t=$(this,t,e,0)??D)===M)return;const r=this._$AH,n=t===D&&r!==D||t.capture!==r.capture||t.once!==r.once||t.passive!==r.passive,s=t!==D&&(r===D||n);n&&this.element.removeEventListener(this.name,this,r),s&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class it{constructor(t,e,r){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=r}get _$AU(){return this._$AM._$AU}_$AI(t){$(this,t)}}const ft=w.litHtmlPolyfillSupport;ft?.(I,tt),(w.litHtmlVersions??=[]).push("3.3.3");const ot=globalThis;class at extends O{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,r)=>{const n=r?.renderBefore??e;let s=n._$litPart$;if(void 0===s){const t=r?.renderBefore??null;n._$litPart$=s=new tt(e.insertBefore(P(),t),t,void 0,r??{})}return s._$AI(t),s})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return M}}at._$litElement$=!0,at.finalized=!0,ot.litElementHydrateSupport?.({LitElement:at});const lt=ot.litElementPolyfillSupport;lt?.({LitElement:at}),(ot.litElementVersions??=[]).push("4.2.2");const dt={attribute:!0,type:String,converter:p,reflect:!1,hasChanged:V},ct=(t=dt,e,r)=>{const{kind:n,metadata:s}=r;let i=globalThis.litPropertyMetadata.get(s);if(void 0===i&&globalThis.litPropertyMetadata.set(s,i=new Map),"setter"===n&&((t=Object.create(t)).wrapped=!0),i.set(r.name,t),"accessor"===n){const{name:n}=r;return{set(r){const s=e.get.call(this);e.set.call(this,r),this.requestUpdate(n,s,t,!0,r)},init(e){return void 0!==e&&this.C(n,void 0,t,e),e}}}if("setter"===n){const{name:n}=r;return function(r){const s=this[n];e.call(this,r),this.requestUpdate(n,s,t,!0,r)}}throw Error("Unsupported decorator location: "+n)};function vt(t){return(e,r)=>"object"==typeof r?ct(t,e,r):((t,e,r)=>{const n=e.hasOwnProperty(r);return e.constructor.createProperty(r,t),n?Object.getOwnPropertyDescriptor(e,r):void 0})(t,e,r)}function yt(t){return vt({...t,state:!0,attribute:!1})}const xt=((t,...e)=>{const r=1===t.length?t[0]:e.reduce((e,r,n)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(r)+t[n+1],t[0]);return new i(r,t,n)})`
+function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPropertyDescriptor(e,r):n;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)i=Reflect.decorate(t,e,r,n);else for(var a=t.length-1;a>=0;a--)(s=t[a])&&(i=(f<3?s(i):f>3?s(e,r,i):s(e,r))||i);return f>3&&i&&Object.defineProperty(e,r,i),i}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,r=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,n=Symbol(),s=new WeakMap;let f=class{constructor(t,e,r){if(this._$cssResult$=!0,r!==n)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(r&&void 0===t){const r=void 0!==e&&1===e.length;r&&(t=s.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),r&&s.set(e,t))}return t}toString(){return this.cssText}};const i=r?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const r of t.cssRules)e+=r.cssText;return(t=>new f("string"==typeof t?t:t+"",void 0,n))(e)})(t):t,{is:a,defineProperty:o,getOwnPropertyDescriptor:l,getOwnPropertyNames:d,getOwnPropertySymbols:c,getPrototypeOf:v}=Object,V=globalThis,x=V.trustedTypes,u=x?x.emptyScript:"",y=V.reactiveElementPolyfillSupport,p=(t,e)=>t,h={toAttribute(t,e){switch(e){case Boolean:t=t?u:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let r=t;switch(e){case Boolean:r=null!==t;break;case Number:r=null===t?null:Number(t);break;case Object:case Array:try{r=JSON.parse(t)}catch(t){r=null}}return r}},g=(t,e)=>!a(t,e),O={attribute:!0,type:String,converter:h,reflect:!1,useDefault:!1,hasChanged:g};Symbol.metadata??=Symbol("metadata"),V.litPropertyMetadata??=new WeakMap;let k=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=O){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const r=Symbol(),n=this.getPropertyDescriptor(t,r,e);void 0!==n&&o(this.prototype,t,n)}}static getPropertyDescriptor(t,e,r){const{get:n,set:s}=l(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:n,set(e){const f=n?.call(this);s?.call(this,e),this.requestUpdate(t,f,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??O}static _$Ei(){if(this.hasOwnProperty(p("elementProperties")))return;const t=v(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(p("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(p("properties"))){const t=this.properties,e=[...d(t),...c(t)];for(const r of e)this.createProperty(r,t[r])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,r]of e)this.elementProperties.set(t,r)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const r=this._$Eu(t,e);void 0!==r&&this._$Eh.set(r,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const r=new Set(t.flat(1/0).reverse());for(const t of r)e.unshift(i(t))}else void 0!==t&&e.push(i(t));return e}static _$Eu(t,e){const r=e.attribute;return!1===r?void 0:"string"==typeof r?r:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const r of e.keys())this.hasOwnProperty(r)&&(t.set(r,this[r]),delete this[r]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,n)=>{if(r)t.adoptedStyleSheets=n.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const r of n){const n=document.createElement("style"),s=e.litNonce;void 0!==s&&n.setAttribute("nonce",s),n.textContent=r.cssText,t.appendChild(n)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,r){this._$AK(t,r)}_$ET(t,e){const r=this.constructor.elementProperties.get(t),n=this.constructor._$Eu(t,r);if(void 0!==n&&!0===r.reflect){const s=(void 0!==r.converter?.toAttribute?r.converter:h).toAttribute(e,r.type);this._$Em=t,null==s?this.removeAttribute(n):this.setAttribute(n,s),this._$Em=null}}_$AK(t,e){const r=this.constructor,n=r._$Eh.get(t);if(void 0!==n&&this._$Em!==n){const t=r.getPropertyOptions(n),s="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:h;this._$Em=n;const f=s.fromAttribute(e,t.type);this[n]=f??this._$Ej?.get(n)??f,this._$Em=null}}requestUpdate(t,e,r,n=!1,s){if(void 0!==t){const f=this.constructor;if(!1===n&&(s=this[t]),r??=f.getPropertyOptions(t),!((r.hasChanged??g)(s,e)||r.useDefault&&r.reflect&&s===this._$Ej?.get(t)&&!this.hasAttribute(f._$Eu(t,r))))return;this.C(t,e,r)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:r,reflect:n,wrapped:s},f){r&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,f??e??this[t]),!0!==s||void 0!==f)||(this._$AL.has(t)||(this.hasUpdated||r||(e=void 0),this._$AL.set(t,e)),!0===n&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,r]of t){const{wrapped:t}=r,n=this[e];!0!==t||this._$AL.has(e)||void 0===n||this.C(e,void 0,r,n)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};k.elementStyles=[],k.shadowRootOptions={mode:"open"},k[p("elementProperties")]=new Map,k[p("finalized")]=new Map,y?.({ReactiveElement:k}),(V.reactiveElementVersions??=[]).push("2.1.2");const q=globalThis,X=t=>t,j=q.trustedTypes,w=j?j.createPolicy("lit-html",{createHTML:t=>t}):void 0,b="$lit$",W=`lit$${Math.random().toFixed(9).slice(2)}$`,F="?"+W,S=`<${F}>`,z=document,P=()=>z.createComment(""),U=t=>null===t||"object"!=typeof t&&"function"!=typeof t,K=Array.isArray,Y="[ \t\n\f\r]",H=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,B=/-->/g,A=/>/g,R=RegExp(`>|${Y}(?:([^\\s"'>=/]+)(${Y}*=${Y}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),G=/'/g,J=/"/g,L=/^(?:script|style|textarea|title)$/i,T=t=>(e,...r)=>({_$litType$:t,strings:e,values:r}),C=T(1),E=T(2),M=Symbol.for("lit-noChange"),D=Symbol.for("lit-nothing"),N=new WeakMap,Q=z.createTreeWalker(z,129);function m(t,e){if(!K(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==w?w.createHTML(e):e}const Z=(t,e)=>{const r=t.length-1,n=[];let s,f=2===e?"<svg>":3===e?"<math>":"",i=H;for(let e=0;e<r;e++){const r=t[e];let a,o,l=-1,d=0;for(;d<r.length&&(i.lastIndex=d,o=i.exec(r),null!==o);)d=i.lastIndex,i===H?"!--"===o[1]?i=B:void 0!==o[1]?i=A:void 0!==o[2]?(L.test(o[2])&&(s=RegExp("</"+o[2],"g")),i=R):void 0!==o[3]&&(i=R):i===R?">"===o[0]?(i=s??H,l=-1):void 0===o[1]?l=-2:(l=i.lastIndex-o[2].length,a=o[1],i=void 0===o[3]?R:'"'===o[3]?J:G):i===J||i===G?i=R:i===B||i===A?i=H:(i=R,s=void 0);const c=i===R&&t[e+1].startsWith("/>")?" ":"";f+=i===H?r+S:l>=0?(n.push(a),r.slice(0,l)+b+r.slice(l)+W+c):r+W+(-2===l?e:c)}return[m(t,f+(t[r]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),n]};class I{constructor({strings:t,_$litType$:e},r){let n;this.parts=[];let s=0,f=0;const i=t.length-1,a=this.parts,[o,l]=Z(t,e);if(this.el=I.createElement(o,r),Q.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(n=Q.nextNode())&&a.length<i;){if(1===n.nodeType){if(n.hasAttributes())for(const t of n.getAttributeNames())if(t.endsWith(b)){const e=l[f++],r=n.getAttribute(t).split(W),i=/([.?@])?(.*)/.exec(e);a.push({type:1,index:s,name:i[2],strings:r,ctor:"."===i[1]?rt:"?"===i[1]?nt:"@"===i[1]?st:et}),n.removeAttribute(t)}else t.startsWith(W)&&(a.push({type:6,index:s}),n.removeAttribute(t));if(L.test(n.tagName)){const t=n.textContent.split(W),e=t.length-1;if(e>0){n.textContent=j?j.emptyScript:"";for(let r=0;r<e;r++)n.append(t[r],P()),Q.nextNode(),a.push({type:2,index:++s});n.append(t[e],P())}}}else if(8===n.nodeType)if(n.data===F)a.push({type:2,index:s});else{let t=-1;for(;-1!==(t=n.data.indexOf(W,t+1));)a.push({type:7,index:s}),t+=W.length-1}s++}}static createElement(t,e){const r=z.createElement("template");return r.innerHTML=t,r}}function $(t,e,r=t,n){if(e===M)return e;let s=void 0!==n?r._$Co?.[n]:r._$Cl;const f=U(e)?void 0:e._$litDirective$;return s?.constructor!==f&&(s?._$AO?.(!1),void 0===f?s=void 0:(s=new f(t),s._$AT(t,r,n)),void 0!==n?(r._$Co??=[])[n]=s:r._$Cl=s),void 0!==s&&(e=$(t,s._$AS(t,e.values),s,n)),e}class _{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:r}=this._$AD,n=(t?.creationScope??z).importNode(e,!0);Q.currentNode=n;let s=Q.nextNode(),f=0,i=0,a=r[0];for(;void 0!==a;){if(f===a.index){let e;2===a.type?e=new tt(s,s.nextSibling,this,t):1===a.type?e=new a.ctor(s,a.name,a.strings,this,t):6===a.type&&(e=new ft(s,this,t)),this._$AV.push(e),a=r[++i]}f!==a?.index&&(s=Q.nextNode(),f++)}return Q.currentNode=z,n}p(t){let e=0;for(const r of this._$AV)void 0!==r&&(void 0!==r.strings?(r._$AI(t,r,e),e+=r.strings.length-2):r._$AI(t[e])),e++}}class tt{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,r,n){this.type=2,this._$AH=D,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=r,this.options=n,this._$Cv=n?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=$(this,t,e),U(t)?t===D||null==t||""===t?(this._$AH!==D&&this._$AR(),this._$AH=D):t!==this._$AH&&t!==M&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>K(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==D&&U(this._$AH)?this._$AA.nextSibling.data=t:this.T(z.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:r}=t,n="number"==typeof r?this._$AC(t):(void 0===r.el&&(r.el=I.createElement(m(r.h,r.h[0]),this.options)),r);if(this._$AH?._$AD===n)this._$AH.p(e);else{const t=new _(n,this),r=t.u(this.options);t.p(e),this.T(r),this._$AH=t}}_$AC(t){let e=N.get(t.strings);return void 0===e&&N.set(t.strings,e=new I(t)),e}k(t){K(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let r,n=0;for(const s of t)n===e.length?e.push(r=new tt(this.O(P()),this.O(P()),this,this.options)):r=e[n],r._$AI(s),n++;n<e.length&&(this._$AR(r&&r._$AB.nextSibling,n),e.length=n)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=X(t).nextSibling;X(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class et{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,r,n,s){this.type=1,this._$AH=D,this._$AN=void 0,this.element=t,this.name=e,this._$AM=n,this.options=s,r.length>2||""!==r[0]||""!==r[1]?(this._$AH=Array(r.length-1).fill(new String),this.strings=r):this._$AH=D}_$AI(t,e=this,r,n){const s=this.strings;let f=!1;if(void 0===s)t=$(this,t,e,0),f=!U(t)||t!==this._$AH&&t!==M,f&&(this._$AH=t);else{const n=t;let i,a;for(t=s[0],i=0;i<s.length-1;i++)a=$(this,n[r+i],e,i),a===M&&(a=this._$AH[i]),f||=!U(a)||a!==this._$AH[i],a===D?t=D:t!==D&&(t+=(a??"")+s[i+1]),this._$AH[i]=a}f&&!n&&this.j(t)}j(t){t===D?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class rt extends et{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===D?void 0:t}}class nt extends et{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==D)}}class st extends et{constructor(t,e,r,n,s){super(t,e,r,n,s),this.type=5}_$AI(t,e=this){if((t=$(this,t,e,0)??D)===M)return;const r=this._$AH,n=t===D&&r!==D||t.capture!==r.capture||t.once!==r.once||t.passive!==r.passive,s=t!==D&&(r===D||n);n&&this.element.removeEventListener(this.name,this,r),s&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class ft{constructor(t,e,r){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=r}get _$AU(){return this._$AM._$AU}_$AI(t){$(this,t)}}const it=q.litHtmlPolyfillSupport;it?.(I,tt),(q.litHtmlVersions??=[]).push("3.3.3");const at=globalThis;class ot extends k{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,r)=>{const n=r?.renderBefore??e;let s=n._$litPart$;if(void 0===s){const t=r?.renderBefore??null;n._$litPart$=s=new tt(e.insertBefore(P(),t),t,void 0,r??{})}return s._$AI(t),s})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return M}}ot._$litElement$=!0,ot.finalized=!0,at.litElementHydrateSupport?.({LitElement:ot});const lt=at.litElementPolyfillSupport;lt?.({LitElement:ot}),(at.litElementVersions??=[]).push("4.2.2");const dt={attribute:!0,type:String,converter:h,reflect:!1,hasChanged:g},ct=(t=dt,e,r)=>{const{kind:n,metadata:s}=r;let f=globalThis.litPropertyMetadata.get(s);if(void 0===f&&globalThis.litPropertyMetadata.set(s,f=new Map),"setter"===n&&((t=Object.create(t)).wrapped=!0),f.set(r.name,t),"accessor"===n){const{name:n}=r;return{set(r){const s=e.get.call(this);e.set.call(this,r),this.requestUpdate(n,s,t,!0,r)},init(e){return void 0!==e&&this.C(n,void 0,t,e),e}}}if("setter"===n){const{name:n}=r;return function(r){const s=this[n];e.call(this,r),this.requestUpdate(n,s,t,!0,r)}}throw Error("Unsupported decorator location: "+n)};function vt(t){return(e,r)=>"object"==typeof r?ct(t,e,r):((t,e,r)=>{const n=e.hasOwnProperty(r);return e.constructor.createProperty(r,t),n?Object.getOwnPropertyDescriptor(e,r):void 0})(t,e,r)}function Vt(t){return vt({...t,state:!0,attribute:!1})}const xt=((t,...e)=>{const r=1===t.length?t[0]:e.reduce((e,r,n)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(r)+t[n+1],t[0]);return new f(r,t,n)})`
   :host {
     display: block;
     background: transparent;
@@ -289,7 +289,7 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
     fill: rgba(255, 255, 255, 0.32);
     pointer-events: none;
   }
-`,ht={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},kt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function ut(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function pt(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const n=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},s=n(t);return`rgba(255, 255, 255, ${s+(n(e)-s)*r})`}const n=ut(t),s=ut(e);return function(t,e,r){const n=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${n(t)}${n(e)}${n(r)}`}(n.r+(s.r-n.r)*r,n.g+(s.g-n.g)*r,n.b+(s.b-n.b)*r)}function Vt(t){let e=kt[0],r=kt[kt.length-1];for(let n=0;n<kt.length-1;n++)if(t>=kt[n].hour&&t<=kt[n+1].hour){e=kt[n],r=kt[n+1];break}const n=r.hour-e.hour,s=0===n?0:(t-e.hour)/n;return{top:pt(e.top,r.top,s),horizon:pt(e.horizon,r.horizon,s),stars:e.stars+(r.stars-e.stars)*s,lights:e.lights+(r.lights-e.lights)*s,clouds:pt(e.clouds,r.clouds,s)}}function gt(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function Ot(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}function wt({houseStyle:t="classic-jaren30",carType:e="hatchback",timeHour:r,timeOfDay:n,solar:s,solarToday:i,load:f,batteryPower:o,soc:a,charger:l,grid:d,showSolar:c,showBattery:v,showEV:y,weather:x="sunny",clouds:h=[],sunriseHour:k=6,sunsetHour:u=21,gridImportToday:p=null,gridExportToday:V=null,homeToday:g=null,batteryChargeToday:O=null,batteryDischargeToday:w=null,evToday:q=null,onNodeClick:X}){let b=r;b=r>=k&&r<=u?6+(r-k)/(u-k)*15:r>u?21+(r-u)/(24-u)*3:r/k*6;const j=o>.05,W=o<-.05,F=d>.05,S=d<-.05,z=l>.1,P=s>20,U=f>20,K=j||W&&S?ht.battery:ht.batteryD,Y=F?ht.gridI:ht.gridE,H=Vt(b),A=H.lights>.05||"rainy"===x||"lightning"===x;let B=H.top,R=H.horizon,G=H.clouds,J="night"===n?.18:.48;"cloudy"===x?(G="#cbd5e1",R=pt(H.horizon,"#94a3b8",.15),J=.98):"rainy"===x||"lightning"===x?(G="#1f2937",B=G,R=pt(H.horizon,"#334155",.5),J=.99):"snowy"===x?(G="#334155",B=G,R=pt(H.horizon,"#4a5568",.4),J=.98):"foggy"===x&&(B=pt(H.top,"#64748b",.65),R=pt(H.horizon,"#94a3b8",.65),G="rgba(203, 213, 225, 0.4)",J=.5);const L={cx:480,cy:600};let T=0,C="#fef08a",M="rgba(254, 240, 138, 0.65)";if(b>=6&&b<=21&&"rainy"!==x&&"lightning"!==x&&"cloudy"!==x&&"snowy"!==x&&"foggy"!==x){const t=(b-6)/15;L.cx=1080*t-60,L.cy=576-528*Math.sin(t*Math.PI),T=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);C=pt("#ea580c","#fef08a",e),M=pt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const D={cx:480,cy:600};let N=0;if((b>21||b<6)&&"rainy"!==x&&"lightning"!==x&&"cloudy"!==x&&"snowy"!==x&&"foggy"!==x){const t=b>21?(b-21)/9:(b+3)/9;D.cx=1080*t-60,D.cy=576-480*Math.sin(t*Math.PI),N=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const Q=b>=8&&b<=18,m=Q?"url(#window-day)":A?"url(#window-night)":"url(#window-dark)",Z=Q?"none":A?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",I=t=>450+1.15*(t-450),$=t=>480+1.15*(t-480),_=Math.round(I(355)),tt=Math.round($(432.5)),et="classic-jaren30"===t?600:545,rt=`M 192,455 L 192,493 L ${_},493 L ${_},${tt}`;let nt=`M ${Math.round(I(492))},${Math.round($(249))} L ${Math.round(I(492))},${Math.round($(270))} L ${_},${Math.round($(270))} L ${_},${tt}`;"modern-villa"===t?nt=`M ${Math.round(I(496))},${Math.round($(182))} L ${Math.round(I(496))},${Math.round($(300))} L ${_},${Math.round($(300))} L ${_},${tt}`:"classic-jaren30"===t?nt=`M ${Math.round(I(479))},${Math.round($(208))} L ${Math.round(I(479))},${Math.round($(370))} L ${_},${Math.round($(370))} L ${_},${tt}`:"barnhouse"===t?nt=`M ${Math.round(I(502))},${Math.round($(198))} L ${Math.round(I(502))},${Math.round($(340))} L ${_},${Math.round($(340))} L ${_},${tt}`:"cubist-bungalow"===t?nt=`M ${Math.round(I(492))},${Math.round($(254))} L ${Math.round(I(492))},${Math.round($(300))} L ${_},${Math.round($(300))} L ${_},${tt}`:"townhouse"===t&&(nt=`M ${Math.round(I(497))},${Math.round($(180))} L ${Math.round(I(497))},${Math.round($(265))} L ${_},${Math.round($(265))} L ${_},${tt}`);const st=`M ${I(310)},${$(420)} L ${_},${tt}`,it=`M ${_},${tt} L ${_},503 L 664,503 L 664,415`;let ft=S?"↑ Teruglevering":F?"↓ Import":"Standby";null!==p&&null!==V?ft=`↓${p.toFixed(1)} ↑${V.toFixed(1)} kWh`:null!==p?ft=`Import: ${p.toFixed(1)} kWh`:null!==V&&(ft=`Terug: ${V.toFixed(1)} kWh`);const ot=null!==g?`Vandaag: ${g.toFixed(1)} kWh`:U?"Actief":"Standby";let at=`SoC: ${a}%`;null!==O&&null!==w?at=`SoC: ${a}% (↓${O.toFixed(1)} ↑${w.toFixed(1)})`:null!==O&&(at=`SoC: ${a}% (↓${O.toFixed(1)})`);const lt=null!==q?`Vandaag: ${q.toFixed(1)} kWh`:z?"Bezig met laden":"Standby",dt=[{id:"grid",title:"Stroomnet",value:Ot(d),sub:ft,color:Y.stroke,active:F||S},{id:"home",title:"Huisverbruik",value:Ot(f),sub:ot,color:ht.home.stroke,active:U}];v&&dt.push({id:"battery",title:"Thuisaccu",value:Ot(o),sub:at,color:K.stroke,active:j||W}),y&&dt.push({id:"ev",title:"Laadpaal (EV)",value:Ot(l),sub:lt,color:ht.ev.stroke,active:z});const ct=(960-170*dt.length)/(dt.length+1),vt=(t,e,r,n,s,i=!1)=>E`
+`,ut={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},yt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function pt(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function ht(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const n=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},s=n(t);return`rgba(255, 255, 255, ${s+(n(e)-s)*r})`}const n=pt(t),s=pt(e);return function(t,e,r){const n=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${n(t)}${n(e)}${n(r)}`}(n.r+(s.r-n.r)*r,n.g+(s.g-n.g)*r,n.b+(s.b-n.b)*r)}function gt(t){let e=yt[0],r=yt[yt.length-1];for(let n=0;n<yt.length-1;n++)if(t>=yt[n].hour&&t<=yt[n+1].hour){e=yt[n],r=yt[n+1];break}const n=r.hour-e.hour,s=0===n?0:(t-e.hour)/n;return{top:ht(e.top,r.top,s),horizon:ht(e.horizon,r.horizon,s),stars:e.stars+(r.stars-e.stars)*s,lights:e.lights+(r.lights-e.lights)*s,clouds:ht(e.clouds,r.clouds,s)}}function Ot(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function kt(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}function qt({houseStyle:t="classic-jaren30",carType:e="hatchback",timeHour:r,timeOfDay:n,solar:s,solarToday:f,load:i,batteryPower:a,soc:o,charger:l,grid:d,showSolar:c,showBattery:v,showEV:V,weather:x="sunny",clouds:u=[],sunriseHour:y=6,sunsetHour:p=21,gridImportToday:h=null,gridExportToday:g=null,homeToday:O=null,batteryChargeToday:k=null,batteryDischargeToday:q=null,evToday:X=null,onNodeClick:j}){let w=r;w=r>=y&&r<=p?6+(r-y)/(p-y)*15:r>p?21+(r-p)/(24-p)*3:r/y*6;const b=a>.05,W=a<-.05,F=d>.05,S=d<-.05,z=l>.1,P=s>20,U=i>20,K=b||W&&S?ut.battery:ut.batteryD,Y=F?ut.gridI:ut.gridE,H=gt(w),B=H.lights>.05||"rainy"===x||"lightning"===x;let A=H.top,R=H.horizon,G=H.clouds,J="night"===n?.18:.48;"cloudy"===x?(G="#cbd5e1",R=ht(H.horizon,"#94a3b8",.15),J=.98):"rainy"===x||"lightning"===x?(G="#1f2937",A=G,R=ht(H.horizon,"#334155",.5),J=.99):"snowy"===x?(G="#334155",A=G,R=ht(H.horizon,"#4a5568",.4),J=.98):"foggy"===x&&(A=ht(H.top,"#64748b",.65),R=ht(H.horizon,"#94a3b8",.65),G="rgba(203, 213, 225, 0.4)",J=.5);const L={cx:480,cy:600};let T=0,C="#fef08a",M="rgba(254, 240, 138, 0.65)";if(w>=6&&w<=21&&"rainy"!==x&&"lightning"!==x&&"cloudy"!==x&&"snowy"!==x&&"foggy"!==x){const t=(w-6)/15;L.cx=1080*t-60,L.cy=576-528*Math.sin(t*Math.PI),T=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);C=ht("#ea580c","#fef08a",e),M=ht("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const D={cx:480,cy:600};let N=0;if((w>21||w<6)&&"rainy"!==x&&"lightning"!==x&&"cloudy"!==x&&"snowy"!==x&&"foggy"!==x){const t=w>21?(w-21)/9:(w+3)/9;D.cx=1080*t-60,D.cy=576-480*Math.sin(t*Math.PI),N=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const Q=w>=8&&w<=18,m=Q?"url(#window-day)":B?"url(#window-night)":"url(#window-dark)",Z=Q?"none":B?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",I=t=>450+1.15*(t-450),$=t=>480+1.15*(t-480),_=Math.round(I(355)),tt=Math.round($(432.5)),et="classic-jaren30"===t?600:545,rt=`M 192,455 L 192,493 L ${_},493 L ${_},${tt}`,nt=`M ${Math.round(I(479))},${Math.round($(208))} L ${Math.round(I(479))},${Math.round($(370))} L ${_},${Math.round($(370))} L ${_},${tt}`,st=`M ${I(310)},${$(420)} L ${_},${tt}`,ft=`M ${_},${tt} L ${_},503 L 664,503 L 664,415`;let it=S?"↑ Teruglevering":F?"↓ Import":"Standby";null!==h&&null!==g?it=`↓${h.toFixed(1)} ↑${g.toFixed(1)} kWh`:null!==h?it=`Import: ${h.toFixed(1)} kWh`:null!==g&&(it=`Terug: ${g.toFixed(1)} kWh`);const at=null!==O?`Vandaag: ${O.toFixed(1)} kWh`:U?"Actief":"Standby";let ot=`SoC: ${o}%`;null!==k&&null!==q?ot=`SoC: ${o}% (↓${k.toFixed(1)} ↑${q.toFixed(1)})`:null!==k&&(ot=`SoC: ${o}% (↓${k.toFixed(1)})`);const lt=null!==X?`Vandaag: ${X.toFixed(1)} kWh`:z?"Bezig met laden":"Standby",dt=[{id:"grid",title:"Stroomnet",value:kt(d),sub:it,color:Y.stroke,active:F||S},{id:"home",title:"Huisverbruik",value:kt(i),sub:at,color:ut.home.stroke,active:U}];v&&dt.push({id:"battery",title:"Thuisaccu",value:kt(a),sub:ot,color:K.stroke,active:b||W}),V&&dt.push({id:"ev",title:"Laadpaal (EV)",value:kt(l),sub:lt,color:ut.ev.stroke,active:z});const ct=(960-170*dt.length)/(dt.length+1),vt=(t,e,r,n,s,f=!1)=>E`
       <path d="${t}" class="flowCable" />
       <path d="${t}" fill="none" stroke="${n}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
@@ -297,25 +297,25 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
       <path d="${t}" fill="none" stroke="${n}" stroke-width="1.2" stroke-linecap="round"
         opacity="${e?.55:0}"
         style="transition: stroke 0.6s ease, opacity 0.6s ease;" />
-      ${((t,e,r,n,s,i=!1)=>e&&0!==r?E`
-      ${Array.from({length:3}).map((e,f)=>E`
+      ${((t,e,r,n,s,f=!1)=>e&&0!==r?E`
+      ${Array.from({length:3}).map((e,i)=>E`
         <circle r="3.5" fill="${n}"
           style="
             offset-path: path('${t}');
             animation: moveParticle ${r}s linear infinite;
             animation-play-state: running;
-            animation-delay: ${-f/3*r}s;
-            animation-direction: ${i?"reverse":"normal"};
+            animation-delay: ${-i/3*r}s;
+            animation-direction: ${f?"reverse":"normal"};
             filter: drop-shadow(0 0 5px ${s}) drop-shadow(0 0 2px ${n});
           " />
       `)}
-    `:E``)(t,e,r,n,s,i)}
+    `:E``)(t,e,r,n,s,f)}
     `;return E`
     <svg viewBox="0 0 960 590" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${B}" />
+          <stop offset="0%" stop-color="${A}" />
           <stop offset="100%" stop-color="${R}" />
         </linearGradient>
 
@@ -471,9 +471,9 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
           ${"cloudy"===x||"rainy"===x||"lightning"===x||"snowy"===x?E`
             <path d="M 0,-10 L 960,-10 L 960,12 Q 945,18 930,12 Q 915,18 900,12 Q 885,18 870,12 Q 855,18 840,12 Q 825,18 810,12 Q 795,18 780,12 Q 765,18 750,12 Q 735,18 720,12 Q 705,18 690,12 Q 675,18 660,12 Q 645,18 630,12 Q 615,18 600,12 Q 585,18 570,12 Q 555,18 540,12 Q 525,18 510,12 Q 495,18 480,12 Q 465,18 450,12 Q 435,18 420,12 Q 405,18 390,12 Q 375,18 360,12 Q 345,18 330,12 Q 315,18 300,12 Q 285,18 270,12 Q 255,18 240,12 Q 225,18 210,12 Q 195,18 180,12 Q 165,18 150,12 Q 135,18 120,12 Q 105,18 90,12 Q 75,18 60,12 Q 45,18 30,12 Q 15,18 0,12 Z" fill="${G}" />
           `:""}
-          ${(h||[]).map(t=>function(t,e,r,n=1,s="#ffffff",i=.9,f=""){return E`
-    <g transform="translate(${e}, ${r}) scale(${n})" opacity="${i}" style="transition: opacity 1.5s ease;">
-      <g class="${t}" style="${f}">
+          ${(u||[]).map(t=>function(t,e,r,n=1,s="#ffffff",f=.9,i=""){return E`
+    <g transform="translate(${e}, ${r}) scale(${n})" opacity="${f}" style="transition: opacity 1.5s ease;">
+      <g class="${t}" style="${i}">
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="rgba(15, 23, 42, 0.15)" transform="translate(0, 4) scale(1.02)" />
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${s}" style="transition: fill 1.5s ease;" />
       </g>
@@ -497,7 +497,7 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
         <line x1="0" y1="480" x2="960" y2="480" class="horizonLine" />
 
         <!-- High-Voltage Electricity Mast (Resting on ground) -->
-        <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${()=>X("grid")}>
+        <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${()=>j("grid")}>
           <rect x="63" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
           <rect x="163" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
 
@@ -563,86 +563,10 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
         <g transform="translate(450, 480) scale(1.15) translate(-450, -480)">
 
           <!-- ── HOUSE DESIGNS ── -->
-          <g id="house-structure" class="interactiveGroup homeGroup" @click=${()=>X("home")}>
-            ${"modern-villa"===t?E`
-              <!-- Plinth / Foundation Base -->
-              <rect x="290" y="455" width="20" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
-              <rect x="345" y="455" width="245" height="25" fill="#2d3748" stroke="#1a202c" stroke-width="0.8" />
-              <line x1="290" y1="467" x2="310" y2="467" stroke="#1a202c" stroke-width="0.5" opacity="0.4" />
-              <line x1="345" y1="467" x2="590" y2="467" stroke="#1a202c" stroke-width="0.5" opacity="0.4" />
+          <g id="house-structure" class="interactiveGroup homeGroup" @click=${()=>j("home")}>
+            ${""}
 
-              <!-- Left Gevel Wall (Textured Cedar planks) -->
-              <rect x="290" y="300" width="90" height="155" fill="#c2410c" stroke="#78350f" stroke-width="0.8" />
-              ${Array.from({length:8}).map((t,e)=>E`
-                <line x1="${300+10*e}" y1="300" x2="${300+10*e}" y2="455" stroke="#451a03" stroke-width="0.8" opacity="0.35" />
-              `)}
-
-              <!-- Right Gevel Wall (White Stucco) -->
-              <rect x="380" y="300" width="210" height="155" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8" />
-              <line x1="380" y1="330" x2="590" y2="330" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
-              <line x1="380" y1="360" x2="590" y2="360" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
-              <line x1="380" y1="390" x2="590" y2="390" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
-              <line x1="380" y1="420" x2="590" y2="420" stroke="#cbd5e1" stroke-width="0.5" opacity="0.4" />
-
-              <!-- Entrance Plant Pot & Monstera -->
-              <g id="entrance-plant">
-                <polygon points="294,455 304,455 302,446 296,446" fill="#1e293b" />
-                <path d="M 298,446 Q 289,435 292,430 Q 297,430 298,440" fill="#22c55e" />
-                <path d="M 298,446 Q 305,432 302,427 Q 297,427 298,440" fill="#16a34a" />
-                <path d="M 298,446 Q 293,437 296,436" stroke="#15803d" stroke-width="2.0" fill="none" stroke-linecap="round" />
-              </g>
-
-              <!-- Voordeur (Front Door - Starts on ground, y=480) -->
-              <g id="house-door">
-                <rect x="310" y="380" width="35" height="100" fill="#78350f" stroke="#451a03" stroke-width="1.5" rx="1.5" />
-                <line x1="337" y1="410" x2="337" y2="435" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-                <rect x="317" y="390" width="6" height="70" fill="${A?"#fde047":"#1e293b"}" stroke="#451a03" stroke-width="0.8" style="fill: ${A?`rgba(253, 224, 71, ${H.lights})`:"#1e293b"}; filter: ${A?`drop-shadow(0 0 4px rgba(253, 224, 71, ${H.lights}))`:"none"}; transition: fill 0.5s ease;" />
-                <rect x="305" y="375" width="45" height="5" fill="#334155" stroke="#1e293b" stroke-width="0.8" rx="1" />
-              </g>
-
-              <!-- Roof Structure -->
-              <polygon points="270,300 440,200 610,300" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" />
-              <line x1="270" y1="300" x2="440" y2="200" stroke="#0f172a" stroke-width="3.5" />
-              <line x1="610" y1="300" x2="440" y2="200" stroke="#0f172a" stroke-width="3.5" />
-              <rect x="265" y="297" width="350" height="6" fill="#64748b" rx="2" />
-              <path d="M 610,303 L 610,455 L 613,458" stroke="#64748b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-
-              <!-- Solar Panel Array -->
-              <g transform="translate(440, 200) rotate(30.5)">
-                <rect x="15" y="-12" width="130" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-                <line x1="45" y1="-12" x2="45" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                <line x1="85" y1="-12" x2="85" y2="-2" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                <line x1="15" y1="-7" x2="145" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-              </g>
-
-              <!-- Windows -->
-              <rect x="395" y="380" width="130" height="70" fill="${m}" stroke="#334155" stroke-width="2.5" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" rx="3" />
-              <g opacity="${H.lights}">
-                <line x1="460" y1="380" x2="460" y2="400" stroke="#334155" stroke-width="1" />
-                <path d="M 450,405 L 470,405 L 460,400 Z" fill="#334155" />
-                <circle cx="460" cy="406" r="4.5" fill="#ffffff" style="filter: drop-shadow(0 0 8px #fde047);" />
-                <polygon points="505,415 485,450 525,450" fill="url(#lamp-light-grad)" opacity="0.35" />
-                <line x1="505" y1="450" x2="505" y2="415" stroke="#334155" stroke-width="1" />
-                <polygon points="498,415 512,415 509,409 501,409" fill="#475569" />
-              </g>
-              <g opacity="${1-H.lights}">
-                <polygon points="395,415 420,380 435,380 395,435" fill="rgba(255,255,255,0.06)" style="pointer-events: none;" />
-                <polygon points="445,450 495,380 510,380 460,450" fill="rgba(255,255,255,0.06)" style="pointer-events: none;" />
-              </g>
-              <line x1="460" y1="380" x2="460" y2="450" stroke="#0f172a" stroke-width="1.5" />
-              <line x1="395" y1="415" x2="525" y2="415" stroke="#0f172a" stroke-width="1.2" />
-
-              <rect x="405" y="310" width="30" height="45" fill="${m}" stroke="#334155" stroke-width="2.0" style="filter: ${Z};" rx="1.5" />
-              <line x1="420" y1="310" x2="420" y2="355" stroke="#0f172a" stroke-width="1.2" />
-              
-              <rect x="485" y="310" width="30" height="45" fill="${m}" stroke="#334155" stroke-width="2.0" style="filter: ${Z};" rx="1.5" />
-              <line x1="500" y1="310" x2="500" y2="355" stroke="#0f172a" stroke-width="1.2" />
-
-              <circle cx="440" cy="255" r="13" fill="${m}" stroke="#334155" stroke-width="2.0" style="filter: ${Z};" />
-              <line x1="440" y1="242" x2="440" y2="268" stroke="#0f172a" stroke-width="1" />
-            `:""}
-
-            ${"classic-jaren30"===t?E`
+            ${E`
               <!-- Plinth (Bottom dark brick) -->
               <rect x="290" y="450" width="300" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
               
@@ -664,7 +588,7 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
               <line x1="255" y1="370" x2="290" y2="355" stroke="#f8fafc" stroke-width="2.5" />
               <!-- Side entrance door -->
               <rect x="264" y="380" width="22" height="65" fill="#1e293b" stroke="#0f172a" stroke-width="1" rx="1" />
-              <rect x="272" y="385" width="6" height="30" fill="${A?"#fde047":"#0f172a"}" opacity="0.8" style="fill: ${A?`rgba(253, 224, 71, ${H.lights})`:"#0f172a"}; transition: fill 0.5s ease;" />
+              <rect x="272" y="385" width="6" height="30" fill="${B?"#fde047":"#0f172a"}" opacity="0.8" style="fill: ${B?`rgba(253, 224, 71, ${H.lights})`:"#0f172a"}; transition: fill 0.5s ease;" />
 
               <!-- Soldier Course Accent Bands (Alternating red/yellow bricks filled with pattern) -->
               <!-- Ground floor windows header soldier course -->
@@ -785,205 +709,52 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
                 <circle cx="560" cy="442" r="6" fill="#fef08a" opacity="0.9" />
                 <circle cx="566" cy="445" r="4" fill="#ffffff" opacity="0.9" />
               </g>
-            `:""}
+            `}
 
-            ${"barnhouse"===t?E`
-              <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
-              <rect x="290" y="280" width="300" height="175" fill="#172554" stroke="#0f172a" stroke-width="1" />
-              ${Array.from({length:26}).map((t,e)=>E`
-                <line x1="${300+11*e}" y1="280" x2="${300+11*e}" y2="455" stroke="#020617" stroke-width="0.8" opacity="0.45" />
-              `)}
-              <!-- Door -->
-              <g id="house-door">
-                <rect x="310" y="380" width="35" height="75" fill="#451a03" stroke="#020617" stroke-width="1.5" />
-                <line x1="317" y1="395" x2="317" y2="435" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
-              </g>
-              <!-- Roof -->
-              <polygon points="260,280 440,150 620,280" fill="#0f172a" stroke="#020617" stroke-width="2" />
-              <line x1="260" y1="280" x2="440" y2="150" stroke="#334155" stroke-width="2.5" />
-              <line x1="620" y1="280" x2="440" y2="150" stroke="#334155" stroke-width="2.5" />
-              <!-- Solar panels -->
-              <g transform="translate(440, 150) rotate(37.5)">
-                <rect x="15" y="-12" width="135" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-              </g>
-              <!-- Tall window -->
-              <rect x="395" y="270" width="120" height="180" fill="${m}" stroke="#0f172a" stroke-width="3.0" style="filter: ${Z}; transition: fill 0.5s ease;" rx="2" />
-              <polygon points="395,270 440,220 485,270" fill="${m}" stroke="#0f172a" stroke-width="2.0" style="filter: ${Z};" />
-              <line x1="440" y1="220" x2="440" y2="450" stroke="#0f172a" stroke-width="2" />
-              <line x1="395" y1="330" x2="515" y2="330" stroke="#0f172a" stroke-width="1.5" />
-              <line x1="395" y1="390" x2="515" y2="390" stroke="#0f172a" stroke-width="1.5" />
-            `:""}
 
-            ${"cubist-bungalow"===t?E`
-              <rect x="290" y="455" width="300" height="25" fill="#1e293b" stroke="#0f172a" stroke-width="0.8" />
-              <rect x="290" y="320" width="90" height="135" fill="#64748b" stroke="#475569" stroke-width="1" />
-              <line x1="290" y1="380" x2="380" y2="380" stroke="#475569" stroke-width="0.8" opacity="0.5" />
-              <rect x="380" y="270" width="210" height="185" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
-              <rect x="285" y="315" width="100" height="6" fill="#334155" rx="1.5" />
-              <rect x="375" y="265" width="220" height="6" fill="#1e293b" rx="1.5" />
-              <!-- Door -->
-              <g id="house-door">
-                <rect x="310" y="380" width="35" height="75" fill="#3b2314" stroke="#1c1009" stroke-width="1.5" />
-                <line x1="337" y1="410" x2="337" y2="430" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-              </g>
-              <!-- Solar panels -->
-              <g id="cubist-solar-mounting">
-                <line x1="445" y1="270" x2="545" y2="270" stroke="#334155" stroke-width="2.5" stroke-linecap="round" />
-                <line x1="535" y1="270" x2="535" y2="242" stroke="#475569" stroke-width="2.0" />
-                <line x1="455" y1="270" x2="455" y2="263" stroke="#475569" stroke-width="2.0" />
-                <g transform="translate(440, 268) rotate(-15)">
-                  <rect x="0" y="-10" width="110" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="1" />
-                  <line x1="27.5" y1="-10" x2="27.5" y2="0" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                  <line x1="55" y1="-10" x2="55" y2="0" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                  <line x1="82.5" y1="-10" x2="82.5" y2="0" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                  <line x1="0" y1="-5" x2="110" y2="-5" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
-                </g>
-              </g>
-              <!-- Windows -->
-              <rect x="395" y="360" width="120" height="80" fill="${m}" stroke="#0f172a" stroke-width="2.5" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
-              <line x1="435" y1="360" x2="435" y2="440" stroke="#0f172a" stroke-width="1.5" />
-              <line x1="475" y1="360" x2="475" y2="440" stroke="#0f172a" stroke-width="1.5" />
-              <rect x="395" y="290" width="120" height="50" fill="${m}" stroke="#0f172a" stroke-width="2.0" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
-              <line x1="455" y1="290" x2="455" y2="340" stroke="#0f172a" stroke-width="1.5" />
-            `:""}
+            ${""}
 
-            ${"townhouse"===t?E`
-              <rect x="290" y="455" width="300" height="25" fill="#292524" stroke="#1c1917" stroke-width="0.8" />
-              <polygon points="290,230 440,150 590,230" fill="#292524" stroke="#1c1917" stroke-width="1.2" opacity="0.8" />
-              <polygon points="290,230 320,230 320,200 350,200 350,170 380,170 380,140 500,140 500,170 530,170 530,200 560,200 560,230 590,230" fill="#44403c" stroke="#1c1917" stroke-width="1" />
-              <rect x="290" y="230" width="300" height="225" fill="#44403c" stroke="#1c1917" stroke-width="1" />
-              ${Array.from({length:32}).map((t,e)=>E`
-                <line x1="290" y1="${230+7*e}" x2="590" y2="${230+7*e}" stroke="#292524" stroke-width="0.5" opacity="0.35" />
-              `)}
-              <!-- Door -->
-              <g id="house-door">
-                <rect x="310" y="380" width="35" height="75" fill="#7c2d12" stroke="#431407" stroke-width="1.8" rx="1" />
-                <line x1="337" y1="410" x2="337" y2="430" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" />
-              </g>
-              <!-- Solar panels -->
-              <g transform="translate(440, 150) rotate(29.6)">
-                <rect x="15" y="-12" width="120" height="10" fill="url(#solar-panel-grad)" stroke="#1e1b4b" stroke-width="1.5" rx="2" />
-              </g>
-              <!-- Windows -->
-              <rect x="395" y="375" width="130" height="80" fill="${m}" stroke="#f8fafc" stroke-width="2.5" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
-              <line x1="460" y1="375" x2="460" y2="455" stroke="#f8fafc" stroke-width="1.8" />
-              <line x1="395" y1="415" x2="525" y2="415" stroke="#f8fafc" stroke-width="1.2" />
-              ${[335,420,505].map(t=>E`
-                <rect x="${t}" y="290" width="35" height="60" fill="${m}" stroke="#f8fafc" stroke-width="2.0" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
-                <line x1="${t+17.5}" y1="290" x2="${t+17.5}" y2="350" stroke="#f8fafc" stroke-width="1.2" />
-              `)}
-              ${[370,460].map(t=>E`
-                <rect x="${t}" y="210" width="30" height="45" fill="${m}" stroke="#f8fafc" stroke-width="1.8" style="filter: ${Z}; transition: fill 0.5s ease;" rx="1" />
-                <line x1="${t+15}" y1="210" x2="${t+15}" y2="255" stroke="#f8fafc" stroke-width="1" />
-              `)}
-            `:""}
+            ${""}
+
+            ${""}
 
             <!-- Fallback Default Brick House (for backward compatibility if no/invalid houseStyle) -->
-            ${"modern-villa"!==t&&"classic-jaren30"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?E`
-              <!-- LEFT WING -->
-              <g id="left-wing">
-                <rect x="180" y="370" width="140" height="110" fill="#9a3412" />
-                <rect x="180" y="370" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
-                <polygon points="175,370 205,330 320,330 320,370" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
-                <line x1="172" y1="373" x2="205" y2="328" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="172" y1="373" x2="205" y2="328" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <line x1="205" y1="330" x2="320" y2="330" stroke="#0f172a" stroke-width="8" />
-                <line x1="205" y1="330" x2="320" y2="330" stroke="#1e293b" stroke-width="4" />
-                <rect x="230" y="390" width="40" height="45" fill="${m}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="250" y1="390" x2="250" y2="435" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="230" y1="412.5" x2="270" y2="412.5" stroke="#0f172a" stroke-width="1.2" />
-              </g>
-
-              <!-- RIGHT WING -->
-              <g id="right-wing">
-                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="#9a3412" />
-                <polygon points="380,480 380,270 500,130 680,340 680,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
-                <line x1="380" y1="270" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="380" y1="270" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <line x1="692" y1="354" x2="500" y2="130" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="692" y1="354" x2="500" y2="130" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <rect x="465" y="385" width="40" height="45" fill="${m}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="485" y1="385" x2="485" y2="430" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="465" y1="407.5" x2="505" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
-                <rect x="555" y="385" width="40" height="45" fill="${m}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="575" y1="385" x2="575" y2="430" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="555" y1="407.5" x2="595" y2="407.5" stroke="#0f172a" stroke-width="1.2" />
-                <rect x="480" y="280" width="40" height="40" fill="${m}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
-                <line x1="500" y1="280" x2="500" y2="320" stroke="#0f172a" stroke-width="1.2" />
-                <line x1="480" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="1.2" />
-              </g>
-
-              <!-- CENTER ENTRANCE GABLE -->
-              <g id="center-portal">
-                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="#9a3412" />
-                <polygon points="320,480 320,340 380,270 440,340 440,480" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
-                <line x1="308" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="308" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <line x1="452" y1="354" x2="380" y2="270" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
-                <line x1="452" y1="354" x2="380" y2="270" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
-                <rect x="360" y="395" width="40" height="85" fill="#052e16" stroke="#021b0d" stroke-width="2" />
-                <circle cx="390" cy="435" r="2" fill="#fbbf24" />
-              </g>
-            `:""}
+            ${""}
           </g>
 
           <!-- ── SOLAR PANELS (conditional) ── -->
           ${c?E`
-            <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),X("solar")}}>
+            <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),j("solar")}}>
               <!-- Only render solar panels if it is the default wing house, since the custom styles have solar panels integrated on their roofs -->
-              ${"modern-villa"!==t&&"classic-jaren30"!==t&&"barnhouse"!==t&&"cubist-bungalow"!==t&&"townhouse"!==t?E`
-                <g transform="translate(320, 340) rotate(-49.4)">
-                  <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
-                  <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
-                  <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#0f172a" stroke-width="2" />
-                  <line x1="75"  y1="-7" x2="75"  y2="0" stroke="#475569" stroke-width="1.2" />
-                  <line x1="125" y1="-7" x2="125" y2="0" stroke="#0f172a" stroke-width="2" />
-                  <line x1="125" y1="-7" x2="125" y2="0" stroke="#475569" stroke-width="1.2" />
-                  <line x1="175" y1="-7" x2="175" y2="0" stroke="#0f172a" stroke-width="2" />
-                  <line x1="175" y1="-7" x2="175" y2="0" stroke="#475569" stroke-width="1.2" />
-                  <line x1="225" y1="-7" x2="225" y2="0" stroke="#0f172a" stroke-width="2" />
-                  <line x1="225" y1="-7" x2="225" y2="0" stroke="#475569" stroke-width="1.2" />
-                  <rect x="10" y="-13" width="235" height="6" fill="url(#solar-panel-grad)" stroke="#1e40af" stroke-width="1.2" rx="1.5" />
-                  <line x1="10"    y1="-10" x2="245"   y2="-10" stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="33.5"  y1="-13" x2="33.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="57"    y1="-13" x2="57"    y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="80.5"  y1="-13" x2="80.5"  y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="104"   y1="-13" x2="104"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="127.5" y1="-13" x2="127.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="151"   y1="-13" x2="151"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="174.5" y1="-13" x2="174.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="198"   y1="-13" x2="198"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                  <line x1="221.5" y1="-13" x2="221.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
-                </g>
-              `:""}
+              ${""}
             </g>
           `:""}
 
           <!-- ── METERKAST / INVERTER (fuse box & inverter combined) ── -->
           <g id="house-inverter">
             <rect x="350" y="420" width="10" height="25" fill="#1e293b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" rx="1" />
-            <circle cx="355" cy="432.5" r="2.5" fill="${P||j||W||F||S||z?"#10b981":"#ef4444"}" style="transition: fill 0.6s ease;" />
+            <circle cx="355" cy="432.5" r="2.5" fill="${P||b||W||F||S||z?"#10b981":"#ef4444"}" style="transition: fill 0.6s ease;" />
           </g>
 
           <!-- ── BATTERY (conditional) ── -->
           ${v?E`
-            <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),X("battery")}}>
+            <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),j("battery")}}>
               <rect x="${et}" y="410" width="35" height="70" fill="url(#battery-body-grad)" stroke="#cbd5e1" stroke-width="1" rx="4" />
               <rect x="${et}" y="410" width="35" height="70" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" rx="4" />
               
               <rect x="${et+5}" y="418" width="25" height="12" fill="rgba(0,0,0,0.72)" rx="1.5" />
-              <text x="${et+17.5}" y="427" text-anchor="middle" fill="${a<20?"#ef4444":W?"#f97316":"#10b981"}" font-size="8.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
-                ${a}%
+              <text x="${et+17.5}" y="427" text-anchor="middle" fill="${o<20?"#ef4444":W?"#f97316":"#10b981"}" font-size="8.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
+                ${o}%
               </text>
               
               <rect x="${et+16.5}" y="436" width="2" height="36" fill="rgba(0,0,0,0.4)" rx="0.5" />
-              <rect x="${et+16.5}" y="${472-a/100*36}" width="2" height="${a/100*36}" fill="${a<20?"#ef4444":W?"#f97316":"#10b981"}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="0.5" />
+              <rect x="${et+16.5}" y="${472-o/100*36}" width="2" height="${o/100*36}" fill="${o<20?"#ef4444":W?"#f97316":"#10b981"}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="0.5" />
             </g>
           `:""}
 
           <!-- ── EV CHARGER (conditional) ── -->
-          ${y?E`
-            <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),X("ev")}}>
+          ${V?E`
+            <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),j("ev")}}>
               <rect x="448" y="425" width="14" height="55" fill="#1e293b" rx="2" />
               <rect x="443" y="415" width="24" height="20" fill="#334155" stroke="#1e293b" stroke-width="1" rx="3" />
               <circle cx="455" cy="425" r="4"
@@ -994,7 +765,7 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
             </g>
 
             <!-- EV Car -->
-            <g id="ev-car" class="interactiveGroup evGroup" opacity="${z?1:.4}" style="transition: opacity 0.6s ease;" @click=${t=>{t.stopPropagation(),X("ev")}}>
+            <g id="ev-car" class="interactiveGroup evGroup" opacity="${z?1:.4}" style="transition: opacity 0.6s ease;" @click=${t=>{t.stopPropagation(),j("ev")}}>
               ${"hatchback"===e?E`
                 <g transform="translate(490, 430)">
                   <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
@@ -1074,13 +845,13 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- FLOW CABLES: Drawn outside the scaled group using scaled coords -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${c?vt(nt,P,gt(s),ht.solar.stroke,ht.solar.glow):""}
+        ${c?vt(nt,P,Ot(s),ut.solar.stroke,ut.solar.glow):""}
 
-        ${vt(rt,F||S,gt(d),Y.stroke,Y.glow,S)}
+        ${vt(rt,F||S,Ot(d),Y.stroke,Y.glow,S)}
 
-        ${v?vt(st,j||W,gt(o),K.stroke,K.glow,j):""}
+        ${v?vt(st,b||W,Ot(a),K.stroke,K.glow,b):""}
 
-        ${y?vt(it,z,gt(l),ht.ev.stroke,ht.ev.glow):""}
+        ${V?vt(ft,z,Ot(l),ut.ev.stroke,ut.ev.glow):""}
 
         <!-- Lightning bolt & Full-Screen flashes -->
         ${"lightning"===x?E`
@@ -1098,19 +869,19 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
         <!-- SOLAR HUD card (top right sky area)                            -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${c?E`
-          <g class="interactiveGroup solarGroup" @click=${()=>X("solar")}>
+          <g class="interactiveGroup solarGroup" @click=${()=>j("solar")}>
             <g transform="translate(696, 90)">
               <rect x="0" y="0" width="200" height="65"
                 class="hudCard ${P?"hudCardActive":""}"
                 rx="8" ry="8"
-                style="${P?`color: ${ht.solar.stroke}`:""}" />
+                style="${P?`color: ${ut.solar.stroke}`:""}" />
               <text x="12" y="20" class="hudTitle">Zonnepanelen</text>
               <text x="12" y="39" class="hudValue ${P?"hudActiveText":""}"
-                style="${P?`color: ${ht.solar.stroke}`:""}">
-                ${P?Ot(s):"—"}
+                style="${P?`color: ${ut.solar.stroke}`:""}">
+                ${P?kt(s):"—"}
               </text>
               <text x="12" y="53" class="hudSub">
-                ${null!==i?`Vandaag: ${i.toFixed(1)} kWh`:P?"Opwek actief":"Geen opwek"}
+                ${null!==f?`Vandaag: ${f.toFixed(1)} kWh`:P?"Opwek actief":"Geen opwek"}
               </text>
             </g>
           </g>
@@ -1120,7 +891,7 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
         <!-- BOTTOM HUD CARDS (grid, home, battery, ev)                     -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${dt.map((t,e)=>E`
-            <g class="interactiveGroup" @click=${()=>X(t.id)}>
+            <g class="interactiveGroup" @click=${()=>j(t.id)}>
               <g transform="translate(${ct+e*(170+ct)}, 510)">
                 <rect x="0" y="0" width="170" height="65"
                   class="hudCard ${t.active?"hudCardActive":""}"
@@ -1137,7 +908,7 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
           `)}
       </g>
     </svg>
-  `}class qt extends at{constructor(){super(...arguments),this.selectedNode=null,this.clouds=[],this.lastWeather=""}getClouds(t){if(this.clouds.length>0&&this.lastWeather===t)return this.clouds;const e="cloudy"===t||"rainy"===t||"lightning"===t||"snowy"===t,r=e?80:3,n=[];for(let t=0;t<r;t++){const t=e?2+1.2*Math.random():.5+.5*Math.random(),r=90+120*Math.random(),s=-Math.random()*r,i=e?90*Math.random()-60:10+90*Math.random(),f=e?.96+.04*Math.random():.6+.4*Math.random();n.push({y:i,scale:t,speed:r,delay:s,opacityMultiplier:f})}return this.clouds=n,this.lastWeather=t,this.clouds}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}handleNodeClick(t){console.info(`[energy-flow-card] Click registered on node: ${t}`),this.selectedNode=this.selectedNode===t?null:t;let e=t;"battery"===t?e=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?e=this.config?.entities.load?"load":"home_power":"ev"===t?e="charger":"grid"===t?e=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(e=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const r=this.config?.entities?this.config.entities[e]:void 0,n=Array.isArray(r)?r[0]:r;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${e}', resolved entity ID: '${n}'`),n){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${n}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:n},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date,r=e.getHours()+e.getMinutes()/60;let n="afternoon";n=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const s=this.getEntityValue(t.solar||t.solar_power),i=this.getEntityValue(t.load||t.home_power),f=this.getEntityValue(t.battery_power),o=t.battery_soc?this.getEntityValue(t.battery_soc):0,a=this.getEntityValue(t.charger);let l=0;(t.grid||t.grid_power)&&(l=this.getEntityValue(t.grid||t.grid_power));let d=f;if(void 0!==this.config.battery_invert){d=!0===this.config.battery_invert?f:-f}else if(t.grid){const t=s+l-i-a;d=Math.abs(f)>.05&&Math.abs(t)>.15?t*f<0?-f:f:-f}else d=-f;const c=t=>{if(!t)return null;const e=this.hass?.states[t];if(!e)return null;const r=parseFloat(e.state);return isNaN(r)?null:r},v=c(t.solar_energy_today||t.solar_today),y=c(t.grid_import_today),x=c(t.grid_export_today),h=c(t.home_today),k=c(t.battery_charge_today),u=c(t.battery_discharge_today),p=c(t.ev_today);let V="sunny";t.weather&&this.hass?.states[t.weather]&&(V=this.hass.states[t.weather].state);let g=6,O=21;const w=this.hass?.states["sun.sun"];if(w)try{const t=new Date(w.attributes.next_rising),e=new Date(w.attributes.next_setting);g=t.getHours()+t.getMinutes()/60,O=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||t.grid_power||(l=i+a-s-d);const q=!!t.solar||!!t.solar_power,X=!!t.battery_power,b=!!t.charger,j=Vt(r),W=`background: linear-gradient(to bottom, ${j.top} 0%, ${j.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;return C`
+  `}class Xt extends ot{constructor(){super(...arguments),this.selectedNode=null,this.clouds=[],this.lastWeather=""}getClouds(t){if(this.clouds.length>0&&this.lastWeather===t)return this.clouds;const e="cloudy"===t||"rainy"===t||"lightning"===t||"snowy"===t,r=e?80:3,n=[];for(let t=0;t<r;t++){const t=e?2+1.2*Math.random():.5+.5*Math.random(),r=90+120*Math.random(),s=-Math.random()*r,f=e?90*Math.random()-60:10+90*Math.random(),i=e?.96+.04*Math.random():.6+.4*Math.random();n.push({y:f,scale:t,speed:r,delay:s,opacityMultiplier:i})}return this.clouds=n,this.lastWeather=t,this.clouds}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}handleNodeClick(t){console.info(`[energy-flow-card] Click registered on node: ${t}`),this.selectedNode=this.selectedNode===t?null:t;let e=t;"battery"===t?e=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?e=this.config?.entities.load?"load":"home_power":"ev"===t?e="charger":"grid"===t?e=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(e=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const r=this.config?.entities?this.config.entities[e]:void 0,n=Array.isArray(r)?r[0]:r;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${e}', resolved entity ID: '${n}'`),n){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${n}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:n},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date,r=e.getHours()+e.getMinutes()/60;let n="afternoon";n=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const s=this.getEntityValue(t.solar||t.solar_power),f=this.getEntityValue(t.load||t.home_power),i=this.getEntityValue(t.battery_power),a=t.battery_soc?this.getEntityValue(t.battery_soc):0,o=this.getEntityValue(t.charger);let l=0;(t.grid||t.grid_power)&&(l=this.getEntityValue(t.grid||t.grid_power));let d=i;if(void 0!==this.config.battery_invert){d=!0===this.config.battery_invert?i:-i}else if(t.grid){const t=s+l-f-o;d=Math.abs(i)>.05&&Math.abs(t)>.15?t*i<0?-i:i:-i}else d=-i;const c=t=>{if(!t)return null;const e=this.hass?.states[t];if(!e)return null;const r=parseFloat(e.state);return isNaN(r)?null:r},v=c(t.solar_energy_today||t.solar_today),V=c(t.grid_import_today),x=c(t.grid_export_today),u=c(t.home_today),y=c(t.battery_charge_today),p=c(t.battery_discharge_today),h=c(t.ev_today);let g="sunny";t.weather&&this.hass?.states[t.weather]&&(g=this.hass.states[t.weather].state);let O=6,k=21;const q=this.hass?.states["sun.sun"];if(q)try{const t=new Date(q.attributes.next_rising),e=new Date(q.attributes.next_setting);O=t.getHours()+t.getMinutes()/60,k=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||t.grid_power||(l=f+o-s-d);const X=!!t.solar||!!t.solar_power,j=!!t.battery_power,w=!!t.charger,b=gt(r),W=`background: linear-gradient(to bottom, ${b.top} 0%, ${b.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;return C`
       <ha-card style="${W}">
         <div class="card-container">
           ${this.config.title?C`
@@ -1147,8 +918,8 @@ function t(t,e,r,n){var s,i=arguments.length,f=i<3?e:null===n?n=Object.getOwnPro
           `:""}
 
           <div class="sceneWrapper">
-            ${wt({timeHour:r,timeOfDay:n,solar:s,solarToday:v,load:i,batteryPower:d,soc:o,charger:a,grid:l,showSolar:q,showBattery:X,showEV:b,weather:V,clouds:this.getClouds(V),sunriseHour:g,sunsetHour:O,gridImportToday:y,gridExportToday:x,homeToday:h,batteryChargeToday:k,batteryDischargeToday:u,evToday:p,houseStyle:this.config?.house_style,carType:this.config?.car_type,onNodeClick:t=>this.handleNodeClick(t)})}
+            ${qt({timeHour:r,timeOfDay:n,solar:s,solarToday:v,load:f,batteryPower:d,soc:a,charger:o,grid:l,showSolar:X,showBattery:j,showEV:w,weather:g,clouds:this.getClouds(g),sunriseHour:O,sunsetHour:k,gridImportToday:V,gridExportToday:x,homeToday:u,batteryChargeToday:y,batteryDischargeToday:p,evToday:h,houseStyle:this.config?.house_style,carType:this.config?.car_type,onNodeClick:t=>this.handleNodeClick(t)})}
           </div>
         </div>
       </ha-card>
-    `}getCardSize(){return 6}}qt.styles=xt,t([vt({attribute:!1})],qt.prototype,"hass",void 0),t([yt()],qt.prototype,"config",void 0),t([yt()],qt.prototype,"selectedNode",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",qt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.0.0 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{qt as EnergyFlowCard};
+    `}getCardSize(){return 6}}Xt.styles=xt,t([vt({attribute:!1})],Xt.prototype,"hass",void 0),t([Vt()],Xt.prototype,"config",void 0),t([Vt()],Xt.prototype,"selectedNode",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",Xt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.0.0 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{Xt as EnergyFlowCard};
