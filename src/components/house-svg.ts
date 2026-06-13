@@ -170,6 +170,16 @@ interface SvgParams {
   onNodeClick: (node: string) => void;
 }
 
+const getCloudLayerPath = (W: number, baseY: number): string => {
+  const step = W / 4;
+  return `M 0,${baseY} 
+    Q ${step * 0.5},${baseY - 30} ${step},${baseY} 
+    T ${step * 2},${baseY} 
+    T ${step * 3},${baseY} 
+    T ${step * 4},${baseY} 
+    L ${W},0 L 0,0 Z`;
+};
+
 export function renderHouseSvg({
   containerWidth,
   containerHeight,
@@ -506,28 +516,58 @@ export function renderHouseSvg({
         ${visualWeather === 'snowy' ? renderSnow(width) : ''}
 
         <!-- Cloud layers -->
-        <g opacity="${cloudOpacity}" style="pointer-events: none;">
-          ${(visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy') ? svg`
-            <path d="${overcastPath}" fill="${cloudColor}" />
-          ` : ''}
-          ${(clouds || []).map(c => {
-            const minY = 20;
-            const isOvercast = (visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy');
-            const maxY = isOvercast ? (height - 420) : (height - 500);
-            const deltaY = Math.max(20, maxY - minY);
-            const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
-            const cloudY = minY + yFactor * deltaY;
-            return renderHDCloud(
-              'customDriftCloud',
-              0,
-              cloudY,
-              c.scale,
-              cloudColor,
-              c.opacityMultiplier,
-              `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
-            );
-          })}
-        </g>
+        ${(visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy') ? svg`
+          <style>
+            @keyframes scrollCloudsBack { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
+            @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
+            @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
+            
+            .cloud-layer-back { animation: scrollCloudsBack 120s infinite linear; }
+            .cloud-layer-mid { animation: scrollCloudsMid 80s infinite linear; }
+            .cloud-layer-front { animation: scrollCloudsFront 40s infinite linear; }
+          </style>
+          
+          <g opacity="${cloudOpacity}" style="pointer-events: none;">
+            <!-- Layer 1 (Back) -->
+            <g class="cloud-layer-back">
+              <path d="${getCloudLayerPath(width, 70)}" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.35)}" />
+              <path d="${getCloudLayerPath(width, 70)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.35)}" />
+            </g>
+            
+            <!-- Layer 2 (Middle) -->
+            <g class="cloud-layer-mid">
+              <path d="${getCloudLayerPath(width, 110)}" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.18)}" />
+              <path d="${getCloudLayerPath(width, 110)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.18)}" />
+            </g>
+            
+            <!-- Layer 3 (Front) -->
+            <g class="cloud-layer-front">
+              <path d="${getCloudLayerPath(width, 150)}" fill="${cloudColor}" />
+              <path d="${getCloudLayerPath(width, 150)}" transform="translate(${width}, 0)" fill="${cloudColor}" />
+            </g>
+          </g>
+        ` : svg`
+          <!-- Floating Cloud layers (Only for sunny/partlycloudy) -->
+          <g opacity="${cloudOpacity}" style="pointer-events: none;">
+            ${(clouds || []).map(c => {
+              const minY = 20;
+              // Limit the clouds to the top 40% of the screen height so they never touch the house
+              const maxY = height * 0.40;
+              const deltaY = Math.max(20, maxY - minY);
+              const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
+              const cloudY = minY + yFactor * deltaY;
+              return renderHDCloud(
+                'customDriftCloud',
+                0,
+                cloudY,
+                c.scale,
+                cloudColor,
+                c.opacityMultiplier,
+                `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
+              );
+            })}
+          </g>
+        `}
 
         <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
         ${visualWeather === 'lightning' ? svg`

@@ -363,7 +363,7 @@ if (!customElements.get('energy-flow-card')) {
   
   // Log message to HA browser console to confirm loading
   console.info(
-    `%c  ENERGY-FLOW-CARD  %c Version 2.2.4 `,
+    `%c  ENERGY-FLOW-CARD  %c Version 2.2.5 `,
     'color: white; background: #10b981; font-weight: 700;',
     'color: #10b981; background: #0f172a; font-weight: 700;'
   );
