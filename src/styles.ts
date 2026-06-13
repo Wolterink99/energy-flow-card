@@ -89,23 +89,17 @@ export const styles = css`
 
   @keyframes driftCustom {
     0% {
-      transform: translateX(-350px);
+      transform: translateX(-400px);
       opacity: 0;
     }
-    15% {
+    12% {
       opacity: 1;
     }
-    45% {
-      opacity: 0.45;
-    }
-    75% {
-      opacity: 0.85;
-    }
-    90% {
+    88% {
       opacity: 1;
     }
     100% {
-      transform: translateX(1100px);
+      transform: translateX(1200px);
       opacity: 0;
     }
   }

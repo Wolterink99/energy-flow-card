@@ -16,14 +16,15 @@ export class EnergyFlowCard extends LitElement {
     if (this.clouds.length > 0 && this.lastWeather === weather) {
       return this.clouds;
     }
-    const count = (weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy') ? 12 : 3;
+    const isOvercast = (weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy');
+    const count = isOvercast ? 80 : 3;
     const list = [];
     for (let i = 0; i < count; i++) {
-      const scale = 0.5 + Math.random() * 0.8;
-      const speed = 40 + Math.random() * 80;
+      const scale = isOvercast ? (2.0 + Math.random() * 1.2) : (0.5 + Math.random() * 0.5);
+      const speed = 90 + Math.random() * 120;
       const delay = -Math.random() * speed;
-      const y = 10 + Math.random() * 110;
-      const opacityMultiplier = 0.6 + Math.random() * 0.4;
+      const y = isOvercast ? (-60 + Math.random() * 90) : (10 + Math.random() * 90);
+      const opacityMultiplier = isOvercast ? (0.96 + Math.random() * 0.04) : (0.6 + Math.random() * 0.4);
       list.push({
         y,
         scale,

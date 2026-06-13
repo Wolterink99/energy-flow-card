@@ -227,20 +227,20 @@ export function renderHouseSvg({
   let cloudOpacity = timeOfDay === 'night' ? 0.18 : 0.48;
 
   if (weather === 'cloudy') {
-    skyTop = interpolateColor(skyState.top, '#475569', 0.5);
-    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.5);
-    cloudColor = 'rgba(241, 245, 249, 0.55)';
-    cloudOpacity = 0.65;
+    cloudColor = '#cbd5e1'; // Light grey clouds
+    // skyTop stays blue — lucht blijft blauw bij bewolkt
+    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.15); // Licht gedempt, maar blauw
+    cloudOpacity = 0.98;
   } else if (weather === 'rainy' || weather === 'lightning') {
-    skyTop = interpolateColor(skyState.top, '#1e293b', 0.75);
-    skyHorizon = interpolateColor(skyState.horizon, '#475569', 0.75);
-    cloudColor = 'rgba(100, 116, 139, 0.5)';
-    cloudOpacity = 0.65;
+    cloudColor = '#1f2937'; // Very dark grey clouds for rain
+    skyTop = cloudColor;
+    skyHorizon = interpolateColor(skyState.horizon, '#334155', 0.5);
+    cloudOpacity = 0.99;
   } else if (weather === 'snowy') {
-    skyTop = interpolateColor(skyState.top, '#475569', 0.5);
-    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.5);
-    cloudColor = 'rgba(255, 255, 255, 0.6)';
-    cloudOpacity = 0.70;
+    cloudColor = '#334155'; // Dark grey for snow
+    skyTop = cloudColor;
+    skyHorizon = interpolateColor(skyState.horizon, '#4a5568', 0.4);
+    cloudOpacity = 0.98;
   } else if (weather === 'foggy') {
     skyTop = interpolateColor(skyState.top, '#64748b', 0.65);
     skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.65);
@@ -531,8 +531,15 @@ export function renderHouseSvg({
           </g>
         ` : ''}
 
+        <!-- Falling precipitation -->
+        ${weather === 'rainy' ? renderRain() : ''}
+        ${weather === 'snowy' ? renderSnow() : ''}
+
         <!-- Cloud layers -->
         <g opacity="${cloudOpacity}" style="pointer-events: none;">
+          ${(weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy') ? svg`
+            <path d="M 0,-10 L 960,-10 L 960,12 Q 945,18 930,12 Q 915,18 900,12 Q 885,18 870,12 Q 855,18 840,12 Q 825,18 810,12 Q 795,18 780,12 Q 765,18 750,12 Q 735,18 720,12 Q 705,18 690,12 Q 675,18 660,12 Q 645,18 630,12 Q 615,18 600,12 Q 585,18 570,12 Q 555,18 540,12 Q 525,18 510,12 Q 495,18 480,12 Q 465,18 450,12 Q 435,18 420,12 Q 405,18 390,12 Q 375,18 360,12 Q 345,18 330,12 Q 315,18 300,12 Q 285,18 270,12 Q 255,18 240,12 Q 225,18 210,12 Q 195,18 180,12 Q 165,18 150,12 Q 135,18 120,12 Q 105,18 90,12 Q 75,18 60,12 Q 45,18 30,12 Q 15,18 0,12 Z" fill="${cloudColor}" />
+          ` : ''}
           ${(clouds || []).map(c => renderHDCloud(
             'customDriftCloud',
             0,
@@ -1201,9 +1208,6 @@ export function renderHouseSvg({
           <rect width="960" height="590" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
         ` : ''}
 
-        <!-- Falling precipitation -->
-        ${weather === 'rainy' ? renderRain() : ''}
-        ${weather === 'snowy' ? renderSnow() : ''}
 
         <!-- Fog overlay (Thicker layer with depth) -->
         ${weather === 'foggy' ? svg`
