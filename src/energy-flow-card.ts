@@ -357,7 +357,7 @@ export class EnergyFlowCard extends LitElement {
               height: 100vh !important;
               width: calc(100vw + 56px) !important;
               margin-left: -56px !important;
-              z-index: 0 !important;
+              z-index: 50 !important;
             }
             ha-card {
               height: 100% !important;

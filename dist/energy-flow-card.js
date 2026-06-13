@@ -877,7 +877,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
               height: 100vh !important;
               width: calc(100vw + 56px) !important;
               margin-left: -56px !important;
-              z-index: 0 !important;
+              z-index: 50 !important;
             }
             ha-card {
               height: 100% !important;
