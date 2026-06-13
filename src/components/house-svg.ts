@@ -297,22 +297,25 @@ export function renderHouseSvg({
   // Cable paths use the scaled coordinate space (multiply Card-2 coords by 1.2)
   // Card-2: mkX=345, mkY=350; in translate(0,70) group → screen y = 420
   // Scaled: mkX=414, mkY=504 (350+70)*1.2 = 504; OR think of it as 345*1.2=414, (350+70)*1.2=504
-  // But since these are inside the scale(1.2) group, we use unscaled coords: mkX=345, mkY=420
-  // Cable paths are OUTSIDE the scaled group, so we must use visual (scaled) coordinates.
+  // Cable path hub point: visual position of the inverter/meterkast (near the center portal door)
+  // sx/sy transform from house inner coords to visual 960x590 screen space (scale 1.15 around 450,480)
   const sx = (x: number) => 450 + 1.15 * (x - 450);
   const sy = (y: number) => 480 + 1.15 * (y - 480);
 
-  const mkX = Math.round(sx(355));
-  const mkY = Math.round(sy(432.5));
+  const mkX = Math.round(sx(355));   // ≈ 341 — visual x of inverter (center portal, left of door)
+  const mkY = Math.round(sy(432.5)); // ≈ 425 — visual y of inverter (just above ground)
 
-  const isJaren30 = houseStyle === 'classic-jaren30';
-  const batX = isJaren30 ? 600 : 545;
+  const batX = 545; // battery display x position
 
-  const gridPath = `M 192,455 L 192,493 L ${mkX},493 L ${mkX},${mkY}`;
+  // Grid: from transformer box (shifted -80 → visual x≈112) underground to hub
+  const gridPath = `M 112,460 L 112,493 L ${mkX},493 L ${mkX},${mkY}`;
 
-  const solarPath = `M ${Math.round(sx(320))},${Math.round(sy(340))} L ${Math.round(sx(320))},${Math.round(sy(370))} L ${mkX},${Math.round(sy(370))} L ${mkX},${mkY}`;
+  // Solar: from center portal roof peak (visual ≈376,250) down to hub
+  // sx(386)≈376, sy(280)≈250 — matches dashboard invX=380,invY=230
+  const solarInterY = Math.round(sy(370)); // horizontal run level ≈ 354
+  const solarPath = `M 376,250 L 376,${solarInterY} L ${mkX},${solarInterY} L ${mkX},${mkY}`;
 
-  const batteryPath = `M ${sx(310)},${sy(420)} L ${mkX},${mkY}`;
+  const batteryPath = `M ${Math.round(sx(310))},${Math.round(sy(420))} L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},503 L 664,503 L 664,415`;
 
   // ── HUD Cards configuration ──
@@ -550,9 +553,9 @@ export function renderHouseSvg({
         <!-- GROUND & ELECTRICITY MAST: Outside scaled group                 -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- Ground (full width) -->
-        <rect x="0" y="480" width="630" height="110" fill="url(#garden-grad)" />
+        <rect x="0" y="480" width="960" height="110" fill="url(#garden-grad)" />
         <!-- Driveway -->
-        <rect x="630" y="480" width="330" height="110" fill="url(#driveway-grad)" />
+        <rect x="588" y="480" width="372" height="18" fill="url(#driveway-grad)" />
         <line x1="0" y1="480" x2="960" y2="480" class="horizonLine" />
 
         <!-- High-Voltage Electricity Mast (Resting on ground) -->
