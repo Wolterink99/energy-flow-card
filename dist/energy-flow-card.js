@@ -328,7 +328,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <path d="M 190,160 L 190,180" stroke-width="1.5" />
       </g>
     </g>
-  `;function bt({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:n,timeOfDay:s,solar:f,solarToday:i,load:a,batteryPower:o,soc:l,charger:d,grid:c,showSolar:v,showBattery:y,showEV:V,weather:p="sunny",clouds:u=[],sunriseHour:x=6,sunsetHour:h=21,gridImportToday:g=null,gridExportToday:O=null,homeToday:k=null,batteryChargeToday:q=null,batteryDischargeToday:X=null,evToday:j=null,onNodeClick:w}){let b=p;"pouring"===p||"lightning-rainy"===p?b="rainy":"snowy-rainy"===p||"hail"===p?b="snowy":"fog"===p&&(b="foggy");const W=t||800,F=e||600,S=(W-800)/2,z=20-S;let P=n;P=n>=x&&n<=h?6+(n-x)/(h-x)*15:n>h?21+(n-h)/(24-h)*3:n/x*6;const U=o>.05,K=o<-.05,Y=c>.05,H=c<-.05,B=d>.1,A=f>20,R=a>20,G=U||K&&H?pt.battery:pt.batteryD,J=Y?pt.gridI:pt.gridE,L=gt(P),C=L.lights>.05||"rainy"===b||"lightning"===b;let T=L.top,M=L.horizon,D=L.clouds,N="night"===s?.18:.48;"cloudy"===b?(D="#cbd5e1",M=ht(L.horizon,"#94a3b8",.15),N=.98):"rainy"===b||"lightning"===b?(D="#1f2937",T=D,M=ht(L.horizon,"#334155",.5),N=.99):"snowy"===b?(D="#334155",T=D,M=ht(L.horizon,"#4a5568",.4),N=.98):"foggy"===b?(T=ht(L.top,"#64748b",.65),M=ht(L.horizon,"#94a3b8",.65),D="rgba(203, 213, 225, 0.4)",N=.5):"partlycloudy"===b&&(T=ht(L.top,"#475569",.15),M=ht(L.horizon,"#64748b",.15),D="#cbd5e1",N=.65);const m=P>=8&&P<=18,Q=m?"url(#window-day)":C?"url(#window-night)":"url(#window-dark)",Z=m?"none":C?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",I={cx:W/2,cy:F};let $=0,_="#fef08a",tt="rgba(254, 240, 138, 0.65)";if(P>=6&&P<=21&&"rainy"!==b&&"lightning"!==b&&"cloudy"!==b&&"snowy"!==b&&"foggy"!==b){const t=(P-6)/15;I.cx=t*(W+120)-60,I.cy=F-120-Math.sin(t*Math.PI)*(F-160),$=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);_=ht("#ea580c","#fef08a",e),tt=ht("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const et={cx:W/2,cy:F};let rt=0;if((P>21||P<6)&&"rainy"!==b&&"lightning"!==b&&"cloudy"!==b&&"snowy"!==b&&"foggy"!==b){const t=P>21?(P-21)/9:(P+3)/9;et.cx=t*(W+120)-60,et.cy=F-120-Math.sin(t*Math.PI)*(F-200),rt=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const nt=345,st=350,ft=Xt(z,-22,.9),it=Xt(z+145.6,112.4,.62),at=Xt(z+249.6,208.4,.42),ot=Xt(z+316.4,275.6,.28),lt=Xt(z+358.4,323.6,.18),dt=`${jt(ft[2],{x:13,y:365},35)} L 13,440 L 345,440 L 345,350`;let ct=H?"↑ Teruglevering":Y?"↓ Import":"Standby";null!==g&&null!==O?ct=`↓${g.toFixed(1)} ↑${O.toFixed(1)} kWh`:null!==g?ct=`Import: ${g.toFixed(1)} kWh`:null!==O&&(ct=`Terug: ${O.toFixed(1)} kWh`);const vt=null!==k?`Vandaag: ${k.toFixed(1)} kWh`:R?"Actief":"Standby";let yt=`SoC: ${l}%`;null!==q&&null!==X?yt=`SoC: ${l}% (↓${q.toFixed(1)} ↑${X.toFixed(1)})`:null!==q&&(yt=`SoC: ${l}% (↓${q.toFixed(1)})`);const Vt=null!==j?`Vandaag: ${j.toFixed(1)} kWh`:B?"Laden":"Standby",ut=[{id:"grid",title:"Stroomnet",value:kt(c),sub:ct,color:J.stroke,active:Y||H}];y&&ut.push({id:"battery",title:"Thuisaccu",value:U||K?kt(o):"Standby",sub:yt,color:G.stroke,active:U||K}),ut.push({id:"home",title:"Huisverbruik",value:kt(a),sub:vt,color:pt.home.stroke,active:R}),V&&ut.push({id:"ev",title:"Laadpaal (EV)",value:kt(d),sub:Vt,color:pt.ev.stroke,active:B});const xt=(W-170*ut.length)/(ut.length+1),bt=(t,e,r,n,s,f=!1)=>E`
+  `;function bt({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:n,timeOfDay:s,solar:f,solarToday:i,load:a,batteryPower:o,soc:l,charger:d,grid:c,showSolar:v,showBattery:y,showEV:V,weather:p="sunny",clouds:u=[],sunriseHour:x=6,sunsetHour:h=21,gridImportToday:g=null,gridExportToday:O=null,homeToday:k=null,batteryChargeToday:q=null,batteryDischargeToday:X=null,evToday:j=null,onNodeClick:w}){let b=p;"pouring"===p||"lightning-rainy"===p?b="rainy":"snowy-rainy"===p||"hail"===p?b="snowy":"fog"===p&&(b="foggy");const W=t||800,F=e||600,S=(W-800)/2,z=20-S;let P=n;P=n>=x&&n<=h?6+(n-x)/(h-x)*15:n>h?21+(n-h)/(24-h)*3:n/x*6;const U=o>.05,K=o<-.05,Y=c>.05,H=c<-.05,B=d>.1,A=f>20,R=a>20,G=U||K&&H?pt.battery:pt.batteryD,J=Y?pt.gridI:pt.gridE,L=gt(P),C=L.lights>.05||"rainy"===b||"lightning"===b;let T=L.top,M=L.horizon,D=L.clouds,N="night"===s?.18:.48;"cloudy"===b?(D="#cbd5e1",M=ht(L.horizon,"#94a3b8",.15),N=.98):"rainy"===b||"lightning"===b?(D="#1f2937",T=D,M=ht(L.horizon,"#334155",.5),N=.99):"snowy"===b?(D="#334155",T=D,M=ht(L.horizon,"#4a5568",.4),N=.98):"foggy"===b?(T=ht(L.top,"#64748b",.65),M=ht(L.horizon,"#94a3b8",.65),D="rgba(203, 213, 225, 0.4)",N=.5):"partlycloudy"===b&&(T=ht(L.top,"#475569",.15),M=ht(L.horizon,"#64748b",.15),D="#cbd5e1",N=.65);const m=P>=8&&P<=18,Q=m?"url(#window-day)":C?"url(#window-night)":"url(#window-dark)",Z=m?"none":C?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",I={cx:W/2,cy:F};let $=0,_="#fef08a",tt="rgba(254, 240, 138, 0.65)";if(P>=6&&P<=21&&"rainy"!==b&&"lightning"!==b&&"cloudy"!==b&&"snowy"!==b&&"foggy"!==b){const t=(P-6)/15;I.cx=t*(W+120)-60,I.cy=F-120-Math.sin(t*Math.PI)*(F-160),$=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);_=ht("#ea580c","#fef08a",e),tt=ht("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const et={cx:W/2,cy:F};let rt=0;if((P>21||P<6)&&"rainy"!==b&&"lightning"!==b&&"cloudy"!==b&&"snowy"!==b&&"foggy"!==b){const t=P>21?(P-21)/9:(P+3)/9;et.cx=t*(W+120)-60,et.cy=F-120-Math.sin(t*Math.PI)*(F-200),rt=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const nt=345,st=350,ft=Xt(z,-22,.9),it=Xt(z+145.6,112.4,.62),at=Xt(z+249.6,208.4,.42),ot=Xt(z+316.4,275.6,.28),lt=Xt(z+358.4,323.6,.18);let dt=H?"↑ Teruglevering":Y?"↓ Import":"Standby";null!==g&&null!==O?dt=`↓${g.toFixed(1)} ↑${O.toFixed(1)} kWh`:null!==g?dt=`Import: ${g.toFixed(1)} kWh`:null!==O&&(dt=`Terug: ${O.toFixed(1)} kWh`);const ct=null!==k?`Vandaag: ${k.toFixed(1)} kWh`:R?"Actief":"Standby";let vt=`SoC: ${l}%`;null!==q&&null!==X?vt=`SoC: ${l}% (↓${q.toFixed(1)} ↑${X.toFixed(1)})`:null!==q&&(vt=`SoC: ${l}% (↓${q.toFixed(1)})`);const yt=null!==j?`Vandaag: ${j.toFixed(1)} kWh`:B?"Laden":"Standby",Vt=[{id:"grid",title:"Stroomnet",value:kt(c),sub:dt,color:J.stroke,active:Y||H}];y&&Vt.push({id:"battery",title:"Thuisaccu",value:U||K?kt(o):"Standby",sub:vt,color:G.stroke,active:U||K}),Vt.push({id:"home",title:"Huisverbruik",value:kt(a),sub:ct,color:pt.home.stroke,active:R}),V&&Vt.push({id:"ev",title:"Laadpaal (EV)",value:kt(d),sub:yt,color:pt.ev.stroke,active:B});const ut=(W-170*Vt.length)/(Vt.length+1),xt=(t,e,r,n,s,f=!1)=>E`
       <path d="${t}" class="flowCable" />
       <path d="${t}" fill="none" stroke="${n}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
@@ -349,7 +349,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           " />
       `)}
     `:E``)(t,e,r,n,s,f)}
-    `,Wt=F-530;return E`
+    `,bt=F-530;return E`
     <svg viewBox="0 0 ${W} ${F}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
@@ -525,7 +525,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- GROUND, MAST, HOUSE, AND CABLES: Translated inside dynamic group-->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <g transform="translate(${S}, ${Wt})">
+        <g transform="translate(${S}, ${bt})">
 
           <!-- Ground (grass base spanning full screen width) -->
           <rect x="${-S}" y="410" width="${W}" height="120" fill="url(#garden-grad)" />
@@ -803,13 +803,13 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
           `:""}
 
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
-          ${v?bt("M 380,230 L 380,270 L 345,270 L 345,350",A,Ot(f),pt.solar.stroke,pt.solar.glow):""}
+          ${v?xt("M 380,230 L 380,270 L 345,270 L 345,350",A,Ot(f),pt.solar.stroke,pt.solar.glow):""}
 
-          ${bt(dt,Y||H,Ot(c),J.stroke,J.glow,H)}
+          ${xt("M 13,410 L 13,440 L 345,440 L 345,350",Y||H,Ot(c),J.stroke,J.glow,H)}
 
-          ${y?bt("M 310,350 L 345,350",U||K,Ot(o),G.stroke,G.glow,U):""}
+          ${y?xt("M 310,350 L 345,350",U||K,Ot(o),G.stroke,G.glow,U):""}
 
-          ${V?bt("M 345,350 L 345,440 L 455,440 L 455,395",B,Ot(d),pt.ev.stroke,pt.ev.glow):""}
+          ${V?xt("M 345,350 L 345,440 L 455,440 L 455,395",B,Ot(d),pt.ev.stroke,pt.ev.glow):""}
 
         </g>
         <!-- End of translate group -->
@@ -850,9 +850,9 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (using dynamic gaps & screen bottom alignment) -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${ut.map((t,e)=>E`
+        ${Vt.map((t,e)=>E`
             <g class="interactiveGroup" @click=${()=>w(t.id)}>
-              <g transform="translate(${xt+e*(170+xt)}, ${F-75})">
+              <g transform="translate(${ut+e*(170+ut)}, ${F-75})">
                 <rect x="0" y="0" width="170" height="65"
                   class="hudCard ${t.active?"hudCardActive":""}"
                   rx="8" ry="8"

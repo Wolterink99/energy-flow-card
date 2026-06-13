@@ -394,9 +394,8 @@ export function renderHouseSvg({
   const p4Tips = getPylonTips(mastX + 316.4, 275.6, 0.28);
   const p5Tips = getPylonTips(mastX + 358.4, 323.6, 0.18);
 
-  // Sagging overhead wire from foreground pylon to transformer box, then underground to meterkast
-  const overheadWire = drawSaggingWire(p1Tips[2], {x: 13, y: 365}, 35);
-  const gridPath = `${overheadWire} L 13,440 L ${mkX},440 L ${mkX},${mkY}`;
+  // Grid path starts at the bottom-center of the transformer box (y = 410) and runs underground to the meterkast
+  const gridPath = `M 13,410 L 13,440 L ${mkX},440 L ${mkX},${mkY}`;
   const solarPath = `M ${invX},${invY} L ${invX},270 L ${mkX},270 L ${mkX},${mkY}`;
   const batteryPath = `M 310,350 L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},440 L 455,440 L 455,395`;

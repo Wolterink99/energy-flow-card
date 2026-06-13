@@ -61,149 +61,154 @@ const newConfig = {
           }
         },
         {
-          type: "custom:bubble-card",
-          card_type: "pop-up",
-          hash: "huisverbruik",
-          name: "Huisverbruik Analyse",
-          icon: "mdi:home-lightning-bolt",
-          back_button: true
-        },
-        {
-          type: "custom:mushroom-template-card",
-          primary: "Actueel Huisverbruik",
-          secondary: "{{ states('sensor.actueel_huisverbruik') | round(0) }} W",
-          icon: "mdi:home-lightning-bolt",
-          icon_color: "deep-purple",
-          layout: "horizontal"
-        },
-        {
-          type: "grid",
-          columns: 2,
-          square: false,
+          type: "vertical-stack",
           cards: [
             {
-              type: "custom:mushroom-entity-card",
-              entity: "sensor.totaalverbruik_vandaag",
-              name: "Vandaag verbruikt",
-              icon: "mdi:calendar-today",
-              icon_color: "deep-purple"
+              type: "custom:bubble-card",
+              card_type: "pop-up",
+              hash: "huisverbruik",
+              name: "Huisverbruik",
+              icon: "mdi:home-lightning-bolt",
+              back_button: true
             },
             {
-              type: "custom:mushroom-entity-card",
-              entity: "sensor.actueel_huisverbruik",
-              name: "Live vermogen",
-              icon: "mdi:pulse",
-              icon_color: "deep-purple"
+              type: "custom:mushroom-template-card",
+              primary: "Actueel Huisverbruik",
+              secondary: "{{ states('sensor.actueel_huisverbruik') | round(0) }} W",
+              icon: "mdi:home-lightning-bolt",
+              icon_color: "deep-purple",
+              layout: "horizontal"
+            },
+            {
+              type: "grid",
+              columns: 2,
+              square: false,
+              cards: [
+                {
+                  type: "custom:mushroom-entity-card",
+                  entity: "sensor.totaalverbruik_vandaag",
+                  name: "Vandaag verbruikt",
+                  icon: "mdi:calendar-today",
+                  icon_color: "deep-purple"
+                },
+                {
+                  type: "custom:mushroom-entity-card",
+                  entity: "sensor.actueel_huisverbruik",
+                  name: "Live vermogen",
+                  icon: "mdi:pulse",
+                  icon_color: "deep-purple"
+                }
+              ]
+            },
+            {
+              type: "history-graph",
+              entities: [
+                "sensor.actueel_huisverbruik"
+              ],
+              hours_to_show: 24,
+              refresh_interval: 0
             }
           ]
         },
         {
-          type: "history-graph",
-          entities: [
-            "sensor.actueel_huisverbruik"
-          ],
-          hours_to_show: 24,
-          refresh_interval: 0
-        },
-        {
-          type: "custom:bubble-card",
-          card_type: "separator",
-          name: "Separator"
-        },
-        {
-          type: "custom:bubble-card",
-          card_type: "pop-up",
-          hash: "zonnepanelen",
-          name: "Zonnepanelen Opbrengst",
-          icon: "mdi:solar-power-variant",
-          back_button: true
-        },
-        {
-          type: "custom:mushroom-template-card",
-          primary: "Actuele Productie",
-          secondary: "{{ states('sensor.totale_actuele_zonneproductie') | round(0) }} W",
-          icon: "mdi:solar-power-variant",
-          icon_color: "amber",
-          layout: "horizontal"
-        },
-        {
-          type: "grid",
-          columns: 2,
-          square: false,
+          type: "vertical-stack",
           cards: [
             {
-              type: "custom:mushroom-entity-card",
-              entity: "sensor.totale_opwek_vandaag_2",
-              name: "Vandaag opgewekt",
-              icon: "mdi:solar-panel-large",
-              icon_color: "amber"
+              type: "custom:bubble-card",
+              card_type: "pop-up",
+              hash: "zonnepanelen",
+              name: "Zonnepanelen",
+              icon: "mdi:solar-power-variant",
+              back_button: true
             },
             {
-              type: "custom:mushroom-entity-card",
-              entity: "sensor.totale_actuele_zonneproductie",
-              name: "Actueel vermogen",
-              icon: "mdi:sun-wireless",
-              icon_color: "amber"
+              type: "custom:mushroom-template-card",
+              primary: "Actuele Productie",
+              secondary: "{{ states('sensor.totale_actuele_zonneproductie') | round(0) }} W",
+              icon: "mdi:solar-power-variant",
+              icon_color: "amber",
+              layout: "horizontal"
+            },
+            {
+              type: "grid",
+              columns: 2,
+              square: false,
+              cards: [
+                {
+                  type: "custom:mushroom-entity-card",
+                  entity: "sensor.totale_opwek_vandaag_2",
+                  name: "Vandaag opgewekt",
+                  icon: "mdi:solar-panel-large",
+                  icon_color: "amber"
+                },
+                {
+                  type: "custom:mushroom-entity-card",
+                  entity: "sensor.totale_actuele_zonneproductie",
+                  name: "Actueel vermogen",
+                  icon: "mdi:sun-wireless",
+                  icon_color: "amber"
+                }
+              ]
+            },
+            {
+              type: "history-graph",
+              entities: [
+                "sensor.totale_actuele_zonneproductie"
+              ],
+              hours_to_show: 24,
+              refresh_interval: 0
             }
           ]
         },
         {
-          type: "history-graph",
-          entities: [
-            "sensor.totale_actuele_zonneproductie"
-          ],
-          hours_to_show: 24,
-          refresh_interval: 0
-        },
-        {
-          type: "custom:bubble-card",
-          card_type: "separator",
-          name: "Separator"
-        },
-        {
-          type: "custom:bubble-card",
-          card_type: "pop-up",
-          hash: "stroomnet",
-          name: "Netinteractie (P1)",
-          icon: "mdi:transmission-tower",
-          back_button: true
-        },
-        {
-          type: "custom:mushroom-template-card",
-          primary: "Netbelasting (P1)",
-          secondary: "{{ states('sensor.p1_meter_power') | round(0) }} W",
-          icon: "mdi:transmission-tower",
-          icon_color: "blue",
-          layout: "horizontal"
-        },
-        {
-          type: "grid",
-          columns: 2,
-          square: false,
+          type: "vertical-stack",
           cards: [
             {
-              type: "custom:mushroom-entity-card",
-              entity: "sensor.p1_netstroom_afname_vandaag",
-              name: "Import vandaag",
-              icon: "mdi:export",
-              icon_color: "red"
+              type: "custom:bubble-card",
+              card_type: "pop-up",
+              hash: "stroomnet",
+              name: "Stroomnet",
+              icon: "mdi:transmission-tower",
+              back_button: true
             },
             {
-              type: "custom:mushroom-entity-card",
-              entity: "sensor.p1_teruglevering_vandaag",
-              name: "Export vandaag",
-              icon: "mdi:import",
-              icon_color: "green"
+              type: "custom:mushroom-template-card",
+              primary: "Netbelasting",
+              secondary: "{{ states('sensor.p1_meter_power') | round(0) }} W",
+              icon: "mdi:transmission-tower",
+              icon_color: "blue",
+              layout: "horizontal"
+            },
+            {
+              type: "grid",
+              columns: 2,
+              square: false,
+              cards: [
+                {
+                  type: "custom:mushroom-entity-card",
+                  entity: "sensor.p1_netstroom_afname_vandaag",
+                  name: "Import vandaag",
+                  icon: "mdi:export",
+                  icon_color: "red"
+                },
+                {
+                  type: "custom:mushroom-entity-card",
+                  entity: "sensor.p1_teruglevering_vandaag",
+                  name: "Export vandaag",
+                  icon: "mdi:import",
+                  icon_color: "green"
+                }
+              ]
+            },
+            {
+              type: "history-graph",
+              entities: [
+                "sensor.p1_meter_power"
+              ],
+              hours_to_show: 24,
+              refresh_interval: 0
             }
           ]
-        },
-        {
-          type: "history-graph",
-          entities: [
-            "sensor.p1_meter_power"
-          ],
-          hours_to_show: 24,
-          refresh_interval: 0
         }
       ]
     }
