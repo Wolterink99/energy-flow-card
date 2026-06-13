@@ -300,31 +300,28 @@ export function renderHouseSvg({
   const sx = (x: number) => 450 + 1.15 * (x - 450);
   const sy = (y: number) => 480 + 1.15 * (y - 480);
 
-  const isJaren30 = houseStyle === 'classic-jaren30';
-  const batX = isJaren30 ? 510 : 545;
-  const batCenterX = batX + 17.5;
-  const batScX = Math.round(sx(batCenterX));
-
-  // Meterkast rect: x=350 y=420 w=10 h=25 → center SVG (355, 432.5)
   const mkX = Math.round(sx(355));
   const mkY = Math.round(sy(432.5));
 
-  // Solar path
+  const isJaren30 = houseStyle === 'classic-jaren30';
+  const batX = isJaren30 ? 600 : 545;
+
+  const gridPath = `M 192,455 L 192,493 L ${mkX},493 L ${mkX},${mkY}`;
+
   let solarPath = `M ${Math.round(sx(492))},${Math.round(sy(249))} L ${Math.round(sx(492))},${Math.round(sy(270))} L ${mkX},${Math.round(sy(270))} L ${mkX},${mkY}`;
   if (houseStyle === 'modern-villa') {
     solarPath = `M ${Math.round(sx(496))},${Math.round(sy(182))} L ${Math.round(sx(496))},${Math.round(sy(300))} L ${mkX},${Math.round(sy(300))} L ${mkX},${mkY}`;
   } else if (houseStyle === 'classic-jaren30') {
     solarPath = `M ${Math.round(sx(479))},${Math.round(sy(208))} L ${Math.round(sx(479))},${Math.round(sy(370))} L ${mkX},${Math.round(sy(370))} L ${mkX},${mkY}`;
   } else if (houseStyle === 'barnhouse') {
-    solarPath = `M ${Math.round(sx(505))},${Math.round(sy(200))} L ${Math.round(sx(505))},${Math.round(sy(280))} L ${mkX},${Math.round(sy(280))} L ${mkX},${mkY}`;
+    solarPath = `M ${Math.round(sx(502))},${Math.round(sy(198))} L ${Math.round(sx(502))},${Math.round(sy(340))} L ${mkX},${Math.round(sy(340))} L ${mkX},${mkY}`;
   } else if (houseStyle === 'cubist-bungalow') {
-    solarPath = `M ${Math.round(sx(485))},${Math.round(sy(250))} L ${Math.round(sx(485))},${Math.round(sy(270))} L ${mkX},${Math.round(sy(270))} L ${mkX},${mkY}`;
+    solarPath = `M ${Math.round(sx(492))},${Math.round(sy(254))} L ${Math.round(sx(492))},${Math.round(sy(300))} L ${mkX},${Math.round(sy(300))} L ${mkX},${mkY}`;
   } else if (houseStyle === 'townhouse') {
-    solarPath = `M ${Math.round(sx(505))},${Math.round(sy(187))} L ${Math.round(sx(505))},${Math.round(sy(230))} L ${mkX},${Math.round(sy(230))} L ${mkX},${mkY}`;
+    solarPath = `M ${Math.round(sx(497))},${Math.round(sy(180))} L ${Math.round(sx(497))},${Math.round(sy(265))} L ${mkX},${Math.round(sy(265))} L ${mkX},${mkY}`;
   }
 
-  const gridPath = `M 192,455 L 192,493 L ${mkX},493 L ${mkX},${mkY}`;
-  const batteryPath = `M ${mkX},${mkY} L ${mkX},493 L ${batScX},493 L ${batScX},474`;
+  const batteryPath = `M ${sx(310)},${sy(420)} L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},503 L 664,503 L 664,415`;
 
   // ── HUD Cards configuration ──
@@ -861,18 +858,6 @@ export function renderHouseSvg({
                   <line x1="15" y1="-7" x2="155" y2="-7" stroke="#3b82f6" stroke-width="0.5" opacity="0.3" />
                 </g>
               ` : ''}
-
-              <!-- Foreground thin tall tree in garden (centered, from photo) -->
-              <g id="front-garden-tree" style="pointer-events: none;">
-                <!-- Trunk -->
-                <rect x="437" y="320" width="6" height="135" fill="#5c4033" rx="1" />
-                <line x1="440" y1="360" x2="432" y2="340" stroke="#5c4033" stroke-width="2" />
-                <line x1="440" y1="340" x2="447" y2="320" stroke="#5c4033" stroke-width="1.8" />
-                <!-- Leaves -->
-                <ellipse cx="440" cy="270" rx="22" ry="75" fill="#15803d" opacity="0.92" />
-                <ellipse cx="440" cy="230" rx="16" ry="60" fill="#16a34a" opacity="0.94" />
-                <ellipse cx="440" cy="180" rx="10" ry="40" fill="#22c55e" opacity="0.95" />
-              </g>
 
               <!-- Hydrangea bushes (Right, from photo) -->
               <g id="front-garden-hydrangeas" style="pointer-events: none;">
