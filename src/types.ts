@@ -23,6 +23,11 @@ export interface EnergyFlowCardConfig {
     battery_discharge_today?: string; // kWh ontladen vandaag
     ev_today?: string;                // kWh laadpaal vandaag
   };
+  tap_action?: {
+    action: string;
+    navigation_path?: string;
+    [key: string]: any;
+  };
 }
 
 // Minimal Home Assistant interface declarations

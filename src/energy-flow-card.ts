@@ -130,6 +130,33 @@ export class EnergyFlowCard extends LitElement {
     }
   }
 
+  private handleCardClick(e: Event): void {
+    const path = e.composedPath();
+    const isInteractive = path.some(el => {
+      if (el instanceof Element) {
+        return el.classList.contains('interactiveGroup') || el.closest?.('.interactiveGroup');
+      }
+      return false;
+    });
+
+    if (isInteractive) {
+      return;
+    }
+
+    if (this.config?.tap_action) {
+      const action = this.config.tap_action;
+      if (action.action === 'navigate' && action.navigation_path) {
+        window.history.pushState(null, '', action.navigation_path);
+        const event = new CustomEvent('location-changed', {
+          detail: { replace: false },
+          bubbles: true,
+          composed: true
+        });
+        this.dispatchEvent(event);
+      }
+    }
+  }
+
   protected render(): TemplateResult {
     if (!this.config || !this.hass) {
       return html`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;
@@ -238,7 +265,7 @@ export class EnergyFlowCard extends LitElement {
     const dynamicBackground = `background: linear-gradient(to bottom, ${skyState.top} 0%, ${skyState.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;
 
     return html`
-      <ha-card style="${dynamicBackground}">
+      <ha-card style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
           ${this.config.title ? html`
             <div class="card-header">
@@ -294,7 +321,7 @@ if (!customElements.get('energy-flow-card')) {
   
   // Log message to HA browser console to confirm loading
   console.info(
-    `%c  ENERGY-FLOW-CARD  %c Version 2.1.9 `,
+    `%c  ENERGY-FLOW-CARD  %c Version 2.2.2 `,
     'color: white; background: #10b981; font-weight: 700;',
     'color: #10b981; background: #0f172a; font-weight: 700;'
   );
