@@ -310,7 +310,7 @@ export function renderHouseSvg({
 
   const gridPath = `M 192,455 L 192,493 L ${mkX},493 L ${mkX},${mkY}`;
 
-  const solarPath = `M ${Math.round(sx(479))},${Math.round(sy(208))} L ${Math.round(sx(479))},${Math.round(sy(370))} L ${mkX},${Math.round(sy(370))} L ${mkX},${mkY}`;
+  const solarPath = `M ${Math.round(sx(320))},${Math.round(sy(340))} L ${Math.round(sx(320))},${Math.round(sy(370))} L ${mkX},${Math.round(sy(370))} L ${mkX},${mkY}`;
 
   const batteryPath = `M ${sx(310)},${sy(420)} L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},503 L 664,503 L 664,415`;
@@ -701,7 +701,7 @@ export function renderHouseSvg({
               <line x1="440" y1="242" x2="440" y2="268" stroke="#0f172a" stroke-width="1" />
             ` : ''}
 
-            ${svg`
+            ${false ? svg`
               <!-- Plinth (Bottom dark brick) -->
               <rect x="290" y="450" width="300" height="10" fill="#2d2524" stroke="#1b0000" stroke-width="0.8" />
               
@@ -864,7 +864,7 @@ export function renderHouseSvg({
                 <circle cx="560" cy="442" r="6" fill="#fef08a" opacity="0.9" />
                 <circle cx="566" cy="445" r="4" fill="#ffffff" opacity="0.9" />
               </g>
-            `}
+            ` : ''}
 
 
             ${false ? svg`
@@ -958,8 +958,8 @@ export function renderHouseSvg({
               `)}
             ` : ''}
 
-            <!-- Fallback Default Brick House (for backward compatibility if no/invalid houseStyle) -->
-            ${false ? svg`
+            <!-- Fallback Default Brick House -->
+            ${svg`
               <!-- LEFT WING -->
               <g id="left-wing">
                 <rect x="180" y="370" width="140" height="110" fill="#9a3412" />
@@ -1004,14 +1004,14 @@ export function renderHouseSvg({
                 <rect x="360" y="395" width="40" height="85" fill="#052e16" stroke="#021b0d" stroke-width="2" />
                 <circle cx="390" cy="435" r="2" fill="#fbbf24" />
               </g>
-            ` : ''}
+            `}
           </g>
 
           <!-- ── SOLAR PANELS (conditional) ── -->
           ${showSolar ? svg`
             <g id="solar-panels" class="interactiveGroup solarGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('solar'); }}>
               <!-- Only render solar panels if it is the default wing house, since the custom styles have solar panels integrated on their roofs -->
-              ${false ? svg`
+              ${svg`
                 <g transform="translate(320, 340) rotate(-49.4)">
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
                   <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#475569" stroke-width="1.2" />
@@ -1035,7 +1035,7 @@ export function renderHouseSvg({
                   <line x1="198"   y1="-13" x2="198"   y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
                   <line x1="221.5" y1="-13" x2="221.5" y2="-7"  stroke="#3b82f6" stroke-width="0.6" opacity="0.4" />
                 </g>
-              ` : ''}
+              `}
             </g>
           ` : ''}
 
