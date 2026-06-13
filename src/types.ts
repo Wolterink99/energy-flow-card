@@ -28,6 +28,7 @@ export interface EnergyFlowCardConfig {
     navigation_path?: string;
     [key: string]: any;
   };
+  screensaver?: boolean;
 }
 
 // Minimal Home Assistant interface declarations

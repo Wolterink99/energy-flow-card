@@ -264,7 +264,35 @@ export class EnergyFlowCard extends LitElement {
     const skyState = getSkyState(decimalHour);
     const dynamicBackground = `background: linear-gradient(to bottom, ${skyState.top} 0%, ${skyState.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;
 
+    const screensaverStyles = this.config.screensaver
+      ? html`
+          <style>
+            :host {
+              position: fixed !important;
+              top: 0 !important;
+              left: 0 !important;
+              height: 100vh !important;
+              width: calc(100vw + 56px) !important;
+              margin-left: -56px !important;
+              z-index: 1000 !important;
+            }
+            ha-card {
+              height: 100% !important;
+              width: 100% !important;
+              border-radius: 0 !important;
+              border: none !important;
+              box-shadow: none !important;
+            }
+            svg {
+              height: 100% !important;
+              width: 100% !important;
+            }
+          </style>
+        `
+      : '';
+
     return html`
+      ${screensaverStyles}
       <ha-card style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
           ${this.config.title ? html`
@@ -321,7 +349,7 @@ if (!customElements.get('energy-flow-card')) {
   
   // Log message to HA browser console to confirm loading
   console.info(
-    `%c  ENERGY-FLOW-CARD  %c Version 2.2.2 `,
+    `%c  ENERGY-FLOW-CARD  %c Version 2.2.3 `,
     'color: white; background: #10b981; font-weight: 700;',
     'color: #10b981; background: #0f172a; font-weight: 700;'
   );
