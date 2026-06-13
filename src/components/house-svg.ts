@@ -103,10 +103,10 @@ function formatPowerAbs(watts: number): string {
   return `${Math.round(abs)} W`;
 }
 
-function renderHDCloud(className: string, x: number, y: number, scale = 1, color = '#ffffff', opacity = 0.9): TemplateResult {
+function renderHDCloud(className: string, x: number, y: number, scale = 1, color = '#ffffff', opacity = 0.9, style = ''): TemplateResult {
   return svg`
     <g transform="translate(${x}, ${y}) scale(${scale})" opacity="${opacity}" style="transition: opacity 1.5s ease;">
-      <g class="${className}">
+      <g class="${className}" style="${style}">
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="rgba(15, 23, 42, 0.15)" transform="translate(0, 4) scale(1.02)" />
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${color}" style="transition: fill 1.5s ease;" />
       </g>
@@ -120,7 +120,7 @@ function renderRain(): TemplateResult {
       ${Array.from({ length: 45 }).map((_, i) => svg`
         <line x1="${15 + i * 21}" y1="0" x2="${-2 + i * 21}" y2="40"
           class="rainDrop"
-          style="animation-delay: ${(i % 7) * 0.09}s; animation-duration: ${0.55 + (i % 4) * 0.07}s;" />
+          style="animation-delay: ${(i % 7) * 0.12}s; animation-duration: ${0.9 + (i % 4) * 0.12}s;" />
       `)}
     </g>
   `;
@@ -154,6 +154,7 @@ interface SvgParams {
   showBattery: boolean;
   showEV: boolean;
   weather?: string;
+  clouds?: any[];
   sunriseHour?: number;
   sunsetHour?: number;
   gridImportToday?: number | null;
@@ -181,6 +182,7 @@ export function renderHouseSvg({
   showBattery,
   showEV,
   weather = 'sunny',
+  clouds = [],
   sunriseHour = 6.0,
   sunsetHour = 21.0,
   gridImportToday = null,
@@ -530,22 +532,22 @@ export function renderHouseSvg({
         ` : ''}
 
         <!-- Cloud layers -->
-        ${renderHDCloud('cloud1', 72,  36,  0.65, cloudColor, cloudOpacity * 0.75)}
-        ${renderHDCloud('cloud2', 432, 84,  0.85, cloudColor, cloudOpacity * 0.85)}
-        ${renderHDCloud('cloud3', 744, 132, 1.0,  cloudColor, cloudOpacity)}
-        ${weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy' ? svg`
-          ${renderHDCloud('cloud2', 20, 20, 0.95, cloudColor, cloudOpacity * 0.95)}
-          ${renderHDCloud('cloud1', 200, 50, 0.8, cloudColor, cloudOpacity * 0.9)}
-          ${renderHDCloud('cloud3', 310, 30, 1.15, cloudColor, cloudOpacity * 0.95)}
-          ${renderHDCloud('cloud2', 520, 70, 0.9, cloudColor, cloudOpacity * 0.9)}
-          ${renderHDCloud('cloud1', 680, 40, 0.75, cloudColor, cloudOpacity * 0.95)}
-          ${renderHDCloud('cloud3', 820, 80, 1.1, cloudColor, cloudOpacity * 0.95)}
-        ` : ''}
-        ${weather === 'rainy' || weather === 'lightning' || weather === 'snowy' ? svg`
-          ${renderHDCloud('cloud3', 100, 10, 1.3, cloudColor, cloudOpacity * 0.95)}
-          ${renderHDCloud('cloud2', 280, -10, 1.4, cloudColor, cloudOpacity * 0.95)}
-          ${renderHDCloud('cloud1', 450, 20, 1.25, cloudColor, cloudOpacity * 0.95)}
-          ${renderHDCloud('cloud3', 600, 0, 1.35, cloudColor, cloudOpacity * 0.95)}
+        <g opacity="${cloudOpacity}" style="pointer-events: none;">
+          ${(clouds || []).map(c => renderHDCloud(
+            'customDriftCloud',
+            0,
+            c.y,
+            c.scale,
+            cloudColor,
+            c.opacityMultiplier,
+            `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
+          ))}
+        </g>
+
+        <!-- Lightning bolts (background) -->
+        ${weather === 'lightning' ? svg`
+          <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
+          <path d="M 220,50 L 190,130 L 220,130 L 170,220" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
         ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
@@ -1197,8 +1199,6 @@ export function renderHouseSvg({
         <!-- Lightning bolt & Full-Screen flashes -->
         ${weather === 'lightning' ? svg`
           <rect width="960" height="590" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
-          <path d="M 504,72 L 468,180 L 516,180 L 444,312 L 480,312 L 420,456" class="lightningBolt" />
-          <path d="M 220,50 L 190,130 L 220,130 L 170,220" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
         ` : ''}
 
         <!-- Falling precipitation -->

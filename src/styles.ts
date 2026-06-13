@@ -87,6 +87,35 @@ export const styles = css`
     100% { transform: translateX(1300px); }
   }
 
+  @keyframes driftCustom {
+    0% {
+      transform: translateX(-350px);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    45% {
+      opacity: 0.45;
+    }
+    75% {
+      opacity: 0.85;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(1100px);
+      opacity: 0;
+    }
+  }
+
+  .customDriftCloud {
+    animation-name: driftCustom;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+
   @keyframes twinkle {
     0%, 100% { opacity: 0.25; }
     50% { opacity: 1; }

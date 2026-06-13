@@ -9,6 +9,34 @@ export class EnergyFlowCard extends LitElement {
   @state() private config?: EnergyFlowCardConfig;
   @state() private selectedNode: string | null = null;
 
+  private clouds: any[] = [];
+  private lastWeather: string = '';
+
+  private getClouds(weather: string): any[] {
+    if (this.clouds.length > 0 && this.lastWeather === weather) {
+      return this.clouds;
+    }
+    const count = (weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy') ? 12 : 3;
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      const scale = 0.5 + Math.random() * 0.8;
+      const speed = 40 + Math.random() * 80;
+      const delay = -Math.random() * speed;
+      const y = 10 + Math.random() * 110;
+      const opacityMultiplier = 0.6 + Math.random() * 0.4;
+      list.push({
+        y,
+        scale,
+        speed,
+        delay,
+        opacityMultiplier
+      });
+    }
+    this.clouds = list;
+    this.lastWeather = weather;
+    return this.clouds;
+  }
+
   static styles = styles;
 
   // Make the card customizable in the Lovelace card picker
@@ -210,6 +238,7 @@ export class EnergyFlowCard extends LitElement {
               showBattery,
               showEV,
               weather: weatherState,
+              clouds: this.getClouds(weatherState),
               sunriseHour,
               sunsetHour,
               gridImportToday,
