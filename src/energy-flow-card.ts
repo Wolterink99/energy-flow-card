@@ -45,10 +45,10 @@ export class EnergyFlowCard extends LitElement {
       const scale = isOvercast ? (2.0 + Math.random() * 1.2) : (0.5 + Math.random() * 0.5);
       const speed = 90 + Math.random() * 120;
       const delay = -Math.random() * speed;
-      const y = isOvercast ? (-60 + Math.random() * 90) : (10 + Math.random() * 90);
+      const yFactor = Math.random();
       const opacityMultiplier = isOvercast ? (0.96 + Math.random() * 0.04) : (0.6 + Math.random() * 0.4);
       list.push({
-        y,
+        yFactor,
         scale,
         speed,
         delay,

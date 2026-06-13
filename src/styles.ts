@@ -59,7 +59,7 @@ export const styles = css`
     user-select: none;
     width: 100%;
     height: auto;
-    border-radius: var(--ha-card-border-radius, 12px);
+    border-radius: 0 !important;
   }
 
   /* Animations & Keyframes */

@@ -301,7 +301,7 @@ export function renderHouseSvg({
   const invY = 230;
 
   // 1-to-1 matching coordinates with dashboard
-  const gridPath = `M 93,390 L 93,440 L ${mkX},440 L ${mkX},${mkY}`;
+  const gridPath = `M 13,390 L 13,440 L ${mkX},440 L ${mkX},${mkY}`;
   const solarPath = `M ${invX},${invY} L ${invX},270 L ${mkX},270 L ${mkX},${mkY}`;
   const batteryPath = `M 310,350 L ${mkX},${mkY}`;
   const evPath = `M ${mkX},${mkY} L ${mkX},440 L 455,440 L 455,395`;
@@ -449,7 +449,7 @@ export function renderHouseSvg({
 
         <!-- Clip path for the whole scene -->
         <clipPath id="scene-clip">
-          <rect width="${width}" height="${height}" rx="12" ry="12" />
+          <rect width="${width}" height="${height}" rx="0" ry="0" />
         </clipPath>
       </defs>
 
@@ -495,15 +495,23 @@ export function renderHouseSvg({
           ${(weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy') ? svg`
             <path d="${overcastPath}" fill="${cloudColor}" />
           ` : ''}
-          ${(clouds || []).map(c => renderHDCloud(
-            'customDriftCloud',
-            0,
-            c.y,
-            c.scale,
-            cloudColor,
-            c.opacityMultiplier,
-            `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
-          ))}
+          ${(clouds || []).map(c => {
+            const minY = 20;
+            const isOvercast = (weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy');
+            const maxY = isOvercast ? (height - 420) : (height - 500);
+            const deltaY = Math.max(20, maxY - minY);
+            const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
+            const cloudY = minY + yFactor * deltaY;
+            return renderHDCloud(
+              'customDriftCloud',
+              0,
+              cloudY,
+              c.scale,
+              cloudColor,
+              c.opacityMultiplier,
+              `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
+            );
+          })}
         </g>
 
         <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
@@ -525,18 +533,9 @@ export function renderHouseSvg({
           <line x1="${-translateX}" y1="410" x2="${width - translateX}" y2="410" class="horizonLine" />
 
           <!-- High-Voltage Electricity Mast (Elektramast) in background -->
-          <g id="electricity-mast" class="interactiveGroup gridGroup" transform="translate(-15, -22) scale(0.9)" @click=${() => onNodeClick('grid')}>
+          <g id="electricity-mast" class="interactiveGroup gridGroup" transform="translate(-95, -22) scale(0.9)" @click=${() => onNodeClick('grid')}>
             <rect x="63" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
             <rect x="163" y="474" width="14" height="8" fill="#64748b" stroke="#475569" stroke-width="1.2" rx="1" />
-
-            <!-- Sagging high-voltage transmission lines -->
-            <path d="M -80,140 Q -15,160 50,180" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
-            <path d="M -80,145 Q 0,165 85,180" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
-            <path d="M -80,140 Q 30,160 155,180" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
-            <path d="M -80,145 Q 50,165 190,180" fill="none" stroke="#334155" stroke-width="1.8" opacity="0.65" />
-            
-            <!-- Top shield/earth wires -->
-            <path d="M -80,60 Q 20,80 120,100" fill="none" stroke="#475569" stroke-width="1.0" opacity="0.5" />
 
             <g stroke="#475569" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M 70,480 L 105,290 L 85,160 L 95,120" />
@@ -591,11 +590,11 @@ export function renderHouseSvg({
 
           <!-- Transformer / Distribution Box -->
           <g id="grid-transformer-box">
-            <rect x="77" y="365" width="32" height="45" fill="#334155" stroke="#1e293b" stroke-width="1.8" rx="3" />
-            <line x1="93" y1="365" x2="93" y2="410" stroke="#1e293b" stroke-width="1" />
-            <circle cx="85" cy="390" r="1.5" fill="#1e293b" />
-            <rect x="83" y="375" width="20" height="12" fill="#fef08a" stroke="#ca8a04" stroke-width="0.8" rx="1" />
-            <polygon points="92,377 96,377 93,381 97,381 91,385 94,381 91,381" fill="#ca8a04" />
+            <rect x="-3" y="365" width="32" height="45" fill="#334155" stroke="#1e293b" stroke-width="1.8" rx="3" />
+            <line x1="13" y1="365" x2="13" y2="410" stroke="#1e293b" stroke-width="1" />
+            <circle cx="5" cy="390" r="1.5" fill="#1e293b" />
+            <rect x="3" y="375" width="20" height="12" fill="#fef08a" stroke="#ca8a04" stroke-width="0.8" rx="1" />
+            <polygon points="12,377 16,377 13,381 17,381 11,385 14,381 11,381" fill="#ca8a04" />
           </g>
 
           <!-- ── HOUSE GEOMETRY ── -->
