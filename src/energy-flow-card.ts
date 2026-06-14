@@ -31,6 +31,7 @@ export class EnergyFlowCard extends LitElement {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    this.restoreSidebarAndHeader();
     super.disconnectedCallback();
   }
 
@@ -79,6 +80,48 @@ export class EnergyFlowCard extends LitElement {
       }
     } catch (e) {
       console.warn('[energy-flow-card] Failed to hide sidebar/header via JS:', e);
+    }
+  }
+
+  private restoreSidebarAndHeader(): void {
+    try {
+      const doc = document;
+      const homeAssistant = doc.querySelector('home-assistant');
+      if (!homeAssistant) return;
+      const main = homeAssistant.shadowRoot?.querySelector('home-assistant-main');
+      if (!main) return;
+      const mainShadow = main.shadowRoot;
+      if (!mainShadow) return;
+
+      const sidebar = mainShadow.querySelector('ha-sidebar');
+      if (sidebar) {
+        (sidebar as HTMLElement).style.width = '';
+        (sidebar as HTMLElement).style.display = '';
+      }
+
+      const contentContainer = mainShadow.querySelector('.content');
+      if (contentContainer) {
+        (contentContainer as HTMLElement).style.paddingLeft = '';
+        (contentContainer as HTMLElement).style.marginLeft = '';
+      }
+
+      const partialResolver = mainShadow.querySelector('partial-panel-resolver');
+      const lovelace = partialResolver?.querySelector('ha-panel-lovelace');
+      const huiRoot = lovelace?.shadowRoot?.querySelector('hui-root');
+      if (huiRoot) {
+        const header = huiRoot.shadowRoot?.querySelector('.header') || huiRoot.shadowRoot?.querySelector('app-header');
+        if (header) {
+          (header as HTMLElement).style.display = '';
+          (header as HTMLElement).style.height = '';
+        }
+        const mainContainer = huiRoot.shadowRoot?.querySelector('#view');
+        if (mainContainer) {
+          (mainContainer as HTMLElement).style.paddingTop = '';
+          (mainContainer as HTMLElement).style.marginTop = '';
+        }
+      }
+    } catch (e) {
+      console.warn('[energy-flow-card] Failed to restore sidebar/header via JS:', e);
     }
   }
 
@@ -215,6 +258,7 @@ export class EnergyFlowCard extends LitElement {
     if (this.config?.tap_action) {
       const action = this.config.tap_action;
       if (action.action === 'navigate' && action.navigation_path) {
+        this.restoreSidebarAndHeader();
         window.history.pushState(null, '', action.navigation_path);
         const event = new CustomEvent('location-changed', {
           detail: { replace: false },
