@@ -315,7 +315,7 @@ export const styles = css`
     border-radius: 16px;
     width: 500px;
     max-width: 95vw;
-    height: 560px;
+    height: 640px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
