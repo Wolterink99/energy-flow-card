@@ -426,7 +426,7 @@ export class EnergyFlowCard extends LitElement {
               height: 100vh !important;
               width: 100vw !important;
               margin-left: 0 !important;
-              z-index: ${this.hasActiveHash ? '1' : '50'} !important;
+              z-index: 50 !important;
             }
             ha-card {
               height: 100% !important;

@@ -945,7 +945,7 @@ function t(t,e,r,n){var s,f=arguments.length,i=f<3?e:null===n?n=Object.getOwnPro
               height: 100vh !important;
               width: 100vw !important;
               margin-left: 0 !important;
-              z-index: ${this.hasActiveHash?"1":"50"} !important;
+              z-index: 50 !important;
             }
             ha-card {
               height: 100% !important;
