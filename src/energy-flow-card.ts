@@ -856,6 +856,22 @@ export class EnergyFlowCard extends LitElement {
     const skyState = getSkyState(decimalHour);
     const dynamicBackground = `background: linear-gradient(to bottom, ${skyState.top} 0%, ${skyState.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;
 
+    // Calculate if we should show window lights
+    let resolvedShowLights: boolean | undefined = undefined;
+    if (entities.light) {
+      const lightConfig = entities.light;
+      const checkLightOn = (id: string): boolean => {
+        const entity = this.hass?.states[id];
+        return entity?.state === 'on';
+      };
+      
+      if (Array.isArray(lightConfig)) {
+        resolvedShowLights = lightConfig.some(id => checkLightOn(id));
+      } else {
+        resolvedShowLights = checkLightOn(lightConfig);
+      }
+    }
+
     const screensaverStyles = this.config.screensaver
       ? html`
           <style>
@@ -921,6 +937,7 @@ export class EnergyFlowCard extends LitElement {
               evToday,
               houseStyle: this.config?.house_style,
               carType: this.config?.car_type,
+              showLights: resolvedShowLights,
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>

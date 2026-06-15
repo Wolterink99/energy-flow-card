@@ -22,6 +22,7 @@ export interface EnergyFlowCardConfig {
     battery_charge_today?: string;    // kWh geladen vandaag
     battery_discharge_today?: string; // kWh ontladen vandaag
     ev_today?: string;                // kWh laadpaal vandaag
+    light?: string | string[];        // Light entity or list of light entities
   };
   tap_action?: {
     action: string;

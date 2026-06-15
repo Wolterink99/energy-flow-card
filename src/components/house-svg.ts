@@ -167,6 +167,7 @@ interface SvgParams {
   batteryChargeToday?: number | null;
   batteryDischargeToday?: number | null;
   evToday?: number | null;
+  showLights?: boolean;
   onNodeClick: (node: string) => void;
 }
 
@@ -264,6 +265,7 @@ export function renderHouseSvg({
   batteryChargeToday = null,
   batteryDischargeToday = null,
   evToday = null,
+  showLights: passedShowLights = undefined,
   onNodeClick
 }: SvgParams): TemplateResult {
 
@@ -309,13 +311,17 @@ export function renderHouseSvg({
   const gridColor = gridImporting ? COLORS.gridI : COLORS.gridE;
 
   const skyState = getSkyState(timeHour);
-  const showLights = skyState.lights > 0.05 || visualWeather === 'rainy' || visualWeather === 'lightning';
+  const resolvedShowLights = passedShowLights !== undefined
+    ? passedShowLights
+    : (skyState.lights > 0.05 || visualWeather === 'rainy' || visualWeather === 'lightning');
 
   // Sky colors with weather adaptation
   let skyTop = skyState.top;
   let skyHorizon = skyState.horizon;
   let cloudColor = skyState.clouds;
   let cloudOpacity = timeOfDay === 'night' ? 0.18 : 0.48;
+
+  const showLights = resolvedShowLights;
 
   if (visualWeather === 'cloudy') {
     cloudColor = '#cbd5e1';
@@ -347,10 +353,10 @@ export function renderHouseSvg({
   const isDay = timeHour >= 8.0 && timeHour <= 18.0;
   const windowFill = isDay
     ? 'url(#window-day)'
-    : (showLights ? 'url(#window-night)' : 'url(#window-dark)');
+    : (resolvedShowLights ? 'url(#window-night)' : 'url(#window-dark)');
   const windowFilter = isDay
     ? 'none'
-    : (showLights ? 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))' : 'none');
+    : (resolvedShowLights ? 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))' : 'none');
 
   // ── Sun trajectory (using dynamic width and height) ──
   const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'cloudy' && visualWeather !== 'snowy' && visualWeather !== 'foggy';

@@ -313,7 +313,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
     border-radius: 16px;
     width: 500px;
     max-width: 95vw;
-    height: 640px;
+    height: 680px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
@@ -653,7 +653,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
         <path d="M 190,160 L 190,180" stroke-width="1.5" />
       </g>
     </g>
-  `;function jt({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:n,solar:a,solarToday:i,load:o,batteryPower:l,soc:f,charger:d,grid:c,showSolar:v,showBattery:p,showEV:h,weather:u="sunny",clouds:y=[],sunriseHour:x=6,sunsetHour:g=21,gridImportToday:V=null,gridExportToday:k=null,homeToday:b=null,batteryChargeToday:O=null,batteryDischargeToday:q=null,evToday:X=null,onNodeClick:w}){let j=u;"pouring"===u||"lightning-rainy"===u?j="rainy":"snowy-rainy"===u||"hail"===u?j="snowy":"fog"===u&&(j="foggy");const W=t||800,S=e||600,F=(W-800)/2,P=20-F;let z=s;z=s>=x&&s<=g?6+(s-x)/(g-x)*15:s>g?21+(s-g)/(24-g)*3:s/x*6;const U=l>.05,K=l<-.05,Y=c>.05,H=c<-.05,A=d>.1,B=a>20,R=o>20,G=U||K&&H?ut.battery:ut.batteryD,L=Y?ut.gridI:ut.gridE,T=Vt(z),J=T.lights>.05||"rainy"===j||"lightning"===j;let C=T.top,E=T.horizon,M=T.clouds,D="night"===n?.18:.48;"cloudy"===j?(M="#cbd5e1",E=gt(T.horizon,"#94a3b8",.15),D=.98):"rainy"===j||"lightning"===j?(M="#1f2937",C=M,E=gt(T.horizon,"#334155",.5),D=.99):"snowy"===j?(M="#334155",C=M,E=gt(T.horizon,"#4a5568",.4),D=.98):"foggy"===j?(C=gt(T.top,"#64748b",.65),E=gt(T.horizon,"#94a3b8",.65),M="rgba(203, 213, 225, 0.4)",D=.5):"partlycloudy"===j&&(C=gt(T.top,"#475569",.15),E=gt(T.horizon,"#64748b",.15),M="#cbd5e1",D=.65);const N=z>=8&&z<=18,Q=N?"url(#window-day)":J?"url(#window-night)":"url(#window-dark)",Z=N?"none":J?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",I={cx:W/2,cy:S};let $=0,_="#fef08a",tt="rgba(254, 240, 138, 0.65)";if(z>=6&&z<=21&&"rainy"!==j&&"lightning"!==j&&"cloudy"!==j&&"snowy"!==j&&"foggy"!==j){const t=(z-6)/15;I.cx=t*(W+120)-60,I.cy=S-120-Math.sin(t*Math.PI)*(S-160),$=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);_=gt("#ea580c","#fef08a",e),tt=gt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const et={cx:W/2,cy:S};let rt=0;if((z>21||z<6)&&"rainy"!==j&&"lightning"!==j&&"cloudy"!==j&&"snowy"!==j&&"foggy"!==j){const t=z>21?(z-21)/9:(z+3)/9;et.cx=t*(W+120)-60,et.cy=S-120-Math.sin(t*Math.PI)*(S-200),rt=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const st=345,nt=350,at=qt(P,-22,.9),it=qt(P+145.6,112.4,.62),ot=qt(P+249.6,208.4,.42),lt=qt(P+316.4,275.6,.28),ft=qt(P+358.4,323.6,.18);let dt=H?"↑ Teruglevering":Y?"↓ Import":"Standby";null!==V&&null!==k?dt=`↓${V.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==V?dt=`Import: ${V.toFixed(1)} kWh`:null!==k&&(dt=`Terug: ${k.toFixed(1)} kWh`);const ct=null!==b?`Vandaag: ${b.toFixed(1)} kWh`:R?"Actief":"Standby";let vt=`SoC: ${f}%`;null!==O&&null!==q?vt=`SoC: ${f}% (↓${O.toFixed(1)} ↑${q.toFixed(1)})`:null!==O&&(vt=`SoC: ${f}% (↓${O.toFixed(1)})`);const pt=null!==X?`Vandaag: ${X.toFixed(1)} kWh`:A?"Laden":"Standby",ht=[{id:"grid",title:"Stroomnet",value:bt(c),sub:dt,color:L.stroke,active:Y||H}];p&&ht.push({id:"battery",title:"Thuisaccu",value:U||K?bt(l):"Standby",sub:vt,color:G.stroke,active:U||K}),ht.push({id:"home",title:"Huisverbruik",value:bt(o),sub:ct,color:ut.home.stroke,active:R}),h&&ht.push({id:"ev",title:"Laadpaal (EV)",value:bt(d),sub:pt,color:ut.ev.stroke,active:A});const yt=(t,e,r,s,n,a=!1)=>m`
+  `;function jt({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:n,solar:a,solarToday:i,load:o,batteryPower:l,soc:f,charger:d,grid:c,showSolar:v,showBattery:p,showEV:h,weather:u="sunny",clouds:y=[],sunriseHour:x=6,sunsetHour:g=21,gridImportToday:V=null,gridExportToday:k=null,homeToday:b=null,batteryChargeToday:O=null,batteryDischargeToday:q=null,evToday:X=null,showLights:w,onNodeClick:j}){let W=u;"pouring"===u||"lightning-rainy"===u?W="rainy":"snowy-rainy"===u||"hail"===u?W="snowy":"fog"===u&&(W="foggy");const S=t||800,F=e||600,P=(S-800)/2,z=20-P;let U=s;U=s>=x&&s<=g?6+(s-x)/(g-x)*15:s>g?21+(s-g)/(24-g)*3:s/x*6;const K=l>.05,Y=l<-.05,H=c>.05,A=c<-.05,B=d>.1,R=a>20,G=o>20,L=K||Y&&A?ut.battery:ut.batteryD,T=H?ut.gridI:ut.gridE,J=Vt(U),C=void 0!==w?w:J.lights>.05||"rainy"===W||"lightning"===W;let E=J.top,M=J.horizon,D=J.clouds,N="night"===n?.18:.48;"cloudy"===W?(D="#cbd5e1",M=gt(J.horizon,"#94a3b8",.15),N=.98):"rainy"===W||"lightning"===W?(D="#1f2937",E=D,M=gt(J.horizon,"#334155",.5),N=.99):"snowy"===W?(D="#334155",E=D,M=gt(J.horizon,"#4a5568",.4),N=.98):"foggy"===W?(E=gt(J.top,"#64748b",.65),M=gt(J.horizon,"#94a3b8",.65),D="rgba(203, 213, 225, 0.4)",N=.5):"partlycloudy"===W&&(E=gt(J.top,"#475569",.15),M=gt(J.horizon,"#64748b",.15),D="#cbd5e1",N=.65);const Q=U>=8&&U<=18,Z=Q?"url(#window-day)":C?"url(#window-night)":"url(#window-dark)",I=Q?"none":C?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",$={cx:S/2,cy:F};let _=0,tt="#fef08a",et="rgba(254, 240, 138, 0.65)";if(U>=6&&U<=21&&"rainy"!==W&&"lightning"!==W&&"cloudy"!==W&&"snowy"!==W&&"foggy"!==W){const t=(U-6)/15;$.cx=t*(S+120)-60,$.cy=F-120-Math.sin(t*Math.PI)*(F-160),_=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);tt=gt("#ea580c","#fef08a",e),et=gt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const rt={cx:S/2,cy:F};let st=0;if((U>21||U<6)&&"rainy"!==W&&"lightning"!==W&&"cloudy"!==W&&"snowy"!==W&&"foggy"!==W){const t=U>21?(U-21)/9:(U+3)/9;rt.cx=t*(S+120)-60,rt.cy=F-120-Math.sin(t*Math.PI)*(F-200),st=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const nt=345,at=350,it=qt(z,-22,.9),ot=qt(z+145.6,112.4,.62),lt=qt(z+249.6,208.4,.42),ft=qt(z+316.4,275.6,.28),dt=qt(z+358.4,323.6,.18);let ct=A?"↑ Teruglevering":H?"↓ Import":"Standby";null!==V&&null!==k?ct=`↓${V.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==V?ct=`Import: ${V.toFixed(1)} kWh`:null!==k&&(ct=`Terug: ${k.toFixed(1)} kWh`);const vt=null!==b?`Vandaag: ${b.toFixed(1)} kWh`:G?"Actief":"Standby";let pt=`SoC: ${f}%`;null!==O&&null!==q?pt=`SoC: ${f}% (↓${O.toFixed(1)} ↑${q.toFixed(1)})`:null!==O&&(pt=`SoC: ${f}% (↓${O.toFixed(1)})`);const ht=null!==X?`Vandaag: ${X.toFixed(1)} kWh`:B?"Laden":"Standby",yt=[{id:"grid",title:"Stroomnet",value:bt(c),sub:ct,color:T.stroke,active:H||A}];p&&yt.push({id:"battery",title:"Thuisaccu",value:K||Y?bt(l):"Standby",sub:pt,color:L.stroke,active:K||Y}),yt.push({id:"home",title:"Huisverbruik",value:bt(o),sub:vt,color:ut.home.stroke,active:G}),h&&yt.push({id:"ev",title:"Laadpaal (EV)",value:bt(d),sub:ht,color:ut.ev.stroke,active:B});const xt=(t,e,r,s,n,a=!1)=>m`
       <path d="${t}" class="flowCable" />
       <path d="${t}" fill="none" stroke="${s}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
@@ -674,13 +674,13 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           " />
       `)}
     `:m``)(t,e,r,s,n,a)}
-    `,xt=S-530;return m`
-    <svg viewBox="0 0 ${W} ${S}" xmlns="http://www.w3.org/2000/svg">
+    `,jt=F-530;return m`
+    <svg viewBox="0 0 ${S} ${F}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${C}" />
-          <stop offset="100%" stop-color="${E}" />
+          <stop offset="0%" stop-color="${E}" />
+          <stop offset="100%" stop-color="${M}" />
         </linearGradient>
 
         <linearGradient id="garden-grad" x1="0" y1="0" x2="0" y2="1">
@@ -739,45 +739,45 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
 
         <!-- Clip path for the whole scene -->
         <clipPath id="scene-clip">
-          <rect width="${W}" height="${S}" rx="0" ry="0" />
+          <rect width="${S}" height="${F}" rx="0" ry="0" />
         </clipPath>
       </defs>
 
       <g clip-path="url(#scene-clip)">
         <!-- Sky background -->
-        <rect width="${W}" height="${S}" fill="url(#sky-grad)" />
+        <rect width="${S}" height="${F}" fill="url(#sky-grad)" />
 
         <!-- Stars (dynamically distributed across width) -->
-        ${T.stars>.05&&"rainy"!==j&&"lightning"!==j&&"cloudy"!==j?m`
-          <g opacity="${T.stars}" style="pointer-events: none;">
-            <circle cx="${.1*W}"  cy="${.08*S}"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="${.26*W}" cy="${.16*S}"  r="1.2" fill="#ffffff" />
-            <circle cx="${.42*W}" cy="${.07*S}"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="${.6*W}"  cy="${.18*S}"  r="1.5" fill="#ffffff" />
-            <circle cx="${.77*W}" cy="${.11*S}"  r="1.2" class="starFast" fill="#ffffff" />
-            <circle cx="${.91*W}" cy="${.2*S}"   r="1.0" fill="#ffffff" />
+        ${J.stars>.05&&"rainy"!==W&&"lightning"!==W&&"cloudy"!==W?m`
+          <g opacity="${J.stars}" style="pointer-events: none;">
+            <circle cx="${.1*S}"  cy="${.08*F}"  r="1.0" class="starFast" fill="#ffffff" />
+            <circle cx="${.26*S}" cy="${.16*F}"  r="1.2" fill="#ffffff" />
+            <circle cx="${.42*S}" cy="${.07*F}"  r="1.0" class="starFast" fill="#ffffff" />
+            <circle cx="${.6*S}"  cy="${.18*F}"  r="1.5" fill="#ffffff" />
+            <circle cx="${.77*S}" cy="${.11*F}"  r="1.2" class="starFast" fill="#ffffff" />
+            <circle cx="${.91*S}" cy="${.2*F}"   r="1.0" fill="#ffffff" />
           </g>
         `:""}
 
         <!-- Dynamic Sun -->
-        ${$>0?m`
+        ${_>0?m`
           <g style="pointer-events: none;">
-            <circle cx="${I.cx}" cy="${I.cy}" r="45" fill="${_}" opacity="${.15*$}" style="filter: blur(8px);" />
-            <circle cx="${I.cx}" cy="${I.cy}" r="22" fill="${_}" opacity="${$}" style="filter: drop-shadow(0 0 12px ${tt});" />
+            <circle cx="${$.cx}" cy="${$.cy}" r="45" fill="${tt}" opacity="${.15*_}" style="filter: blur(8px);" />
+            <circle cx="${$.cx}" cy="${$.cy}" r="22" fill="${tt}" opacity="${_}" style="filter: drop-shadow(0 0 12px ${et});" />
           </g>
         `:""}
 
         <!-- Dynamic Moon -->
-        ${rt>0?m`
-          <g style="pointer-events: none;" opacity="${rt}">
-            <circle cx="${et.cx}" cy="${et.cy}" r="25" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
-            <circle cx="${et.cx}" cy="${et.cy}" r="14" fill="#f1f5f9" />
-            <circle cx="${et.cx+5}" cy="${et.cy-3}" r="13" fill="url(#sky-grad)" />
+        ${st>0?m`
+          <g style="pointer-events: none;" opacity="${st}">
+            <circle cx="${rt.cx}" cy="${rt.cy}" r="25" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
+            <circle cx="${rt.cx}" cy="${rt.cy}" r="14" fill="#f1f5f9" />
+            <circle cx="${rt.cx+5}" cy="${rt.cy-3}" r="13" fill="url(#sky-grad)" />
           </g>
         `:""}
 
         <!-- Falling precipitation -->
-        ${"rainy"===j?function(t){const e=Math.ceil(t/18);return m`
+        ${"rainy"===W?function(t){const e=Math.ceil(t/18);return m`
     <g style="pointer-events: none;">
       ${Array.from({length:e}).map((t,e)=>m`
         <line x1="${15+18*e}" y1="0" x2="${18*e-2}" y2="40"
@@ -785,8 +785,8 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           style="animation-delay: ${e%7*.12}s; animation-duration: ${.9+e%4*.12}s;" />
       `)}
     </g>
-  `}(W):""}
-        ${"snowy"===j?function(t){const e=Math.ceil(t/20);return m`
+  `}(S):""}
+        ${"snowy"===W?function(t){const e=Math.ceil(t/20);return m`
     <g style="pointer-events: none;">
       ${Array.from({length:e}).map((t,e)=>m`
         <circle cx="${15+20*e}" cy="0" r="${1.8+e%4*.6}"
@@ -794,125 +794,125 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           style="animation-delay: ${e%8*.4}s; animation-duration: ${3.5+e%5*.6}s;" />
       `)}
     </g>
-  `}(W):""}
+  `}(S):""}
 
         <!-- Cloud layers -->
-        ${"cloudy"===j||"rainy"===j||"lightning"===j||"snowy"===j?m`
+        ${"cloudy"===W||"rainy"===W||"lightning"===W||"snowy"===W?m`
           <style>
-            @keyframes scrollCloudsBack { 0% { transform: translateX(0px); } 100% { transform: translateX(-${W}px); } }
-            @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${W}px); } }
-            @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${W}px); } }
+            @keyframes scrollCloudsBack { 0% { transform: translateX(0px); } 100% { transform: translateX(-${S}px); } }
+            @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${S}px); } }
+            @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${S}px); } }
             
             .cloud-layer-back { animation: scrollCloudsBack 120s infinite linear; }
             .cloud-layer-mid { animation: scrollCloudsMid 80s infinite linear; }
             .cloud-layer-front { animation: scrollCloudsFront 40s infinite linear; }
           </style>
           
-          <g opacity="${D}" style="pointer-events: none;">
+          <g opacity="${N}" style="pointer-events: none;">
             <!-- Layer 1 (Back) -->
             <g class="cloud-layer-back">
-              <path d="${Ot(W,70)}" fill="${gt(M,"#0a0f1d",.35)}" />
-              <path d="${Ot(W,70)}" transform="translate(${W}, 0)" fill="${gt(M,"#0a0f1d",.35)}" />
+              <path d="${Ot(S,70)}" fill="${gt(D,"#0a0f1d",.35)}" />
+              <path d="${Ot(S,70)}" transform="translate(${S}, 0)" fill="${gt(D,"#0a0f1d",.35)}" />
             </g>
             
             <!-- Layer 2 (Middle) -->
             <g class="cloud-layer-mid">
-              <path d="${Ot(W,110)}" fill="${gt(M,"#0a0f1d",.18)}" />
-              <path d="${Ot(W,110)}" transform="translate(${W}, 0)" fill="${gt(M,"#0a0f1d",.18)}" />
+              <path d="${Ot(S,110)}" fill="${gt(D,"#0a0f1d",.18)}" />
+              <path d="${Ot(S,110)}" transform="translate(${S}, 0)" fill="${gt(D,"#0a0f1d",.18)}" />
             </g>
             
             <!-- Layer 3 (Front) -->
             <g class="cloud-layer-front">
-              <path d="${Ot(W,150)}" fill="${M}" />
-              <path d="${Ot(W,150)}" transform="translate(${W}, 0)" fill="${M}" />
+              <path d="${Ot(S,150)}" fill="${D}" />
+              <path d="${Ot(S,150)}" transform="translate(${S}, 0)" fill="${D}" />
             </g>
           </g>
         `:m`
           <!-- Floating Cloud layers (Only for sunny/partlycloudy) -->
-          <g opacity="${D}" style="pointer-events: none;">
-            ${(y||[]).map(t=>{const e=.4*S,r=Math.max(20,e-20);return function(t,e,r,s=1,n="#ffffff",a=.9,i=""){return m`
+          <g opacity="${N}" style="pointer-events: none;">
+            ${(y||[]).map(t=>{const e=.4*F,r=Math.max(20,e-20);return function(t,e,r,s=1,n="#ffffff",a=.9,i=""){return m`
     <g transform="translate(${e}, ${r}) scale(${s})" opacity="${a}" style="transition: opacity 1.5s ease;">
       <g class="${t}" style="${i}">
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="rgba(15, 23, 42, 0.15)" transform="translate(0, 4) scale(1.02)" />
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${n}" style="transition: fill 1.5s ease;" />
       </g>
     </g>
-  `}("customDriftCloud",0,20+(void 0!==t.yFactor?t.yFactor:.5)*r,t.scale,M,t.opacityMultiplier,`animation-duration: ${t.speed}s; animation-delay: ${t.delay}s;`)})}
+  `}("customDriftCloud",0,20+(void 0!==t.yFactor?t.yFactor:.5)*r,t.scale,D,t.opacityMultiplier,`animation-duration: ${t.speed}s; animation-delay: ${t.delay}s;`)})}
           </g>
         `}
 
         <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
-        ${"lightning"===j?m`
-          <path d="M ${W/2+20},60 L ${W/2-10},150 L ${W/2+30},150 L ${W/2-30},260 L ${W/2},260 L ${W/2-50},380" class="lightningBolt" />
-          <path d="M ${.225*W},40 L ${.194*W},110 L ${.225*W},110 L ${.175*W},180" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
+        ${"lightning"===W?m`
+          <path d="M ${S/2+20},60 L ${S/2-10},150 L ${S/2+30},150 L ${S/2-30},260 L ${S/2},260 L ${S/2-50},380" class="lightningBolt" />
+          <path d="M ${.225*S},40 L ${.194*S},110 L ${.225*S},110 L ${.175*S},180" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
         `:""}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- GROUND, MAST, HOUSE, AND CABLES: Translated inside dynamic group-->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <g transform="translate(${F}, ${xt})">
+        <g transform="translate(${P}, ${jt})">
 
           <!-- Ground (grass base spanning full screen width) -->
-          <rect x="${-F}" y="410" width="${W}" height="120" fill="url(#garden-grad)" />
+          <rect x="${-P}" y="410" width="${S}" height="120" fill="url(#garden-grad)" />
           
           <!-- Driveway: from center gable (x=320) to right edge, rounded left corners -->
-          <path d="M 320,410 Q 320,430 340,430 L ${W-F},430 L ${W-F},410 Z" fill="url(#driveway-grad)" />
-          <line x1="${-F}" y1="410" x2="${W-F}" y2="410" class="horizonLine" />
+          <path d="M 320,410 Q 320,430 340,430 L ${S-P},430 L ${S-P},410 Z" fill="url(#driveway-grad)" />
+          <line x1="${-P}" y1="410" x2="${S-P}" y2="410" class="horizonLine" />
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
           <!-- Background Pylons (Right/Far) -->
-          ${wt(P+358.4,323.6,.18,.22,"#64748b")}
-          ${wt(P+316.4,275.6,.28,.38,"#5d6d82")}
-          ${wt(P+249.6,208.4,.42,.58,"#546479")}
-          ${wt(P+145.6,112.4,.62,.78,"#4c5c71")}
+          ${wt(z+358.4,323.6,.18,.22,"#64748b")}
+          ${wt(z+316.4,275.6,.28,.38,"#5d6d82")}
+          ${wt(z+249.6,208.4,.42,.58,"#546479")}
+          ${wt(z+145.6,112.4,.62,.78,"#4c5c71")}
 
           <!-- Parallax sagging power lines between pylons -->
           <!-- Segment P5 (Far) to P4 -->
-          <path d="${Xt(ft[0],lt[0],5)} 
-                   ${Xt(ft[1],lt[1],5)} 
-                   ${Xt(ft[2],lt[2],5)} 
-                   ${Xt(ft[3],lt[3],5)}" 
+          <path d="${Xt(dt[0],ft[0],5)} 
+                   ${Xt(dt[1],ft[1],5)} 
+                   ${Xt(dt[2],ft[2],5)} 
+                   ${Xt(dt[3],ft[3],5)}" 
                 fill="none" stroke="#64748b" stroke-width="0.5" opacity="0.15" />
                 
           <!-- Segment P4 to P3 -->
-          <path d="${Xt(lt[0],ot[0],9)} 
-                   ${Xt(lt[1],ot[1],9)} 
-                   ${Xt(lt[2],ot[2],9)} 
-                   ${Xt(lt[3],ot[3],9)}" 
+          <path d="${Xt(ft[0],lt[0],9)} 
+                   ${Xt(ft[1],lt[1],9)} 
+                   ${Xt(ft[2],lt[2],9)} 
+                   ${Xt(ft[3],lt[3],9)}" 
                 fill="none" stroke="#5d6d82" stroke-width="0.8" opacity="0.32" />
 
           <!-- Segment P3 to P2 -->
-          <path d="${Xt(ot[0],it[0],14)} 
-                   ${Xt(ot[1],it[1],14)} 
-                   ${Xt(ot[2],it[2],14)} 
-                   ${Xt(ot[3],it[3],14)}" 
+          <path d="${Xt(lt[0],ot[0],14)} 
+                   ${Xt(lt[1],ot[1],14)} 
+                   ${Xt(lt[2],ot[2],14)} 
+                   ${Xt(lt[3],ot[3],14)}" 
                 fill="none" stroke="#546479" stroke-width="1.2" opacity="0.52" />
 
           <!-- Segment P2 to P1 (Foreground) -->
-          <path d="${Xt(it[0],at[0],22)} 
-                   ${Xt(it[1],at[1],22)} 
-                   ${Xt(it[2],at[2],22)} 
-                   ${Xt(it[3],at[3],22)}" 
+          <path d="${Xt(ot[0],it[0],22)} 
+                   ${Xt(ot[1],it[1],22)} 
+                   ${Xt(ot[2],it[2],22)} 
+                   ${Xt(ot[3],it[3],22)}" 
                 fill="none" stroke="#4c5c71" stroke-width="1.6" opacity="0.75" />
 
           <!-- Wires going off-screen left from foreground P1 -->
-          <path d="${Xt({x:-F,y:at[0].y-35},at[0],30)} 
-                   ${Xt({x:-F,y:at[1].y-35},at[1],30)} 
-                   ${Xt({x:-F,y:at[3].y-35},at[3],30)}" 
+          <path d="${Xt({x:-P,y:it[0].y-35},it[0],30)} 
+                   ${Xt({x:-P,y:it[1].y-35},it[1],30)} 
+                   ${Xt({x:-P,y:it[3].y-35},it[3],30)}" 
                 fill="none" stroke="#4c5c71" stroke-width="1.8" opacity="0.8" />
 
           <!-- Wires extending past P5 into the horizon -->
-          <path d="M ${ft[0].x},${ft[0].y} L ${ft[0].x+50},${ft[0].y-2} 
-                   M ${ft[1].x},${ft[1].y} L ${ft[1].x+50},${ft[1].y-2} 
-                   M ${ft[2].x},${ft[2].y} L ${ft[2].x+50},${ft[2].y-2} 
-                   M ${ft[3].x},${ft[3].y} L ${ft[3].x+50},${ft[3].y-2}" 
+          <path d="M ${dt[0].x},${dt[0].y} L ${dt[0].x+50},${dt[0].y-2} 
+                   M ${dt[1].x},${dt[1].y} L ${dt[1].x+50},${dt[1].y-2} 
+                   M ${dt[2].x},${dt[2].y} L ${dt[2].x+50},${dt[2].y-2} 
+                   M ${dt[3].x},${dt[3].y} L ${dt[3].x+50},${dt[3].y-2}" 
                 fill="none" stroke="#64748b" stroke-width="0.3" opacity="0.1" />
 
           <!-- Interactive Foreground Mast (Pylon 1) -->
-          <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${()=>w("grid")}>
-            ${wt(P,-22,.9,1,"#475569")}
+          <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${()=>j("grid")}>
+            ${wt(z,-22,.9,1,"#475569")}
             <!-- Larger transparent tap target for tablets -->
-            <rect x="${P}" y="100" width="200" height="380" fill="transparent" style="cursor: pointer;" />
+            <rect x="${z}" y="100" width="200" height="380" fill="transparent" style="cursor: pointer;" />
           </g>
 
           <!-- Transformer / Distribution Box -->
@@ -925,7 +925,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           </g>
 
           <!-- ── HOUSE GEOMETRY ── -->
-          <g id="house-structure" class="interactiveGroup homeGroup" @click=${()=>w("home")}>
+          <g id="house-structure" class="interactiveGroup homeGroup" @click=${()=>j("home")}>
             <!-- LEFT WING -->
             <g id="left-wing">
               <rect x="180" y="300" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
@@ -939,7 +939,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
               <line x1="205" y1="260" x2="320" y2="260" stroke="#1e293b" stroke-width="4" />
               
               <!-- Window -->
-              <rect x="230" y="320" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="230" y="320" width="40" height="45" fill="${Z}" stroke="#0f172a" stroke-width="2" style="filter: ${I}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="250" y1="320" x2="250" y2="365" stroke="#0f172a" stroke-width="1.2" />
               <line x1="230" y1="342.5" x2="270" y2="342.5" stroke="#0f172a" stroke-width="1.2" />
             </g>
@@ -955,16 +955,16 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
               <line x1="692" y1="284" x2="500" y2="60" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
               
               <!-- Downstairs windows -->
-              <rect x="465" y="315" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="465" y="315" width="40" height="45" fill="${Z}" stroke="#0f172a" stroke-width="2" style="filter: ${I}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="485" y1="315" x2="485" y2="360" stroke="#0f172a" stroke-width="1.2" />
               <line x1="465" y1="337.5" x2="505" y2="337.5" stroke="#0f172a" stroke-width="1.2" />
               
-              <rect x="555" y="315" width="40" height="45" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="555" y="315" width="40" height="45" fill="${Z}" stroke="#0f172a" stroke-width="2" style="filter: ${I}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="575" y1="315" x2="575" y2="360" stroke="#0f172a" stroke-width="1.2" />
               <line x1="555" y1="337.5" x2="595" y2="337.5" stroke="#0f172a" stroke-width="1.2" />
               
               <!-- Upstairs window -->
-              <rect x="480" y="210" width="40" height="40" fill="${Q}" stroke="#0f172a" stroke-width="2" style="filter: ${Z}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="480" y="210" width="40" height="40" fill="${Z}" stroke="#0f172a" stroke-width="2" style="filter: ${I}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="500" y1="210" x2="500" y2="250" stroke="#0f172a" stroke-width="1.2" />
               <line x1="480" y1="230" x2="520" y2="230" stroke="#0f172a" stroke-width="1.2" />
             </g>
@@ -986,7 +986,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
 
           <!-- ── SOLAR PANELS (continuous array flat on roof slope) ── -->
           ${v?m`
-            <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),w("solar")}}>
+            <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),j("solar")}}>
               <g transform="translate(320, 270) rotate(-49.4)">
                 <!-- Mounting rods -->
                 <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
@@ -1026,37 +1026,37 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           <!-- ── METERKAST location ── -->
           <g id="house-inverter">
             <rect x="${340}" y="${340}" width="10" height="20" fill="#1e293b" rx="1" />
-            <circle cx="${st}" cy="${nt}" r="2.5" fill="${B||U||K||Y||H||A?"#10b981":"#ef4444"}" style="transition: fill 0.6s ease;" />
+            <circle cx="${nt}" cy="${at}" r="2.5" fill="${R||K||Y||H||A||B?"#10b981":"#ef4444"}" style="transition: fill 0.6s ease;" />
           </g>
 
           <!-- ── THUISACCU (Battery against left wing wall) ── -->
           ${p?m`
-            <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),w("battery")}}>
+            <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),j("battery")}}>
               <rect x="280" y="340" width="30" height="70" fill="url(#battery-body-grad)" stroke="#cbd5e1" stroke-width="1.5" rx="3" />
               
               <rect x="285" y="348" width="20" height="10" fill="rgba(0,0,0,0.72)" rx="1.5" />
-              <text x="295" y="356" text-anchor="middle" fill="${f<20?"#ef4444":K?"#f97316":"#10b981"}" font-size="8px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
+              <text x="295" y="356" text-anchor="middle" fill="${f<20?"#ef4444":Y?"#f97316":"#10b981"}" font-size="8px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
                 ${f}%
               </text>
               
               <rect x="294" y="365" width="2" height="40" fill="rgba(0,0,0,0.15)" rx="0.5" />
-              <rect x="294" y="${405-f/100*40}" width="2" height="${f/100*40}" fill="${f<20?"#ef4444":K?"#f97316":"#10b981"}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="0.5" />
+              <rect x="294" y="${405-f/100*40}" width="2" height="${f/100*40}" fill="${f<20?"#ef4444":Y?"#f97316":"#10b981"}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="0.5" />
             </g>
           `:""}
 
           <!-- ── EV CHARGER ── -->
           ${h?m`
-            <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),w("ev")}}>
+            <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),j("ev")}}>
               <rect x="450" y="355" width="10" height="55" fill="#1e293b" rx="1" />
               <circle cx="455" cy="365" r="3.5"
-                fill="${A?"#a855f7":"#10b981"}"
-                style="filter: ${A?"drop-shadow(0 0 6px #a855f7)":"none"}; transition: fill 0.5s ease;" />
+                fill="${B?"#a855f7":"#10b981"}"
+                style="filter: ${B?"drop-shadow(0 0 6px #a855f7)":"none"}; transition: fill 0.5s ease;" />
               <!-- Charging cable -->
               <path d="M 455,370 C 460,390 475,400 495,395" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="3,3" />
             </g>
 
             <!-- EV Car (Vector drawing shifted up by 70px) -->
-            <g id="ev-car" class="interactiveGroup evGroup" opacity="${A?1:.4}" style="transition: opacity 0.6s ease;" @click=${t=>{t.stopPropagation(),w("ev")}}>
+            <g id="ev-car" class="interactiveGroup evGroup" opacity="${B?1:.4}" style="transition: opacity 0.6s ease;" @click=${t=>{t.stopPropagation(),j("ev")}}>
               ${"hatchback"===r?m`
                 <g transform="translate(490, 360)">
                   <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
@@ -1131,49 +1131,49 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           `:""}
 
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
-          ${v?yt("M 380,230 L 380,270 L 345,270 L 345,350",B,kt(a),ut.solar.stroke,ut.solar.glow):""}
+          ${v?xt("M 380,230 L 380,270 L 345,270 L 345,350",R,kt(a),ut.solar.stroke,ut.solar.glow):""}
 
           <!-- Grid cable: underground from transformer box to meterkast (no pylon-to-box cable) -->
-          ${yt("M 13,410 L 13,440 L 345,440 L 345,350",Y||H,kt(c),L.stroke,L.glow,H)}
+          ${xt("M 13,410 L 13,440 L 345,440 L 345,350",H||A,kt(c),T.stroke,T.glow,A)}
 
-          ${p?yt("M 310,350 L 345,350",U||K,kt(l),G.stroke,G.glow,U):""}
+          ${p?xt("M 310,350 L 345,350",K||Y,kt(l),L.stroke,L.glow,K):""}
 
-          ${h?yt("M 345,350 L 345,440 L 455,440 L 455,395",A,kt(d),ut.ev.stroke,ut.ev.glow):""}
+          ${h?xt("M 345,350 L 345,440 L 455,440 L 455,395",B,kt(d),ut.ev.stroke,ut.ev.glow):""}
 
         </g>
         <!-- End of translate group -->
 
         <!-- Lightning Screen Flashes -->
-        ${"lightning"===j?m`
-          <rect width="${W}" height="${S}" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
+        ${"lightning"===W?m`
+          <rect width="${S}" height="${F}" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
         `:""}
 
         <!-- Fog overlay -->
-        ${"foggy"===j?m`
-          <rect width="${W}" height="${S}" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
-          <rect width="${W}" height="${S}" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
+        ${"foggy"===W?m`
+          <rect width="${S}" height="${F}" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
+          <rect width="${S}" height="${F}" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
         `:""}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- SOLAR HUD CARD (Top right sky area, dynamically aligned)        -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${v?m`
-          <g class="interactiveGroup solarGroup" @click=${()=>w("solar")}>
+          <g class="interactiveGroup solarGroup" @click=${()=>j("solar")}>
             <!-- Solar panels are at design x=320, y=270 (inside translate group)
                  So SVG x = translateX+320, SVG y = translateY+270
                  Card goes LEFT of the panels at the same roof height -->
-            <g transform="translate(${F+130}, ${xt+90})">
+            <g transform="translate(${P+130}, ${jt+90})">
               <rect x="0" y="0" width="170" height="65"
-                class="hudCard ${B?"hudCardActive":""}"
+                class="hudCard ${R?"hudCardActive":""}"
                 rx="8" ry="8"
-                style="${B?`color: ${ut.solar.stroke}`:""}" />
+                style="${R?`color: ${ut.solar.stroke}`:""}" />
               <text x="12" y="20" class="hudTitle">Zonnepanelen</text>
-              <text x="12" y="39" class="hudValue ${B?"hudActiveText":""}"
-                style="${B?`color: ${ut.solar.stroke}`:""}">
-                ${B?bt(a):"—"}
+              <text x="12" y="39" class="hudValue ${R?"hudActiveText":""}"
+                style="${R?`color: ${ut.solar.stroke}`:""}">
+                ${R?bt(a):"—"}
               </text>
               <text x="12" y="53" class="hudSub">
-                ${null!==i?`Vandaag: ${i.toFixed(1)} kWh`:B?"Opwek actief":"Geen opwek"}
+                ${null!==i?`Vandaag: ${i.toFixed(1)} kWh`:R?"Opwek actief":"Geen opwek"}
               </text>
             </g>
           </g>
@@ -1196,69 +1196,69 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
         ──────────────────────────────────────────────────────────────────────────── -->
 
         <!-- 1. Stroomnet — onder de masten (mast is altijd op SVG x=20) -->
-        <g class="interactiveGroup gridGroup" @click=${()=>w("grid")}>
-          <g transform="translate(20, ${S-75})">
+        <g class="interactiveGroup gridGroup" @click=${()=>j("grid")}>
+          <g transform="translate(20, ${F-75})">
             <rect x="0" y="0" width="170" height="65"
-              class="hudCard ${Y||H?"hudCardActive":""}"
+              class="hudCard ${H||A?"hudCardActive":""}"
               rx="8" ry="8"
-              style="${Y||H?`color: ${L.stroke}`:""}" />
+              style="${H||A?`color: ${T.stroke}`:""}" />
             <text x="12" y="20" class="hudTitle">Stroomnet</text>
-            <text x="12" y="39" class="hudValue ${Y||H?"hudActiveText":""}"
-              style="${Y||H?`color: ${L.stroke}`:""}">
-              ${Y||H?bt(c):"—"}
-            </text>
-            <text x="12" y="53" class="hudSub">${dt}</text>
-          </g>
-        </g>
-
-        <!-- 2. Thuisaccu — ruimte gereserveerd onder de accupositie (design x=280, SVG x=translateX+280) -->
-        ${p?m`
-          <g class="interactiveGroup batteryGroup" @click=${()=>w("battery")}>
-            <g transform="translate(${F+195}, ${S-75})">
-              <rect x="0" y="0" width="170" height="65"
-                class="hudCard ${U||K?"hudCardActive":""}"
-                rx="8" ry="8"
-                style="${U||K?`color: ${G.stroke}`:""}" />
-              <text x="12" y="20" class="hudTitle">Thuisaccu</text>
-              <text x="12" y="39" class="hudValue ${U||K?"hudActiveText":""}"
-                style="${U||K?`color: ${G.stroke}`:""}">
-                ${U||K?bt(l):"Standby"}
-              </text>
-              <text x="12" y="53" class="hudSub">${vt}</text>
-            </g>
-          </g>
-        `:""}
-
-        <!-- 3. Huisverbruik — onder de meterkast (mkX=345, gecentreerd: translateX+345-85=translateX+260) -->
-        <g class="interactiveGroup homeGroup" @click=${()=>w("home")}>
-          <g transform="translate(${F+260}, ${S-75})">
-            <rect x="0" y="0" width="170" height="65"
-              class="hudCard ${R?"hudCardActive":""}"
-              rx="8" ry="8"
-              style="${R?`color: ${ut.home.stroke}`:""}" />
-            <text x="12" y="20" class="hudTitle">Huisverbruik</text>
-            <text x="12" y="39" class="hudValue ${R?"hudActiveText":""}"
-              style="${R?`color: ${ut.home.stroke}`:""}">
-              ${R?bt(o):"—"}
+            <text x="12" y="39" class="hudValue ${H||A?"hudActiveText":""}"
+              style="${H||A?`color: ${T.stroke}`:""}">
+              ${H||A?bt(c):"—"}
             </text>
             <text x="12" y="53" class="hudSub">${ct}</text>
           </g>
         </g>
 
-        <!-- 4. Laadpaal (EV) — onder de laadpaal (design x=455, gecentreerd: translateX+455-85=translateX+370) -->
-        ${h?m`
-          <g class="interactiveGroup evGroup" @click=${()=>w("ev")}>
-            <g transform="translate(${F+370}, ${S-75})">
+        <!-- 2. Thuisaccu — ruimte gereserveerd onder de accupositie (design x=280, SVG x=translateX+280) -->
+        ${p?m`
+          <g class="interactiveGroup batteryGroup" @click=${()=>j("battery")}>
+            <g transform="translate(${P+195}, ${F-75})">
               <rect x="0" y="0" width="170" height="65"
-                class="hudCard ${A?"hudCardActive":""}"
+                class="hudCard ${K||Y?"hudCardActive":""}"
                 rx="8" ry="8"
-                style="${A?`color: ${ut.ev.stroke}`:""}" />
-              <text x="12" y="20" class="hudTitle">Laadpaal (EV)</text>
-              <text x="12" y="39" class="hudValue ${A?"hudActiveText":""}"
-                style="${A?`color: ${ut.ev.stroke}`:""}">
-                ${A?bt(d):"—"}
+                style="${K||Y?`color: ${L.stroke}`:""}" />
+              <text x="12" y="20" class="hudTitle">Thuisaccu</text>
+              <text x="12" y="39" class="hudValue ${K||Y?"hudActiveText":""}"
+                style="${K||Y?`color: ${L.stroke}`:""}">
+                ${K||Y?bt(l):"Standby"}
               </text>
               <text x="12" y="53" class="hudSub">${pt}</text>
+            </g>
+          </g>
+        `:""}
+
+        <!-- 3. Huisverbruik — onder de meterkast (mkX=345, gecentreerd: translateX+345-85=translateX+260) -->
+        <g class="interactiveGroup homeGroup" @click=${()=>j("home")}>
+          <g transform="translate(${P+260}, ${F-75})">
+            <rect x="0" y="0" width="170" height="65"
+              class="hudCard ${G?"hudCardActive":""}"
+              rx="8" ry="8"
+              style="${G?`color: ${ut.home.stroke}`:""}" />
+            <text x="12" y="20" class="hudTitle">Huisverbruik</text>
+            <text x="12" y="39" class="hudValue ${G?"hudActiveText":""}"
+              style="${G?`color: ${ut.home.stroke}`:""}">
+              ${G?bt(o):"—"}
+            </text>
+            <text x="12" y="53" class="hudSub">${vt}</text>
+          </g>
+        </g>
+
+        <!-- 4. Laadpaal (EV) — onder de laadpaal (design x=455, gecentreerd: translateX+455-85=translateX+370) -->
+        ${h?m`
+          <g class="interactiveGroup evGroup" @click=${()=>j("ev")}>
+            <g transform="translate(${P+370}, ${F-75})">
+              <rect x="0" y="0" width="170" height="65"
+                class="hudCard ${B?"hudCardActive":""}"
+                rx="8" ry="8"
+                style="${B?`color: ${ut.ev.stroke}`:""}" />
+              <text x="12" y="20" class="hudTitle">Laadpaal (EV)</text>
+              <text x="12" y="39" class="hudValue ${B?"hudActiveText":""}"
+                style="${B?`color: ${ut.ev.stroke}`:""}">
+                ${B?bt(d):"—"}
+              </text>
+              <text x="12" y="53" class="hudSub">${ht}</text>
             </g>
           </g>
         `:""}
@@ -1382,7 +1382,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           </div>
         </div>
       </div>
-    `}switchTab(t){this.activeTab=t,setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)}getClouds(t){if(this.clouds.length>0&&this.lastWeather===t)return this.clouds;const e="cloudy"===t||"rainy"===t||"lightning"===t||"snowy"===t,r=e?80:3,s=[];for(let t=0;t<r;t++){const t=e?2+1.2*Math.random():.5+.5*Math.random(),r=90+120*Math.random(),n=-Math.random()*r,a=Math.random(),i=e?.96+.04*Math.random():.6+.4*Math.random();s.push({yFactor:a,scale:t,speed:r,delay:n,opacityMultiplier:i})}return this.clouds=s,this.lastWeather=t,this.clouds}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}async handleNodeClick(t){if(console.info(`[energy-flow-card] Click registered on node: ${t}`),"solar"===t||"home"===t||"grid"===t){this.activePopup=t,this.activeTab="day",this.statsData={};const e=[];if("solar"===t){const t=this.config?.entities.solar_energy_today||(this.config?.entities).solar_today;t&&e.push(t)}else if("home"===t){const t=this.config?.entities.home_today;t&&e.push(t)}else if("grid"===t){let t=this.config?.entities.grid_import_today,r=this.config?.entities.grid_export_today;this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(t="sensor.p1_meter_energy_import",r="sensor.p1_meter_energy_export"),t&&e.push(t),r&&e.push(r)}return void(e.length>0&&(await this.fetchStatsData(e),setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)))}const e=`${t}_tap_action`,r=this.config[e];if(r){if(console.log(`[energy-flow-card] Executing custom action for node '${t}':`,r),"navigate"===r.action&&r.navigation_path){const t=r.navigation_path;if(t.startsWith("#"))return void(window.location.hash=t);{window.history.pushState(null,"",t);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}}const e=new CustomEvent("hass-action",{detail:{config:{tap_action:r},action:"tap",action_config:r},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}this.selectedNode=this.selectedNode===t?null:t;let s=t;"battery"===t?s=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?s=this.config?.entities.load?"load":"home_power":"ev"===t?s="charger":"grid"===t?s=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(s=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const n=this.config?.entities?this.config.entities[s]:void 0,a=Array.isArray(n)?n[0]:n;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${s}', resolved entity ID: '${a}'`),a){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${a}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:a},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}handleCardClick(t){if(!t.composedPath().some(t=>t instanceof Element&&(t.classList.contains("interactiveGroup")||t.closest?.(".interactiveGroup")))&&this.config?.tap_action){const t=this.config.tap_action;if("navigate"===t.action&&t.navigation_path){this.restoreSidebarAndHeader(),window.history.pushState(null,"",t.navigation_path);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});this.dispatchEvent(e)}}}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date;let r=e.getHours()+e.getMinutes()/60;void 0!==this.config.time_override&&(r=this.config.time_override);let s="afternoon";s=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const n=this.getEntityValue(t.solar||t.solar_power),a=this.getEntityValue(t.load||t.home_power),i=this.getEntityValue(t.battery_power),o=t.battery_soc?this.getEntityValue(t.battery_soc):0,l=this.getEntityValue(t.charger);let f=0;(t.grid||t.grid_power)&&(f=this.getEntityValue(t.grid||t.grid_power));let d=i;if(void 0!==this.config.battery_invert){d=!0===this.config.battery_invert?i:-i}else if(t.grid){const t=n+f-a-l;d=Math.abs(i)>.05&&Math.abs(t)>.15?t*i<0?-i:i:-i}else d=-i;const c=this.parseEntityFloat(t.solar_energy_today||t.solar_today),v=this.parseEntityFloat(t.grid_import_today),p=this.parseEntityFloat(t.grid_export_today),h=this.parseEntityFloat(t.home_today),u=this.parseEntityFloat(t.battery_charge_today),y=this.parseEntityFloat(t.battery_discharge_today),x=this.parseEntityFloat(t.ev_today);let g="sunny",V=t.weather;if(!V&&this.hass){const t=Object.keys(this.hass.states).find(t=>t.startsWith("weather."));t&&(V=t,console.info(`[energy-flow-card] Auto-detected weather entity: ${V}`))}this.config.weather_override?g=this.config.weather_override:V&&this.hass?.states[V]&&(g=this.hass.states[V].state);let k=6,b=21;const O=this.hass?.states["sun.sun"];if(O)try{const t=new Date(O.attributes.next_rising),e=new Date(O.attributes.next_setting);k=t.getHours()+t.getMinutes()/60,b=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||t.grid_power||(f=a+l-n-d);const q=!!t.solar||!!t.solar_power,X=!!t.battery_power,w=!!t.charger,j=Vt(r),W=`background: linear-gradient(to bottom, ${j.top} 0%, ${j.horizon} 81%, #0a2919 81.1%, #05160d 100%);`,S=this.config.screensaver?C`
+    `}switchTab(t){this.activeTab=t,setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)}getClouds(t){if(this.clouds.length>0&&this.lastWeather===t)return this.clouds;const e="cloudy"===t||"rainy"===t||"lightning"===t||"snowy"===t,r=e?80:3,s=[];for(let t=0;t<r;t++){const t=e?2+1.2*Math.random():.5+.5*Math.random(),r=90+120*Math.random(),n=-Math.random()*r,a=Math.random(),i=e?.96+.04*Math.random():.6+.4*Math.random();s.push({yFactor:a,scale:t,speed:r,delay:n,opacityMultiplier:i})}return this.clouds=s,this.lastWeather=t,this.clouds}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}async handleNodeClick(t){if(console.info(`[energy-flow-card] Click registered on node: ${t}`),"solar"===t||"home"===t||"grid"===t){this.activePopup=t,this.activeTab="day",this.statsData={};const e=[];if("solar"===t){const t=this.config?.entities.solar_energy_today||(this.config?.entities).solar_today;t&&e.push(t)}else if("home"===t){const t=this.config?.entities.home_today;t&&e.push(t)}else if("grid"===t){let t=this.config?.entities.grid_import_today,r=this.config?.entities.grid_export_today;this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(t="sensor.p1_meter_energy_import",r="sensor.p1_meter_energy_export"),t&&e.push(t),r&&e.push(r)}return void(e.length>0&&(await this.fetchStatsData(e),setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)))}const e=`${t}_tap_action`,r=this.config[e];if(r){if(console.log(`[energy-flow-card] Executing custom action for node '${t}':`,r),"navigate"===r.action&&r.navigation_path){const t=r.navigation_path;if(t.startsWith("#"))return void(window.location.hash=t);{window.history.pushState(null,"",t);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}}const e=new CustomEvent("hass-action",{detail:{config:{tap_action:r},action:"tap",action_config:r},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}this.selectedNode=this.selectedNode===t?null:t;let s=t;"battery"===t?s=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?s=this.config?.entities.load?"load":"home_power":"ev"===t?s="charger":"grid"===t?s=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(s=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const n=this.config?.entities?this.config.entities[s]:void 0,a=Array.isArray(n)?n[0]:n;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${s}', resolved entity ID: '${a}'`),a){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${a}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:a},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}handleCardClick(t){if(!t.composedPath().some(t=>t instanceof Element&&(t.classList.contains("interactiveGroup")||t.closest?.(".interactiveGroup")))&&this.config?.tap_action){const t=this.config.tap_action;if("navigate"===t.action&&t.navigation_path){this.restoreSidebarAndHeader(),window.history.pushState(null,"",t.navigation_path);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});this.dispatchEvent(e)}}}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date;let r=e.getHours()+e.getMinutes()/60;void 0!==this.config.time_override&&(r=this.config.time_override);let s="afternoon";s=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const n=this.getEntityValue(t.solar||t.solar_power),a=this.getEntityValue(t.load||t.home_power),i=this.getEntityValue(t.battery_power),o=t.battery_soc?this.getEntityValue(t.battery_soc):0,l=this.getEntityValue(t.charger);let f=0;(t.grid||t.grid_power)&&(f=this.getEntityValue(t.grid||t.grid_power));let d=i;if(void 0!==this.config.battery_invert){d=!0===this.config.battery_invert?i:-i}else if(t.grid){const t=n+f-a-l;d=Math.abs(i)>.05&&Math.abs(t)>.15?t*i<0?-i:i:-i}else d=-i;const c=this.parseEntityFloat(t.solar_energy_today||t.solar_today),v=this.parseEntityFloat(t.grid_import_today),p=this.parseEntityFloat(t.grid_export_today),h=this.parseEntityFloat(t.home_today),u=this.parseEntityFloat(t.battery_charge_today),y=this.parseEntityFloat(t.battery_discharge_today),x=this.parseEntityFloat(t.ev_today);let g="sunny",V=t.weather;if(!V&&this.hass){const t=Object.keys(this.hass.states).find(t=>t.startsWith("weather."));t&&(V=t,console.info(`[energy-flow-card] Auto-detected weather entity: ${V}`))}this.config.weather_override?g=this.config.weather_override:V&&this.hass?.states[V]&&(g=this.hass.states[V].state);let k=6,b=21;const O=this.hass?.states["sun.sun"];if(O)try{const t=new Date(O.attributes.next_rising),e=new Date(O.attributes.next_setting);k=t.getHours()+t.getMinutes()/60,b=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}t.grid||t.grid_power||(f=a+l-n-d);const q=!!t.solar||!!t.solar_power,X=!!t.battery_power,w=!!t.charger,j=Vt(r),W=`background: linear-gradient(to bottom, ${j.top} 0%, ${j.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;let S;if(t.light){const e=t.light,r=t=>{const e=this.hass?.states[t];return"on"===e?.state};S=Array.isArray(e)?e.some(t=>r(t)):r(e)}const F=this.config.screensaver?C`
           <style>
             :host {
               position: fixed !important;
@@ -1406,7 +1406,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
             }
           </style>
         `:"";return C`
-      ${S}
+      ${F}
       <ha-card style="${W}" @click=${this.handleCardClick}>
         <div class="card-container">
           ${this.config.title?C`
@@ -1416,7 +1416,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           `:""}
 
           <div class="sceneWrapper">
-            ${jt({containerWidth:this.cardWidth,containerHeight:this.cardHeight,timeHour:r,timeOfDay:s,solar:n,solarToday:c,load:a,batteryPower:d,soc:o,charger:l,grid:f,showSolar:q,showBattery:X,showEV:w,weather:g,clouds:this.getClouds(g),sunriseHour:k,sunsetHour:b,gridImportToday:v,gridExportToday:p,homeToday:h,batteryChargeToday:u,batteryDischargeToday:y,evToday:x,houseStyle:this.config?.house_style,carType:this.config?.car_type,onNodeClick:t=>this.handleNodeClick(t)})}
+            ${jt({containerWidth:this.cardWidth,containerHeight:this.cardHeight,timeHour:r,timeOfDay:s,solar:n,solarToday:c,load:a,batteryPower:d,soc:o,charger:l,grid:f,showSolar:q,showBattery:X,showEV:w,weather:g,clouds:this.getClouds(g),sunriseHour:k,sunsetHour:b,gridImportToday:v,gridExportToday:p,homeToday:h,batteryChargeToday:u,batteryDischargeToday:y,evToday:x,houseStyle:this.config?.house_style,carType:this.config?.car_type,showLights:S,onNodeClick:t=>this.handleNodeClick(t)})}
           </div>
 
           <!-- Glassmorphism Custom Popup Overlay -->
