@@ -2,9 +2,10 @@ const WebSocket = require('ws');
 
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI0NWIyYTA4MzhjOWQ0NjI2Yjc5NTY5NGU1Mzk0ZmU2ZCIsImlhdCI6MTc4MDIyODEwMiwiZXhwIjoyMDk1NTg4MTAyfQ.c-gOuNc3AezEImPkxMvuBeTPVbfpx8CzWqcixCpflM4";
 const url = "wss://84wgzzzm8ai8igpemwargw2qsuihp9ww.ui.nabu.casa/api/websocket";
-const commitHash = "0162380007e81fb7608259e9677325b289d579c4";
 
 const ws = new WebSocket(url);
+
+let messageId = 1;
 
 ws.on('open', () => {
   console.log('Connected');
@@ -18,14 +19,11 @@ ws.on('message', (data) => {
       access_token: token
     }));
   } else if (msg.type === 'auth_ok') {
-    const newUrl = `https://cdn.jsdelivr.net/gh/Wolterink99/energy-flow-card@${commitHash}/dist/energy-flow-card.js`;
-    console.log(`Updating resource to: ${newUrl}`);
+    console.log('Auth OK');
     ws.send(JSON.stringify({
-      id: 1,
-      type: 'lovelace/resources/update',
-      resource_id: '133a64019132493f90d8c0741f8cdba6',
-      url: newUrl,
-      res_type: 'module'
+      id: messageId++,
+      type: 'lovelace/config',
+      url_path: 'dashboard-screensaver'
     }));
   } else if (msg.type === 'result') {
     console.log('Result:', JSON.stringify(msg, null, 2));

@@ -187,12 +187,28 @@ export class EnergyFlowCard extends LitElement {
 
   private handleNodeClick(nodeId: string): void {
     console.info(`[energy-flow-card] Click registered on node: ${nodeId}`);
-    
-    // Check for custom tap action (e.g. grid_tap_action, solar_tap_action, etc.)
     const actionKey = `${nodeId}_tap_action`;
     const customAction = (this.config as any)[actionKey];
     if (customAction) {
-      console.info(`[energy-flow-card] Executing custom action for node '${nodeId}':`, customAction);
+      console.log(`[energy-flow-card] Executing custom action for node '${nodeId}':`, customAction);
+      
+      if (customAction.action === 'navigate' && customAction.navigation_path) {
+        const path = customAction.navigation_path;
+        if (path.startsWith('#')) {
+          window.location.hash = path;
+          return;
+        } else {
+          window.history.pushState(null, '', path);
+          const ev = new CustomEvent('location-changed', {
+            detail: { replace: false },
+            bubbles: true,
+            composed: true
+          });
+          this.dispatchEvent(ev);
+          return;
+        }
+      }
+
       const event = new CustomEvent('hass-action', {
         detail: {
           config: {
