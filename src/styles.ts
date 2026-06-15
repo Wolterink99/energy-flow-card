@@ -291,4 +291,185 @@ export const styles = css`
     fill: rgba(255, 255, 255, 0.32);
     pointer-events: none;
   }
+
+  /* Glassmorphism Popup Overlay */
+  .glass-popup-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .glass-popup-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    padding: 24px;
+    color: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-popup-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+    transition: color 0.2s;
+  }
+
+  .glass-popup-close:hover {
+    color: #ffffff;
+  }
+
+  .glass-popup-header {
+    margin-bottom: 20px;
+  }
+
+  .glass-popup-title {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .glass-popup-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 4px;
+  }
+
+  .glass-popup-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .glass-popup-stat {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .glass-popup-chart-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .chart-loading, .chart-no-data {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+  }
+
+  /* SVG/HTML Bar Chart */
+  .glass-bar-chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 120px;
+    padding-top: 20px;
+  }
+
+  .chart-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    height: 100%;
+  }
+
+  .chart-bar-wrapper {
+    height: 80px;
+    width: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+  }
+
+  .chart-bar {
+    width: 100%;
+    background: linear-gradient(to top, #10b981, #34d399);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .bar-value {
+    position: absolute;
+    top: -20px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+  }
+
+  .chart-label {
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: capitalize;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 `;

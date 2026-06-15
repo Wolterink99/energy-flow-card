@@ -11,6 +11,9 @@ export class EnergyFlowCard extends LitElement {
   @state() private cardWidth: number = 800;
   @state() private cardHeight: number = 600;
   @state() private hasActiveHash: boolean = false;
+  @state() private activePopup: string | null = null;
+  @state() private activePopupHistory: { day: string; value: number }[] = [];
+  @state() private isLoadingHistory: boolean = false;
 
   private resizeObserver?: ResizeObserver;
   private clouds: any[] = [];
@@ -134,6 +137,57 @@ export class EnergyFlowCard extends LitElement {
     this.hasActiveHash = hash !== '' && hash !== '#';
   };
 
+  private async fetchHistory(entityId: string): Promise<{ day: string; value: number }[]> {
+    if (!this.hass) return [];
+    try {
+      const now = new Date();
+      const startTime = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000).toISOString();
+      const res = await (this.hass as any).callWS({
+        type: 'history/history_during_period',
+        start_time: startTime,
+        entity_ids: [entityId],
+        significant_changes_only: false,
+        no_attributes: true
+      });
+      const entityHistory = res[entityId] || [];
+      return this.processHistory(entityHistory);
+    } catch (e) {
+      console.warn('[energy-flow-card] Failed to fetch history via WS:', e);
+      return [];
+    }
+  }
+
+  private processHistory(historyItems: any[]): { day: string; value: number }[] {
+    const dailyMax: Record<string, { weekday: string; maxValue: number }> = {};
+    const sorted = [...historyItems].sort((a, b) => a.lu - b.lu);
+    
+    sorted.forEach(item => {
+      const val = parseFloat(item.s);
+      if (isNaN(val)) return;
+      
+      const date = new Date(item.lu * 1000);
+      const dateKey = date.toISOString().split('T')[0];
+      const weekday = date.toLocaleDateString('nl-NL', { weekday: 'short' });
+      
+      if (!dailyMax[dateKey] || val > dailyMax[dateKey].maxValue) {
+        dailyMax[dateKey] = { weekday, maxValue: val };
+      }
+    });
+    
+    return Object.keys(dailyMax)
+      .sort()
+      .slice(-7)
+      .map(key => ({
+        day: dailyMax[key].weekday,
+        value: dailyMax[key].maxValue
+      }));
+  }
+
+  private closePopup(): void {
+    this.activePopup = null;
+    this.activePopupHistory = [];
+  }
+
   private getClouds(weather: string): any[] {
     if (this.clouds.length > 0 && this.lastWeather === weather) {
       return this.clouds;
@@ -194,8 +248,21 @@ export class EnergyFlowCard extends LitElement {
     return resolveValue(entityInput);
   }
 
-  private handleNodeClick(nodeId: string): void {
+  private async handleNodeClick(nodeId: string): Promise<void> {
     console.info(`[energy-flow-card] Click registered on node: ${nodeId}`);
+    
+    if (nodeId === 'solar') {
+      this.activePopup = 'solar';
+      const entity = this.config?.entities.solar_energy_today || (this.config?.entities as any).solar_today;
+      if (entity) {
+        this.isLoadingHistory = true;
+        this.activePopupHistory = [];
+        this.activePopupHistory = await this.fetchHistory(entity);
+        this.isLoadingHistory = false;
+      }
+      return;
+    }
+
     const actionKey = `${nodeId}_tap_action`;
     const customAction = (this.config as any)[actionKey];
     if (customAction) {
@@ -484,6 +551,63 @@ export class EnergyFlowCard extends LitElement {
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>
+
+          <!-- Glassmorphism Custom Popup Overlay -->
+          ${this.activePopup === 'solar' ? html`
+            <div class="glass-popup-overlay" @click=${this.closePopup}>
+              <div class="glass-popup-card" @click=${(e: Event) => e.stopPropagation()}>
+                <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
+                
+                <div class="glass-popup-header">
+                  <div class="glass-popup-title">Zonnepanelen</div>
+                  <div class="glass-popup-subtitle">Live Opbrengst & Historie</div>
+                </div>
+
+                <div class="glass-popup-stats">
+                  <div class="glass-popup-stat">
+                    <span class="stat-label">Huidig vermogen</span>
+                    <span class="stat-value" style="color: #10b981;">
+                      ${solar >= 20 ? (solar >= 1000 ? `${(solar / 1000).toFixed(1)} kW` : `${Math.round(solar)} W`) : '0 W'}
+                    </span>
+                  </div>
+                  <div class="glass-popup-stat">
+                    <span class="stat-label">Vandaag opgewekt</span>
+                    <span class="stat-value">
+                      ${solarToday !== null ? `${solarToday.toFixed(1)} kWh` : '0 kWh'}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="glass-popup-chart-container">
+                  <div class="chart-title">Opbrengst afgelopen 7 dagen (kWh)</div>
+                  ${this.isLoadingHistory ? html`
+                    <div class="chart-loading">Gegevens laden...</div>
+                  ` : html`
+                    ${this.activePopupHistory.length === 0 ? html`
+                      <div class="chart-no-data">Geen historische gegevens beschikbaar.</div>
+                    ` : html`
+                      <div class="glass-bar-chart">
+                        ${this.activePopupHistory.map(item => {
+                          const maxVal = Math.max(...this.activePopupHistory.map(i => i.value)) || 1;
+                          const percent = (item.value / maxVal) * 80; // Scale to max 80% height
+                          return html`
+                            <div class="chart-column">
+                              <div class="chart-bar-wrapper">
+                                <div class="chart-bar" style="height: ${Math.max(5, percent)}%;">
+                                  <span class="bar-value">${item.value.toFixed(1)}</span>
+                                </div>
+                              </div>
+                              <span class="chart-label">${item.day}</span>
+                            </div>
+                          `;
+                        })}
+                      </div>
+                    `}
+                  `}
+                </div>
+              </div>
+            </div>
+          ` : ''}
         </div>
       </ha-card>
     `;

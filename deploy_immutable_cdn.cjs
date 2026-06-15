@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI0NWIyYTA4MzhjOWQ0NjI2Yjc5NTY5NGU1Mzk0ZmU2ZCIsImlhdCI6MTc4MDIyODEwMiwiZXhwIjoyMDk1NTg4MTAyfQ.c-gOuNc3AezEImPkxMvuBeTPVbfpx8CzWqcixCpflM4";
 const url = "wss://84wgzzzm8ai8igpemwargw2qsuihp9ww.ui.nabu.casa/api/websocket";
-const commitHash = "ab91a40d894d2cf6ab3407e1b45384a151a1ad4b";
+const commitHash = "d0bed312f7d2ef92eca63639c751a42c5898dbab";
 
 const ws = new WebSocket(url);
 
