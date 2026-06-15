@@ -10,6 +10,7 @@ export class EnergyFlowCard extends LitElement {
   @state() private selectedNode: string | null = null;
   @state() private cardWidth: number = 800;
   @state() private cardHeight: number = 600;
+  @state() private hasActiveHash: boolean = false;
 
   private resizeObserver?: ResizeObserver;
   private clouds: any[] = [];
@@ -25,12 +26,15 @@ export class EnergyFlowCard extends LitElement {
       }
     });
     this.resizeObserver.observe(this);
+    window.addEventListener('hashchange', this.handleHashChange);
+    this.handleHashChange();
   }
 
   public disconnectedCallback(): void {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    window.removeEventListener('hashchange', this.handleHashChange);
     this.restoreSidebarAndHeader();
     super.disconnectedCallback();
   }
@@ -124,6 +128,11 @@ export class EnergyFlowCard extends LitElement {
       console.warn('[energy-flow-card] Failed to restore sidebar/header via JS:', e);
     }
   }
+
+  private handleHashChange = () => {
+    const hash = window.location.hash;
+    this.hasActiveHash = hash !== '' && hash !== '#';
+  };
 
   private getClouds(weather: string): any[] {
     if (this.clouds.length > 0 && this.lastWeather === weather) {
@@ -417,7 +426,7 @@ export class EnergyFlowCard extends LitElement {
               height: 100vh !important;
               width: 100vw !important;
               margin-left: 0 !important;
-              z-index: 50 !important;
+              z-index: ${this.hasActiveHash ? '1' : '50'} !important;
             }
             ha-card {
               height: 100% !important;
