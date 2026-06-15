@@ -160,6 +160,15 @@ export class EnergyFlowCard extends LitElement {
     }
   }
 
+  private getStatPointValue(point: any, entityId: string): number {
+    if (!point) return 0;
+    const isCumulative = !entityId.includes('vandaag') && !entityId.includes('today');
+    if (isCumulative && point.change !== undefined && point.change !== null) {
+      return point.change;
+    }
+    return point.state || 0;
+  }
+
   private getProcessedSingleData(entityId: string): { label: string; value: number }[] {
     const raw = this.statsData[entityId] || [];
     if (this.activeTab === 'day') {
@@ -167,7 +176,7 @@ export class EnergyFlowCard extends LitElement {
         const date = new Date(point.start);
         return {
           label: date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }),
-          value: point.state || 0
+          value: this.getStatPointValue(point, entityId)
         };
       });
     } else if (this.activeTab === 'month') {
@@ -181,7 +190,7 @@ export class EnergyFlowCard extends LitElement {
         if (!monthlyGroups[monthKey]) {
           monthlyGroups[monthKey] = { label: monthLabel, sum: 0 };
         }
-        monthlyGroups[monthKey].sum += point.state || 0;
+        monthlyGroups[monthKey].sum += this.getStatPointValue(point, entityId);
       });
       return Object.keys(monthlyGroups)
         .sort()
@@ -198,7 +207,7 @@ export class EnergyFlowCard extends LitElement {
         if (!yearlyGroups[year]) {
           yearlyGroups[year] = 0;
         }
-        yearlyGroups[year] += point.state || 0;
+        yearlyGroups[year] += this.getStatPointValue(point, entityId);
       });
       return Object.keys(yearlyGroups)
         .sort()
@@ -217,10 +226,10 @@ export class EnergyFlowCard extends LitElement {
     const exportMap = new Map<string, number>();
 
     importRaw.forEach(p => {
-      importMap.set(new Date(p.start).toDateString(), p.state || 0);
+      importMap.set(new Date(p.start).toDateString(), this.getStatPointValue(p, importEntity));
     });
     exportRaw.forEach(p => {
-      exportMap.set(new Date(p.start).toDateString(), p.state || 0);
+      exportMap.set(new Date(p.start).toDateString(), this.getStatPointValue(p, exportEntity));
     });
 
     const allStarts = new Set<string>();
@@ -317,6 +326,10 @@ export class EnergyFlowCard extends LitElement {
     const entities = this.config?.entities;
     if (!entities) return '';
 
+    const grid = this.getEntityValue(entities.grid || (entities as any).grid_power);
+    const gridImportToday = this.parseEntityFloat(entities.grid_import_today);
+    const gridExportToday = this.parseEntityFloat(entities.grid_export_today);
+
     // Values to display
     if (this.activePopup === 'solar') {
       title = 'Zonnepanelen';
@@ -412,8 +425,12 @@ export class EnergyFlowCard extends LitElement {
       stat2Val = `${gridImportToday !== null ? gridImportToday.toFixed(1) : '0'} / ${gridExportToday !== null ? gridExportToday.toFixed(1) : '0'} kWh`;
       hasSecondStat = true;
 
-      const impEntity = entities.grid_import_today;
-      const expEntity = entities.grid_export_today;
+      let impEntity = entities.grid_import_today;
+      let expEntity = entities.grid_export_today;
+      if (this.hass?.states['sensor.p1_meter_energy_import'] && this.hass?.states['sensor.p1_meter_energy_export']) {
+        impEntity = 'sensor.p1_meter_energy_import';
+        expEntity = 'sensor.p1_meter_energy_export';
+      }
 
       if (this.isLoadingHistory) {
         chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
@@ -472,16 +489,40 @@ export class EnergyFlowCard extends LitElement {
           </div>
 
           <div class="glass-popup-stats">
-            <div class="glass-popup-stat">
-              <span class="stat-label">${stat1Label}</span>
-              <span class="stat-value" style="color: #10b981;">${stat1Val}</span>
-            </div>
-            ${hasSecondStat ? html`
-              <div class="glass-popup-stat">
-                <span class="stat-label">${stat2Label}</span>
-                <span class="stat-value">${stat2Val}</span>
+            ${this.activePopup === 'grid' ? html`
+              <div class="glass-popup-stat" style="grid-column: span 2;">
+                <span class="stat-label">${grid >= 0 ? 'Netto Import (Live)' : 'Netto Export (Live)'}</span>
+                <span class="stat-value" style="color: ${grid >= 0 ? '#ef4444' : '#10b981'}; display: flex; align-items: center; gap: 6px;">
+                  <ha-icon icon="${grid >= 0 ? 'mdi:transmission-tower-export' : 'mdi:transmission-tower-import'}"></ha-icon>
+                  ${Math.abs(grid) >= 1000 ? `${(Math.abs(grid) / 1000).toFixed(1)} kW` : `${Math.round(Math.abs(grid))} W`}
+                </span>
               </div>
-            ` : ''}
+              <div class="glass-popup-stat">
+                <span class="stat-label">Import vandaag</span>
+                <span class="stat-value" style="color: #ef4444; display: flex; align-items: center; gap: 6px;">
+                  <ha-icon icon="mdi:arrow-down-bold"></ha-icon>
+                  ${gridImportToday !== null ? `${gridImportToday.toFixed(1)} kWh` : '0 kWh'}
+                </span>
+              </div>
+              <div class="glass-popup-stat">
+                <span class="stat-label">Export vandaag</span>
+                <span class="stat-value" style="color: #10b981; display: flex; align-items: center; gap: 6px;">
+                  <ha-icon icon="mdi:arrow-up-bold"></ha-icon>
+                  ${gridExportToday !== null ? `${gridExportToday.toFixed(1)} kWh` : '0 kWh'}
+                </span>
+              </div>
+            ` : html`
+              <div class="glass-popup-stat">
+                <span class="stat-label">${stat1Label}</span>
+                <span class="stat-value" style="color: #10b981;">${stat1Val}</span>
+              </div>
+              ${hasSecondStat ? html`
+                <div class="glass-popup-stat">
+                  <span class="stat-label">${stat2Label}</span>
+                  <span class="stat-value">${stat2Val}</span>
+                </div>
+              ` : ''}
+            `}
           </div>
 
           <div class="glass-popup-chart-container">
@@ -581,8 +622,12 @@ export class EnergyFlowCard extends LitElement {
         const ent = this.config?.entities.home_today;
         if (ent) entitiesToFetch.push(ent);
       } else if (nodeId === 'grid') {
-        const imp = this.config?.entities.grid_import_today;
-        const exp = this.config?.entities.grid_export_today;
+        let imp = this.config?.entities.grid_import_today;
+        let exp = this.config?.entities.grid_export_today;
+        if (this.hass?.states['sensor.p1_meter_energy_import'] && this.hass?.states['sensor.p1_meter_energy_export']) {
+          imp = 'sensor.p1_meter_energy_import';
+          exp = 'sensor.p1_meter_energy_export';
+        }
         if (imp) entitiesToFetch.push(imp);
         if (exp) entitiesToFetch.push(exp);
       }
