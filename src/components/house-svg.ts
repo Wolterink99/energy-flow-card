@@ -720,6 +720,7 @@ export function renderHouseSvg({
             <!-- LEFT WING -->
             <g id="left-wing">
               <rect x="180" y="300" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
+              <rect x="180" y="300" width="140" height="110" fill="black" opacity="0.32" style="pointer-events: none;" />
               <polygon points="175,300 205,260 320,260 320,300" fill="url(#tiles-pat)" stroke="#0f172a" stroke-width="2" />
               
               <!-- Left roof trim -->
@@ -737,6 +738,7 @@ export function renderHouseSvg({
             <!-- RIGHT WING -->
             <g id="right-wing">
               <polygon points="380,410 380,200 500,60 680,270 680,410" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
+              <polygon points="380,410 380,200 500,60 680,270 680,410" fill="black" opacity="0.32" style="pointer-events: none;" />
               
               <line x1="380" y1="200" x2="500" y2="60" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
               <line x1="380" y1="200" x2="500" y2="60" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
@@ -761,6 +763,7 @@ export function renderHouseSvg({
             <!-- CENTER ENTRANCE GABLE -->
             <g id="center-portal">
               <polygon points="320,410 320,270 380,200 440,270 440,410" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
+              <polygon points="320,410 320,270 380,200 440,270 440,410" fill="black" opacity="0.32" style="pointer-events: none;" />
               <line x1="308" y1="284" x2="380" y2="200" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
               <line x1="308" y1="284" x2="380" y2="200" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
               <line x1="452" y1="284" x2="380" y2="200" stroke="#0f172a" stroke-width="12" stroke-linecap="round" />
