@@ -552,6 +552,31 @@ export const styles = css`
     transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  .chart-values-stacked {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 34px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+
+  .stacked-val {
+    white-space: nowrap;
+  }
+
+  .import-color {
+    color: #f87171;
+  }
+
+  .export-color {
+    color: #34d399;
+  }
+
   .bar-value {
     position: absolute;
     top: -24px;

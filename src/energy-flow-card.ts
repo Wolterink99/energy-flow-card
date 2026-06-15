@@ -447,18 +447,20 @@ export class EnergyFlowCard extends LitElement {
                 const exportPercent = (item.exportValue / maxVal) * 80;
                 return html`
                   <div class="chart-column" style="min-width: 60px;">
+                    <!-- Stacked values at the top of the column -->
+                    <div class="chart-values-stacked">
+                      <span class="stacked-val import-color">${item.importValue > 0 ? item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
+                      <span class="stacked-val export-color">${item.exportValue > 0 ? item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
+                    </div>
+
                     <div class="grid-double-bar-wrapper">
                       <!-- Import bar -->
                       <div class="grid-import-bar-wrapper">
-                        <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;">
-                          ${item.importValue > 0 ? html`<span class="bar-value" style="left: -12px;">${item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>` : ''}
-                        </div>
+                        <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
                       </div>
                       <!-- Export bar -->
                       <div class="grid-export-bar-wrapper">
-                        <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;">
-                          ${item.exportValue > 0 ? html`<span class="bar-value" style="left: -12px;">${item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>` : ''}
-                        </div>
+                        <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
                       </div>
                     </div>
                     <span class="chart-label">${item.label}</span>
