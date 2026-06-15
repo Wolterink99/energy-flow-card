@@ -14,6 +14,8 @@ export class EnergyFlowCard extends LitElement {
   @state() private activePopup: string | null = null;
   @state() private activePopupHistory: { day: string; value: number }[] = [];
   @state() private isLoadingHistory: boolean = false;
+  @state() private activeTab: 'day' | 'month' | 'year' = 'day';
+  @state() private statsData: Record<string, any[]> = {};
 
   private resizeObserver?: ResizeObserver;
   private clouds: any[] = [];
@@ -137,55 +139,370 @@ export class EnergyFlowCard extends LitElement {
     this.hasActiveHash = hash !== '' && hash !== '#';
   };
 
-  private async fetchHistory(entityId: string): Promise<{ day: string; value: number }[]> {
-    if (!this.hass) return [];
+  private async fetchStatsData(entityIds: string[]): Promise<void> {
+    if (!this.hass) return;
+    this.isLoadingHistory = true;
     try {
       const now = new Date();
-      const startTime = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000).toISOString();
+      const startTime = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000).toISOString();
       const res = await (this.hass as any).callWS({
-        type: 'history/history_during_period',
+        type: 'recorder/statistics_during_period',
         start_time: startTime,
-        entity_ids: [entityId],
-        significant_changes_only: false,
-        no_attributes: true
+        statistic_ids: entityIds,
+        period: 'day'
       });
-      const entityHistory = res[entityId] || [];
-      return this.processHistory(entityHistory);
+      this.statsData = res || {};
     } catch (e) {
-      console.warn('[energy-flow-card] Failed to fetch history via WS:', e);
-      return [];
+      console.warn('[energy-flow-card] Failed to fetch stats via WS:', e);
+      this.statsData = {};
+    } finally {
+      this.isLoadingHistory = false;
     }
   }
 
-  private processHistory(historyItems: any[]): { day: string; value: number }[] {
-    const dailyMax: Record<string, { weekday: string; maxValue: number }> = {};
-    const sorted = [...historyItems].sort((a, b) => a.lu - b.lu);
-    
-    sorted.forEach(item => {
-      const val = parseFloat(item.s);
-      if (isNaN(val)) return;
-      
-      const date = new Date(item.lu * 1000);
-      const dateKey = date.toISOString().split('T')[0];
-      const weekday = date.toLocaleDateString('nl-NL', { weekday: 'short' });
-      
-      if (!dailyMax[dateKey] || val > dailyMax[dateKey].maxValue) {
-        dailyMax[dateKey] = { weekday, maxValue: val };
-      }
+  private getProcessedSingleData(entityId: string): { label: string; value: number }[] {
+    const raw = this.statsData[entityId] || [];
+    if (this.activeTab === 'day') {
+      return raw.slice(-30).map(point => {
+        const date = new Date(point.start);
+        return {
+          label: date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }),
+          value: point.state || 0
+        };
+      });
+    } else if (this.activeTab === 'month') {
+      const monthlyGroups: Record<string, { label: string; sum: number }> = {};
+      raw.forEach(point => {
+        const date = new Date(point.start);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthKey = `${year}-${month.toString().padStart(2, '0')}`;
+        const monthLabel = date.toLocaleDateString('nl-NL', { month: 'short' });
+        if (!monthlyGroups[monthKey]) {
+          monthlyGroups[monthKey] = { label: monthLabel, sum: 0 };
+        }
+        monthlyGroups[monthKey].sum += point.state || 0;
+      });
+      return Object.keys(monthlyGroups)
+        .sort()
+        .slice(-12)
+        .map(key => ({
+          label: monthlyGroups[key].label,
+          value: monthlyGroups[key].sum
+        }));
+    } else {
+      const yearlyGroups: Record<string, number> = {};
+      raw.forEach(point => {
+        const date = new Date(point.start);
+        const year = date.getFullYear().toString();
+        if (!yearlyGroups[year]) {
+          yearlyGroups[year] = 0;
+        }
+        yearlyGroups[year] += point.state || 0;
+      });
+      return Object.keys(yearlyGroups)
+        .sort()
+        .map(year => ({
+          label: year,
+          value: yearlyGroups[year]
+        }));
+    }
+  }
+
+  private getProcessedGridData(importEntity: string, exportEntity: string): { label: string; importValue: number; exportValue: number }[] {
+    const importRaw = this.statsData[importEntity] || [];
+    const exportRaw = this.statsData[exportEntity] || [];
+
+    const importMap = new Map<string, number>();
+    const exportMap = new Map<string, number>();
+
+    importRaw.forEach(p => {
+      importMap.set(new Date(p.start).toDateString(), p.state || 0);
     });
-    
-    return Object.keys(dailyMax)
-      .sort()
-      .slice(-7)
-      .map(key => ({
-        day: dailyMax[key].weekday,
-        value: dailyMax[key].maxValue
-      }));
+    exportRaw.forEach(p => {
+      exportMap.set(new Date(p.start).toDateString(), p.state || 0);
+    });
+
+    const allStarts = new Set<string>();
+    importRaw.forEach(p => allStarts.add(p.start));
+    exportRaw.forEach(p => allStarts.add(p.start));
+
+    const sortedStarts = Array.from(allStarts).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+    if (this.activeTab === 'day') {
+      return sortedStarts.slice(-30).map(startStr => {
+        const date = new Date(startStr);
+        const dateKey = date.toDateString();
+        return {
+          label: date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }),
+          importValue: importMap.get(dateKey) || 0,
+          exportValue: exportMap.get(dateKey) || 0
+        };
+      });
+    } else if (this.activeTab === 'month') {
+      const monthlyGroups: Record<string, { label: string; importSum: number; exportSum: number }> = {};
+      sortedStarts.forEach(startStr => {
+        const date = new Date(startStr);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthKey = `${year}-${month.toString().padStart(2, '0')}`;
+        const monthLabel = date.toLocaleDateString('nl-NL', { month: 'short' });
+        const dateKey = date.toDateString();
+        
+        if (!monthlyGroups[monthKey]) {
+          monthlyGroups[monthKey] = { label: monthLabel, importSum: 0, exportSum: 0 };
+        }
+        monthlyGroups[monthKey].importSum += importMap.get(dateKey) || 0;
+        monthlyGroups[monthKey].exportSum += exportMap.get(dateKey) || 0;
+      });
+
+      return Object.keys(monthlyGroups)
+        .sort()
+        .slice(-12)
+        .map(key => ({
+          label: monthlyGroups[key].label,
+          importValue: monthlyGroups[key].importSum,
+          exportValue: monthlyGroups[key].exportSum
+        }));
+    } else {
+      const yearlyGroups: Record<string, { importSum: number; exportSum: number }> = {};
+      sortedStarts.forEach(startStr => {
+        const date = new Date(startStr);
+        const year = date.getFullYear().toString();
+        const dateKey = date.toDateString();
+
+        if (!yearlyGroups[year]) {
+          yearlyGroups[year] = { importSum: 0, exportSum: 0 };
+        }
+        yearlyGroups[year].importSum += importMap.get(dateKey) || 0;
+        yearlyGroups[year].exportSum += exportMap.get(dateKey) || 0;
+      });
+
+      return Object.keys(yearlyGroups)
+        .sort()
+        .map(year => ({
+          label: year,
+          importValue: yearlyGroups[year].importSum,
+          exportValue: yearlyGroups[year].exportSum
+        }));
+    }
+  }
+
+  private parseEntityFloat(entId?: string): number | null {
+    if (!entId || !this.hass) return null;
+    const entity = this.hass.states[entId];
+    if (!entity) return null;
+    const v = parseFloat(entity.state);
+    return isNaN(v) ? null : v;
   }
 
   private closePopup(): void {
     this.activePopup = null;
     this.activePopupHistory = [];
+    this.statsData = {};
+  }
+
+  private renderPopup(): TemplateResult | string {
+    if (!this.activePopup) return '';
+    
+    let title = '';
+    let subtitle = '';
+    let stat1Label = '';
+    let stat1Val = '';
+    let stat2Label = '';
+    let stat2Val = '';
+    let hasSecondStat = false;
+    let chartHtml: TemplateResult | string = '';
+
+    const entities = this.config?.entities;
+    if (!entities) return '';
+
+    // Values to display
+    if (this.activePopup === 'solar') {
+      title = 'Zonnepanelen';
+      subtitle = 'Productie & Historie';
+      const solar = this.getEntityValue(entities.solar || (entities as any).solar_power);
+      const solarToday = this.parseEntityFloat(entities.solar_energy_today || (entities as any).solar_today);
+      
+      stat1Label = 'Huidig vermogen';
+      stat1Val = solar >= 20 ? (solar >= 1000 ? `${(solar / 1000).toFixed(1)} kW` : `${Math.round(solar)} W`) : '0 W';
+      stat2Label = 'Vandaag opgewekt';
+      stat2Val = solarToday !== null ? `${solarToday.toFixed(1)} kWh` : '0 kWh';
+      hasSecondStat = true;
+
+      const entityId = entities.solar_energy_today || (entities as any).solar_today;
+      if (this.isLoadingHistory) {
+        chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+      } else if (!entityId || !this.statsData[entityId] || this.statsData[entityId].length === 0) {
+        chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
+      } else {
+        const processed = this.getProcessedSingleData(entityId);
+        const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+        chartHtml = html`
+          <div class="scrollable-chart-container">
+            <div class="glass-bar-chart">
+              ${processed.map(item => {
+                const percent = (item.value / maxVal) * 80; // max 80% height
+                return html`
+                  <div class="chart-column">
+                    <div class="chart-bar-wrapper">
+                      <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
+                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>
+                      </div>
+                    </div>
+                    <span class="chart-label">${item.label}</span>
+                  </div>
+                `;
+              })}
+            </div>
+          </div>
+        `;
+      }
+    } else if (this.activePopup === 'home') {
+      title = 'Huisverbruik';
+      subtitle = 'Verbruik & Historie';
+      const load = this.getEntityValue(entities.load || (entities as any).home_power);
+      const homeToday = this.parseEntityFloat(entities.home_today);
+      
+      stat1Label = 'Huidig verbruik';
+      stat1Val = load >= 1000 ? `${(load / 1000).toFixed(1)} kW` : `${Math.round(load)} W`;
+      stat2Label = 'Vandaag verbruikt';
+      stat2Val = homeToday !== null ? `${homeToday.toFixed(1)} kWh` : '0 kWh';
+      hasSecondStat = true;
+
+      const entityId = entities.home_today;
+      if (this.isLoadingHistory) {
+        chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+      } else if (!entityId || !this.statsData[entityId] || this.statsData[entityId].length === 0) {
+        chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
+      } else {
+        const processed = this.getProcessedSingleData(entityId);
+        const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+        chartHtml = html`
+          <div class="scrollable-chart-container">
+            <div class="glass-bar-chart">
+              ${processed.map(item => {
+                const percent = (item.value / maxVal) * 80;
+                return html`
+                  <div class="chart-column">
+                    <div class="chart-bar-wrapper">
+                      <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
+                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>
+                      </div>
+                    </div>
+                    <span class="chart-label">${item.label}</span>
+                  </div>
+                `;
+              })}
+            </div>
+          </div>
+        `;
+      }
+    } else if (this.activePopup === 'grid') {
+      title = 'Stroomnet';
+      subtitle = 'Netbelasting & Historie';
+      const grid = this.getEntityValue(entities.grid || (entities as any).grid_power);
+      const gridImportToday = this.parseEntityFloat(entities.grid_import_today);
+      const gridExportToday = this.parseEntityFloat(entities.grid_export_today);
+
+      stat1Label = grid >= 0 ? 'Netto Import (Live)' : 'Netto Export (Live)';
+      stat1Val = Math.abs(grid) >= 1000 ? `${(Math.abs(grid) / 1000).toFixed(1)} kW` : `${Math.round(Math.abs(grid))} W`;
+      
+      stat2Label = 'Import / Export Vandaag';
+      stat2Val = `${gridImportToday !== null ? gridImportToday.toFixed(1) : '0'} / ${gridExportToday !== null ? gridExportToday.toFixed(1) : '0'} kWh`;
+      hasSecondStat = true;
+
+      const impEntity = entities.grid_import_today;
+      const expEntity = entities.grid_export_today;
+
+      if (this.isLoadingHistory) {
+        chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+      } else if (!impEntity || !expEntity || (!this.statsData[impEntity] && !this.statsData[expEntity])) {
+        chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
+      } else {
+        const processed = this.getProcessedGridData(impEntity, expEntity);
+        const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
+        chartHtml = html`
+          <div class="scrollable-chart-container">
+            <div class="glass-bar-chart">
+              ${processed.map(item => {
+                const importPercent = (item.importValue / maxVal) * 80;
+                const exportPercent = (item.exportValue / maxVal) * 80;
+                return html`
+                  <div class="chart-column" style="min-width: 60px;">
+                    <div class="grid-double-bar-wrapper">
+                      <!-- Import bar -->
+                      <div class="grid-import-bar-wrapper">
+                        <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;">
+                          ${item.importValue > 0 ? html`<span class="bar-value" style="left: -12px;">${item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>` : ''}
+                        </div>
+                      </div>
+                      <!-- Export bar -->
+                      <div class="grid-export-bar-wrapper">
+                        <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;">
+                          ${item.exportValue > 0 ? html`<span class="bar-value" style="left: -12px;">${item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>` : ''}
+                        </div>
+                      </div>
+                    </div>
+                    <span class="chart-label">${item.label}</span>
+                  </div>
+                `;
+              })}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    return html`
+      <div class="glass-popup-overlay" @click=${this.closePopup}>
+        <div class="glass-popup-card" @click=${(e: Event) => e.stopPropagation()}>
+          <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
+          
+          <div class="glass-popup-header">
+            <div class="glass-popup-title">${title}</div>
+            <div class="glass-popup-subtitle">${subtitle}</div>
+          </div>
+
+          <!-- Tab switcher -->
+          <div class="popup-tabs">
+            <button class="popup-tab-btn ${this.activeTab === 'day' ? 'active' : ''}" @click=${() => this.switchTab('day')}>Dag</button>
+            <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
+            <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
+          </div>
+
+          <div class="glass-popup-stats">
+            <div class="glass-popup-stat">
+              <span class="stat-label">${stat1Label}</span>
+              <span class="stat-value" style="color: #10b981;">${stat1Val}</span>
+            </div>
+            ${hasSecondStat ? html`
+              <div class="glass-popup-stat">
+                <span class="stat-label">${stat2Label}</span>
+                <span class="stat-value">${stat2Val}</span>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="glass-popup-chart-container">
+            <div class="chart-title">
+              ${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (kWh)
+            </div>
+            ${chartHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private switchTab(tab: 'day' | 'month' | 'year'): void {
+    this.activeTab = tab;
+    setTimeout(() => {
+      const container = this.shadowRoot?.querySelector('.scrollable-chart-container');
+      if (container) {
+        container.scrollLeft = container.scrollWidth;
+      }
+    }, 100);
   }
 
   private getClouds(weather: string): any[] {
@@ -251,14 +568,33 @@ export class EnergyFlowCard extends LitElement {
   private async handleNodeClick(nodeId: string): Promise<void> {
     console.info(`[energy-flow-card] Click registered on node: ${nodeId}`);
     
-    if (nodeId === 'solar') {
-      this.activePopup = 'solar';
-      const entity = this.config?.entities.solar_energy_today || (this.config?.entities as any).solar_today;
-      if (entity) {
-        this.isLoadingHistory = true;
-        this.activePopupHistory = [];
-        this.activePopupHistory = await this.fetchHistory(entity);
-        this.isLoadingHistory = false;
+    if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid') {
+      this.activePopup = nodeId;
+      this.activeTab = 'day';
+      this.statsData = {};
+      
+      const entitiesToFetch: string[] = [];
+      if (nodeId === 'solar') {
+        const ent = this.config?.entities.solar_energy_today || (this.config?.entities as any).solar_today;
+        if (ent) entitiesToFetch.push(ent);
+      } else if (nodeId === 'home') {
+        const ent = this.config?.entities.home_today;
+        if (ent) entitiesToFetch.push(ent);
+      } else if (nodeId === 'grid') {
+        const imp = this.config?.entities.grid_import_today;
+        const exp = this.config?.entities.grid_export_today;
+        if (imp) entitiesToFetch.push(imp);
+        if (exp) entitiesToFetch.push(exp);
+      }
+      
+      if (entitiesToFetch.length > 0) {
+        await this.fetchStatsData(entitiesToFetch);
+        setTimeout(() => {
+          const container = this.shadowRoot?.querySelector('.scrollable-chart-container');
+          if (container) {
+            container.scrollLeft = container.scrollWidth;
+          }
+        }, 100);
       }
       return;
     }
@@ -302,7 +638,6 @@ export class EnergyFlowCard extends LitElement {
 
     this.selectedNode = this.selectedNode === nodeId ? null : nodeId;
     
-    // Map node id to entity key, with smart fallbacks
     let entityKey = nodeId;
     if (nodeId === 'battery') {
       entityKey = this.config?.entities.battery_power ? 'battery_power' : 'battery_soc';
@@ -421,22 +756,13 @@ export class EnergyFlowCard extends LitElement {
       batteryPower = -rawBatteryPower;
     }
 
-    // Helper to parse daily energy sensor states
-    const parseEntityFloat = (entId?: string): number | null => {
-      if (!entId) return null;
-      const entity = this.hass?.states[entId];
-      if (!entity) return null;
-      const v = parseFloat(entity.state);
-      return isNaN(v) ? null : v;
-    };
-
-    const solarToday = parseEntityFloat(entities.solar_energy_today || (entities as any).solar_today);
-    const gridImportToday = parseEntityFloat(entities.grid_import_today);
-    const gridExportToday = parseEntityFloat(entities.grid_export_today);
-    const homeToday = parseEntityFloat(entities.home_today);
-    const batteryChargeToday = parseEntityFloat(entities.battery_charge_today);
-    const batteryDischargeToday = parseEntityFloat(entities.battery_discharge_today);
-    const evToday = parseEntityFloat(entities.ev_today);
+    const solarToday = this.parseEntityFloat(entities.solar_energy_today || (entities as any).solar_today);
+    const gridImportToday = this.parseEntityFloat(entities.grid_import_today);
+    const gridExportToday = this.parseEntityFloat(entities.grid_export_today);
+    const homeToday = this.parseEntityFloat(entities.home_today);
+    const batteryChargeToday = this.parseEntityFloat(entities.battery_charge_today);
+    const batteryDischargeToday = this.parseEntityFloat(entities.battery_discharge_today);
+    const evToday = this.parseEntityFloat(entities.ev_today);
 
     // Weather state from Home Assistant
     let weatherState = 'sunny';
@@ -553,61 +879,7 @@ export class EnergyFlowCard extends LitElement {
           </div>
 
           <!-- Glassmorphism Custom Popup Overlay -->
-          ${this.activePopup === 'solar' ? html`
-            <div class="glass-popup-overlay" @click=${this.closePopup}>
-              <div class="glass-popup-card" @click=${(e: Event) => e.stopPropagation()}>
-                <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
-                
-                <div class="glass-popup-header">
-                  <div class="glass-popup-title">Zonnepanelen</div>
-                  <div class="glass-popup-subtitle">Live Opbrengst & Historie</div>
-                </div>
-
-                <div class="glass-popup-stats">
-                  <div class="glass-popup-stat">
-                    <span class="stat-label">Huidig vermogen</span>
-                    <span class="stat-value" style="color: #10b981;">
-                      ${solar >= 20 ? (solar >= 1000 ? `${(solar / 1000).toFixed(1)} kW` : `${Math.round(solar)} W`) : '0 W'}
-                    </span>
-                  </div>
-                  <div class="glass-popup-stat">
-                    <span class="stat-label">Vandaag opgewekt</span>
-                    <span class="stat-value">
-                      ${solarToday !== null ? `${solarToday.toFixed(1)} kWh` : '0 kWh'}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="glass-popup-chart-container">
-                  <div class="chart-title">Opbrengst afgelopen 7 dagen (kWh)</div>
-                  ${this.isLoadingHistory ? html`
-                    <div class="chart-loading">Gegevens laden...</div>
-                  ` : html`
-                    ${this.activePopupHistory.length === 0 ? html`
-                      <div class="chart-no-data">Geen historische gegevens beschikbaar.</div>
-                    ` : html`
-                      <div class="glass-bar-chart">
-                        ${this.activePopupHistory.map(item => {
-                          const maxVal = Math.max(...this.activePopupHistory.map(i => i.value)) || 1;
-                          const percent = (item.value / maxVal) * 80; // Scale to max 80% height
-                          return html`
-                            <div class="chart-column">
-                              <div class="chart-bar-wrapper">
-                                <div class="chart-bar" style="height: ${Math.max(5, percent)}%;">
-                                  <span class="bar-value">${item.value.toFixed(1)}</span>
-                                </div>
-                              </div>
-                              <span class="chart-label">${item.day}</span>
-                            </div>
-                          `;
-                        })}
-                      </div>
-                    `}
-                  `}
-                </div>
-              </div>
-            </div>
-          ` : ''}
+          ${this.renderPopup()}
         </div>
       </ha-card>
     `;

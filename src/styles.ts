@@ -410,28 +410,92 @@ export const styles = css`
     font-size: 13px;
   }
 
+  /* Tab switcher inside popups */
+  .popup-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+  }
+
+  .popup-tab-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 6px 14px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .popup-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+
+  .popup-tab-btn.active {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  }
+
+  /* Scrollable Chart Container */
+  .scrollable-chart-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    padding-top: 25px; /* space for bar values */
+    margin-top: 8px;
+  }
+
+  .scrollable-chart-container::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .scrollable-chart-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollable-chart-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 3px;
+  }
+
+  .scrollable-chart-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
   /* SVG/HTML Bar Chart */
   .glass-bar-chart {
     display: flex;
-    justify-content: space-between;
+    gap: 14px;
     align-items: flex-end;
-    height: 120px;
-    padding-top: 20px;
+    height: 150px;
+    min-width: max-content;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .chart-column {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 1;
+    min-width: 50px;
     height: 100%;
+    justify-content: flex-end;
   }
 
   .chart-bar-wrapper {
-    height: 80px;
-    width: 16px;
+    height: 100px;
+    width: 24px;
     background: rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
+    border-radius: 4px;
     display: flex;
     align-items: flex-end;
     position: relative;
@@ -439,21 +503,63 @@ export const styles = css`
 
   .chart-bar {
     width: 100%;
-    background: linear-gradient(to top, #10b981, #34d399);
-    border-radius: 8px;
+    border-radius: 4px;
     display: flex;
     justify-content: center;
     position: relative;
     transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  .solar-bar {
+    background: linear-gradient(to top, #f59e0b, #fbbf24);
+  }
+
+  .home-bar {
+    background: linear-gradient(to top, #8b5cf6, #a78bfa);
+  }
+
+  /* Double-bar grid wrapper */
+  .grid-double-bar-wrapper {
+    display: flex;
+    gap: 6px;
+    height: 100px;
+    align-items: flex-end;
+  }
+
+  .grid-import-bar-wrapper, .grid-export-bar-wrapper {
+    height: 100%;
+    width: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+  }
+
+  .grid-import-bar {
+    width: 100%;
+    background: linear-gradient(to top, #ef4444, #f87171);
+    border-radius: 3px;
+    position: relative;
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .grid-export-bar {
+    width: 100%;
+    background: linear-gradient(to top, #10b981, #34d399);
+    border-radius: 3px;
+    position: relative;
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   .bar-value {
     position: absolute;
-    top: -20px;
-    font-size: 10px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.85);
+    top: -24px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #ffffff;
     white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
   }
 
   .chart-label {
@@ -461,6 +567,7 @@ export const styles = css`
     font-size: 11px;
     color: rgba(255, 255, 255, 0.5);
     text-transform: capitalize;
+    white-space: nowrap;
   }
 
   @keyframes fadeIn {
