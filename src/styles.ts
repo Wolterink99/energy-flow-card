@@ -310,16 +310,21 @@ export const styles = css`
   }
 
   .glass-popup-card {
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15, 23, 42, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
-    width: 90%;
-    max-width: 500px;
+    width: 500px;
+    max-width: 95vw;
+    height: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
     padding: 24px;
     color: #ffffff;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     position: relative;
     animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
   }
 
   .glass-popup-close {
@@ -390,6 +395,10 @@ export const styles = css`
     border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: 12px;
     padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
   }
 
   .chart-title {
@@ -452,6 +461,9 @@ export const styles = css`
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
     padding-top: 25px; /* space for bar values */
     margin-top: 8px;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
   }
 
   .scrollable-chart-container::-webkit-scrollbar {
