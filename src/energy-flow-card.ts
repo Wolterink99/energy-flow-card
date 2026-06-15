@@ -858,8 +858,17 @@ export class EnergyFlowCard extends LitElement {
 
     // Calculate if we should show window lights
     let resolvedShowLights: boolean | undefined = undefined;
-    if (entities.light) {
-      const lightConfig = entities.light;
+    let lightConfig = entities.light;
+    
+    if (!lightConfig && this.hass) {
+      const links = 'light.woonkamer_dimmerlinks_ecodim_dimmer_switch_zb3_0_licht';
+      const rechts = 'light.woonkamer_dimmerrechts_ecodim_dimmer_switch_zb3_0_licht';
+      if (this.hass.states[links] || this.hass.states[rechts]) {
+        lightConfig = [links, rechts];
+      }
+    }
+
+    if (lightConfig) {
       const checkLightOn = (id: string): boolean => {
         const entity = this.hass?.states[id];
         return entity?.state === 'on';
