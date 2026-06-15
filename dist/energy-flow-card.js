@@ -313,7 +313,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
     border-radius: 16px;
     width: 500px;
     max-width: 95vw;
-    height: 520px;
+    height: 560px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
