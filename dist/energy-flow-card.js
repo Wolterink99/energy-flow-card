@@ -1468,9 +1468,10 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
                       </div>
  
                       <!-- Temperaturen (Max & Min daaronder) -->
-                      <div style="display: flex; justify-content: center; gap: 4px; align-items: baseline;">
-                        <span style="font-size: 13px; font-weight: bold; color: #ffffff;">${t.temperature}°</span>
-                        <span style="font-size: 11px; color: rgba(255,255,255,0.4);">${void 0!==t.templow?`${t.templow}°`:"—"}</span>
+                      <div style="display: flex; justify-content: center; gap: 3px; align-items: baseline; font-size: 12px;">
+                        <span style="font-weight: bold; color: #ffffff;">${t.temperature}°</span>
+                        <span style="color: rgba(255,255,255,0.3); font-size: 11px;">/</span>
+                        <span style="color: rgba(255,255,255,0.5); font-size: 11px;">${void 0!==t.templow?`${t.templow}°`:"—"}</span>
                       </div>
  
                       <!-- Regen -->

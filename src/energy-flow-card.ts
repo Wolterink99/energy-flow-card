@@ -590,9 +590,10 @@ export class EnergyFlowCard extends LitElement {
                       </div>
  
                       <!-- Temperaturen (Max & Min daaronder) -->
-                      <div style="display: flex; justify-content: center; gap: 4px; align-items: baseline;">
-                        <span style="font-size: 13px; font-weight: bold; color: #ffffff;">${day.temperature}°</span>
-                        <span style="font-size: 11px; color: rgba(255,255,255,0.4);">${day.templow !== undefined ? `${day.templow}°` : '—'}</span>
+                      <div style="display: flex; justify-content: center; gap: 3px; align-items: baseline; font-size: 12px;">
+                        <span style="font-weight: bold; color: #ffffff;">${day.temperature}°</span>
+                        <span style="color: rgba(255,255,255,0.3); font-size: 11px;">/</span>
+                        <span style="color: rgba(255,255,255,0.5); font-size: 11px;">${day.templow !== undefined ? `${day.templow}°` : '—'}</span>
                       </div>
  
                       <!-- Regen -->
