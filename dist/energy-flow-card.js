@@ -1160,7 +1160,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${u?m`
           <g class="interactiveGroup weatherGroup" @click=${()=>z("weather")}>
-            <g transform="translate(${K-190}, ${Bt+90})">
+            <g transform="translate(${K-190}, 20)">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard"
                 rx="8" ry="8" />
