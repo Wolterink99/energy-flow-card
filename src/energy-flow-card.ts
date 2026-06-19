@@ -530,7 +530,7 @@ export class EnergyFlowCard extends LitElement {
       
       return html`
         <div class="glass-popup-overlay" @click=${this.closePopup}>
-          <div class="glass-popup-card" @click=${(e: Event) => e.stopPropagation()}>
+          <div class="glass-popup-card" style="height: auto;" @click=${(e: Event) => e.stopPropagation()}>
             <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
             
             <div class="glass-popup-header" style="margin-bottom: 24px;">
@@ -571,7 +571,7 @@ export class EnergyFlowCard extends LitElement {
               </div>
             </div>
 
-            <div class="glass-popup-forecast-section" style="margin-top: auto; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); box-sizing: border-box;">
+            <div class="glass-popup-forecast-section" style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); box-sizing: border-box;">
               <div class="chart-title" style="margin-bottom: 8px; font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); text-transform: uppercase;">Weersverwachting</div>
               <div style="display: flex; justify-content: space-between; gap: 6px;">
                 ${this.weatherForecast && this.weatherForecast.length > 0 ? this.weatherForecast.slice(0, 5).map(day => {
