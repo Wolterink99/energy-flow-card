@@ -1335,15 +1335,15 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
               <div class="chart-title" style="margin-bottom: 12px; font-size: 12px; font-weight: bold; color: rgba(255,255,255,0.6); text-transform: uppercase;">Weersverwachting</div>
               <div style="display: flex; justify-content: space-between; gap: 8px;">
                 ${this.weatherForecast&&this.weatherForecast.length>0?this.weatherForecast.slice(0,5).map(t=>{const e=new Date(t.datetime).toLocaleDateString("nl-NL",{weekday:"short"}),r=Ft[t.condition]||"mdi:weather-partly-cloudy",s=void 0!==t.precipitation?t.precipitation:0;return C`
-                    <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; min-width: 0;">
+                    <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 12px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; min-width: 0;">
                       <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: rgba(255,255,255,0.5);">${e}</span>
                       <ha-icon icon="${r}" style="width: 24px; height: 24px; margin: 8px 0; color: #fbbf24;"></ha-icon>
                       <span style="font-size: 14px; font-weight: bold; color: #ffffff;">${t.temperature}°</span>
                       ${void 0!==t.templow?C`<span style="font-size: 11px; color: rgba(255,255,255,0.4);">${t.templow}°</span>`:""}
                       ${s>0?C`
-                        <span style="font-size: 9px; color: #60a5fa; margin-top: 4px; display: flex; align-items: center; gap: 1px; justify-content: center; width: 100%;">
-                          <ha-icon icon="mdi:water" style="width: 10px; height: 10px; flex-shrink: 0;"></ha-icon>
-                          ${s} mm
+                        <span style="font-size: 9px; color: #60a5fa; margin-top: 4px; display: flex; align-items: center; gap: 2px; justify-content: center; width: 100%;">
+                          <ha-icon icon="mdi:water" style="--mdc-icon-size: 12px; width: 12px; height: 12px; flex-shrink: 0;"></ha-icon>
+                          <span>${s} mm</span>
                         </span>
                       `:""}
                     </div>

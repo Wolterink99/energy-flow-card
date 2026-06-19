@@ -429,15 +429,15 @@ export class EnergyFlowCard extends LitElement {
                   const precip = day.precipitation !== undefined ? day.precipitation : 0;
                   
                   return html`
-                    <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; min-width: 0;">
+                    <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 12px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; min-width: 0;">
                       <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: rgba(255,255,255,0.5);">${dayLabel}</span>
                       <ha-icon icon="${icon}" style="width: 24px; height: 24px; margin: 8px 0; color: #fbbf24;"></ha-icon>
                       <span style="font-size: 14px; font-weight: bold; color: #ffffff;">${day.temperature}°</span>
                       ${day.templow !== undefined ? html`<span style="font-size: 11px; color: rgba(255,255,255,0.4);">${day.templow}°</span>` : ''}
                       ${precip > 0 ? html`
-                        <span style="font-size: 9px; color: #60a5fa; margin-top: 4px; display: flex; align-items: center; gap: 1px; justify-content: center; width: 100%;">
-                          <ha-icon icon="mdi:water" style="width: 10px; height: 10px; flex-shrink: 0;"></ha-icon>
-                          ${precip} mm
+                        <span style="font-size: 9px; color: #60a5fa; margin-top: 4px; display: flex; align-items: center; gap: 2px; justify-content: center; width: 100%;">
+                          <ha-icon icon="mdi:water" style="--mdc-icon-size: 12px; width: 12px; height: 12px; flex-shrink: 0;"></ha-icon>
+                          <span>${precip} mm</span>
                         </span>
                       ` : ''}
                     </div>
