@@ -524,7 +524,18 @@ export class EnergyFlowCard extends LitElement {
       const apparentTemp = weatherEntity.attributes.apparent_temperature;
       const windSpeed = weatherEntity.attributes.wind_speed;
       const humidity = weatherEntity.attributes.humidity;
-      const pressure = weatherEntity.attributes.pressure;
+      
+      // Fallback pressure detection
+      let pressure = weatherEntity.attributes.pressure;
+      if (pressure === undefined || pressure === null) {
+        const fallbackEntity = Object.values(this.hass?.states || {}).find(
+          ent => ent.entity_id.startsWith('weather.') && ent.attributes.pressure !== undefined && ent.attributes.pressure !== null
+        );
+        if (fallbackEntity) {
+          pressure = fallbackEntity.attributes.pressure;
+        }
+      }
+      
       const friendlyName = weatherEntity.attributes.friendly_name || 'Weer';
       const condTranslated = WEATHER_TRANSLATIONS[state] || state;
       
@@ -533,41 +544,71 @@ export class EnergyFlowCard extends LitElement {
           <div class="glass-popup-card" style="height: auto;" @click=${(e: Event) => e.stopPropagation()}>
             <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
             
-            <div class="glass-popup-header" style="margin-bottom: 24px;">
+            <div class="glass-popup-header" style="margin-bottom: 20px;">
               <div class="glass-popup-title">${friendlyName}</div>
               <div class="glass-popup-subtitle">Actuele weersinformatie voor jouw locatie</div>
             </div>
-
-            <div class="glass-popup-stats" style="grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-              <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 20px;">
-                <div>
-                  <span class="stat-label">Conditie</span>
-                  <span class="stat-value" style="font-size: 24px; color: #fbbf24; text-transform: capitalize;">${condTranslated}</span>
+ 
+            <div class="glass-popup-stats" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+              <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="background: rgba(255,255,255,0.05); border-radius: 50%; padding: 6px; display: flex; align-items: center; justify-content: center;">
+                    ${getWeatherIconSvg(state, false, 36)}
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <span class="stat-label" style="font-size: 11px; margin-bottom: 2px; color: rgba(255,255,255,0.5);">Conditie</span>
+                    <span class="stat-value" style="font-size: 18px; color: #fbbf24; text-transform: capitalize; font-weight: 600; line-height: 1.2;">${condTranslated}</span>
+                  </div>
                 </div>
-                <div style="text-align: right;">
-                  <span class="stat-label">Temperatuur</span>
-                  <span class="stat-value" style="font-size: 32px; color: #ffffff;">${temp !== undefined ? `${temp} °C` : '—'}</span>
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                    <span class="stat-label" style="font-size: 11px; margin-bottom: 2px; color: rgba(255,255,255,0.5);">Temperatuur</span>
+                    <span class="stat-value" style="font-size: 24px; color: #ffffff; font-weight: 600; line-height: 1.2;">${temp !== undefined ? `${temp} °C` : '—'}</span>
+                  </div>
+                  <div style="background: rgba(255,50,50,0.1); border-radius: 50%; padding: 8px; display: flex; align-items: center; justify-content: center;">
+                    <ha-icon icon="mdi:thermometer" style="--mdc-icon-size: 30px; width: 30px; height: 30px; color: #ff5252;"></ha-icon>
+                  </div>
                 </div>
               </div>
-
-              <div class="glass-popup-stat">
-                <span class="stat-label">Gevoelstemperatuur</span>
-                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${apparentTemp !== undefined ? `${apparentTemp} °C` : '—'}</span>
+ 
+              <div class="glass-popup-stat" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
+                <div style="background: rgba(255,255,255,0.04); border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center;">
+                  <ha-icon icon="mdi:account-thermometer" style="--mdc-icon-size: 20px; width: 20px; height: 20px; color: #ff9f43;"></ha-icon>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                  <span class="stat-label" style="font-size: 11px; margin-bottom: 2px;">Gevoelstemp.</span>
+                  <span class="stat-value" style="font-size: 15px; color: #cbd5e1; font-weight: 500;">${apparentTemp !== undefined ? `${apparentTemp} °C` : '—'}</span>
+                </div>
               </div>
-
-              <div class="glass-popup-stat">
-                <span class="stat-label">Windsnelheid</span>
-                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${windSpeed !== undefined ? `${windSpeed} km/h` : '—'}</span>
+ 
+              <div class="glass-popup-stat" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
+                <div style="background: rgba(255,255,255,0.04); border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center;">
+                  <ha-icon icon="mdi:weather-windy" style="--mdc-icon-size: 20px; width: 20px; height: 20px; color: #60a5fa;"></ha-icon>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                  <span class="stat-label" style="font-size: 11px; margin-bottom: 2px;">Windsnelheid</span>
+                  <span class="stat-value" style="font-size: 15px; color: #cbd5e1; font-weight: 500;">${windSpeed !== undefined ? `${windSpeed} km/h` : '—'}</span>
+                </div>
               </div>
-
-              <div class="glass-popup-stat">
-                <span class="stat-label">Luchtvochtigheid</span>
-                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${humidity !== undefined ? `${humidity}%` : '—'}</span>
+ 
+              <div class="glass-popup-stat" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
+                <div style="background: rgba(255,255,255,0.04); border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center;">
+                  <ha-icon icon="mdi:water-percent" style="--mdc-icon-size: 20px; width: 20px; height: 20px; color: #26c6da;"></ha-icon>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                  <span class="stat-label" style="font-size: 11px; margin-bottom: 2px;">Vochtigheid</span>
+                  <span class="stat-value" style="font-size: 15px; color: #cbd5e1; font-weight: 500;">${humidity !== undefined ? `${humidity}%` : '—'}</span>
+                </div>
               </div>
-
-              <div class="glass-popup-stat">
-                <span class="stat-label">Luchtdruk</span>
-                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${pressure !== undefined ? `${pressure} hPa` : '—'}</span>
+ 
+              <div class="glass-popup-stat" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
+                <div style="background: rgba(255,255,255,0.04); border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center;">
+                  <ha-icon icon="mdi:gauge" style="--mdc-icon-size: 20px; width: 20px; height: 20px; color: #26a69a;"></ha-icon>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                  <span class="stat-label" style="font-size: 11px; margin-bottom: 2px;">Luchtdruk</span>
+                  <span class="stat-value" style="font-size: 15px; color: #cbd5e1; font-weight: 500;">${pressure !== undefined ? `${pressure} hPa` : '—'}</span>
+                </div>
               </div>
             </div>
 
