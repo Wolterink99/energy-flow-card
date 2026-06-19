@@ -1033,7 +1033,7 @@ export function renderHouseSvg({
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${weather ? svg`
           <g class="interactiveGroup weatherGroup" @click=${() => onNodeClick('weather')}>
-            <g transform="translate(20, ${translateY + 90})">
+            <g transform="translate(${width - 190}, ${translateY + 90})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard"
                 rx="8" ry="8" />
