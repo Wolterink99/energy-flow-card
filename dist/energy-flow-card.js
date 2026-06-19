@@ -1461,15 +1461,15 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
                     <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 2px; text-align: center; display: flex; flex-direction: column; align-items: center; min-width: 0; gap: 4px;">
                       <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: rgba(255,255,255,0.5);">${e}</span>
                       
-                      <!-- Dag (Overdag High) -->
-                      <div style="display: flex; flex-direction: column; align-items: center; gap: 1px;">
+                      <!-- Iconen (Dag & Nacht naast elkaar) -->
+                      <div style="display: flex; justify-content: center; gap: 4px; align-items: center; width: 100%;">
                         ${Ft(t.condition,!1,16)}
-                        <span style="font-size: 13px; font-weight: bold; color: #ffffff;">${t.temperature}°</span>
+                        ${Ft(t.condition,!0,16)}
                       </div>
  
-                      <!-- Nacht (Nacht Low) -->
-                      <div style="display: flex; flex-direction: column; align-items: center; gap: 1px;">
-                        ${Ft(t.condition,!0,16)}
+                      <!-- Temperaturen (Max & Min daaronder) -->
+                      <div style="display: flex; justify-content: center; gap: 4px; align-items: baseline;">
+                        <span style="font-size: 13px; font-weight: bold; color: #ffffff;">${t.temperature}°</span>
                         <span style="font-size: 11px; color: rgba(255,255,255,0.4);">${void 0!==t.templow?`${t.templow}°`:"—"}</span>
                       </div>
  
