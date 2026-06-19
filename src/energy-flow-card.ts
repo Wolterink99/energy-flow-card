@@ -835,6 +835,7 @@ export class EnergyFlowCard extends LitElement {
     }
 
     const windSpeed = weatherEntity?.attributes?.wind_speed !== undefined ? parseFloat(weatherEntity.attributes.wind_speed) : 10;
+    const temperature = weatherEntity?.attributes?.temperature !== undefined ? parseFloat(weatherEntity.attributes.temperature) : null;
     let rainIntensity: 'light' | 'normal' | 'heavy' = 'normal';
     if (weatherEntity?.attributes?.precipitation !== undefined) {
       const precip = parseFloat(weatherEntity.attributes.precipitation);
@@ -970,6 +971,7 @@ export class EnergyFlowCard extends LitElement {
               gridPriceUnit,
               rainIntensity,
               windSpeed,
+              temperature,
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>

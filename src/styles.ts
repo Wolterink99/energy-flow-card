@@ -242,6 +242,7 @@ export const styles = css`
   .evGroup:hover { filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.5)); }
   .homeGroup:hover { filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.35)); }
   .gridGroup:hover { filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.5)); }
+  .weatherGroup:hover { filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.5)); }
 
   /* HUD Overlays */
   .hudCard {
@@ -315,7 +316,7 @@ export const styles = css`
     border-radius: 16px;
     width: 500px;
     max-width: 95vw;
-    height: 640px;
+    height: 680px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;

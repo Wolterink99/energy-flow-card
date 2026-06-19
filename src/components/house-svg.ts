@@ -12,6 +12,24 @@ const COLORS = {
   home:    { stroke: '#e2e8f0', glow: 'rgba(226,232,240,0.3)' },
 };
 
+const WEATHER_TRANSLATIONS: Record<string, string> = {
+  'sunny': 'Zonnig',
+  'clear-night': 'Heldere nacht',
+  'cloudy': 'Bewolkt',
+  'fog': 'Mistig',
+  'hail': 'Hagel',
+  'lightning': 'Onweer',
+  'lightning-rainy': 'Onweer met regen',
+  'partlycloudy': 'Licht bewolkt',
+  'pouring': 'Stortregen',
+  'rainy': 'Regen',
+  'snowy': 'Sneeuw',
+  'snowy-rainy': 'Natte sneeuw',
+  'windy': 'Winderig',
+  'windy-variant': 'Winderig',
+  'exceptional': 'Uitzonderlijk'
+};
+
 // Continuous Sky Interpolation Keyframes
 interface SkyKeyframe {
   hour: number;
@@ -181,6 +199,7 @@ interface SvgParams {
   gridPriceUnit?: string;
   rainIntensity?: 'light' | 'normal' | 'heavy';
   windSpeed?: number;
+  temperature?: number | null;
   onNodeClick: (node: string) => void;
 }
 
@@ -283,6 +302,7 @@ export function renderHouseSvg({
   gridPriceUnit = '€/kWh',
   rainIntensity = 'normal',
   windSpeed = 10,
+  temperature = null,
   onNodeClick
 }: SvgParams): TemplateResult {
 
@@ -1006,6 +1026,26 @@ export function renderHouseSvg({
         ${visualWeather === 'foggy' ? svg`
           <rect width="${width}" height="${height}" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
           <rect width="${width}" height="${height}" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
+        ` : ''}
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- WEATHER HUD CARD (Top left sky area, aligned with Stroomnet)    -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        ${weather ? svg`
+          <g class="interactiveGroup weatherGroup" @click=${() => onNodeClick('weather')}>
+            <g transform="translate(20, ${translateY + 90})">
+              <rect x="0" y="0" width="170" height="65"
+                class="hudCard"
+                rx="8" ry="8" />
+              <text x="12" y="20" class="hudTitle">Weer</text>
+              <text x="12" y="39" class="hudValue">
+                ${temperature !== null ? `${temperature.toFixed(1)} °C` : '—'}
+              </text>
+              <text x="12" y="53" class="hudSub">
+                ${WEATHER_TRANSLATIONS[weather] || weather}
+              </text>
+            </g>
+          </g>
         ` : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
