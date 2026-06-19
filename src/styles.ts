@@ -53,7 +53,7 @@ export const styles = css`
     line-height: 0;
   }
 
-  svg {
+  svg:not(.weather-icon) {
     display: block;
     overflow: hidden;
     user-select: none;

@@ -31,7 +31,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
   switch (cond) {
     case 'sunny':
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <circle cx="12" cy="12" r="5" fill="#f59e0b" />
           <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
             <line x1="12" y1="3" x2="12" y2="5" />
@@ -47,14 +47,14 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
       `;
     case 'clear-night':
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <path d="M12 3a9 9 0 1 0 9 9 9.75 9.75 0 0 1-9-9Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
           <path d="M18 4v2m-1-1h2" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" />
         </svg>
       `;
     case 'cloudy':
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <path d="M6 18a4 4 0 0 1-1-7.87 6 6 0 0 1 11.75-1.68 4.5 4.5 0 0 1 3.25 8.55Z" fill="#64748b" />
           <path d="M4 19a3 3 0 0 1-.75-5.9 4.5 4.5 0 0 1 8.81-1.26 3.38 3.38 0 0 1 2.44 6.41Z" fill="#94a3b8" opacity="0.85" transform="translate(-2, 1)" />
         </svg>
@@ -62,7 +62,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
     case 'partlycloudy':
       if (isNight) {
         return html`
-          <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+          <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
             <g transform="translate(1, -2)">
               <path d="M11 4a7 7 0 1 0 7 7 7.6 7.6 0 0 1-7-7Z" fill="#fbbf24" opacity="0.8" />
             </g>
@@ -71,7 +71,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
         `;
       }
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <g transform="translate(-2, -2)">
             <circle cx="11" cy="11" r="4.5" fill="#fbbf24" />
             <g stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round">
@@ -81,14 +81,14 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
               <line x1="17.5" y1="11" x2="19" y2="11" />
             </g>
           </g>
-          <path d="M8 18a3.5 3.5 0 0 1-.87-6.88 5 5 0 0 1 9.8-1.4 3.75 3.75 0 0 1 2.7 7.13Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="0.5" />
+          <path d="M8 18a3.5 3.5 0 0 1-.87-6.88 5 5 0 0 1 9.8-1.4 3.75 3.75 0 0 1 2.7 7.13Z" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="0.5" />
         </svg>
       `;
     case 'rainy':
     case 'pouring':
       if (isNight) {
         return html`
-          <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+          <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
             <g transform="translate(1, -2)">
               <path d="M11 4a7 7 0 1 0 7 7 7.6 7.6 0 0 1-7-7Z" fill="#fbbf24" opacity="0.6" />
             </g>
@@ -102,7 +102,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
         `;
       }
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <path d="M8 15a3.5 3.5 0 0 1-.87-6.88 5 5 0 0 1 9.8-1.4 3.75 3.75 0 0 1 2.7 7.13Z" fill="#475569" />
           <g stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round">
             <line x1="8" y1="17" x2="7" y2="20" />
@@ -115,7 +115,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
     case 'lightning-rainy':
       if (isNight) {
         return html`
-          <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+          <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
             <g transform="translate(1, -2)">
               <path d="M11 4a7 7 0 1 0 7 7 7.6 7.6 0 0 1-7-7Z" fill="#fbbf24" opacity="0.5" />
             </g>
@@ -129,7 +129,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
         `;
       }
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <path d="M8 15a3.5 3.5 0 0 1-.87-6.88 5 5 0 0 1 9.8-1.4 3.75 3.75 0 0 1 2.7 7.13Z" fill="#334155" />
           <polygon points="12,14 9,18 11.5,18 10,22 15,17 12.5,17" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
           <g stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round">
@@ -143,7 +143,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
     case 'hail':
       if (isNight) {
         return html`
-          <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+          <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
             <g transform="translate(1, -2)">
               <path d="M11 4a7 7 0 1 0 7 7 7.6 7.6 0 0 1-7-7Z" fill="#fbbf24" opacity="0.5" />
             </g>
@@ -155,7 +155,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
         `;
       }
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <path d="M8 15a3.5 3.5 0 0 1-.87-6.88 5 5 0 0 1 9.8-1.4 3.75 3.75 0 0 1 2.7 7.13Z" fill="#64748b" />
           <circle cx="8" cy="18" r="1.2" fill="#ffffff" />
           <circle cx="12" cy="19" r="1.2" fill="#ffffff" />
@@ -165,7 +165,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
     case 'windy':
     case 'windy-variant':
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <g stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" fill="none">
             <path d="M4 8h12a2 2 0 1 0-2-2" />
             <path d="M2 12h17a2.5 2.5 0 1 1-2.5 2.5" />
@@ -175,7 +175,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
       `;
     case 'fog':
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <path d="M8 13a3.5 3.5 0 0 1-.87-6.88 5 5 0 0 1 9.8-1.4 3.75 3.75 0 0 1 2.7 7.13Z" fill="#94a3b8" opacity="0.7" />
           <g stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round">
             <line x1="4" y1="16" x2="20" y2="16" />
@@ -185,7 +185,7 @@ function getWeatherIconSvg(condition: string, isNight: boolean = false, size: nu
       `;
     default:
       return html`
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px; height: ${size}px; flex-shrink: 0; display: block; margin: 0 auto;">
+        <svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" style="width: ${size}px !important; height: ${size}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <circle cx="12" cy="12" r="8" fill="#fbbf24" />
         </svg>
       `;
@@ -585,8 +585,8 @@ export class EnergyFlowCard extends LitElement {
                       
                       <!-- Iconen (Dag & Nacht naast elkaar) -->
                       <div style="display: flex; justify-content: center; gap: 4px; align-items: center; width: 100%;">
-                        ${getWeatherIconSvg(day.condition, false, 16)}
-                        ${getWeatherIconSvg(day.condition, true, 16)}
+                        ${getWeatherIconSvg(day.condition, false, 14)}
+                        ${getWeatherIconSvg(day.condition, true, 14)}
                       </div>
  
                       <!-- Temperaturen (Max & Min daaronder) -->
