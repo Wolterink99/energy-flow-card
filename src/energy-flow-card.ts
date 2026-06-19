@@ -494,7 +494,10 @@ export class EnergyFlowCard extends LitElement {
     return isNaN(v) ? null : v;
   }
 
-  private closePopup(): void {
+  private closePopup(e?: Event): void {
+    if (e) {
+      e.stopPropagation();
+    }
     this.activePopup = null;
     this.activePopupHistory = [];
     this.statsData = {};
@@ -1077,6 +1080,10 @@ export class EnergyFlowCard extends LitElement {
   }
 
   private handleCardClick(e: Event): void {
+    if (this.activePopup) {
+      return;
+    }
+
     const path = e.composedPath();
     const isInteractive = path.some(el => {
       if (el instanceof Element) {
