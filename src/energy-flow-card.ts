@@ -573,7 +573,7 @@ export class EnergyFlowCard extends LitElement {
  
               <div class="glass-popup-stat" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
                 <div style="background: rgba(255,255,255,0.04); border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center;">
-                  <ha-icon icon="mdi:account-thermometer" style="--mdc-icon-size: 20px; width: 20px; height: 20px; color: #ff9f43;"></ha-icon>
+                  <ha-icon icon="mdi:thermometer" style="--mdc-icon-size: 20px; width: 20px; height: 20px; color: #ff9f43;"></ha-icon>
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: flex-start;">
                   <span class="stat-label" style="font-size: 11px; margin-bottom: 2px;">Gevoelstemp.</span>
