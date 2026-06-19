@@ -49,7 +49,8 @@ const newConfig = {
                 home_today: "sensor.echt_huisverbruik_vandaag",
                 grid_power: "sensor.p1_meter_power",
                 grid_import_today: "sensor.p1_netstroom_afname_vandaag",
-                grid_export_today: "sensor.p1_teruglevering_vandaag"
+                grid_export_today: "sensor.p1_teruglevering_vandaag",
+                grid_price: "sensor.zonneplan_current_electricity_tariff"
               },
               home_tap_action: {
                 action: "navigate",
@@ -185,7 +186,7 @@ const newConfig = {
                 },
                 {
                   type: "grid",
-                  columns: 2,
+                  columns: 3,
                   square: false,
                   cards: [
                     {
@@ -201,6 +202,13 @@ const newConfig = {
                       name: "Export vandaag",
                       icon: "mdi:import",
                       icon_color: "green"
+                    },
+                    {
+                      type: "custom:mushroom-entity-card",
+                      entity: "sensor.zonneplan_current_electricity_tariff",
+                      name: "Stroomprijs",
+                      icon: "mdi:cash-multiple",
+                      icon_color: "amber"
                     }
                   ]
                 },

@@ -168,6 +168,8 @@ interface SvgParams {
   batteryDischargeToday?: number | null;
   evToday?: number | null;
   showLights?: boolean;
+  gridPrice?: number | null;
+  gridPriceUnit?: string;
   onNodeClick: (node: string) => void;
 }
 
@@ -266,6 +268,8 @@ export function renderHouseSvg({
   batteryDischargeToday = null,
   evToday = null,
   showLights: passedShowLights = undefined,
+  gridPrice = null,
+  gridPriceUnit = '€/kWh',
   onNodeClick
 }: SvgParams): TemplateResult {
 
@@ -426,6 +430,12 @@ export function renderHouseSvg({
   }
 
   const evSub = evToday !== null ? `Vandaag: ${evToday.toFixed(1)} kWh` : (evActive ? 'Laden' : 'Standby');
+
+  let gridPriceLabel = '';
+  if (gridPrice !== null) {
+    const formattedPrice = gridPrice.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+    gridPriceLabel = `€ ${formattedPrice}`;
+  }
 
   interface CardConfig { id: string; title: string; value: string; sub: string; color: string; active: boolean; }
   const bottomCards: CardConfig[] = [
@@ -1028,6 +1038,9 @@ export function renderHouseSvg({
               rx="8" ry="8"
               style="${gridImporting || gridExporting ? `color: ${gridColor.stroke}` : ''}" />
             <text x="12" y="20" class="hudTitle">Stroomnet</text>
+            ${gridPriceLabel ? svg`
+              <text x="158" y="20" class="hudTitle" text-anchor="end" fill="#fbbf24" font-weight="bold">${gridPriceLabel}</text>
+            ` : ''}
             <text x="12" y="39" class="hudValue ${gridImporting || gridExporting ? 'hudActiveText' : ''}"
               style="${gridImporting || gridExporting ? `color: ${gridColor.stroke}` : ''}">
               ${gridImporting || gridExporting ? formatPowerAbs(grid) : '—'}

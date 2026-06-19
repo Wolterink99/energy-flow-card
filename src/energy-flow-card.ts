@@ -811,6 +811,11 @@ export class EnergyFlowCard extends LitElement {
     const batteryDischargeToday = this.parseEntityFloat(entities.battery_discharge_today);
     const evToday = this.parseEntityFloat(entities.ev_today);
 
+    // Parse grid price
+    const gridPriceState = entities.grid_price ? this.hass?.states[entities.grid_price] : null;
+    const gridPrice = gridPriceState ? parseFloat(gridPriceState.state) : null;
+    const gridPriceUnit = gridPriceState ? (gridPriceState.attributes.unit_of_measurement || '€/kWh') : '€/kWh';
+
     // Weather state from Home Assistant
     let weatherState = 'sunny';
     let weatherEntityId = entities.weather;
@@ -947,6 +952,8 @@ export class EnergyFlowCard extends LitElement {
               houseStyle: this.config?.house_style,
               carType: this.config?.car_type,
               showLights: resolvedShowLights,
+              gridPrice,
+              gridPriceUnit,
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>
