@@ -63,10 +63,6 @@ const newConfig = {
               grid_tap_action: {
                 action: "navigate",
                 navigation_path: "#stroomnet"
-              },
-              weather_tap_action: {
-                action: "navigate",
-                navigation_path: "#weer"
               }
             },
             {
@@ -223,32 +219,6 @@ const newConfig = {
                   ],
                   hours_to_show: 24,
                   refresh_interval: 0
-                }
-              ]
-            },
-            {
-              type: "vertical-stack",
-              cards: [
-                {
-                  type: "custom:bubble-card",
-                  card_type: "pop-up",
-                  hash: "weer",
-                  name: "Weerbericht",
-                  icon: "mdi:weather-sunny",
-                  back_button: true
-                },
-                {
-                  type: "custom:mushroom-template-card",
-                  primary: "Weer in {{ state_attr('weather.buienradar', 'friendly_name') }}",
-                  secondary: "Temperatuur: {{ state_attr('weather.buienradar', 'temperature') }} °C | Status: {{ states('weather.buienradar') }}",
-                  icon: "mdi:weather-sunny",
-                  icon_color: "amber",
-                  layout: "horizontal"
-                },
-                {
-                  type: "weather-forecast",
-                  entity: "weather.buienradar",
-                  show_forecast: true
                 }
               ]
             }

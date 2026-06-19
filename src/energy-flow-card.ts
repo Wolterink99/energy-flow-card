@@ -4,6 +4,24 @@ import { HomeAssistant, EnergyFlowCardConfig } from './types';
 import { styles } from './styles';
 import { renderHouseSvg, getSkyState } from './components/house-svg';
 
+const WEATHER_TRANSLATIONS: Record<string, string> = {
+  'sunny': 'Zonnig',
+  'clear-night': 'Heldere nacht',
+  'cloudy': 'Bewolkt',
+  'fog': 'Mistig',
+  'hail': 'Hagel',
+  'lightning': 'Onweer',
+  'lightning-rainy': 'Onweer met regen',
+  'partlycloudy': 'Licht bewolkt',
+  'pouring': 'Stortregen',
+  'rainy': 'Regen',
+  'snowy': 'Sneeuw',
+  'snowy-rainy': 'Natte sneeuw',
+  'windy': 'Winderig',
+  'windy-variant': 'Winderig',
+  'exceptional': 'Uitzonderlijk'
+};
+
 export class EnergyFlowCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private config?: EnergyFlowCardConfig;
@@ -326,6 +344,74 @@ export class EnergyFlowCard extends LitElement {
     const entities = this.config?.entities;
     if (!entities) return '';
 
+    if (this.activePopup === 'weather') {
+      const weatherEntity = entities.weather ? this.hass?.states[entities.weather] : null;
+      if (!weatherEntity) return '';
+      
+      const state = weatherEntity.state;
+      const temp = weatherEntity.attributes.temperature;
+      const apparentTemp = weatherEntity.attributes.apparent_temperature;
+      const windSpeed = weatherEntity.attributes.wind_speed;
+      const humidity = weatherEntity.attributes.humidity;
+      const pressure = weatherEntity.attributes.pressure;
+      const friendlyName = weatherEntity.attributes.friendly_name || 'Weer';
+      const condTranslated = WEATHER_TRANSLATIONS[state] || state;
+      
+      return html`
+        <div class="glass-popup-overlay" @click=${this.closePopup}>
+          <div class="glass-popup-card" @click=${(e: Event) => e.stopPropagation()}>
+            <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
+            
+            <div class="glass-popup-header" style="margin-bottom: 24px;">
+              <div class="glass-popup-title">${friendlyName}</div>
+              <div class="glass-popup-subtitle">Actuele weersinformatie voor jouw locatie</div>
+            </div>
+
+            <div class="glass-popup-stats" style="grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+              <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 20px;">
+                <div>
+                  <span class="stat-label">Conditie</span>
+                  <span class="stat-value" style="font-size: 24px; color: #fbbf24; text-transform: capitalize;">${condTranslated}</span>
+                </div>
+                <div style="text-align: right;">
+                  <span class="stat-label">Temperatuur</span>
+                  <span class="stat-value" style="font-size: 32px; color: #ffffff;">${temp !== undefined ? `${temp} °C` : '—'}</span>
+                </div>
+              </div>
+
+              <div class="glass-popup-stat">
+                <span class="stat-label">Gevoelstemperatuur</span>
+                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${apparentTemp !== undefined ? `${apparentTemp} °C` : '—'}</span>
+              </div>
+
+              <div class="glass-popup-stat">
+                <span class="stat-label">Windsnelheid</span>
+                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${windSpeed !== undefined ? `${windSpeed} km/h` : '—'}</span>
+              </div>
+
+              <div class="glass-popup-stat">
+                <span class="stat-label">Luchtvochtigheid</span>
+                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${humidity !== undefined ? `${humidity}%` : '—'}</span>
+              </div>
+
+              <div class="glass-popup-stat">
+                <span class="stat-label">Luchtdruk</span>
+                <span class="stat-value" style="font-size: 18px; color: #cbd5e1;">${pressure !== undefined ? `${pressure} hPa` : '—'}</span>
+              </div>
+            </div>
+
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); padding: 16px; margin-top: auto;">
+              <div style="text-align: center; color: rgba(255,255,255,0.4);">
+                <ha-icon icon="mdi:weather-partly-cloudy" style="font-size: 48px; display: block; margin: 0 auto 12px auto; width: 48px; height: 48px;"></ha-icon>
+                <span>Fijne dag gewenst!</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
     const grid = this.getEntityValue(entities.grid || (entities as any).grid_power);
     const gridImportToday = this.parseEntityFloat(entities.grid_import_today);
     const gridExportToday = this.parseEntityFloat(entities.grid_export_today);
@@ -611,7 +697,7 @@ export class EnergyFlowCard extends LitElement {
   private async handleNodeClick(nodeId: string): Promise<void> {
     console.info(`[energy-flow-card] Click registered on node: ${nodeId}`);
     
-    if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid') {
+    if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'weather') {
       this.activePopup = nodeId;
       this.activeTab = 'day';
       this.statsData = {};
