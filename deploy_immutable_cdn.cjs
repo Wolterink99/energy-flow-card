@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI0NWIyYTA4MzhjOWQ0NjI2Yjc5NTY5NGU1Mzk0ZmU2ZCIsImlhdCI6MTc4MDIyODEwMiwiZXhwIjoyMDk1NTg4MTAyfQ.c-gOuNc3AezEImPkxMvuBeTPVbfpx8CzWqcixCpflM4";
 const url = "wss://84wgzzzm8ai8igpemwargw2qsuihp9ww.ui.nabu.casa/api/websocket";
-const commitHash = "3f0e7d4ee714979e2a7cf2e5ec9c12a7a4058d84";
+const commitHash = "549fc574a6c30c38b34f32cf4a4c8f18f69a13c4";
 
 const ws = new WebSocket(url);
 
@@ -18,7 +18,7 @@ ws.on('message', (data) => {
       access_token: token
     }));
   } else if (msg.type === 'auth_ok') {
-    const newUrl = `https://cdn.jsdelivr.net/gh/Wolterink99/energy-flow-card@${commitHash}/dist/energy-flow-card.js`;
+    const newUrl = `https://cdn.jsdelivr.net/gh/Wolterink99/energy-flow-card@${commitHash}/dist/energy-flow-card.js?v=${Date.now()}`;
     console.log(`Updating resource to: ${newUrl}`);
     ws.send(JSON.stringify({
       id: 1,

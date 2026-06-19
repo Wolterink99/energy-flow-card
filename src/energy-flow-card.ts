@@ -22,6 +22,24 @@ const WEATHER_TRANSLATIONS: Record<string, string> = {
   'exceptional': 'Uitzonderlijk'
 };
 
+const WEATHER_ICONS: Record<string, string> = {
+  'sunny': 'mdi:weather-sunny',
+  'clear-night': 'mdi:weather-night',
+  'cloudy': 'mdi:weather-cloudy',
+  'fog': 'mdi:weather-fog',
+  'hail': 'mdi:weather-hail',
+  'lightning': 'mdi:weather-lightning',
+  'lightning-rainy': 'mdi:weather-lightning-rainy',
+  'partlycloudy': 'mdi:weather-partly-cloudy',
+  'pouring': 'mdi:weather-pouring',
+  'rainy': 'mdi:weather-rainy',
+  'snowy': 'mdi:weather-snowy',
+  'snowy-rainy': 'mdi:weather-snowy-rainy',
+  'windy': 'mdi:weather-windy',
+  'windy-variant': 'mdi:weather-windy-variant',
+  'exceptional': 'mdi:alert-circle-outline'
+};
+
 export class EnergyFlowCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private config?: EnergyFlowCardConfig;
@@ -34,6 +52,7 @@ export class EnergyFlowCard extends LitElement {
   @state() private isLoadingHistory: boolean = false;
   @state() private activeTab: 'day' | 'month' | 'year' = 'day';
   @state() private statsData: Record<string, any[]> = {};
+  @state() private weatherForecast: any[] = [];
 
   private resizeObserver?: ResizeObserver;
   private clouds: any[] = [];
@@ -400,10 +419,34 @@ export class EnergyFlowCard extends LitElement {
               </div>
             </div>
 
-            <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); padding: 16px; margin-top: auto;">
-              <div style="text-align: center; color: rgba(255,255,255,0.4);">
-                <ha-icon icon="mdi:weather-partly-cloudy" style="font-size: 48px; display: block; margin: 0 auto 12px auto; width: 48px; height: 48px;"></ha-icon>
-                <span>Fijne dag gewenst!</span>
+            <div class="glass-popup-forecast-section" style="margin-top: auto; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); box-sizing: border-box;">
+              <div class="chart-title" style="margin-bottom: 12px; font-size: 12px; font-weight: bold; color: rgba(255,255,255,0.6); text-transform: uppercase;">Weersverwachting</div>
+              <div style="display: flex; justify-content: space-between; gap: 8px;">
+                ${this.weatherForecast && this.weatherForecast.length > 0 ? this.weatherForecast.slice(0, 5).map(day => {
+                  const date = new Date(day.datetime);
+                  const dayLabel = date.toLocaleDateString('nl-NL', { weekday: 'short' });
+                  const icon = WEATHER_ICONS[day.condition] || 'mdi:weather-partly-cloudy';
+                  const precip = day.precipitation !== undefined ? day.precipitation : 0;
+                  
+                  return html`
+                    <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; min-width: 0;">
+                      <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: rgba(255,255,255,0.5);">${dayLabel}</span>
+                      <ha-icon icon="${icon}" style="width: 24px; height: 24px; margin: 8px 0; color: #fbbf24;"></ha-icon>
+                      <span style="font-size: 14px; font-weight: bold; color: #ffffff;">${day.temperature}°</span>
+                      ${day.templow !== undefined ? html`<span style="font-size: 11px; color: rgba(255,255,255,0.4);">${day.templow}°</span>` : ''}
+                      ${precip > 0 ? html`
+                        <span style="font-size: 9px; color: #60a5fa; margin-top: 4px; display: flex; align-items: center; gap: 1px; justify-content: center; width: 100%;">
+                          <ha-icon icon="mdi:water" style="width: 10px; height: 10px; flex-shrink: 0;"></ha-icon>
+                          ${precip} mm
+                        </span>
+                      ` : ''}
+                    </div>
+                  `;
+                }) : html`
+                  <div style="flex: 1; text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; padding: 12px 0;">
+                    Geen weersverwachting beschikbaar.
+                  </div>
+                `}
               </div>
             </div>
 
@@ -729,6 +772,33 @@ export class EnergyFlowCard extends LitElement {
           }
         }, 100);
       }
+      
+      if (nodeId === 'weather') {
+        this.weatherForecast = [];
+        const weatherEntityId = this.config?.entities.weather;
+        if (weatherEntityId) {
+          try {
+            this.isLoadingHistory = true;
+            const res = await (this.hass as any).callWS({
+              type: 'call_service',
+              domain: 'weather',
+              service: 'get_forecasts',
+              service_data: {
+                entity_id: weatherEntityId,
+                type: 'daily'
+              },
+              return_response: true
+            });
+            this.weatherForecast = res?.response?.[weatherEntityId]?.forecast || [];
+          } catch (e) {
+            console.warn('[energy-flow-card] Failed to fetch weather forecast:', e);
+            this.weatherForecast = [];
+          } finally {
+            this.isLoadingHistory = false;
+          }
+        }
+      }
+      
       return;
     }
 
