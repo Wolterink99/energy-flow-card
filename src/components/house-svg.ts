@@ -114,14 +114,23 @@ function renderHDCloud(className: string, x: number, y: number, scale = 1, color
   `;
 }
 
-function renderRain(width: number): TemplateResult {
-  const count = Math.ceil(width / 18);
+function renderRain(width: number, intensity: 'light' | 'normal' | 'heavy' = 'normal'): TemplateResult {
+  let spacing = 18;
+  let baseDuration = 0.9;
+  if (intensity === 'light') {
+    spacing = 36;
+    baseDuration = 1.3;
+  } else if (intensity === 'heavy') {
+    spacing = 9;
+    baseDuration = 0.55;
+  }
+  const count = Math.ceil(width / spacing);
   return svg`
     <g style="pointer-events: none;">
       ${Array.from({ length: count }).map((_, i) => svg`
-        <line x1="${15 + i * 18}" y1="0" x2="${-2 + i * 18}" y2="40"
+        <line x1="${15 + i * spacing}" y1="0" x2="${-2 + i * spacing}" y2="40"
           class="rainDrop"
-          style="animation-delay: ${(i % 7) * 0.12}s; animation-duration: ${0.9 + (i % 4) * 0.12}s;" />
+          style="animation-delay: ${(i % 7) * 0.12}s; animation-duration: ${baseDuration + (i % 4) * 0.12}s;" />
       `)}
     </g>
   `;
@@ -170,6 +179,8 @@ interface SvgParams {
   showLights?: boolean;
   gridPrice?: number | null;
   gridPriceUnit?: string;
+  rainIntensity?: 'light' | 'normal' | 'heavy';
+  windSpeed?: number;
   onNodeClick: (node: string) => void;
 }
 
@@ -270,6 +281,8 @@ export function renderHouseSvg({
   showLights: passedShowLights = undefined,
   gridPrice = null,
   gridPriceUnit = '€/kWh',
+  rainIntensity = 'normal',
+  windSpeed = 10,
   onNodeClick
 }: SvgParams): TemplateResult {
 
@@ -324,6 +337,12 @@ export function renderHouseSvg({
   let skyHorizon = skyState.horizon;
   let cloudColor = skyState.clouds;
   let cloudOpacity = timeOfDay === 'night' ? 0.18 : 0.48;
+
+  // Calculate wind speed animation durations (base is 10 km/h)
+  const windFactor = Math.max(2, Math.min(80, windSpeed)) / 10;
+  const backDuration = (120 / windFactor).toFixed(1);
+  const midDuration = (80 / windFactor).toFixed(1);
+  const frontDuration = (40 / windFactor).toFixed(1);
 
   const showLights = resolvedShowLights;
 
@@ -591,7 +610,7 @@ export function renderHouseSvg({
         ` : ''}
 
         <!-- Falling precipitation -->
-        ${visualWeather === 'rainy' ? renderRain(width) : ''}
+        ${visualWeather === 'rainy' ? renderRain(width, rainIntensity) : ''}
         ${visualWeather === 'snowy' ? renderSnow(width) : ''}
 
         <!-- Cloud layers -->
@@ -601,9 +620,9 @@ export function renderHouseSvg({
             @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
             @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
             
-            .cloud-layer-back { animation: scrollCloudsBack 120s infinite linear; }
-            .cloud-layer-mid { animation: scrollCloudsMid 80s infinite linear; }
-            .cloud-layer-front { animation: scrollCloudsFront 40s infinite linear; }
+            .cloud-layer-back { animation: scrollCloudsBack ${backDuration}s infinite linear; }
+            .cloud-layer-mid { animation: scrollCloudsMid ${midDuration}s infinite linear; }
+            .cloud-layer-front { animation: scrollCloudsFront ${frontDuration}s infinite linear; }
           </style>
           
           <g opacity="${cloudOpacity}" style="pointer-events: none;">

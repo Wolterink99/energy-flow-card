@@ -827,10 +827,24 @@ export class EnergyFlowCard extends LitElement {
       }
     }
 
+    let weatherEntity = (weatherEntityId && this.hass?.states[weatherEntityId]) ? this.hass.states[weatherEntityId] : null;
     if (this.config.weather_override) {
       weatherState = this.config.weather_override;
-    } else if (weatherEntityId && this.hass?.states[weatherEntityId]) {
-      weatherState = this.hass.states[weatherEntityId].state;
+    } else if (weatherEntity) {
+      weatherState = weatherEntity.state;
+    }
+
+    const windSpeed = weatherEntity?.attributes?.wind_speed !== undefined ? parseFloat(weatherEntity.attributes.wind_speed) : 10;
+    let rainIntensity: 'light' | 'normal' | 'heavy' = 'normal';
+    if (weatherEntity?.attributes?.precipitation !== undefined) {
+      const precip = parseFloat(weatherEntity.attributes.precipitation);
+      if (precip > 0) {
+        if (precip < 1.0) rainIntensity = 'light';
+        else if (precip >= 4.0) rainIntensity = 'heavy';
+      }
+    }
+    if (weatherState === 'pouring' || weatherState === 'lightning-rainy') {
+      rainIntensity = 'heavy';
     }
 
     // Sunrise/sunset from Home Assistant sun.sun
@@ -954,6 +968,8 @@ export class EnergyFlowCard extends LitElement {
               showLights: resolvedShowLights,
               gridPrice,
               gridPriceUnit,
+              rainIntensity,
+              windSpeed,
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>

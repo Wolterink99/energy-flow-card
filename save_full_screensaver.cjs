@@ -42,7 +42,7 @@ const newConfig = {
                 navigation_path: "/lovelace/0"
               },
               entities: {
-                weather: "weather.forecast_home",
+                weather: "weather.buienradar",
                 solar_power: "sensor.totale_live_zonnestroom",
                 solar_today: "sensor.totale_opwek_vandaag_2",
                 home_power: "sensor.live_huisverbruik",
