@@ -43,10 +43,10 @@ const newConfig = {
               },
               entities: {
                 weather: "weather.forecast_home",
-                solar_power: "sensor.totale_actuele_zonneproductie",
+                solar_power: "sensor.totale_live_zonnestroom",
                 solar_today: "sensor.totale_opwek_vandaag_2",
-                home_power: "sensor.actueel_huisverbruik",
-                home_today: "sensor.totaalverbruik_vandaag",
+                home_power: "sensor.live_huisverbruik",
+                home_today: "sensor.echt_huisverbruik_vandaag",
                 grid_power: "sensor.p1_meter_power",
                 grid_import_today: "sensor.p1_netstroom_afname_vandaag",
                 grid_export_today: "sensor.p1_teruglevering_vandaag"
@@ -78,7 +78,7 @@ const newConfig = {
                 {
                   type: "custom:mushroom-template-card",
                   primary: "Actueel Huisverbruik",
-                  secondary: "{{ states('sensor.actueel_huisverbruik') | round(0) }} W",
+                  secondary: "{{ states('sensor.live_huisverbruik') | round(0) }} W",
                   icon: "mdi:home-lightning-bolt",
                   icon_color: "deep-purple",
                   layout: "horizontal"
@@ -90,14 +90,14 @@ const newConfig = {
                   cards: [
                     {
                       type: "custom:mushroom-entity-card",
-                      entity: "sensor.totaalverbruik_vandaag",
+                      entity: "sensor.echt_huisverbruik_vandaag",
                       name: "Vandaag verbruikt",
                       icon: "mdi:calendar-today",
                       icon_color: "deep-purple"
                     },
                     {
                       type: "custom:mushroom-entity-card",
-                      entity: "sensor.actueel_huisverbruik",
+                      entity: "sensor.live_huisverbruik",
                       name: "Live vermogen",
                       icon: "mdi:pulse",
                       icon_color: "deep-purple"
@@ -107,7 +107,7 @@ const newConfig = {
                 {
                   type: "history-graph",
                   entities: [
-                    "sensor.actueel_huisverbruik"
+                    "sensor.live_huisverbruik"
                   ],
                   hours_to_show: 24,
                   refresh_interval: 0
@@ -128,7 +128,7 @@ const newConfig = {
                 {
                   type: "custom:mushroom-template-card",
                   primary: "Actuele Productie",
-                  secondary: "{{ states('sensor.totale_actuele_zonneproductie') | round(0) }} W",
+                  secondary: "{{ states('sensor.totale_live_zonnestroom') | round(0) }} W",
                   icon: "mdi:solar-power-variant",
                   icon_color: "amber",
                   layout: "horizontal"
@@ -147,7 +147,7 @@ const newConfig = {
                     },
                     {
                       type: "custom:mushroom-entity-card",
-                      entity: "sensor.totale_actuele_zonneproductie",
+                      entity: "sensor.totale_live_zonnestroom",
                       name: "Actueel vermogen",
                       icon: "mdi:sun-wireless",
                       icon_color: "amber"
@@ -157,7 +157,7 @@ const newConfig = {
                 {
                   type: "history-graph",
                   entities: [
-                    "sensor.totale_actuele_zonneproductie"
+                    "sensor.totale_live_zonnestroom"
                   ],
                   hours_to_show: 24,
                   refresh_interval: 0
