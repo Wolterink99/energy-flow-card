@@ -644,16 +644,20 @@ export function renderHouseSvg({
         ${isSunVisible && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'snowy' && visualWeather !== 'foggy' ? svg`
           <style>
             @keyframes flyBird1 {
-              0% { transform: translate(-40px, 60px) scale(0.6); }
-              100% { transform: translate(${width + 40}px, 40px) scale(0.6); }
+              0% { transform: translate(-40px, 45px) scale(0.55); }
+              100% { transform: translate(${width + 40}px, 35px) scale(0.55); }
             }
             @keyframes flyBird2 {
-              0% { transform: translate(-75px, 72px) scale(0.5); }
-              100% { transform: translate(${width + 40}px, 52px) scale(0.5); }
+              0% { transform: translate(-40px, 110px) scale(0.4); }
+              100% { transform: translate(${width + 40}px, 95px) scale(0.4); }
             }
             @keyframes flyBird3 {
-              0% { transform: translate(-65px, 48px) scale(0.55); }
-              100% { transform: translate(${width + 40}px, 28px) scale(0.55); }
+              0% { transform: translate(-40px, 160px) scale(0.65); }
+              100% { transform: translate(${width + 40}px, 145px) scale(0.65); }
+            }
+            @keyframes flyBird4 {
+              0% { transform: translate(-40px, 80px) scale(0.48); }
+              100% { transform: translate(${width + 40}px, 70px) scale(0.48); }
             }
             @keyframes flap {
               0% { transform: scaleY(1.0); }
@@ -670,14 +674,17 @@ export function renderHouseSvg({
             }
           </style>
           <g style="pointer-events: none;">
-            <g style="animation: flyBird1 25s infinite linear; animation-delay: 2s;">
+            <g style="animation: flyBird1 28s infinite linear; animation-delay: 1s;">
+              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.5s infinite ease-in-out; transform-origin: 10px 4px;" />
+            </g>
+            <g style="animation: flyBird2 36s infinite linear; animation-delay: 8s;">
+              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.7s infinite ease-in-out; transform-origin: 10px 4px;" />
+            </g>
+            <g style="animation: flyBird3 22s infinite linear; animation-delay: 15s;">
+              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.4s infinite ease-in-out; transform-origin: 10px 4px;" />
+            </g>
+            <g style="animation: flyBird4 31s infinite linear; animation-delay: 22s;">
               <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.6s infinite ease-in-out; transform-origin: 10px 4px;" />
-            </g>
-            <g style="animation: flyBird2 25s infinite linear; animation-delay: 2.8s;">
-              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.6s infinite ease-in-out; animation-delay: 0.15s; transform-origin: 10px 4px;" />
-            </g>
-            <g style="animation: flyBird3 25s infinite linear; animation-delay: 2.4s;">
-              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.6s infinite ease-in-out; animation-delay: 0.08s; transform-origin: 10px 4px;" />
             </g>
           </g>
         ` : ''}
@@ -754,22 +761,22 @@ export function renderHouseSvg({
           <!-- Wind Turbines in the far background (behind pylon cables and ground) -->
           <!-- Small Wind Turbine (further) -->
           <g id="wind-turbine-small" style="pointer-events: none;" opacity="0.3">
-            <path d="M 318,410 L 319.5,330 L 320.5,330 L 322,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 320px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
-              <circle cx="320" cy="330" r="2.2" fill="#64748b" />
-              <path d="M 320,330 Q 319,295 320,285 Q 321,295 320,330" fill="#cbd5e1" />
-              <path d="M 320,330 Q 319,295 320,285 Q 321,295 320,330" fill="#cbd5e1" transform="rotate(120 320 330)" />
-              <path d="M 320,330 Q 319,295 320,285 Q 321,295 320,330" fill="#cbd5e1" transform="rotate(240 320 330)" />
+            <path d="M 128,410 L 129.5,330 L 130.5,330 L 132,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 130px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
+              <circle cx="130" cy="330" r="2.2" fill="#64748b" />
+              <path d="M 130,330 Q 129,295 130,285 Q 131,295 130,330" fill="#cbd5e1" />
+              <path d="M 130,330 Q 129,295 130,285 Q 131,295 130,330" fill="#cbd5e1" transform="rotate(120 130 330)" />
+              <path d="M 130,330 Q 129,295 130,285 Q 131,295 130,330" fill="#cbd5e1" transform="rotate(240 130 330)" />
             </g>
           </g>
           <!-- Medium Wind Turbine -->
           <g id="wind-turbine-med" style="pointer-events: none;" opacity="0.45">
-            <path d="M 276,410 L 278.5,290 L 281.5,290 L 284,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 280px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
-              <circle cx="280" cy="290" r="3.5" fill="#64748b" />
-              <path d="M 280,290 Q 278,235 280,220 Q 282,235 280,290" fill="#cbd5e1" />
-              <path d="M 280,290 Q 278,235 280,220 Q 282,235 280,290" fill="#cbd5e1" transform="rotate(120 280 290)" />
-              <path d="M 280,290 Q 278,235 280,220 Q 282,235 280,290" fill="#cbd5e1" transform="rotate(240 280 290)" />
+            <path d="M 81,410 L 83.5,290 L 86.5,290 L 89,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 85px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
+              <circle cx="85" cy="290" r="3.5" fill="#64748b" />
+              <path d="M 85,290 Q 83,235 85,220 Q 87,235 85,290" fill="#cbd5e1" />
+              <path d="M 85,290 Q 83,235 85,220 Q 87,235 85,290" fill="#cbd5e1" transform="rotate(120 85 290)" />
+              <path d="M 85,290 Q 83,235 85,220 Q 87,235 85,290" fill="#cbd5e1" transform="rotate(240 85 290)" />
             </g>
           </g>
 
