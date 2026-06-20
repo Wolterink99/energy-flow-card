@@ -674,16 +674,16 @@ export function renderHouseSvg({
             }
           </style>
           <g style="pointer-events: none;">
-            <g style="animation: flyBird1 28s infinite linear; animation-delay: 1s;">
+            <g style="animation: flyBird1 28s infinite linear; animation-delay: 1s; transform: translate(-100px, -100px);">
               <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.5s infinite ease-in-out; transform-origin: 10px 4px;" />
             </g>
-            <g style="animation: flyBird2 36s infinite linear; animation-delay: 8s;">
+            <g style="animation: flyBird2 36s infinite linear; animation-delay: 8s; transform: translate(-100px, -100px);">
               <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.7s infinite ease-in-out; transform-origin: 10px 4px;" />
             </g>
-            <g style="animation: flyBird3 22s infinite linear; animation-delay: 15s;">
+            <g style="animation: flyBird3 22s infinite linear; animation-delay: 15s; transform: translate(-100px, -100px);">
               <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.4s infinite ease-in-out; transform-origin: 10px 4px;" />
             </g>
-            <g style="animation: flyBird4 31s infinite linear; animation-delay: 22s;">
+            <g style="animation: flyBird4 31s infinite linear; animation-delay: 22s; transform: translate(-100px, -100px);">
               <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.6s infinite ease-in-out; transform-origin: 10px 4px;" />
             </g>
           </g>
@@ -761,22 +761,22 @@ export function renderHouseSvg({
           <!-- Wind Turbines in the far background (behind pylon cables and ground) -->
           <!-- Small Wind Turbine (further) -->
           <g id="wind-turbine-small" style="pointer-events: none;" opacity="0.3">
-            <path d="M 128,410 L 129.5,330 L 130.5,330 L 132,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 130px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
-              <circle cx="130" cy="330" r="2.2" fill="#64748b" />
-              <path d="M 130,330 Q 129,295 130,285 Q 131,295 130,330" fill="#cbd5e1" />
-              <path d="M 130,330 Q 129,295 130,285 Q 131,295 130,330" fill="#cbd5e1" transform="rotate(120 130 330)" />
-              <path d="M 130,330 Q 129,295 130,285 Q 131,295 130,330" fill="#cbd5e1" transform="rotate(240 130 330)" />
+            <path d="M 93,410 L 94.5,330 L 95.5,330 L 97,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 95px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
+              <circle cx="95" cy="330" r="2.2" fill="#64748b" />
+              <path d="M 95,330 Q 94,295 95,285 Q 96,295 95,330" fill="#cbd5e1" />
+              <path d="M 95,330 Q 94,295 95,285 Q 96,295 95,330" fill="#cbd5e1" transform="rotate(120 95 330)" />
+              <path d="M 95,330 Q 94,295 95,285 Q 96,295 95,330" fill="#cbd5e1" transform="rotate(240 95 330)" />
             </g>
           </g>
           <!-- Medium Wind Turbine -->
           <g id="wind-turbine-med" style="pointer-events: none;" opacity="0.45">
-            <path d="M 81,410 L 83.5,290 L 86.5,290 L 89,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 85px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
-              <circle cx="85" cy="290" r="3.5" fill="#64748b" />
-              <path d="M 85,290 Q 83,235 85,220 Q 87,235 85,290" fill="#cbd5e1" />
-              <path d="M 85,290 Q 83,235 85,220 Q 87,235 85,290" fill="#cbd5e1" transform="rotate(120 85 290)" />
-              <path d="M 85,290 Q 83,235 85,220 Q 87,235 85,290" fill="#cbd5e1" transform="rotate(240 85 290)" />
+            <path d="M 51,410 L 53.5,290 L 56.5,290 L 59,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 55px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
+              <circle cx="55" cy="290" r="3.5" fill="#64748b" />
+              <path d="M 55,290 Q 53,235 55,220 Q 57,235 55,290" fill="#cbd5e1" />
+              <path d="M 55,290 Q 53,235 55,220 Q 57,235 55,290" fill="#cbd5e1" transform="rotate(120 55 290)" />
+              <path d="M 55,290 Q 53,235 55,220 Q 57,235 55,290" fill="#cbd5e1" transform="rotate(240 55 290)" />
             </g>
           </g>
 
