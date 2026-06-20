@@ -617,4 +617,16 @@ export const styles = css`
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
+
+  @keyframes spinWindTurbine {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes shootingStar {
+    0% { transform: translate(300px, -50px) rotate(-20deg); opacity: 0; }
+    2% { opacity: 1; }
+    12% { transform: translate(-200px, 150px) rotate(-20deg); opacity: 0; }
+    100% { transform: translate(-200px, 150px) rotate(-20deg); opacity: 0; }
+  }
 `;

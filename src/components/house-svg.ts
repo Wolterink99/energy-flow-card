@@ -363,6 +363,7 @@ export function renderHouseSvg({
   const backDuration = (120 / windFactor).toFixed(1);
   const midDuration = (80 / windFactor).toFixed(1);
   const frontDuration = (40 / windFactor).toFixed(1);
+  const turbineDuration = windSpeed > 0.5 ? Math.max(1.2, Math.min(18, 45 / (windSpeed / 5))) : 0;
 
   const showLights = resolvedShowLights;
 
@@ -536,6 +537,11 @@ export function renderHouseSvg({
           <stop offset="100%" stop-color="${skyHorizon}" />
         </linearGradient>
 
+        <linearGradient id="shooting-star-grad" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+        </linearGradient>
+
         <linearGradient id="garden-grad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#0f3f26" />
           <stop offset="100%" stop-color="#0a2919" />
@@ -604,11 +610,16 @@ export function renderHouseSvg({
         ${skyState.stars > 0.05 && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'cloudy' ? svg`
           <g opacity="${skyState.stars}" style="pointer-events: none;">
             <circle cx="${width * 0.1}"  cy="${height * 0.08}"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="${width * 0.26}" cy="${height * 0.16}"  r="1.2" fill="#ffffff" />
+            <circle cx="${width * 0.26}" cy="${height * 0.16}"  r="1.2" class="starMed" fill="#ffffff" />
             <circle cx="${width * 0.42}" cy="${height * 0.07}"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="${width * 0.6}"  cy="${height * 0.18}"  r="1.5" fill="#ffffff" />
+            <circle cx="${width * 0.6}"  cy="${height * 0.18}"  r="1.5" class="starSlow" fill="#ffffff" />
             <circle cx="${width * 0.77}" cy="${height * 0.11}"  r="1.2" class="starFast" fill="#ffffff" />
-            <circle cx="${width * 0.91}" cy="${height * 0.2}"   r="1.0" fill="#ffffff" />
+            <circle cx="${width * 0.91}" cy="${height * 0.2}"   r="1.0" class="starMed" fill="#ffffff" />
+          </g>
+          <!-- Shooting Star -->
+          <g style="animation: shootingStar 18s infinite linear; animation-delay: 8s; pointer-events: none;">
+            <circle cx="0" cy="0" r="1.5" fill="#ffffff" style="filter: drop-shadow(0 0 4px #ffffff);" />
+            <line x1="0" y1="0" x2="40" y2="-10" stroke="url(#shooting-star-grad)" stroke-width="1.5" />
           </g>
         ` : ''}
 
@@ -626,6 +637,48 @@ export function renderHouseSvg({
             <circle cx="${moonPos.cx}" cy="${moonPos.cy}" r="25" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
             <circle cx="${moonPos.cx}" cy="${moonPos.cy}" r="14" fill="#f1f5f9" />
             <circle cx="${moonPos.cx + 5}" cy="${moonPos.cy - 3}" r="13" fill="url(#sky-grad)" />
+          </g>
+        ` : ''}
+
+        <!-- Flying Birds during the day -->
+        ${isSunVisible && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'snowy' && visualWeather !== 'foggy' ? svg`
+          <style>
+            @keyframes flyBird1 {
+              0% { transform: translate(-40px, 60px) scale(0.6); }
+              100% { transform: translate(${width + 40}px, 40px) scale(0.6); }
+            }
+            @keyframes flyBird2 {
+              0% { transform: translate(-75px, 72px) scale(0.5); }
+              100% { transform: translate(${width + 40}px, 52px) scale(0.5); }
+            }
+            @keyframes flyBird3 {
+              0% { transform: translate(-65px, 48px) scale(0.55); }
+              100% { transform: translate(${width + 40}px, 28px) scale(0.55); }
+            }
+            @keyframes flap {
+              0% { transform: scaleY(1.0); }
+              50% { transform: scaleY(0.2); }
+              100% { transform: scaleY(1.0); }
+            }
+            .bird {
+              fill: none;
+              stroke: rgba(15, 23, 42, 0.4);
+              stroke-width: 1.8;
+              stroke-linecap: round;
+              stroke-linejoin: round;
+              transform-origin: center;
+            }
+          </style>
+          <g style="pointer-events: none;">
+            <g style="animation: flyBird1 25s infinite linear; animation-delay: 2s;">
+              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.6s infinite ease-in-out; transform-origin: 10px 4px;" />
+            </g>
+            <g style="animation: flyBird2 25s infinite linear; animation-delay: 2.8s;">
+              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.6s infinite ease-in-out; animation-delay: 0.15s; transform-origin: 10px 4px;" />
+            </g>
+            <g style="animation: flyBird3 25s infinite linear; animation-delay: 2.4s;">
+              <path d="M 0,4 Q 5,-2 10,4 Q 15,-2 20,4" class="bird" style="animation: flap 0.6s infinite ease-in-out; animation-delay: 0.08s; transform-origin: 10px 4px;" />
+            </g>
           </g>
         ` : ''}
 
@@ -697,6 +750,28 @@ export function renderHouseSvg({
         <!-- GROUND, MAST, HOUSE, AND CABLES: Translated inside dynamic group-->
         <!-- ════════════════════════════════════════════════════════════════ -->
         <g transform="translate(${translateX}, ${translateY})">
+
+          <!-- Wind Turbines in the far background (behind pylon cables and ground) -->
+          <!-- Small Wind Turbine (further) -->
+          <g id="wind-turbine-small" style="pointer-events: none;" opacity="0.3">
+            <path d="M 318,410 L 319.5,330 L 320.5,330 L 322,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 320px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
+              <circle cx="320" cy="330" r="2.2" fill="#64748b" />
+              <path d="M 320,330 Q 319,295 320,285 Q 321,295 320,330" fill="#cbd5e1" />
+              <path d="M 320,330 Q 319,295 320,285 Q 321,295 320,330" fill="#cbd5e1" transform="rotate(120 320 330)" />
+              <path d="M 320,330 Q 319,295 320,285 Q 321,295 320,330" fill="#cbd5e1" transform="rotate(240 320 330)" />
+            </g>
+          </g>
+          <!-- Medium Wind Turbine -->
+          <g id="wind-turbine-med" style="pointer-events: none;" opacity="0.45">
+            <path d="M 276,410 L 278.5,290 L 281.5,290 L 284,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 280px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
+              <circle cx="280" cy="290" r="3.5" fill="#64748b" />
+              <path d="M 280,290 Q 278,235 280,220 Q 282,235 280,290" fill="#cbd5e1" />
+              <path d="M 280,290 Q 278,235 280,220 Q 282,235 280,290" fill="#cbd5e1" transform="rotate(120 280 290)" />
+              <path d="M 280,290 Q 278,235 280,220 Q 282,235 280,290" fill="#cbd5e1" transform="rotate(240 280 290)" />
+            </g>
+          </g>
 
           <!-- Ground (grass base spanning full screen width) -->
           <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
