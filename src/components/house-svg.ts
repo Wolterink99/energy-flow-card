@@ -203,15 +203,7 @@ interface SvgParams {
   onNodeClick: (node: string) => void;
 }
 
-const getCloudLayerPath = (W: number, baseY: number): string => {
-  const step = W / 4;
-  return `M 0,${baseY} 
-    Q ${step * 0.5},${baseY - 30} ${step},${baseY} 
-    T ${step * 2},${baseY} 
-    T ${step * 3},${baseY} 
-    T ${step * 4},${baseY} 
-    L ${W},0 L 0,0 Z`;
-};
+
 
 const getPylonTips = (xOffset: number, yOffset: number, S: number) => {
   return [
@@ -358,39 +350,39 @@ export function renderHouseSvg({
   let cloudColor = skyState.clouds;
   let cloudOpacity = timeOfDay === 'night' ? 0.18 : 0.48;
 
-  // Calculate wind speed animation durations (base is 10 km/h)
-  const windFactor = Math.max(2, Math.min(80, windSpeed)) / 10;
-  const backDuration = (120 / windFactor).toFixed(1);
-  const midDuration = (80 / windFactor).toFixed(1);
-  const frontDuration = (40 / windFactor).toFixed(1);
+
   const turbineDuration = windSpeed > 0.5 ? Math.max(1.2, Math.min(18, 45 / (windSpeed / 5))) : 0;
 
   const showLights = resolvedShowLights;
 
   if (visualWeather === 'cloudy') {
-    cloudColor = '#cbd5e1';
+    cloudColor = '#b8c5d6'; // nice overcast light gray-blue
     skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.15);
     cloudOpacity = 0.98;
   } else if (visualWeather === 'rainy' || visualWeather === 'lightning') {
-    cloudColor = '#1f2937';
-    skyTop = cloudColor;
-    skyHorizon = interpolateColor(skyState.horizon, '#334155', 0.5);
+    cloudColor = '#475569'; // dark rain clouds
+    skyTop = '#1f2937';
+    skyHorizon = interpolateColor(skyState.horizon, '#1e293b', 0.55);
     cloudOpacity = 0.99;
   } else if (visualWeather === 'snowy') {
-    cloudColor = '#334155';
-    skyTop = cloudColor;
-    skyHorizon = interpolateColor(skyState.horizon, '#4a5568', 0.4);
+    cloudColor = '#7a889b'; // cold snowy slate gray
+    skyTop = '#475569';
+    skyHorizon = interpolateColor(skyState.horizon, '#334155', 0.4);
     cloudOpacity = 0.98;
   } else if (visualWeather === 'foggy') {
     skyTop = interpolateColor(skyState.top, '#64748b', 0.65);
     skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.65);
-    cloudColor = 'rgba(203, 213, 225, 0.4)';
+    cloudColor = '#a8b5c6';
     cloudOpacity = 0.50;
   } else if (visualWeather === 'partlycloudy') {
-    skyTop = interpolateColor(skyState.top, '#475569', 0.15);
-    skyHorizon = interpolateColor(skyState.horizon, '#64748b', 0.15);
-    cloudColor = '#cbd5e1';
+    skyTop = interpolateColor(skyState.top, '#475569', 0.1);
+    skyHorizon = interpolateColor(skyState.horizon, '#64748b', 0.1);
+    cloudColor = '#e2e8f0'; // very light gray-white
     cloudOpacity = 0.65;
+  } else {
+    // Default/sunny: pure white
+    cloudColor = '#ffffff';
+    cloudOpacity = 0.48;
   }
 
   // ── Window appearance ──
@@ -693,59 +685,33 @@ export function renderHouseSvg({
         ${visualWeather === 'rainy' ? renderRain(width, rainIntensity) : ''}
         ${visualWeather === 'snowy' ? renderSnow(width) : ''}
 
-        <!-- Cloud layers -->
-        ${(visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy') ? svg`
-          <style>
-            @keyframes scrollCloudsBack { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
-            @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
-            @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
-            
-            .cloud-layer-back { animation: scrollCloudsBack ${backDuration}s infinite linear; }
-            .cloud-layer-mid { animation: scrollCloudsMid ${midDuration}s infinite linear; }
-            .cloud-layer-front { animation: scrollCloudsFront ${frontDuration}s infinite linear; }
-          </style>
+        <!-- Cloud layers (For all weather types) -->
+        <g opacity="${cloudOpacity}" style="pointer-events: none;">
+          ${(visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy') ? svg`
+            <!-- Solid backdrop sheet so no sky peaks through -->
+            <rect width="${width}" height="100" fill="${cloudColor}" opacity="0.95" />
+            <path d="M 0,100 Q ${width*0.25},120 ${width*0.5},100 T ${width},100 L ${width},0 L 0,0 Z" fill="${cloudColor}" opacity="0.95" style="filter: blur(8px);" />
+          ` : ''}
           
-          <g opacity="${cloudOpacity}" style="pointer-events: none;">
-            <!-- Layer 1 (Back) -->
-            <g class="cloud-layer-back">
-              <path d="${getCloudLayerPath(width, 70)}" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.35)}" />
-              <path d="${getCloudLayerPath(width, 70)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.35)}" />
-            </g>
-            
-            <!-- Layer 2 (Middle) -->
-            <g class="cloud-layer-mid">
-              <path d="${getCloudLayerPath(width, 110)}" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.18)}" />
-              <path d="${getCloudLayerPath(width, 110)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#0a0f1d', 0.18)}" />
-            </g>
-            
-            <!-- Layer 3 (Front) -->
-            <g class="cloud-layer-front">
-              <path d="${getCloudLayerPath(width, 150)}" fill="${cloudColor}" />
-              <path d="${getCloudLayerPath(width, 150)}" transform="translate(${width}, 0)" fill="${cloudColor}" />
-            </g>
-          </g>
-        ` : svg`
-          <!-- Floating Cloud layers (Only for sunny/partlycloudy) -->
-          <g opacity="${cloudOpacity}" style="pointer-events: none;">
-            ${(clouds || []).map(c => {
-              const minY = 20;
-              // Limit the clouds to the top 40% of the screen height so they never touch the house
-              const maxY = height * 0.40;
-              const deltaY = Math.max(20, maxY - minY);
-              const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
-              const cloudY = minY + yFactor * deltaY;
-              return renderHDCloud(
-                'customDriftCloud',
-                0,
-                cloudY,
-                c.scale,
-                cloudColor,
-                c.opacityMultiplier,
-                `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
-              );
-            })}
-          </g>
-        `}
+          <!-- Overlapping drifting individual clouds -->
+          ${(clouds || []).map(c => {
+            const minY = 10;
+            // Limit the clouds to the top 35% of the screen height so they never touch the house
+            const maxY = height * 0.35;
+            const deltaY = Math.max(10, maxY - minY);
+            const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
+            const cloudY = minY + yFactor * deltaY;
+            return renderHDCloud(
+              'customDriftCloud',
+              0,
+              cloudY,
+              c.scale,
+              cloudColor,
+              c.opacityMultiplier,
+              `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
+            );
+          })}
+        </g>
 
         <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
         ${visualWeather === 'lightning' ? svg`

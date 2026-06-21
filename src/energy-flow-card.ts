@@ -889,14 +889,14 @@ export class EnergyFlowCard extends LitElement {
       return this.clouds;
     }
     const isOvercast = (weather === 'cloudy' || weather === 'rainy' || weather === 'lightning' || weather === 'snowy');
-    const count = isOvercast ? 80 : 3;
+    const count = isOvercast ? 24 : 3;
     const list = [];
     for (let i = 0; i < count; i++) {
-      const scale = isOvercast ? (2.0 + Math.random() * 1.2) : (0.5 + Math.random() * 0.5);
-      const speed = 90 + Math.random() * 120;
+      const scale = isOvercast ? (1.8 + Math.random() * 1.2) : (1.2 + Math.random() * 0.8);
+      const speed = isOvercast ? (100 + Math.random() * 140) : (80 + Math.random() * 100);
       const delay = -Math.random() * speed;
       const yFactor = Math.random();
-      const opacityMultiplier = isOvercast ? (0.96 + Math.random() * 0.04) : (0.6 + Math.random() * 0.4);
+      const opacityMultiplier = isOvercast ? (0.85 + Math.random() * 0.15) : (0.6 + Math.random() * 0.3);
       list.push({
         yFactor,
         scale,
