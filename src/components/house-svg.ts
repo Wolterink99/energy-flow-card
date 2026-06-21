@@ -721,20 +721,29 @@ export function renderHouseSvg({
           <g opacity="${cloudOpacity}" style="pointer-events: none;">
             <!-- Layer 1 (Back - Darkest) -->
             <g class="cloud-layer-back">
-              <path d="${getOvercastDeckPath(width, 100, 1)}" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" />
-              <path d="${getOvercastDeckPath(width, 100, 1)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" />
+              <path d="${getOvercastDeckPath(width, 60, 1)}" fill="${interpolateColor(cloudColor, '#111827', 0.25)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastDeckPath(width, 60, 1)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.25)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              
+              <path d="${getOvercastDeckPath(width, 95, 2)}" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastDeckPath(width, 95, 2)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
             </g>
             
             <!-- Layer 2 (Middle - Medium) -->
             <g class="cloud-layer-mid">
-              <path d="${getOvercastDeckPath(width, 125, 3)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" />
-              <path d="${getOvercastDeckPath(width, 125, 3)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" />
+              <path d="${getOvercastDeckPath(width, 85, 3)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.15)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastDeckPath(width, 85, 3)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.15)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              
+              <path d="${getOvercastDeckPath(width, 120, 4)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastDeckPath(width, 120, 4)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
             </g>
             
             <!-- Layer 3 (Front - Main Color) -->
             <g class="cloud-layer-front">
-              <path d="${getOvercastDeckPath(width, 150, 5)}" fill="${cloudColor}" />
-              <path d="${getOvercastDeckPath(width, 150, 5)}" transform="translate(${width}, 0)" fill="${cloudColor}" />
+              <path d="${getOvercastDeckPath(width, 110, 5)}" fill="${interpolateColor(cloudColor, '#ffffff', 0.04)}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastDeckPath(width, 110, 5)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#ffffff', 0.04)}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              
+              <path d="${getOvercastDeckPath(width, 150, 6)}" fill="${cloudColor}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastDeckPath(width, 150, 6)}" transform="translate(${width}, 0)" fill="${cloudColor}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
             </g>
           </g>
         ` : svg`
