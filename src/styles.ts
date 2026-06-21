@@ -134,20 +134,7 @@ export const styles = css`
     }
   }
 
-  @keyframes rainFall {
-    0%   { transform: translateY(-40px); opacity: 0; }
-    10%  { opacity: 0.75; }
-    90%  { opacity: 0.75; }
-    100% { transform: translateY(640px); opacity: 0; }
-  }
 
-  @keyframes snowFall {
-    0%   { transform: translateY(-20px) translateX(0px); opacity: 0; }
-    10%  { opacity: 0.85; }
-    50%  { transform: translateY(300px) translateX(12px); }
-    90%  { opacity: 0.85; }
-    100% { transform: translateY(640px) translateX(-8px); opacity: 0; }
-  }
 
   @keyframes lightningFlash {
     0%   { opacity: 0; }
