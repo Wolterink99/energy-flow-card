@@ -33,6 +33,7 @@ const newConfig = {
             {
               type: "custom:energy-flow-card",
               screensaver: true,
+              weather_test: true,
               house_style: "classic-jaren30",
               show_solar: true,
               show_battery: false,
