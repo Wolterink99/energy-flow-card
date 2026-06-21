@@ -1309,8 +1309,28 @@ export class EnergyFlowCard extends LitElement {
         `
       : '';
 
+    const dynamicAnimations = html`
+      <style>
+        @keyframes rainFall {
+          0%   { transform: translateY(-40px); opacity: 0; }
+          10%  { opacity: 0.75; }
+          90%  { opacity: 0.75; }
+          100% { transform: translateY(${this.cardHeight + 40}px); opacity: 0; }
+        }
+
+        @keyframes snowFall {
+          0%   { transform: translateY(-20px) translateX(0px); opacity: 0; }
+          10%  { opacity: 0.85; }
+          50%  { transform: translateY(${(this.cardHeight) / 2}px) translateX(12px); }
+          90%  { opacity: 0.85; }
+          100% { transform: translateY(${this.cardHeight + 20}px) translateX(-8px); opacity: 0; }
+        }
+      </style>
+    `;
+
     return html`
       ${screensaverStyles}
+      ${dynamicAnimations}
       <ha-card style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
           ${this.config.title ? html`

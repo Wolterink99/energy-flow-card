@@ -185,7 +185,7 @@ export const styles = css`
   .snowFlake {
     fill: #e2e8f0;
     opacity: 0.85;
-    animation: snowFall 5s infinite ease-in-out;
+    animation: snowFall 5s infinite linear;
   }
 
   .lightningBolt {
