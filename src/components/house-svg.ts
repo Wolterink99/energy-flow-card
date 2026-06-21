@@ -203,7 +203,28 @@ interface SvgParams {
   onNodeClick: (node: string) => void;
 }
 
-
+const getOvercastDeckPath = (W: number, baseY: number, seed: number): string => {
+  let path = `M 0,${baseY}`;
+  const segments = 12;
+  const segmentWidth = W / segments;
+  
+  for (let i = 0; i < segments; i++) {
+    const startX = i * segmentWidth;
+    const endX = (i + 1) * segmentWidth;
+    const midX = (startX + endX) / 2;
+    
+    const waveNum = (i + seed) % 5;
+    let bumpHeight = 22;
+    if (waveNum === 1) bumpHeight = 38;
+    else if (waveNum === 2) bumpHeight = 14;
+    else if (waveNum === 3) bumpHeight = 28;
+    else if (waveNum === 4) bumpHeight = 44;
+    
+    path += ` Q ${midX},${baseY - bumpHeight} ${endX},${baseY}`;
+  }
+  path += ` L ${W},0 L 0,0 Z`;
+  return path;
+};
 
 const getPylonTips = (xOffset: number, yOffset: number, S: number) => {
   return [
@@ -685,33 +706,59 @@ export function renderHouseSvg({
         ${visualWeather === 'rainy' ? renderRain(width, rainIntensity) : ''}
         ${visualWeather === 'snowy' ? renderSnow(width) : ''}
 
-        <!-- Cloud layers (For all weather types) -->
-        <g opacity="${cloudOpacity}" style="pointer-events: none;">
-          ${(visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy') ? svg`
-            <!-- Solid backdrop sheet so no sky peaks through -->
-            <rect width="${width}" height="100" fill="${cloudColor}" opacity="0.95" />
-            <path d="M 0,100 Q ${width*0.25},120 ${width*0.5},100 T ${width},100 L ${width},0 L 0,0 Z" fill="${cloudColor}" opacity="0.95" style="filter: blur(8px);" />
-          ` : ''}
+        <!-- Cloud layers -->
+        ${(visualWeather === 'cloudy' || visualWeather === 'rainy' || visualWeather === 'lightning' || visualWeather === 'snowy') ? svg`
+          <style>
+            @keyframes scrollCloudsBack { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
+            @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
+            @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
+            
+            .cloud-layer-back { animation: scrollCloudsBack 140s infinite linear; }
+            .cloud-layer-mid { animation: scrollCloudsMid 90s infinite linear; }
+            .cloud-layer-front { animation: scrollCloudsFront 50s infinite linear; }
+          </style>
           
-          <!-- Overlapping drifting individual clouds -->
-          ${(clouds || []).map(c => {
-            const minY = 10;
-            // Limit the clouds to the top 35% of the screen height so they never touch the house
-            const maxY = height * 0.35;
-            const deltaY = Math.max(10, maxY - minY);
-            const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
-            const cloudY = minY + yFactor * deltaY;
-            return renderHDCloud(
-              'customDriftCloud',
-              0,
-              cloudY,
-              c.scale,
-              cloudColor,
-              c.opacityMultiplier,
-              `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
-            );
-          })}
-        </g>
+          <g opacity="${cloudOpacity}" style="pointer-events: none;">
+            <!-- Layer 1 (Back - Darkest) -->
+            <g class="cloud-layer-back">
+              <path d="${getOvercastDeckPath(width, 100, 1)}" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" />
+              <path d="${getOvercastDeckPath(width, 100, 1)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" />
+            </g>
+            
+            <!-- Layer 2 (Middle - Medium) -->
+            <g class="cloud-layer-mid">
+              <path d="${getOvercastDeckPath(width, 125, 3)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" />
+              <path d="${getOvercastDeckPath(width, 125, 3)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" />
+            </g>
+            
+            <!-- Layer 3 (Front - Main Color) -->
+            <g class="cloud-layer-front">
+              <path d="${getOvercastDeckPath(width, 150, 5)}" fill="${cloudColor}" />
+              <path d="${getOvercastDeckPath(width, 150, 5)}" transform="translate(${width}, 0)" fill="${cloudColor}" />
+            </g>
+          </g>
+        ` : svg`
+          <!-- Floating Cloud layers (Only for sunny/partlycloudy) -->
+          <g opacity="${cloudOpacity}" style="pointer-events: none;">
+            ${(clouds || []).map(c => {
+              const minY = 20;
+              // Limit the clouds to the top 40% of the screen height so they never touch the house
+              const maxY = height * 0.40;
+              const deltaY = Math.max(20, maxY - minY);
+              const yFactor = c.yFactor !== undefined ? c.yFactor : 0.5;
+              const cloudY = minY + yFactor * deltaY;
+              return renderHDCloud(
+                'customDriftCloud',
+                0,
+                cloudY,
+                c.scale,
+                cloudColor,
+                c.opacityMultiplier,
+                `animation-duration: ${c.speed}s; animation-delay: ${c.delay}s;`
+              );
+            })}
+          </g>
+        `}
 
         <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
         ${visualWeather === 'lightning' ? svg`
