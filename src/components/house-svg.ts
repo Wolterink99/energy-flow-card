@@ -220,7 +220,7 @@ const getOvercastDeckPath = (W: number, baseY: number, seed: number): string => 
     else if (waveNum === 3) bumpHeight = 28;
     else if (waveNum === 4) bumpHeight = 44;
     
-    path += ` Q ${midX},${baseY - bumpHeight} ${endX},${baseY}`;
+    path += ` Q ${midX},${baseY + bumpHeight} ${endX},${baseY}`;
   }
   path += ` L ${W},0 L 0,0 Z`;
   return path;
@@ -713,9 +713,9 @@ export function renderHouseSvg({
             @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
             @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${width}px); } }
             
-            .cloud-layer-back { animation: scrollCloudsBack 140s infinite linear; }
-            .cloud-layer-mid { animation: scrollCloudsMid 90s infinite linear; }
-            .cloud-layer-front { animation: scrollCloudsFront 50s infinite linear; }
+            .cloud-layer-back { animation: scrollCloudsBack 140s infinite linear; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25)); }
+            .cloud-layer-mid { animation: scrollCloudsMid 90s infinite linear; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.3)); }
+            .cloud-layer-front { animation: scrollCloudsFront 50s infinite linear; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35)); }
           </style>
           
           <g opacity="${cloudOpacity}" style="pointer-events: none;">
