@@ -862,49 +862,52 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
             @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${U}px); } }
             @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${U}px); } }
             
-            .cloud-layer-back { animation: scrollCloudsBack 140s infinite linear; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25)); }
-            .cloud-layer-mid { animation: scrollCloudsMid 90s infinite linear; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.3)); }
-            .cloud-layer-front { animation: scrollCloudsFront 50s infinite linear; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35)); }
+            .cloud-layer-back { animation: scrollCloudsBack 140s infinite linear; }
+            .cloud-layer-mid { animation: scrollCloudsMid 90s infinite linear; }
+            .cloud-layer-front { animation: scrollCloudsFront 50s infinite linear; }
           </style>
           
           <g opacity="${_}" style="pointer-events: none;">
             <!-- Layer 1 (Back - Darkest) -->
             <g class="cloud-layer-back">
-              <path d="${Ot(U,60,1)}" fill="${bt($,"#111827",.25)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${Ot(U,60,1)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.25)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${qt(U,60,1)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
-              <path d="${qt(U,60,1)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
-              
-              <path d="${Ot(U,95,2)}" fill="${bt($,"#111827",.2)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${Ot(U,95,2)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.2)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${qt(U,95,2)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
-              <path d="${qt(U,95,2)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
+              <!-- Y=95 first, Y=60 last -->
+              <path d="${Ot(U,95,2)}" fill="${bt($,"#111827",.2)}" />
+              <path d="${Ot(U,95,2)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.2)}" />
+              <path d="${qt(U,95,2)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${qt(U,95,2)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+
+              <path d="${Ot(U,60,1)}" fill="${bt($,"#111827",.25)}" />
+              <path d="${Ot(U,60,1)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.25)}" />
+              <path d="${qt(U,60,1)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${qt(U,60,1)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
             </g>
             
             <!-- Layer 2 (Middle - Medium) -->
             <g class="cloud-layer-mid">
-              <path d="${Ot(U,85,3)}" fill="${bt($,"#1f2937",.15)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${Ot(U,85,3)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.15)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${qt(U,85,3)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
-              <path d="${qt(U,85,3)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
-              
-              <path d="${Ot(U,120,4)}" fill="${bt($,"#1f2937",.1)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${Ot(U,120,4)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.1)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${qt(U,120,4)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
-              <path d="${qt(U,120,4)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
+              <!-- Y=120 first, Y=85 last -->
+              <path d="${Ot(U,120,4)}" fill="${bt($,"#1f2937",.1)}" />
+              <path d="${Ot(U,120,4)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.1)}" />
+              <path d="${qt(U,120,4)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
+              <path d="${qt(U,120,4)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
+
+              <path d="${Ot(U,85,3)}" fill="${bt($,"#1f2937",.15)}" />
+              <path d="${Ot(U,85,3)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.15)}" />
+              <path d="${qt(U,85,3)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
+              <path d="${qt(U,85,3)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
             </g>
             
             <!-- Layer 3 (Front - Main Color) -->
             <g class="cloud-layer-front">
-              <path d="${Ot(U,110,5)}" fill="${bt($,"#ffffff",.04)}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${Ot(U,110,5)}" transform="translate(${U}, 0)" fill="${bt($,"#ffffff",.04)}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${qt(U,110,5)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
-              <path d="${qt(U,110,5)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
-              
-              <path d="${Ot(U,150,6)}" fill="${$}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${Ot(U,150,6)}" transform="translate(${U}, 0)" fill="${$}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${qt(U,150,6)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
-              <path d="${qt(U,150,6)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
+              <!-- Y=150 first, Y=110 last -->
+              <path d="${Ot(U,150,6)}" fill="${$}" />
+              <path d="${Ot(U,150,6)}" transform="translate(${U}, 0)" fill="${$}" />
+              <path d="${qt(U,150,6)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
+              <path d="${qt(U,150,6)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
+
+              <path d="${Ot(U,110,5)}" fill="${bt($,"#ffffff",.04)}" />
+              <path d="${Ot(U,110,5)}" transform="translate(${U}, 0)" fill="${bt($,"#ffffff",.04)}" />
+              <path d="${qt(U,110,5)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
+              <path d="${qt(U,110,5)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
             </g>
           </g>
         `:J`
