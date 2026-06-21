@@ -24,6 +24,7 @@ export interface EnergyFlowCardConfig {
     ev_today?: string;                // kWh laadpaal vandaag
     light?: string | string[];        // Light entity or list of light entities
     grid_price?: string;              // Huidige energieprijs sensor
+    temperature?: string;             // Optionele buitentemperatuur sensor
   };
   tap_action?: {
     action: string;

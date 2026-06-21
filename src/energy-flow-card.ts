@@ -1212,7 +1212,14 @@ export class EnergyFlowCard extends LitElement {
     }
 
     const windSpeed = this.debugWindSpeed !== null ? this.debugWindSpeed : (weatherEntity?.attributes?.wind_speed !== undefined ? parseFloat(weatherEntity.attributes.wind_speed) : 10);
-    const temperature = this.debugTemperature !== null ? this.debugTemperature : (weatherEntity?.attributes?.temperature !== undefined ? parseFloat(weatherEntity.attributes.temperature) : null);
+    let temperature = this.debugTemperature !== null ? this.debugTemperature : null;
+    if (temperature === null) {
+      if (entities.temperature) {
+        temperature = this.parseEntityFloat(entities.temperature);
+      } else if (weatherEntity?.attributes?.temperature !== undefined) {
+        temperature = parseFloat(weatherEntity.attributes.temperature);
+      }
+    }
     let rainIntensity: 'light' | 'normal' | 'heavy' = 'normal';
     if (this.debugRainIntensity !== null) {
       rainIntensity = this.debugRainIntensity;
