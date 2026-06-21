@@ -614,7 +614,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
     12% { transform: translate(-200px, 150px) rotate(-20deg); opacity: 0; }
     100% { transform: translate(-200px, 150px) rotate(-20deg); opacity: 0; }
   }
-`,gt={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},ut={sunny:"Zonnig","clear-night":"Heldere nacht",cloudy:"Bewolkt",fog:"Mistig",hail:"Hagel",lightning:"Onweer","lightning-rainy":"Onweer met regen",partlycloudy:"Licht bewolkt",pouring:"Stortregen",rainy:"Regen",snowy:"Sneeuw","snowy-rainy":"Natte sneeuw",windy:"Winderig","windy-variant":"Winderig",exceptional:"Uitzonderlijk"},xt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function yt(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function bt(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const s=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},n=s(t);return`rgba(255, 255, 255, ${n+(s(e)-n)*r})`}const s=yt(t),n=yt(e);return function(t,e,r){const s=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${s(t)}${s(e)}${s(r)}`}(s.r+(n.r-s.r)*r,s.g+(n.g-s.g)*r,s.b+(n.b-s.b)*r)}function Vt(t){let e=xt[0],r=xt[xt.length-1];for(let s=0;s<xt.length-1;s++)if(t>=xt[s].hour&&t<=xt[s+1].hour){e=xt[s],r=xt[s+1];break}const s=r.hour-e.hour,n=0===s?0:(t-e.hour)/s;return{top:bt(e.top,r.top,n),horizon:bt(e.horizon,r.horizon,n),stars:e.stars+(r.stars-e.stars)*n,lights:e.lights+(r.lights-e.lights)*n,clouds:bt(e.clouds,r.clouds,n)}}function kt(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function wt(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}const Ot=(t,e,r)=>{let s=`M 0,${e}`;const n=t/12;for(let t=0;t<12;t++){const a=(t+1)*n,i=(t+r)%5;let o=22;1===i?o=38:2===i?o=14:3===i?o=28:4===i&&(o=44),s+=` Q ${(t*n+a)/2},${e+o} ${a},${e}`}return s+=` L ${t},0 L 0,0 Z`,s},qt=(t,e,r)=>[{x:t+50*r,y:e+180*r},{x:t+85*r,y:e+180*r},{x:t+155*r,y:e+180*r},{x:t+190*r,y:e+180*r}],Xt=(t,e,r)=>{const s=(t.x+e.x)/2,n=(t.y+e.y)/2+r;return`M ${t.x},${t.y} Q ${s},${n} ${e.x},${e.y}`},jt=(t,e,r,s,n)=>J`
+`,gt={solar:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},battery:{stroke:"#10b981",glow:"rgba(16,185,129,0.5)"},batteryD:{stroke:"#ef4444",glow:"rgba(239,68,68,0.5)"},gridI:{stroke:"#06b6d4",glow:"rgba(6,182,212,0.5)"},gridE:{stroke:"#22c55e",glow:"rgba(34,197,94,0.5)"},ev:{stroke:"#a855f7",glow:"rgba(168,85,247,0.5)"},home:{stroke:"#e2e8f0"}},ut={sunny:"Zonnig","clear-night":"Heldere nacht",cloudy:"Bewolkt",fog:"Mistig",hail:"Hagel",lightning:"Onweer","lightning-rainy":"Onweer met regen",partlycloudy:"Licht bewolkt",pouring:"Stortregen",rainy:"Regen",snowy:"Sneeuw","snowy-rainy":"Natte sneeuw",windy:"Winderig","windy-variant":"Winderig",exceptional:"Uitzonderlijk"},xt=[{hour:0,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:4.5,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:6,top:"#1e1b4b",horizon:"#fdba74",stars:.2,lights:.3,clouds:"rgba(255, 255, 255, 0.35)"},{hour:8,top:"#0ea5e9",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:17,top:"#0284c7",horizon:"#bae6fd",stars:0,lights:0,clouds:"rgba(255, 255, 255, 0.65)"},{hour:19.5,top:"#3b0764",horizon:"#f97316",stars:0,lights:.5,clouds:"rgba(255, 255, 255, 0.45)"},{hour:21,top:"#18113c",horizon:"#ea580c",stars:.1,lights:1,clouds:"rgba(255, 255, 255, 0.18)"},{hour:22.5,top:"#020617",horizon:"#1e293b",stars:.6,lights:1,clouds:"rgba(255, 255, 255, 0.08)"},{hour:24,top:"#020617",horizon:"#0f172a",stars:.8,lights:1,clouds:"rgba(255, 255, 255, 0.08)"}];function yt(t){const e=t.replace("#","");return{r:parseInt(e.substring(0,2),16),g:parseInt(e.substring(2,4),16),b:parseInt(e.substring(4,6),16)}}function bt(t,e,r){if(t.startsWith("rgba")||e.startsWith("rgba")){const s=t=>{const e=t.match(/[\d.]+\)$/);return e?parseFloat(e[0]):1},n=s(t);return`rgba(255, 255, 255, ${n+(s(e)-n)*r})`}const s=yt(t),n=yt(e);return function(t,e,r){const s=t=>{const e=Math.max(0,Math.min(255,Math.round(t))).toString(16);return 1===e.length?"0"+e:e};return`#${s(t)}${s(e)}${s(r)}`}(s.r+(n.r-s.r)*r,s.g+(n.g-s.g)*r,s.b+(n.b-s.b)*r)}function Vt(t){let e=xt[0],r=xt[xt.length-1];for(let s=0;s<xt.length-1;s++)if(t>=xt[s].hour&&t<=xt[s+1].hour){e=xt[s],r=xt[s+1];break}const s=r.hour-e.hour,n=0===s?0:(t-e.hour)/s;return{top:bt(e.top,r.top,n),horizon:bt(e.horizon,r.horizon,n),stars:e.stars+(r.stars-e.stars)*n,lights:e.lights+(r.lights-e.lights)*n,clouds:bt(e.clouds,r.clouds,n)}}function kt(t){const e=Math.abs(t);return e<20?0:e<1e3?16:6}function wt(t){const e=Math.abs(t);return e>=1e3?`${(e/1e3).toFixed(1)} kW`:`${Math.round(e)} W`}const Ot=(t,e,r)=>{let s=`M 0,${e}`;const n=t/12;for(let t=0;t<12;t++){const a=(t+1)*n,i=(t+r)%5;let o=22;1===i?o=38:2===i?o=14:3===i?o=28:4===i&&(o=44),s+=` Q ${(t*n+a)/2},${e+o} ${a},${e}`}return s+=` L ${t},0 L 0,0 Z`,s},qt=(t,e,r)=>{let s=`M 0,${e}`;const n=t/12;for(let t=0;t<12;t++){const a=(t+1)*n,i=(t+r)%5;let o=22;1===i?o=38:2===i?o=14:3===i?o=28:4===i&&(o=44),s+=` Q ${(t*n+a)/2},${e+o} ${a},${e}`}return s},Xt=(t,e,r)=>[{x:t+50*r,y:e+180*r},{x:t+85*r,y:e+180*r},{x:t+155*r,y:e+180*r},{x:t+190*r,y:e+180*r}],jt=(t,e,r)=>{const s=(t.x+e.x)/2,n=(t.y+e.y)/2+r;return`M ${t.x},${t.y} Q ${s},${n} ${e.x},${e.y}`},Wt=(t,e,r,s,n)=>J`
     <g transform="translate(${t}, ${e}) scale(${r})" opacity="${s}" stroke="${n}" fill="none" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
       <rect x="63" y="474" width="14" height="8" fill="#64748b" stroke="${n}" stroke-width="1.2" rx="1" />
       <rect x="163" y="474" width="14" height="8" fill="#64748b" stroke="${n}" stroke-width="1.2" rx="1" />
@@ -653,7 +653,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
         <path d="M 190,160 L 190,180" stroke-width="1.5" />
       </g>
     </g>
-  `;function Wt({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:n,solar:a,solarToday:i,load:o,batteryPower:l,soc:d,charger:f,grid:c,showSolar:p,showBattery:v,showEV:h,weather:g="sunny",clouds:u=[],sunriseHour:x=6,sunsetHour:y=21,gridImportToday:b=null,gridExportToday:V=null,homeToday:k=null,batteryChargeToday:w=null,batteryDischargeToday:O=null,evToday:q=null,showLights:X,gridPrice:j=null,gridPriceUnit:W="€/kWh",rainIntensity:S="normal",windSpeed:F=10,temperature:z=null,onNodeClick:P}){let m=g;"pouring"===g||"lightning-rainy"===g?m="rainy":"snowy-rainy"===g||"hail"===g?m="snowy":"fog"===g&&(m="foggy");const U=t||800,K=e||600,Y=(U-800)/2,H=20-Y;let B=s;B=s>=x&&s<=y?6+(s-x)/(y-x)*15:s>y?21+(s-y)/(24-y)*3:s/x*6;const A=l>.05,T=l<-.05,R=c>.05,L=c<-.05,G=f>.1,C=a>20,E=o>20,M=A||T&&L?gt.battery:gt.batteryD,D=R?gt.gridI:gt.gridE,N=Vt(B),Q=void 0!==X?X:N.lights>.05||"rainy"===m||"lightning"===m;let Z=N.top,I=N.horizon,$=N.clouds,_="night"===n?.18:.48;const tt=F>.5?Math.max(1.2,Math.min(18,45/(F/5))):0;"cloudy"===m?($="#b8c5d6",I=bt(N.horizon,"#94a3b8",.15),_=.98):"rainy"===m||"lightning"===m?($="#475569",Z="#1f2937",I=bt(N.horizon,"#1e293b",.55),_=.99):"snowy"===m?($="#7a889b",Z="#475569",I=bt(N.horizon,"#334155",.4),_=.98):"foggy"===m?(Z=bt(N.top,"#64748b",.65),I=bt(N.horizon,"#94a3b8",.65),$="#a8b5c6",_=.5):"partlycloudy"===m?(Z=bt(N.top,"#475569",.1),I=bt(N.horizon,"#64748b",.1),$="#e2e8f0",_=.65):($="#ffffff",_=.48);const et=B>=8&&B<=18,rt=et?"url(#window-day)":Q?"url(#window-night)":"url(#window-dark)",st=et?"none":Q?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",nt=B>=6&&B<=21&&"rainy"!==m&&"lightning"!==m&&"cloudy"!==m&&"snowy"!==m&&"foggy"!==m,at={cx:U/2,cy:K};let it=0,ot="#fef08a",lt="rgba(254, 240, 138, 0.65)";if(nt){const t=(B-6)/15;at.cx=t*(U+120)-60,at.cy=K-120-Math.sin(t*Math.PI)*(K-160),it=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);ot=bt("#ea580c","#fef08a",e),lt=bt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const dt={cx:U/2,cy:K};let ft=0;if((B>21||B<6)&&"rainy"!==m&&"lightning"!==m&&"cloudy"!==m&&"snowy"!==m&&"foggy"!==m){const t=B>21?(B-21)/9:(B+3)/9;dt.cx=t*(U+120)-60,dt.cy=K-120-Math.sin(t*Math.PI)*(K-200),ft=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const ct=345,pt=350,vt=qt(H,-22,.9),ht=qt(H+145.6,112.4,.62),xt=qt(H+249.6,208.4,.42),yt=qt(H+316.4,275.6,.28),Wt=qt(H+358.4,323.6,.18);let St=L?"↑ Teruglevering":R?"↓ Import":"Standby";null!==b&&null!==V?St=`↓${b.toFixed(1)} ↑${V.toFixed(1)} kWh`:null!==b?St=`Import: ${b.toFixed(1)} kWh`:null!==V&&(St=`Terug: ${V.toFixed(1)} kWh`);const Ft=null!==k?`Vandaag: ${k.toFixed(1)} kWh`:E?"Actief":"Standby";let zt=`SoC: ${d}%`;null!==w&&null!==O?zt=`SoC: ${d}% (↓${w.toFixed(1)} ↑${O.toFixed(1)})`:null!==w&&(zt=`SoC: ${d}% (↓${w.toFixed(1)})`);const Pt=null!==q?`Vandaag: ${q.toFixed(1)} kWh`:G?"Laden":"Standby";let mt="";if(null!==j){mt=`€ ${j.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:3})}`}const Ut=[{id:"grid",title:"Stroomnet",value:wt(c),sub:St,color:D.stroke,active:R||L}];v&&Ut.push({id:"battery",title:"Thuisaccu",value:A||T?wt(l):"Standby",sub:zt,color:M.stroke,active:A||T}),Ut.push({id:"home",title:"Huisverbruik",value:wt(o),sub:Ft,color:gt.home.stroke,active:E}),h&&Ut.push({id:"ev",title:"Laadpaal (EV)",value:wt(f),sub:Pt,color:gt.ev.stroke,active:G});const Kt=(t,e,r,s,n,a=!1)=>J`
+  `;function St({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:n,solar:a,solarToday:i,load:o,batteryPower:l,soc:d,charger:f,grid:c,showSolar:p,showBattery:v,showEV:h,weather:g="sunny",clouds:u=[],sunriseHour:x=6,sunsetHour:y=21,gridImportToday:b=null,gridExportToday:V=null,homeToday:k=null,batteryChargeToday:w=null,batteryDischargeToday:O=null,evToday:q=null,showLights:X,gridPrice:j=null,gridPriceUnit:W="€/kWh",rainIntensity:S="normal",windSpeed:F=10,temperature:z=null,onNodeClick:P}){let m=g;"pouring"===g||"lightning-rainy"===g?m="rainy":"snowy-rainy"===g||"hail"===g?m="snowy":"fog"===g&&(m="foggy");const U=t||800,K=e||600,Y=(U-800)/2,H=20-Y;let B=s;B=s>=x&&s<=y?6+(s-x)/(y-x)*15:s>y?21+(s-y)/(24-y)*3:s/x*6;const A=l>.05,T=l<-.05,R=c>.05,L=c<-.05,G=f>.1,C=a>20,E=o>20,M=A||T&&L?gt.battery:gt.batteryD,D=R?gt.gridI:gt.gridE,N=Vt(B),Q=void 0!==X?X:N.lights>.05||"rainy"===m||"lightning"===m;let Z=N.top,I=N.horizon,$=N.clouds,_="night"===n?.18:.48;const tt=F>.5?Math.max(1.2,Math.min(18,45/(F/5))):0;"cloudy"===m?($="#b8c5d6",I=bt(N.horizon,"#94a3b8",.15),_=.98):"rainy"===m||"lightning"===m?($="#475569",Z="#1f2937",I=bt(N.horizon,"#1e293b",.55),_=.99):"snowy"===m?($="#7a889b",Z="#475569",I=bt(N.horizon,"#334155",.4),_=.98):"foggy"===m?(Z=bt(N.top,"#64748b",.65),I=bt(N.horizon,"#94a3b8",.65),$="#a8b5c6",_=.5):"partlycloudy"===m?(Z=bt(N.top,"#475569",.1),I=bt(N.horizon,"#64748b",.1),$="#e2e8f0",_=.65):($="#ffffff",_=.48);const et=B>=8&&B<=18,rt=et?"url(#window-day)":Q?"url(#window-night)":"url(#window-dark)",st=et?"none":Q?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",nt=B>=6&&B<=21&&"rainy"!==m&&"lightning"!==m&&"cloudy"!==m&&"snowy"!==m&&"foggy"!==m,at={cx:U/2,cy:K};let it=0,ot="#fef08a",lt="rgba(254, 240, 138, 0.65)";if(nt){const t=(B-6)/15;at.cx=t*(U+120)-60,at.cy=K-120-Math.sin(t*Math.PI)*(K-160),it=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);ot=bt("#ea580c","#fef08a",e),lt=bt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const dt={cx:U/2,cy:K};let ft=0;if((B>21||B<6)&&"rainy"!==m&&"lightning"!==m&&"cloudy"!==m&&"snowy"!==m&&"foggy"!==m){const t=B>21?(B-21)/9:(B+3)/9;dt.cx=t*(U+120)-60,dt.cy=K-120-Math.sin(t*Math.PI)*(K-200),ft=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const ct=345,pt=350,vt=Xt(H,-22,.9),ht=Xt(H+145.6,112.4,.62),xt=Xt(H+249.6,208.4,.42),yt=Xt(H+316.4,275.6,.28),St=Xt(H+358.4,323.6,.18);let Ft=L?"↑ Teruglevering":R?"↓ Import":"Standby";null!==b&&null!==V?Ft=`↓${b.toFixed(1)} ↑${V.toFixed(1)} kWh`:null!==b?Ft=`Import: ${b.toFixed(1)} kWh`:null!==V&&(Ft=`Terug: ${V.toFixed(1)} kWh`);const zt=null!==k?`Vandaag: ${k.toFixed(1)} kWh`:E?"Actief":"Standby";let Pt=`SoC: ${d}%`;null!==w&&null!==O?Pt=`SoC: ${d}% (↓${w.toFixed(1)} ↑${O.toFixed(1)})`:null!==w&&(Pt=`SoC: ${d}% (↓${w.toFixed(1)})`);const mt=null!==q?`Vandaag: ${q.toFixed(1)} kWh`:G?"Laden":"Standby";let Ut="";if(null!==j){Ut=`€ ${j.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:3})}`}const Kt=[{id:"grid",title:"Stroomnet",value:wt(c),sub:Ft,color:D.stroke,active:R||L}];v&&Kt.push({id:"battery",title:"Thuisaccu",value:A||T?wt(l):"Standby",sub:Pt,color:M.stroke,active:A||T}),Kt.push({id:"home",title:"Huisverbruik",value:wt(o),sub:zt,color:gt.home.stroke,active:E}),h&&Kt.push({id:"ev",title:"Laadpaal (EV)",value:wt(f),sub:mt,color:gt.ev.stroke,active:G});const Yt=(t,e,r,s,n,a=!1)=>J`
       <path d="${t}" class="flowCable" />
       <path d="${t}" fill="none" stroke="${s}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
@@ -674,7 +674,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           " />
       `)}
     `:J``)(t,e,r,s,n,a)}
-    `,Yt=K-530;return J`
+    `,Ht=K-530;return J`
     <svg viewBox="0 0 ${U} ${K}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
@@ -870,29 +870,41 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           <g opacity="${_}" style="pointer-events: none;">
             <!-- Layer 1 (Back - Darkest) -->
             <g class="cloud-layer-back">
-              <path d="${Ot(U,60,1)}" fill="${bt($,"#111827",.25)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${Ot(U,60,1)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.25)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${Ot(U,60,1)}" fill="${bt($,"#111827",.25)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${Ot(U,60,1)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.25)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${qt(U,60,1)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
+              <path d="${qt(U,60,1)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
               
-              <path d="${Ot(U,95,2)}" fill="${bt($,"#111827",.2)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${Ot(U,95,2)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.2)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${Ot(U,95,2)}" fill="${bt($,"#111827",.2)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${Ot(U,95,2)}" transform="translate(${U}, 0)" fill="${bt($,"#111827",.2)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${qt(U,95,2)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
+              <path d="${qt(U,95,2)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
             </g>
             
             <!-- Layer 2 (Middle - Medium) -->
             <g class="cloud-layer-mid">
-              <path d="${Ot(U,85,3)}" fill="${bt($,"#1f2937",.15)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${Ot(U,85,3)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.15)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${Ot(U,85,3)}" fill="${bt($,"#1f2937",.15)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${Ot(U,85,3)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.15)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${qt(U,85,3)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
+              <path d="${qt(U,85,3)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
               
-              <path d="${Ot(U,120,4)}" fill="${bt($,"#1f2937",.1)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${Ot(U,120,4)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.1)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${Ot(U,120,4)}" fill="${bt($,"#1f2937",.1)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${Ot(U,120,4)}" transform="translate(${U}, 0)" fill="${bt($,"#1f2937",.1)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${qt(U,120,4)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
+              <path d="${qt(U,120,4)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
             </g>
             
             <!-- Layer 3 (Front - Main Color) -->
             <g class="cloud-layer-front">
-              <path d="${Ot(U,110,5)}" fill="${bt($,"#ffffff",.04)}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${Ot(U,110,5)}" transform="translate(${U}, 0)" fill="${bt($,"#ffffff",.04)}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Ot(U,110,5)}" fill="${bt($,"#ffffff",.04)}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Ot(U,110,5)}" transform="translate(${U}, 0)" fill="${bt($,"#ffffff",.04)}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${qt(U,110,5)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
+              <path d="${qt(U,110,5)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
               
-              <path d="${Ot(U,150,6)}" fill="${$}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${Ot(U,150,6)}" transform="translate(${U}, 0)" fill="${$}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Ot(U,150,6)}" fill="${$}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Ot(U,150,6)}" transform="translate(${U}, 0)" fill="${$}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${qt(U,150,6)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
+              <path d="${qt(U,150,6)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
             </g>
           </g>
         `:J`
@@ -918,7 +930,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- GROUND, MAST, HOUSE, AND CABLES: Translated inside dynamic group-->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <g transform="translate(${Y}, ${Yt})">
+        <g transform="translate(${Y}, ${Ht})">
 
           <!-- Wind Turbines in the far background (behind pylon cables and ground) -->
           <!-- Small Wind Turbine (further) -->
@@ -951,56 +963,56 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
           <!-- Background Pylons (Right/Far) -->
-          ${jt(H+358.4,323.6,.18,.22,"#64748b")}
-          ${jt(H+316.4,275.6,.28,.38,"#5d6d82")}
-          ${jt(H+249.6,208.4,.42,.58,"#546479")}
-          ${jt(H+145.6,112.4,.62,.78,"#4c5c71")}
+          ${Wt(H+358.4,323.6,.18,.22,"#64748b")}
+          ${Wt(H+316.4,275.6,.28,.38,"#5d6d82")}
+          ${Wt(H+249.6,208.4,.42,.58,"#546479")}
+          ${Wt(H+145.6,112.4,.62,.78,"#4c5c71")}
 
           <!-- Parallax sagging power lines between pylons -->
           <!-- Segment P5 (Far) to P4 -->
-          <path d="${Xt(Wt[0],yt[0],5)} 
-                   ${Xt(Wt[1],yt[1],5)} 
-                   ${Xt(Wt[2],yt[2],5)} 
-                   ${Xt(Wt[3],yt[3],5)}" 
+          <path d="${jt(St[0],yt[0],5)} 
+                   ${jt(St[1],yt[1],5)} 
+                   ${jt(St[2],yt[2],5)} 
+                   ${jt(St[3],yt[3],5)}" 
                 fill="none" stroke="#64748b" stroke-width="0.5" opacity="0.15" />
                 
           <!-- Segment P4 to P3 -->
-          <path d="${Xt(yt[0],xt[0],9)} 
-                   ${Xt(yt[1],xt[1],9)} 
-                   ${Xt(yt[2],xt[2],9)} 
-                   ${Xt(yt[3],xt[3],9)}" 
+          <path d="${jt(yt[0],xt[0],9)} 
+                   ${jt(yt[1],xt[1],9)} 
+                   ${jt(yt[2],xt[2],9)} 
+                   ${jt(yt[3],xt[3],9)}" 
                 fill="none" stroke="#5d6d82" stroke-width="0.8" opacity="0.32" />
 
           <!-- Segment P3 to P2 -->
-          <path d="${Xt(xt[0],ht[0],14)} 
-                   ${Xt(xt[1],ht[1],14)} 
-                   ${Xt(xt[2],ht[2],14)} 
-                   ${Xt(xt[3],ht[3],14)}" 
+          <path d="${jt(xt[0],ht[0],14)} 
+                   ${jt(xt[1],ht[1],14)} 
+                   ${jt(xt[2],ht[2],14)} 
+                   ${jt(xt[3],ht[3],14)}" 
                 fill="none" stroke="#546479" stroke-width="1.2" opacity="0.52" />
 
           <!-- Segment P2 to P1 (Foreground) -->
-          <path d="${Xt(ht[0],vt[0],22)} 
-                   ${Xt(ht[1],vt[1],22)} 
-                   ${Xt(ht[2],vt[2],22)} 
-                   ${Xt(ht[3],vt[3],22)}" 
+          <path d="${jt(ht[0],vt[0],22)} 
+                   ${jt(ht[1],vt[1],22)} 
+                   ${jt(ht[2],vt[2],22)} 
+                   ${jt(ht[3],vt[3],22)}" 
                 fill="none" stroke="#4c5c71" stroke-width="1.6" opacity="0.75" />
 
           <!-- Wires going off-screen left from foreground P1 -->
-          <path d="${Xt({x:-Y,y:vt[0].y-35},vt[0],30)} 
-                   ${Xt({x:-Y,y:vt[1].y-35},vt[1],30)} 
-                   ${Xt({x:-Y,y:vt[3].y-35},vt[3],30)}" 
+          <path d="${jt({x:-Y,y:vt[0].y-35},vt[0],30)} 
+                   ${jt({x:-Y,y:vt[1].y-35},vt[1],30)} 
+                   ${jt({x:-Y,y:vt[3].y-35},vt[3],30)}" 
                 fill="none" stroke="#4c5c71" stroke-width="1.8" opacity="0.8" />
 
           <!-- Wires extending past P5 into the horizon -->
-          <path d="M ${Wt[0].x},${Wt[0].y} L ${Wt[0].x+50},${Wt[0].y-2} 
-                   M ${Wt[1].x},${Wt[1].y} L ${Wt[1].x+50},${Wt[1].y-2} 
-                   M ${Wt[2].x},${Wt[2].y} L ${Wt[2].x+50},${Wt[2].y-2} 
-                   M ${Wt[3].x},${Wt[3].y} L ${Wt[3].x+50},${Wt[3].y-2}" 
+          <path d="M ${St[0].x},${St[0].y} L ${St[0].x+50},${St[0].y-2} 
+                   M ${St[1].x},${St[1].y} L ${St[1].x+50},${St[1].y-2} 
+                   M ${St[2].x},${St[2].y} L ${St[2].x+50},${St[2].y-2} 
+                   M ${St[3].x},${St[3].y} L ${St[3].x+50},${St[3].y-2}" 
                 fill="none" stroke="#64748b" stroke-width="0.3" opacity="0.1" />
 
           <!-- Interactive Foreground Mast (Pylon 1) -->
           <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${()=>P("grid")}>
-            ${jt(H,-22,.9,1,"#475569")}
+            ${Wt(H,-22,.9,1,"#475569")}
             <!-- Larger transparent tap target for tablets -->
             <rect x="${H}" y="100" width="200" height="380" fill="transparent" style="cursor: pointer;" />
           </g>
@@ -1221,14 +1233,14 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           `:""}
 
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
-          ${p?Kt("M 380,230 L 380,270 L 345,270 L 345,350",C,kt(a),gt.solar.stroke,gt.solar.glow):""}
+          ${p?Yt("M 380,230 L 380,270 L 345,270 L 345,350",C,kt(a),gt.solar.stroke,gt.solar.glow):""}
 
           <!-- Grid cable: underground from transformer box to meterkast (no pylon-to-box cable) -->
-          ${Kt("M 13,410 L 13,440 L 345,440 L 345,350",R||L,kt(c),D.stroke,D.glow,L)}
+          ${Yt("M 13,410 L 13,440 L 345,440 L 345,350",R||L,kt(c),D.stroke,D.glow,L)}
 
-          ${v?Kt("M 310,350 L 345,350",A||T,kt(l),M.stroke,M.glow,A):""}
+          ${v?Yt("M 310,350 L 345,350",A||T,kt(l),M.stroke,M.glow,A):""}
 
-          ${h?Kt("M 345,350 L 345,440 L 455,440 L 455,395",G,kt(f),gt.ev.stroke,gt.ev.glow):""}
+          ${h?Yt("M 345,350 L 345,440 L 455,440 L 455,395",G,kt(f),gt.ev.stroke,gt.ev.glow):""}
 
         </g>
         <!-- End of translate group -->
@@ -1272,7 +1284,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
             <!-- Solar panels are at design x=320, y=270 (inside translate group)
                  So SVG x = translateX+320, SVG y = translateY+270
                  Card goes LEFT of the panels at the same roof height -->
-            <g transform="translate(${Y+130}, ${Yt+90})">
+            <g transform="translate(${Y+130}, ${Ht+90})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${C?"hudCardActive":""}"
                 rx="8" ry="8"
@@ -1313,14 +1325,14 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
               rx="8" ry="8"
               style="${R||L?`color: ${D.stroke}`:""}" />
             <text x="12" y="20" class="hudTitle">Stroomnet</text>
-            ${mt?J`
-              <text x="158" y="20" class="hudTitle" text-anchor="end" fill="#fbbf24" font-weight="bold">${mt}</text>
+            ${Ut?J`
+              <text x="158" y="20" class="hudTitle" text-anchor="end" fill="#fbbf24" font-weight="bold">${Ut}</text>
             `:""}
             <text x="12" y="39" class="hudValue ${R||L?"hudActiveText":""}"
               style="${R||L?`color: ${D.stroke}`:""}">
               ${R||L?wt(c):"—"}
             </text>
-            <text x="12" y="53" class="hudSub">${St}</text>
+            <text x="12" y="53" class="hudSub">${Ft}</text>
           </g>
         </g>
 
@@ -1337,7 +1349,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
                 style="${A||T?`color: ${M.stroke}`:""}">
                 ${A||T?wt(l):"Standby"}
               </text>
-              <text x="12" y="53" class="hudSub">${zt}</text>
+              <text x="12" y="53" class="hudSub">${Pt}</text>
             </g>
           </g>
         `:""}
@@ -1354,7 +1366,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
               style="${E?`color: ${gt.home.stroke}`:""}">
               ${E?wt(o):"—"}
             </text>
-            <text x="12" y="53" class="hudSub">${Ft}</text>
+            <text x="12" y="53" class="hudSub">${zt}</text>
           </g>
         </g>
 
@@ -1371,13 +1383,13 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
                 style="${G?`color: ${gt.ev.stroke}`:""}">
                 ${G?wt(f):"—"}
               </text>
-              <text x="12" y="53" class="hudSub">${Pt}</text>
+              <text x="12" y="53" class="hudSub">${mt}</text>
             </g>
           </g>
         `:""}
       </g>
     </svg>
-  `}const St={sunny:"Zonnig","clear-night":"Heldere nacht",cloudy:"Bewolkt",fog:"Mistig",hail:"Hagel",lightning:"Onweer","lightning-rainy":"Onweer met regen",partlycloudy:"Licht bewolkt",pouring:"Stortregen",rainy:"Regen",snowy:"Sneeuw","snowy-rainy":"Natte sneeuw",windy:"Winderig","windy-variant":"Winderig",exceptional:"Uitzonderlijk"};function Ft(t,e=!1,r=20){let s=t;switch(e&&"sunny"===t&&(s="clear-night"),s){case"sunny":return C`
+  `}const Ft={sunny:"Zonnig","clear-night":"Heldere nacht",cloudy:"Bewolkt",fog:"Mistig",hail:"Hagel",lightning:"Onweer","lightning-rainy":"Onweer met regen",partlycloudy:"Licht bewolkt",pouring:"Stortregen",rainy:"Regen",snowy:"Sneeuw","snowy-rainy":"Natte sneeuw",windy:"Winderig","windy-variant":"Winderig",exceptional:"Uitzonderlijk"};function zt(t,e=!1,r=20){let s=t;switch(e&&"sunny"===t&&(s="clear-night"),s){case"sunny":return C`
         <svg class="weather-icon" width="${r}" height="${r}" viewBox="0 0 24 24" style="width: ${r}px !important; height: ${r}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <circle cx="12" cy="12" r="5" fill="#f59e0b" />
           <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
@@ -1500,7 +1512,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
         <svg class="weather-icon" width="${r}" height="${r}" viewBox="0 0 24 24" style="width: ${r}px !important; height: ${r}px !important; flex-shrink: 0; display: block; margin: 0 auto;">
           <circle cx="12" cy="12" r="8" fill="#fbbf24" />
         </svg>
-      `}}class zt extends lt{constructor(){super(...arguments),this.selectedNode=null,this.cardWidth=800,this.cardHeight=600,this.hasActiveHash=!1,this.activePopup=null,this.activePopupHistory=[],this.isLoadingHistory=!1,this.activeTab="day",this.statsData={},this.weatherForecast=[],this.debugWeatherState=null,this.debugTimeHour=null,this.debugWindSpeed=null,this.debugRainIntensity=null,this.debugTemperature=null,this._weatherTestPanelOpen=!1,this.clouds=[],this.lastWeather="",this.handleHashChange=()=>{const t=window.location.hash;this.hasActiveHash=""!==t&&"#"!==t}}connectedCallback(){super.connectedCallback(),this.resizeObserver=new ResizeObserver(t=>{for(const e of t){const{width:t,height:r}=e.contentRect;this.cardWidth=t||800,this.cardHeight=r||600}}),this.resizeObserver.observe(this),window.addEventListener("hashchange",this.handleHashChange),this.handleHashChange()}disconnectedCallback(){this.resizeObserver&&this.resizeObserver.disconnect(),window.removeEventListener("hashchange",this.handleHashChange),this.restoreSidebarAndHeader(),super.disconnectedCallback()}updated(t){super.updated(t),this.hideSidebarAndHeader()}hideSidebarAndHeader(){if(this.config?.screensaver)try{const t=document.querySelector("home-assistant");if(!t)return;const e=t.shadowRoot?.querySelector("home-assistant-main");if(!e)return;const r=e.shadowRoot;if(!r)return;const s=r.querySelector("ha-sidebar");s&&(s.style.width="0px",s.style.display="none");const n=r.querySelector(".content");n&&(n.style.paddingLeft="0px",n.style.marginLeft="0px");const a=r.querySelector("partial-panel-resolver"),i=a?.querySelector("ha-panel-lovelace"),o=i?.shadowRoot?.querySelector("hui-root");if(o){const t=o.shadowRoot?.querySelector(".header")||o.shadowRoot?.querySelector("app-header");t&&(t.style.display="none",t.style.height="0px");const e=o.shadowRoot?.querySelector("#view");e&&(e.style.paddingTop="0px",e.style.marginTop="0px")}}catch(t){console.warn("[energy-flow-card] Failed to hide sidebar/header via JS:",t)}}restoreSidebarAndHeader(){try{const t=document.querySelector("home-assistant");if(!t)return;const e=t.shadowRoot?.querySelector("home-assistant-main");if(!e)return;const r=e.shadowRoot;if(!r)return;const s=r.querySelector("ha-sidebar");s&&(s.style.width="",s.style.display="");const n=r.querySelector(".content");n&&(n.style.paddingLeft="",n.style.marginLeft="");const a=r.querySelector("partial-panel-resolver"),i=a?.querySelector("ha-panel-lovelace"),o=i?.shadowRoot?.querySelector("hui-root");if(o){const t=o.shadowRoot?.querySelector(".header")||o.shadowRoot?.querySelector("app-header");t&&(t.style.display="",t.style.height="");const e=o.shadowRoot?.querySelector("#view");e&&(e.style.paddingTop="",e.style.marginTop="")}}catch(t){console.warn("[energy-flow-card] Failed to restore sidebar/header via JS:",t)}}async fetchStatsData(t){if(this.hass){this.isLoadingHistory=!0;try{const e=new Date,r=new Date(e.getTime()-31536e6).toISOString(),s=await this.hass.callWS({type:"recorder/statistics_during_period",start_time:r,statistic_ids:t,period:"day"});this.statsData=s||{}}catch(t){console.warn("[energy-flow-card] Failed to fetch stats via WS:",t),this.statsData={}}finally{this.isLoadingHistory=!1}}}getStatPointValue(t,e){if(!t)return 0;return!e.includes("vandaag")&&!e.includes("today")&&void 0!==t.change&&null!==t.change?t.change:t.state||0}getProcessedSingleData(t){const e=this.statsData[t]||[];if("day"===this.activeTab)return e.slice(-30).map(e=>({label:new Date(e.start).toLocaleDateString("nl-NL",{day:"numeric",month:"short"}),value:this.getStatPointValue(e,t)}));if("month"===this.activeTab){const r={};return e.forEach(e=>{const s=new Date(e.start),n=`${s.getFullYear()}-${s.getMonth().toString().padStart(2,"0")}`,a=s.toLocaleDateString("nl-NL",{month:"short"});r[n]||(r[n]={label:a,sum:0}),r[n].sum+=this.getStatPointValue(e,t)}),Object.keys(r).sort().slice(-12).map(t=>({label:r[t].label,value:r[t].sum}))}{const r={};return e.forEach(e=>{const s=new Date(e.start).getFullYear().toString();r[s]||(r[s]=0),r[s]+=this.getStatPointValue(e,t)}),Object.keys(r).sort().map(t=>({label:t,value:r[t]}))}}getProcessedGridData(t,e){const r=this.statsData[t]||[],s=this.statsData[e]||[],n=new Map,a=new Map;r.forEach(e=>{n.set(new Date(e.start).toDateString(),this.getStatPointValue(e,t))}),s.forEach(t=>{a.set(new Date(t.start).toDateString(),this.getStatPointValue(t,e))});const i=new Set;r.forEach(t=>i.add(t.start)),s.forEach(t=>i.add(t.start));const o=Array.from(i).sort((t,e)=>new Date(t).getTime()-new Date(e).getTime());if("day"===this.activeTab)return o.slice(-30).map(t=>{const e=new Date(t),r=e.toDateString();return{label:e.toLocaleDateString("nl-NL",{day:"numeric",month:"short"}),importValue:n.get(r)||0,exportValue:a.get(r)||0}});if("month"===this.activeTab){const t={};return o.forEach(e=>{const r=new Date(e),s=`${r.getFullYear()}-${r.getMonth().toString().padStart(2,"0")}`,i=r.toLocaleDateString("nl-NL",{month:"short"}),o=r.toDateString();t[s]||(t[s]={label:i,importSum:0,exportSum:0}),t[s].importSum+=n.get(o)||0,t[s].exportSum+=a.get(o)||0}),Object.keys(t).sort().slice(-12).map(e=>({label:t[e].label,importValue:t[e].importSum,exportValue:t[e].exportSum}))}{const t={};return o.forEach(e=>{const r=new Date(e),s=r.getFullYear().toString(),i=r.toDateString();t[s]||(t[s]={importSum:0,exportSum:0}),t[s].importSum+=n.get(i)||0,t[s].exportSum+=a.get(i)||0}),Object.keys(t).sort().map(e=>({label:e,importValue:t[e].importSum,exportValue:t[e].exportSum}))}}parseEntityFloat(t){if(!t||!this.hass)return null;const e=this.hass.states[t];if(!e)return null;const r=parseFloat(e.state);return isNaN(r)?null:r}closePopup(t){t&&t.stopPropagation(),this.activePopup=null,this.activePopupHistory=[],this.statsData={}}renderPopup(){if(!this.activePopup)return"";let t="",e="",r="",s="",n="",a="",i=!1,o="";const l=this.config?.entities;if(!l)return"";if("weather"===this.activePopup){const t=l.weather?this.hass?.states[l.weather]:null;if(!t)return"";const e=t.state,r=t.attributes.temperature,s=t.attributes.apparent_temperature,n=t.attributes.wind_speed,a=t.attributes.humidity;let i=t.attributes.pressure;if(null==i){const t=Object.values(this.hass?.states||{}).find(t=>t.entity_id.startsWith("weather.")&&void 0!==t.attributes.pressure&&null!==t.attributes.pressure);t&&(i=t.attributes.pressure)}const o=t.attributes.friendly_name||"Weer",d=St[e]||e;return C`
+      `}}class Pt extends lt{constructor(){super(...arguments),this.selectedNode=null,this.cardWidth=800,this.cardHeight=600,this.hasActiveHash=!1,this.activePopup=null,this.activePopupHistory=[],this.isLoadingHistory=!1,this.activeTab="day",this.statsData={},this.weatherForecast=[],this.debugWeatherState=null,this.debugTimeHour=null,this.debugWindSpeed=null,this.debugRainIntensity=null,this.debugTemperature=null,this._weatherTestPanelOpen=!1,this.clouds=[],this.lastWeather="",this.handleHashChange=()=>{const t=window.location.hash;this.hasActiveHash=""!==t&&"#"!==t}}connectedCallback(){super.connectedCallback(),this.resizeObserver=new ResizeObserver(t=>{for(const e of t){const{width:t,height:r}=e.contentRect;this.cardWidth=t||800,this.cardHeight=r||600}}),this.resizeObserver.observe(this),window.addEventListener("hashchange",this.handleHashChange),this.handleHashChange()}disconnectedCallback(){this.resizeObserver&&this.resizeObserver.disconnect(),window.removeEventListener("hashchange",this.handleHashChange),this.restoreSidebarAndHeader(),super.disconnectedCallback()}updated(t){super.updated(t),this.hideSidebarAndHeader()}hideSidebarAndHeader(){if(this.config?.screensaver)try{const t=document.querySelector("home-assistant");if(!t)return;const e=t.shadowRoot?.querySelector("home-assistant-main");if(!e)return;const r=e.shadowRoot;if(!r)return;const s=r.querySelector("ha-sidebar");s&&(s.style.width="0px",s.style.display="none");const n=r.querySelector(".content");n&&(n.style.paddingLeft="0px",n.style.marginLeft="0px");const a=r.querySelector("partial-panel-resolver"),i=a?.querySelector("ha-panel-lovelace"),o=i?.shadowRoot?.querySelector("hui-root");if(o){const t=o.shadowRoot?.querySelector(".header")||o.shadowRoot?.querySelector("app-header");t&&(t.style.display="none",t.style.height="0px");const e=o.shadowRoot?.querySelector("#view");e&&(e.style.paddingTop="0px",e.style.marginTop="0px")}}catch(t){console.warn("[energy-flow-card] Failed to hide sidebar/header via JS:",t)}}restoreSidebarAndHeader(){try{const t=document.querySelector("home-assistant");if(!t)return;const e=t.shadowRoot?.querySelector("home-assistant-main");if(!e)return;const r=e.shadowRoot;if(!r)return;const s=r.querySelector("ha-sidebar");s&&(s.style.width="",s.style.display="");const n=r.querySelector(".content");n&&(n.style.paddingLeft="",n.style.marginLeft="");const a=r.querySelector("partial-panel-resolver"),i=a?.querySelector("ha-panel-lovelace"),o=i?.shadowRoot?.querySelector("hui-root");if(o){const t=o.shadowRoot?.querySelector(".header")||o.shadowRoot?.querySelector("app-header");t&&(t.style.display="",t.style.height="");const e=o.shadowRoot?.querySelector("#view");e&&(e.style.paddingTop="",e.style.marginTop="")}}catch(t){console.warn("[energy-flow-card] Failed to restore sidebar/header via JS:",t)}}async fetchStatsData(t){if(this.hass){this.isLoadingHistory=!0;try{const e=new Date,r=new Date(e.getTime()-31536e6).toISOString(),s=await this.hass.callWS({type:"recorder/statistics_during_period",start_time:r,statistic_ids:t,period:"day"});this.statsData=s||{}}catch(t){console.warn("[energy-flow-card] Failed to fetch stats via WS:",t),this.statsData={}}finally{this.isLoadingHistory=!1}}}getStatPointValue(t,e){if(!t)return 0;return!e.includes("vandaag")&&!e.includes("today")&&void 0!==t.change&&null!==t.change?t.change:t.state||0}getProcessedSingleData(t){const e=this.statsData[t]||[];if("day"===this.activeTab)return e.slice(-30).map(e=>({label:new Date(e.start).toLocaleDateString("nl-NL",{day:"numeric",month:"short"}),value:this.getStatPointValue(e,t)}));if("month"===this.activeTab){const r={};return e.forEach(e=>{const s=new Date(e.start),n=`${s.getFullYear()}-${s.getMonth().toString().padStart(2,"0")}`,a=s.toLocaleDateString("nl-NL",{month:"short"});r[n]||(r[n]={label:a,sum:0}),r[n].sum+=this.getStatPointValue(e,t)}),Object.keys(r).sort().slice(-12).map(t=>({label:r[t].label,value:r[t].sum}))}{const r={};return e.forEach(e=>{const s=new Date(e.start).getFullYear().toString();r[s]||(r[s]=0),r[s]+=this.getStatPointValue(e,t)}),Object.keys(r).sort().map(t=>({label:t,value:r[t]}))}}getProcessedGridData(t,e){const r=this.statsData[t]||[],s=this.statsData[e]||[],n=new Map,a=new Map;r.forEach(e=>{n.set(new Date(e.start).toDateString(),this.getStatPointValue(e,t))}),s.forEach(t=>{a.set(new Date(t.start).toDateString(),this.getStatPointValue(t,e))});const i=new Set;r.forEach(t=>i.add(t.start)),s.forEach(t=>i.add(t.start));const o=Array.from(i).sort((t,e)=>new Date(t).getTime()-new Date(e).getTime());if("day"===this.activeTab)return o.slice(-30).map(t=>{const e=new Date(t),r=e.toDateString();return{label:e.toLocaleDateString("nl-NL",{day:"numeric",month:"short"}),importValue:n.get(r)||0,exportValue:a.get(r)||0}});if("month"===this.activeTab){const t={};return o.forEach(e=>{const r=new Date(e),s=`${r.getFullYear()}-${r.getMonth().toString().padStart(2,"0")}`,i=r.toLocaleDateString("nl-NL",{month:"short"}),o=r.toDateString();t[s]||(t[s]={label:i,importSum:0,exportSum:0}),t[s].importSum+=n.get(o)||0,t[s].exportSum+=a.get(o)||0}),Object.keys(t).sort().slice(-12).map(e=>({label:t[e].label,importValue:t[e].importSum,exportValue:t[e].exportSum}))}{const t={};return o.forEach(e=>{const r=new Date(e),s=r.getFullYear().toString(),i=r.toDateString();t[s]||(t[s]={importSum:0,exportSum:0}),t[s].importSum+=n.get(i)||0,t[s].exportSum+=a.get(i)||0}),Object.keys(t).sort().map(e=>({label:e,importValue:t[e].importSum,exportValue:t[e].exportSum}))}}parseEntityFloat(t){if(!t||!this.hass)return null;const e=this.hass.states[t];if(!e)return null;const r=parseFloat(e.state);return isNaN(r)?null:r}closePopup(t){t&&t.stopPropagation(),this.activePopup=null,this.activePopupHistory=[],this.statsData={}}renderPopup(){if(!this.activePopup)return"";let t="",e="",r="",s="",n="",a="",i=!1,o="";const l=this.config?.entities;if(!l)return"";if("weather"===this.activePopup){const t=l.weather?this.hass?.states[l.weather]:null;if(!t)return"";const e=t.state,r=t.attributes.temperature,s=t.attributes.apparent_temperature,n=t.attributes.wind_speed,a=t.attributes.humidity;let i=t.attributes.pressure;if(null==i){const t=Object.values(this.hass?.states||{}).find(t=>t.entity_id.startsWith("weather.")&&void 0!==t.attributes.pressure&&null!==t.attributes.pressure);t&&(i=t.attributes.pressure)}const o=t.attributes.friendly_name||"Weer",d=Ft[e]||e;return C`
         <div class="glass-popup-overlay" @click=${this.closePopup}>
           <div class="glass-popup-card" style="height: auto;" @click=${t=>t.stopPropagation()}>
             <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
@@ -1514,7 +1526,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
               <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
                 <div style="display: flex; align-items: center; gap: 14px;">
                   <div style="background: rgba(255,255,255,0.05); border-radius: 50%; padding: 6px; display: flex; align-items: center; justify-content: center;">
-                    ${Ft(e,!1,36)}
+                    ${zt(e,!1,36)}
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start;">
                     <span class="stat-label" style="font-size: 11px; margin-bottom: 2px; color: rgba(255,255,255,0.5);">Conditie</span>
@@ -1582,8 +1594,8 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
                       
                       <!-- Iconen (Dag & Nacht naast elkaar) -->
                       <div style="display: flex; justify-content: center; gap: 4px; align-items: center; width: 100%;">
-                        ${Ft(t.condition,!1,14)}
-                        ${Ft(t.condition,!0,14)}
+                        ${zt(t.condition,!1,14)}
+                        ${zt(t.condition,!0,14)}
                       </div>
  
                       <!-- Temperaturen (Max & Min daaronder) -->
@@ -1781,7 +1793,7 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           `:""}
 
           <div class="sceneWrapper">
-            ${Wt({containerWidth:this.cardWidth,containerHeight:this.cardHeight,timeHour:r,timeOfDay:s,solar:n,solarToday:c,load:a,batteryPower:f,soc:o,charger:l,grid:d,showSolar:z,showBattery:P,showEV:m,weather:k,clouds:this.getClouds(k),sunriseHour:W,sunsetHour:S,gridImportToday:p,gridExportToday:v,homeToday:h,batteryChargeToday:g,batteryDischargeToday:u,evToday:x,houseStyle:this.config?.house_style,carType:this.config?.car_type,showLights:Y,gridPrice:b,gridPriceUnit:V,rainIntensity:j,windSpeed:q,temperature:X,onNodeClick:t=>this.handleNodeClick(t)})}
+            ${St({containerWidth:this.cardWidth,containerHeight:this.cardHeight,timeHour:r,timeOfDay:s,solar:n,solarToday:c,load:a,batteryPower:f,soc:o,charger:l,grid:d,showSolar:z,showBattery:P,showEV:m,weather:k,clouds:this.getClouds(k),sunriseHour:W,sunsetHour:S,gridImportToday:p,gridExportToday:v,homeToday:h,batteryChargeToday:g,batteryDischargeToday:u,evToday:x,houseStyle:this.config?.house_style,carType:this.config?.car_type,showLights:Y,gridPrice:b,gridPriceUnit:V,rainIntensity:j,windSpeed:q,temperature:X,onNodeClick:t=>this.handleNodeClick(t)})}
           </div>
 
           <!-- Glassmorphism Custom Popup Overlay -->
@@ -1878,4 +1890,4 @@ function t(t,e,r,s){var n,a=arguments.length,i=a<3?e:null===s?s=Object.getOwnPro
           `:""}
         </div>
       </ha-card>
-    `}_toggleWeatherTestPanel(){this._weatherTestPanelOpen=!this._weatherTestPanelOpen}_resetAllDebugOverrides(){this.debugWeatherState=null,this.debugTimeHour=null,this.debugWindSpeed=null,this.debugRainIntensity=null,this.debugTemperature=null}getCardSize(){return 6}}zt.styles=ht,t([pt({attribute:!1})],zt.prototype,"hass",void 0),t([vt()],zt.prototype,"config",void 0),t([vt()],zt.prototype,"selectedNode",void 0),t([vt()],zt.prototype,"cardWidth",void 0),t([vt()],zt.prototype,"cardHeight",void 0),t([vt()],zt.prototype,"hasActiveHash",void 0),t([vt()],zt.prototype,"activePopup",void 0),t([vt()],zt.prototype,"activePopupHistory",void 0),t([vt()],zt.prototype,"isLoadingHistory",void 0),t([vt()],zt.prototype,"activeTab",void 0),t([vt()],zt.prototype,"statsData",void 0),t([vt()],zt.prototype,"weatherForecast",void 0),t([vt()],zt.prototype,"debugWeatherState",void 0),t([vt()],zt.prototype,"debugTimeHour",void 0),t([vt()],zt.prototype,"debugWindSpeed",void 0),t([vt()],zt.prototype,"debugRainIntensity",void 0),t([vt()],zt.prototype,"debugTemperature",void 0),t([vt()],zt.prototype,"_weatherTestPanelOpen",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",zt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.3.3 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{zt as EnergyFlowCard};
+    `}_toggleWeatherTestPanel(){this._weatherTestPanelOpen=!this._weatherTestPanelOpen}_resetAllDebugOverrides(){this.debugWeatherState=null,this.debugTimeHour=null,this.debugWindSpeed=null,this.debugRainIntensity=null,this.debugTemperature=null}getCardSize(){return 6}}Pt.styles=ht,t([pt({attribute:!1})],Pt.prototype,"hass",void 0),t([vt()],Pt.prototype,"config",void 0),t([vt()],Pt.prototype,"selectedNode",void 0),t([vt()],Pt.prototype,"cardWidth",void 0),t([vt()],Pt.prototype,"cardHeight",void 0),t([vt()],Pt.prototype,"hasActiveHash",void 0),t([vt()],Pt.prototype,"activePopup",void 0),t([vt()],Pt.prototype,"activePopupHistory",void 0),t([vt()],Pt.prototype,"isLoadingHistory",void 0),t([vt()],Pt.prototype,"activeTab",void 0),t([vt()],Pt.prototype,"statsData",void 0),t([vt()],Pt.prototype,"weatherForecast",void 0),t([vt()],Pt.prototype,"debugWeatherState",void 0),t([vt()],Pt.prototype,"debugTimeHour",void 0),t([vt()],Pt.prototype,"debugWindSpeed",void 0),t([vt()],Pt.prototype,"debugRainIntensity",void 0),t([vt()],Pt.prototype,"debugTemperature",void 0),t([vt()],Pt.prototype,"_weatherTestPanelOpen",void 0),customElements.get("energy-flow-card")||(customElements.define("energy-flow-card",Pt),console.info("%c  ENERGY-FLOW-CARD  %c Version 2.3.3 ","color: white; background: #10b981; font-weight: 700;","color: #10b981; background: #0f172a; font-weight: 700;"));export{Pt as EnergyFlowCard};

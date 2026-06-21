@@ -226,6 +226,28 @@ const getOvercastDeckPath = (W: number, baseY: number, seed: number): string => 
   return path;
 };
 
+const getOvercastBottomLinePath = (W: number, baseY: number, seed: number): string => {
+  let path = `M 0,${baseY}`;
+  const segments = 12;
+  const segmentWidth = W / segments;
+  
+  for (let i = 0; i < segments; i++) {
+    const startX = i * segmentWidth;
+    const endX = (i + 1) * segmentWidth;
+    const midX = (startX + endX) / 2;
+    
+    const waveNum = (i + seed) % 5;
+    let bumpHeight = 22;
+    if (waveNum === 1) bumpHeight = 38;
+    else if (waveNum === 2) bumpHeight = 14;
+    else if (waveNum === 3) bumpHeight = 28;
+    else if (waveNum === 4) bumpHeight = 44;
+    
+    path += ` Q ${midX},${baseY + bumpHeight} ${endX},${baseY}`;
+  }
+  return path;
+};
+
 const getPylonTips = (xOffset: number, yOffset: number, S: number) => {
   return [
     { x: xOffset + S * 50, y: yOffset + S * 180 },
@@ -721,29 +743,41 @@ export function renderHouseSvg({
           <g opacity="${cloudOpacity}" style="pointer-events: none;">
             <!-- Layer 1 (Back - Darkest) -->
             <g class="cloud-layer-back">
-              <path d="${getOvercastDeckPath(width, 60, 1)}" fill="${interpolateColor(cloudColor, '#111827', 0.25)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${getOvercastDeckPath(width, 60, 1)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.25)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastDeckPath(width, 60, 1)}" fill="${interpolateColor(cloudColor, '#111827', 0.25)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastDeckPath(width, 60, 1)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.25)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastBottomLinePath(width, 60, 1)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
+              <path d="${getOvercastBottomLinePath(width, 60, 1)}" transform="translate(${width}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
               
-              <path d="${getOvercastDeckPath(width, 95, 2)}" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
-              <path d="${getOvercastDeckPath(width, 95, 2)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastDeckPath(width, 95, 2)}" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastDeckPath(width, 95, 2)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#111827', 0.20)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));" />
+              <path d="${getOvercastBottomLinePath(width, 95, 2)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
+              <path d="${getOvercastBottomLinePath(width, 95, 2)}" transform="translate(${width}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" />
             </g>
             
             <!-- Layer 2 (Middle - Medium) -->
             <g class="cloud-layer-mid">
-              <path d="${getOvercastDeckPath(width, 85, 3)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.15)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${getOvercastDeckPath(width, 85, 3)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.15)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastDeckPath(width, 85, 3)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.15)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastDeckPath(width, 85, 3)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.15)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastBottomLinePath(width, 85, 3)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
+              <path d="${getOvercastBottomLinePath(width, 85, 3)}" transform="translate(${width}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
               
-              <path d="${getOvercastDeckPath(width, 120, 4)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
-              <path d="${getOvercastDeckPath(width, 120, 4)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastDeckPath(width, 120, 4)}" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastDeckPath(width, 120, 4)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#1f2937', 0.10)}" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));" />
+              <path d="${getOvercastBottomLinePath(width, 120, 4)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
+              <path d="${getOvercastBottomLinePath(width, 120, 4)}" transform="translate(${width}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" />
             </g>
             
             <!-- Layer 3 (Front - Main Color) -->
             <g class="cloud-layer-front">
-              <path d="${getOvercastDeckPath(width, 110, 5)}" fill="${interpolateColor(cloudColor, '#ffffff', 0.04)}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${getOvercastDeckPath(width, 110, 5)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#ffffff', 0.04)}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastDeckPath(width, 110, 5)}" fill="${interpolateColor(cloudColor, '#ffffff', 0.04)}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastDeckPath(width, 110, 5)}" transform="translate(${width}, 0)" fill="${interpolateColor(cloudColor, '#ffffff', 0.04)}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastBottomLinePath(width, 110, 5)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
+              <path d="${getOvercastBottomLinePath(width, 110, 5)}" transform="translate(${width}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
               
-              <path d="${getOvercastDeckPath(width, 150, 6)}" fill="${cloudColor}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${getOvercastDeckPath(width, 150, 6)}" transform="translate(${width}, 0)" fill="${cloudColor}" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastDeckPath(width, 150, 6)}" fill="${cloudColor}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastDeckPath(width, 150, 6)}" transform="translate(${width}, 0)" fill="${cloudColor}" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${getOvercastBottomLinePath(width, 150, 6)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
+              <path d="${getOvercastBottomLinePath(width, 150, 6)}" transform="translate(${width}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
             </g>
           </g>
         ` : svg`
