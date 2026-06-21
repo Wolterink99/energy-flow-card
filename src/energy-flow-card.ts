@@ -205,6 +205,12 @@ export class EnergyFlowCard extends LitElement {
   @state() private activeTab: 'day' | 'month' | 'year' = 'day';
   @state() private statsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
+  @state() private debugWeatherState: string | null = null;
+  @state() private debugTimeHour: number | null = null;
+  @state() private debugWindSpeed: number | null = null;
+  @state() private debugRainIntensity: 'light' | 'normal' | 'heavy' | null = null;
+  @state() private debugTemperature: number | null = null;
+  @state() private _weatherTestPanelOpen: boolean = false;
 
   private resizeObserver?: ResizeObserver;
   private clouds: any[] = [];
@@ -1121,7 +1127,9 @@ export class EnergyFlowCard extends LitElement {
     // Get current browser time decimal representation (0.0 to 24.0)
     const now = new Date();
     let decimalHour = now.getHours() + now.getMinutes() / 60;
-    if (this.config.time_override !== undefined) {
+    if (this.debugTimeHour !== null) {
+      decimalHour = this.debugTimeHour;
+    } else if (this.config.time_override !== undefined) {
       decimalHour = this.config.time_override;
     }
 
@@ -1195,24 +1203,30 @@ export class EnergyFlowCard extends LitElement {
     }
 
     let weatherEntity = (weatherEntityId && this.hass?.states[weatherEntityId]) ? this.hass.states[weatherEntityId] : null;
-    if (this.config.weather_override) {
+    if (this.debugWeatherState !== null) {
+      weatherState = this.debugWeatherState;
+    } else if (this.config.weather_override) {
       weatherState = this.config.weather_override;
     } else if (weatherEntity) {
       weatherState = weatherEntity.state;
     }
 
-    const windSpeed = weatherEntity?.attributes?.wind_speed !== undefined ? parseFloat(weatherEntity.attributes.wind_speed) : 10;
-    const temperature = weatherEntity?.attributes?.temperature !== undefined ? parseFloat(weatherEntity.attributes.temperature) : null;
+    const windSpeed = this.debugWindSpeed !== null ? this.debugWindSpeed : (weatherEntity?.attributes?.wind_speed !== undefined ? parseFloat(weatherEntity.attributes.wind_speed) : 10);
+    const temperature = this.debugTemperature !== null ? this.debugTemperature : (weatherEntity?.attributes?.temperature !== undefined ? parseFloat(weatherEntity.attributes.temperature) : null);
     let rainIntensity: 'light' | 'normal' | 'heavy' = 'normal';
-    if (weatherEntity?.attributes?.precipitation !== undefined) {
-      const precip = parseFloat(weatherEntity.attributes.precipitation);
-      if (precip > 0) {
-        if (precip < 1.0) rainIntensity = 'light';
-        else if (precip >= 4.0) rainIntensity = 'heavy';
+    if (this.debugRainIntensity !== null) {
+      rainIntensity = this.debugRainIntensity;
+    } else {
+      if (weatherEntity?.attributes?.precipitation !== undefined) {
+        const precip = parseFloat(weatherEntity.attributes.precipitation);
+        if (precip > 0) {
+          if (precip < 1.0) rainIntensity = 'light';
+          else if (precip >= 4.0) rainIntensity = 'heavy';
+        }
       }
-    }
-    if (weatherState === 'pouring' || weatherState === 'lightning-rainy') {
-      rainIntensity = 'heavy';
+      if (weatherState === 'pouring' || weatherState === 'lightning-rainy') {
+        rainIntensity = 'heavy';
+      }
     }
 
     // Sunrise/sunset from Home Assistant sun.sun
@@ -1345,9 +1359,111 @@ export class EnergyFlowCard extends LitElement {
 
           <!-- Glassmorphism Custom Popup Overlay -->
           ${this.renderPopup()}
+
+          <!-- Weather Test Panel Overlay/Drawer -->
+          ${this.config?.weather_test ? html`
+            <!-- Floating Toggle Button -->
+            <div style="position: absolute; left: 16px; top: 16px; z-index: 100;">
+              <button @click=${this._toggleWeatherTestPanel} style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: background 0.3s ease;">
+                <ha-icon icon="mdi:cog" style="--mdc-icon-size: 14px; width: 14px; height: 14px;"></ha-icon>
+                Simulatiepaneel
+              </button>
+            </div>
+
+            <!-- Panel Content -->
+            ${this._weatherTestPanelOpen ? html`
+              <div style="position: absolute; left: 16px; top: 52px; z-index: 99; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); width: 280px; border-radius: 12px; padding: 16px; color: #fff; font-family: system-ui, sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                  <span style="font-weight: bold; font-size: 13px; color: #10b981; text-transform: uppercase;">Weer Simulator</span>
+                  <button @click=${this._toggleWeatherTestPanel} style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+                </div>
+
+                <!-- Weather Selector -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold; text-transform: uppercase;">Weertype</span>
+                  <select @change=${(e: any) => this.debugWeatherState = e.target.value || null} style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px; border-radius: 6px; font-size: 12px; outline: none; cursor: pointer; width: 100%;">
+                    <option value="" ?selected=${this.debugWeatherState === null}>Standaard (HA)</option>
+                    <option value="sunny" ?selected=${this.debugWeatherState === 'sunny'}>Zonnig</option>
+                    <option value="partlycloudy" ?selected=${this.debugWeatherState === 'partlycloudy'}>Licht bewolkt</option>
+                    <option value="cloudy" ?selected=${this.debugWeatherState === 'cloudy'}>Bewolkt</option>
+                    <option value="rainy" ?selected=${this.debugWeatherState === 'rainy'}>Regen</option>
+                    <option value="pouring" ?selected=${this.debugWeatherState === 'pouring'}>Stortregen</option>
+                    <option value="lightning" ?selected=${this.debugWeatherState === 'lightning'}>Onweer</option>
+                    <option value="snowy" ?selected=${this.debugWeatherState === 'snowy'}>Sneeuw</option>
+                    <option value="fog" ?selected=${this.debugWeatherState === 'fog'}>Mist</option>
+                  </select>
+                </div>
+
+                <!-- Time Slider -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
+                    <span>TIJDSTIP (UUR)</span>
+                    <span style="color: #10b981;">${this.debugTimeHour !== null ? `${Math.floor(this.debugTimeHour)}:${String(Math.floor((this.debugTimeHour % 1) * 60)).padStart(2, '0')}` : 'Standaard'}</span>
+                  </div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="range" min="0" max="23.9" step="0.1" .value=${this.debugTimeHour !== null ? this.debugTimeHour : decimalHour} @input=${(e: any) => this.debugTimeHour = parseFloat(e.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                    ${this.debugTimeHour !== null ? html`<button @click=${() => this.debugTimeHour = null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>` : ''}
+                  </div>
+                </div>
+
+                <!-- Wind Speed -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
+                    <span>WINDSNELHEID (KM/H)</span>
+                    <span style="color: #10b981;">${this.debugWindSpeed !== null ? `${this.debugWindSpeed} km/h` : 'Standaard'}</span>
+                  </div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="range" min="0" max="120" step="1" .value=${this.debugWindSpeed !== null ? this.debugWindSpeed : windSpeed} @input=${(e: any) => this.debugWindSpeed = parseInt(e.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                    ${this.debugWindSpeed !== null ? html`<button @click=${() => this.debugWindSpeed = null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>` : ''}
+                  </div>
+                </div>
+
+                <!-- Rain Intensity -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold; text-transform: uppercase;">Regen Intensiteit</span>
+                  <div style="display: flex; gap: 4px;">
+                    ${['light', 'normal', 'heavy'].map(mode => html`
+                      <button @click=${() => this.debugRainIntensity = this.debugRainIntensity === mode ? null : mode as any} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugRainIntensity === mode ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                        ${mode === 'light' ? 'Licht' : mode === 'normal' ? 'Normaal' : 'Zwaar'}
+                      </button>
+                    `)}
+                  </div>
+                </div>
+
+                <!-- Temperature -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
+                    <span>TEMPERATUUR (°C)</span>
+                    <span style="color: #10b981;">${this.debugTemperature !== null ? `${this.debugTemperature} °C` : 'Standaard'}</span>
+                  </div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="range" min="-15" max="40" step="0.5" .value=${this.debugTemperature !== null ? this.debugTemperature : (temperature !== null ? temperature : 15)} @input=${(e: any) => this.debugTemperature = parseFloat(e.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                    ${this.debugTemperature !== null ? html`<button @click=${() => this.debugTemperature = null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>` : ''}
+                  </div>
+                </div>
+
+                <!-- Reset Simulator -->
+                <button @click=${this._resetAllDebugOverrides} style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; text-transform: uppercase;">
+                  Reset simulator
+                </button>
+              </div>
+            ` : ''}
+          ` : ''}
         </div>
       </ha-card>
     `;
+  }
+
+  private _toggleWeatherTestPanel(): void {
+    this._weatherTestPanelOpen = !this._weatherTestPanelOpen;
+  }
+
+  private _resetAllDebugOverrides(): void {
+    this.debugWeatherState = null;
+    this.debugTimeHour = null;
+    this.debugWindSpeed = null;
+    this.debugRainIntensity = null;
+    this.debugTemperature = null;
   }
 
   // Lovelace requirement: custom card size representation
