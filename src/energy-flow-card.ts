@@ -1363,8 +1363,8 @@ export class EnergyFlowCard extends LitElement {
           <!-- Weather Test Panel Overlay/Drawer -->
           ${this.config?.weather_test ? html`
             <!-- Floating Toggle Button -->
-            <div style="position: absolute; left: 16px; top: 16px; z-index: 100;">
-              <button @click=${this._toggleWeatherTestPanel} style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: background 0.3s ease;">
+            <div style="position: absolute; left: 16px; top: 16px; z-index: 100;" @click=${(e: Event) => e.stopPropagation()}>
+              <button @click=${(e: Event) => { e.stopPropagation(); this._toggleWeatherTestPanel(); }} style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: background 0.3s ease;">
                 <ha-icon icon="mdi:cog" style="--mdc-icon-size: 14px; width: 14px; height: 14px;"></ha-icon>
                 Simulatiepaneel
               </button>
@@ -1372,10 +1372,10 @@ export class EnergyFlowCard extends LitElement {
 
             <!-- Panel Content -->
             ${this._weatherTestPanelOpen ? html`
-              <div style="position: absolute; left: 16px; top: 52px; z-index: 99; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); width: 280px; border-radius: 12px; padding: 16px; color: #fff; font-family: system-ui, sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+              <div @click=${(e: Event) => e.stopPropagation()} style="position: absolute; left: 16px; top: 52px; z-index: 99; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); width: 280px; border-radius: 12px; padding: 16px; color: #fff; font-family: system-ui, sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
                   <span style="font-weight: bold; font-size: 13px; color: #10b981; text-transform: uppercase;">Weer Simulator</span>
-                  <button @click=${this._toggleWeatherTestPanel} style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+                  <button @click=${(e: Event) => { e.stopPropagation(); this._toggleWeatherTestPanel(); }} style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
                 </div>
 
                 <!-- Weather Selector -->
