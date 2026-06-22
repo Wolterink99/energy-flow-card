@@ -32,7 +32,8 @@ const newConfig = {
           house_style: "classic-jaren30",
           show_solar: true,
           show_battery: false,
-          show_ev: false,
+          show_ev: true,
+          car_type: "/local/vw_golf_id3.png",
           tap_action: {
             action: "navigate",
             navigation_path: "/lovelace/0"
