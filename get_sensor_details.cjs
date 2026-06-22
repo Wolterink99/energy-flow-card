@@ -22,14 +22,16 @@ ws.on('message', (data) => {
       type: 'get_states'
     }));
   } else if (msg.type === 'result' && msg.id === 1) {
-    console.log('--- EV / CHARGER / LAADPAAL SENSORS ---');
+    console.log('--- POOL / PUMP SENSORS ---');
     const matches = msg.result.filter(e => 
-      e.entity_id.toLowerCase().includes('laad') || 
-      e.entity_id.toLowerCase().includes('charger') || 
-      e.entity_id.toLowerCase().includes('car') || 
-      e.entity_id.toLowerCase().includes('ev') ||
-      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('laad')) ||
-      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('charger'))
+      e.entity_id.toLowerCase().includes('pomp') || 
+      e.entity_id.toLowerCase().includes('pump') || 
+      e.entity_id.toLowerCase().includes('zwembad') || 
+      e.entity_id.toLowerCase().includes('pool') ||
+      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('pomp')) ||
+      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('pump')) ||
+      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('zwembad')) ||
+      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('pool'))
     );
     matches.forEach(e => {
       console.log(`${e.entity_id}: state=${e.state}, unit="${e.attributes.unit_of_measurement || ''}", name="${e.attributes.friendly_name}"`);

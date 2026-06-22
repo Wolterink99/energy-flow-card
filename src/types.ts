@@ -25,6 +25,7 @@ export interface EnergyFlowCardConfig {
     light?: string | string[];        // Light entity or list of light entities
     grid_price?: string;              // Huidige energieprijs sensor
     temperature?: string;             // Optionele buitentemperatuur sensor
+    pool_pump?: string;               // Optionele zwembadpomp switch/sensor
   };
   tap_action?: {
     action: string;

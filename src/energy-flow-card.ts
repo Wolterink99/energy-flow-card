@@ -215,6 +215,7 @@ export class EnergyFlowCard extends LitElement {
   @state() private debugEVPower: number | null = null;
   @state() private debugShowBattery: boolean | null = null;
   @state() private debugShowEV: boolean | null = null;
+  @state() private debugPoolPumpActive: boolean | null = null;
   @state() private _weatherTestPanelOpen: boolean = false;
 
   private resizeObserver?: ResizeObserver;
@@ -1256,6 +1257,23 @@ export class EnergyFlowCard extends LitElement {
       }
     }
 
+    let poolPumpActive = false;
+    if (this.debugPoolPumpActive !== null) {
+      poolPumpActive = this.debugPoolPumpActive;
+    } else {
+      let poolPumpEntityId = entities.pool_pump;
+      if (!poolPumpEntityId && this.hass) {
+        const detected = Object.keys(this.hass.states).find(id => id.includes('zwembadpomp') || id.includes('pool_pump'));
+        if (detected) {
+          poolPumpEntityId = detected;
+        }
+      }
+      if (poolPumpEntityId && this.hass?.states[poolPumpEntityId]) {
+        const stateStr = this.hass.states[poolPumpEntityId].state;
+        poolPumpActive = stateStr === 'on' || stateStr === 'active' || stateStr === 'true';
+      }
+    }
+
     if (!entities.grid && !(entities as any).grid_power) {
       // grid = huisverbruik + laadpaal - opwek - acculaden + accuontladen
       grid = load + charger - solar - batteryPower;
@@ -1385,6 +1403,7 @@ export class EnergyFlowCard extends LitElement {
               rainIntensity,
               windSpeed,
               temperature,
+              poolPumpActive,
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>
@@ -1546,8 +1565,24 @@ export class EnergyFlowCard extends LitElement {
                   </div>
                 ` : ''}
 
+                <!-- Pool Pump Toggle -->
+                <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px;">
+                  <span style="font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold; text-transform: uppercase;">Zwembadpomp (Simulatie)</span>
+                  <div style="display: flex; gap: 4px;">
+                    <button @click=${() => this.debugPoolPumpActive = null} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugPoolPumpActive === null ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Auto (HA)
+                    </button>
+                    <button @click=${() => this.debugPoolPumpActive = true} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugPoolPumpActive === true ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Altijd AAN
+                    </button>
+                    <button @click=${() => this.debugPoolPumpActive = false} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugPoolPumpActive === false ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Altijd UIT
+                    </button>
+                  </div>
+                </div>
+
                 <!-- Reset Simulator -->
-                <button @click=${this._resetAllDebugOverrides} style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; text-transform: uppercase;">
+                <button @click=${this._resetAllDebugOverrides} style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; text-transform: uppercase; margin-top: 8px;">
                   Reset simulator
                 </button>
               </div>
@@ -1573,6 +1608,7 @@ export class EnergyFlowCard extends LitElement {
     this.debugEVPower = null;
     this.debugShowBattery = null;
     this.debugShowEV = null;
+    this.debugPoolPumpActive = null;
   }
 
   // Lovelace requirement: custom card size representation
