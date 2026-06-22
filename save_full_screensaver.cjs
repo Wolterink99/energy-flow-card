@@ -38,7 +38,7 @@ const newConfig = {
               show_solar: true,
               show_battery: false,
               show_ev: true,
-              car_type: "/local/vw_golf_id3.png",
+              car_type: "pool",
               tap_action: {
                 action: "navigate",
                 navigation_path: "/lovelace/0"
@@ -52,7 +52,8 @@ const newConfig = {
                 grid_power: "sensor.p1_meter_power",
                 grid_import_today: "sensor.p1_netstroom_afname_vandaag",
                 grid_export_today: "sensor.p1_teruglevering_vandaag",
-                grid_price: "sensor.zonneplan_current_electricity_tariff"
+                grid_price: "sensor.zonneplan_current_electricity_tariff",
+                pool_pump: "switch.buiten_zwembadpomp_ledvance_plug_outdoor_eu_t"
               },
               home_tap_action: {
                 action: "navigate",
