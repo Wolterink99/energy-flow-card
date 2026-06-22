@@ -843,7 +843,7 @@ export function renderHouseSvg({
           <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
 
           <!-- Eendenvijver met domme eenden (Duck Pond with Silly Ducks) -->
-          <g id="duck-pond" style="pointer-events: none;">
+          <g id="duck-pond" style="pointer-events: none;" transform="translate(480, -10)">
             <!-- Shadow under the pond -->
             <ellipse cx="210" cy="470" rx="55" ry="24" fill="rgba(0,0,0,0.22)" />
             <!-- Outer bank / shoreline -->
