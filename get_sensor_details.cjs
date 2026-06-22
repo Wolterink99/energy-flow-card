@@ -22,15 +22,17 @@ ws.on('message', (data) => {
       type: 'get_states'
     }));
   } else if (msg.type === 'result' && msg.id === 1) {
-    console.log('--- CONSUMPTION/TODAY SENSORS ---');
+    console.log('--- EV / CHARGER / LAADPAAL SENSORS ---');
     const matches = msg.result.filter(e => 
-      e.entity_id.includes('verbruik') || 
-      e.entity_id.includes('vandaag') || 
-      e.entity_id.includes('consumption') || 
-      e.entity_id.includes('today')
+      e.entity_id.toLowerCase().includes('laad') || 
+      e.entity_id.toLowerCase().includes('charger') || 
+      e.entity_id.toLowerCase().includes('car') || 
+      e.entity_id.toLowerCase().includes('ev') ||
+      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('laad')) ||
+      (e.attributes.friendly_name && e.attributes.friendly_name.toLowerCase().includes('charger'))
     );
     matches.forEach(e => {
-      console.log(`${e.entity_id}: state=${e.state}, name="${e.attributes.friendly_name}"`);
+      console.log(`${e.entity_id}: state=${e.state}, unit="${e.attributes.unit_of_measurement || ''}", name="${e.attributes.friendly_name}"`);
     });
     ws.close();
   }
