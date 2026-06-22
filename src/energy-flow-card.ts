@@ -210,6 +210,11 @@ export class EnergyFlowCard extends LitElement {
   @state() private debugWindSpeed: number | null = null;
   @state() private debugRainIntensity: 'light' | 'normal' | 'heavy' | null = null;
   @state() private debugTemperature: number | null = null;
+  @state() private debugBatteryPower: number | null = null;
+  @state() private debugBatterySoc: number | null = null;
+  @state() private debugEVPower: number | null = null;
+  @state() private debugShowBattery: boolean | null = null;
+  @state() private debugShowEV: boolean | null = null;
   @state() private _weatherTestPanelOpen: boolean = false;
 
   private resizeObserver?: ResizeObserver;
@@ -1143,9 +1148,9 @@ export class EnergyFlowCard extends LitElement {
     // Parse states
     const solar = this.getEntityValue(entities.solar || (entities as any).solar_power);
     const load = this.getEntityValue(entities.load || (entities as any).home_power);
-    const rawBatteryPower = this.getEntityValue(entities.battery_power);
-    const soc = entities.battery_soc ? this.getEntityValue(entities.battery_soc) : 0;
-    const charger = this.getEntityValue(entities.charger);
+    const rawBatteryPower = this.debugBatteryPower !== null ? this.debugBatteryPower : this.getEntityValue(entities.battery_power);
+    const soc = this.debugBatterySoc !== null ? this.debugBatterySoc : (entities.battery_soc ? this.getEntityValue(entities.battery_soc) : 0);
+    const charger = this.debugEVPower !== null ? this.debugEVPower : this.getEntityValue(entities.charger);
 
     // Parse grid early for battery polarity auto-detection (it will be finalized later if not configured)
     let grid = 0;
@@ -1258,8 +1263,8 @@ export class EnergyFlowCard extends LitElement {
 
     // Check configuration flags for layout
     const showSolar = !!entities.solar || !!(entities as any).solar_power;
-    const showBattery = !!entities.battery_power;
-    const showEV = !!entities.charger;
+    const showBattery = this.debugShowBattery !== null ? this.debugShowBattery : !!entities.battery_power;
+    const showEV = this.debugShowEV !== null ? this.debugShowEV : !!entities.charger;
 
     const skyState = getSkyState(decimalHour);
     const dynamicBackground = `background: linear-gradient(to bottom, ${skyState.top} 0%, ${skyState.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;
@@ -1399,9 +1404,9 @@ export class EnergyFlowCard extends LitElement {
 
             <!-- Panel Content -->
             ${this._weatherTestPanelOpen ? html`
-              <div @click=${(e: Event) => e.stopPropagation()} style="position: absolute; left: 16px; top: 52px; z-index: 99; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); width: 280px; border-radius: 12px; padding: 16px; color: #fff; font-family: system-ui, sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+              <div @click=${(e: Event) => e.stopPropagation()} style="position: absolute; left: 16px; top: 52px; z-index: 99; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); width: 280px; max-height: 75vh; overflow-y: auto; border-radius: 12px; padding: 16px; color: #fff; font-family: system-ui, sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
-                  <span style="font-weight: bold; font-size: 13px; color: #10b981; text-transform: uppercase;">Weer Simulator</span>
+                  <span style="font-weight: bold; font-size: 13px; color: #10b981; text-transform: uppercase;">Weer & Apparaten Simulator</span>
                   <button @click=${(e: Event) => { e.stopPropagation(); this._toggleWeatherTestPanel(); }} style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
                 </div>
 
@@ -1469,6 +1474,78 @@ export class EnergyFlowCard extends LitElement {
                   </div>
                 </div>
 
+                <!-- Battery Toggle -->
+                <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px;">
+                  <span style="font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold; text-transform: uppercase;">Thuisbatterij</span>
+                  <div style="display: flex; gap: 4px;">
+                    <button @click=${() => this.debugShowBattery = null} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugShowBattery === null ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Auto (HA)
+                    </button>
+                    <button @click=${() => { this.debugShowBattery = true; if (this.debugBatteryPower === null) this.debugBatteryPower = 1500; if (this.debugBatterySoc === null) this.debugBatterySoc = 50; }} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugShowBattery === true ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Altijd AAN
+                    </button>
+                    <button @click=${() => this.debugShowBattery = false} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugShowBattery === false ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Altijd UIT
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Battery Power Slider -->
+                ${showBattery ? html`
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
+                      <span>BATTERIJ VERMOGEN (W)</span>
+                      <span style="color: #10b981;">${this.debugBatteryPower !== null ? `${this.debugBatteryPower} W` : 'Standaard'}</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <input type="range" min="-5000" max="5000" step="50" .value=${this.debugBatteryPower !== null ? this.debugBatteryPower : 0} @input=${(e: any) => this.debugBatteryPower = parseInt(e.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                      ${this.debugBatteryPower !== null ? html`<button @click=${() => this.debugBatteryPower = null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>` : ''}
+                    </div>
+                  </div>
+
+                  <!-- Battery SoC Slider -->
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
+                      <span>BATTERIJ LADING (%)</span>
+                      <span style="color: #10b981;">${this.debugBatterySoc !== null ? `${this.debugBatterySoc} %` : 'Standaard'}</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <input type="range" min="0" max="100" step="1" .value=${this.debugBatterySoc !== null ? this.debugBatterySoc : 50} @input=${(e: any) => this.debugBatterySoc = parseInt(e.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                      ${this.debugBatterySoc !== null ? html`<button @click=${() => this.debugBatterySoc = null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>` : ''}
+                    </div>
+                  </div>
+                ` : ''}
+
+                <!-- EV Charger Toggle -->
+                <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px;">
+                  <span style="font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold; text-transform: uppercase;">Laadpaal</span>
+                  <div style="display: flex; gap: 4px;">
+                    <button @click=${() => this.debugShowEV = null} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugShowEV === null ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Auto (HA)
+                    </button>
+                    <button @click=${() => { this.debugShowEV = true; if (this.debugEVPower === null) this.debugEVPower = 3600; }} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugShowEV === true ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Altijd AAN
+                    </button>
+                    <button @click=${() => this.debugShowEV = false} style="flex: 1; padding: 4px; font-size: 10px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: ${this.debugShowEV === false ? '#10b981' : 'rgba(0,0,0,0.2)'}; color: #fff; font-weight: 600;">
+                      Altijd UIT
+                    </button>
+                  </div>
+                </div>
+
+                <!-- EV Charger Power Slider -->
+                ${showEV ? html`
+                  <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
+                      <span>LAADPAAL VERMOGEN (W)</span>
+                      <span style="color: #10b981;">${this.debugEVPower !== null ? `${this.debugEVPower} W` : 'Standaard'}</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <input type="range" min="0" max="11000" step="100" .value=${this.debugEVPower !== null ? this.debugEVPower : 0} @input=${(e: any) => this.debugEVPower = parseInt(e.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                      ${this.debugEVPower !== null ? html`<button @click=${() => this.debugEVPower = null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>` : ''}
+                    </div>
+                  </div>
+                ` : ''}
+
                 <!-- Reset Simulator -->
                 <button @click=${this._resetAllDebugOverrides} style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; text-transform: uppercase;">
                   Reset simulator
@@ -1491,6 +1568,11 @@ export class EnergyFlowCard extends LitElement {
     this.debugWindSpeed = null;
     this.debugRainIntensity = null;
     this.debugTemperature = null;
+    this.debugBatteryPower = null;
+    this.debugBatterySoc = null;
+    this.debugEVPower = null;
+    this.debugShowBattery = null;
+    this.debugShowEV = null;
   }
 
   // Lovelace requirement: custom card size representation
