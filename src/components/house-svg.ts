@@ -841,6 +841,88 @@ export function renderHouseSvg({
 
           <!-- Ground (grass base spanning full screen width) -->
           <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
+
+          <!-- Eendenvijver met domme eenden (Duck Pond with Silly Ducks) -->
+          <g id="duck-pond" style="pointer-events: none;">
+            <!-- Shadow under the pond -->
+            <ellipse cx="210" cy="470" rx="55" ry="24" fill="rgba(0,0,0,0.22)" />
+            <!-- Outer bank / shoreline -->
+            <ellipse cx="210" cy="468" rx="52" ry="22" fill="#854d0e" />
+            <!-- Water -->
+            <ellipse cx="210" cy="468" rx="49" ry="19" fill="#38bdf8" stroke="#0284c7" stroke-width="1.8" />
+            <ellipse cx="207" cy="466" rx="43" ry="15" fill="#0ea5e9" opacity="0.6" />
+            
+            <!-- Pond plants / stones -->
+            <circle cx="162" cy="468" r="4" fill="#64748b" />
+            <circle cx="163" cy="467" r="2.5" fill="#94a3b8" />
+            <circle cx="256" cy="470" r="4.5" fill="#475569" />
+            <circle cx="257" cy="469" r="3" fill="#64748b" />
+            <circle cx="185" cy="452" r="3.2" fill="#475569" />
+            
+            <!-- Reed / Riet -->
+            <path d="M 252,458 Q 255,445 252,440" stroke="#15803d" stroke-width="1.5" fill="none" />
+            <path d="M 255,459 Q 260,448 259,444" stroke="#16a34a" stroke-width="1.2" fill="none" />
+            <path d="M 248,460 Q 247,450 245,446" stroke="#16a34a" stroke-width="1" fill="none" />
+            
+            <!-- Water reflections / ripples -->
+            <path d="M 185,465 Q 210,469 235,465" stroke="rgba(255,255,255,0.45)" stroke-width="1" fill="none" />
+            <path d="M 195,472 Q 210,475 225,472" stroke="rgba(255,255,255,0.45)" stroke-width="0.8" fill="none" />
+
+            <!-- EEND 1: Drijvende derp-eend met googly eyes -->
+            <g transform="translate(195, 458)">
+              <!-- Body -->
+              <ellipse cx="10" cy="7" rx="10" ry="7" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
+              <!-- Tail -->
+              <path d="M 0,5 Q -3,0 2,3 Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
+              <!-- Head -->
+              <circle cx="17" cy="1" r="5" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
+              <!-- Beak (derpy, pointing down-ish) -->
+              <polygon points="21,-1 27,2 21,3" fill="#ea580c" />
+              <!-- Big Googly Eyes -->
+              <circle cx="15.5" cy="-0.5" r="2.2" fill="#fff" stroke="#000" stroke-width="0.3" />
+              <circle cx="15.2" cy="-0.2" r="0.9" fill="#000" />
+              <circle cx="18.5" cy="-0.5" r="2.2" fill="#fff" stroke="#000" stroke-width="0.3" />
+              <circle cx="19.0" cy="-0.8" r="0.9" fill="#000" />
+            </g>
+
+            <!-- EEND 2: Eend die op de oever staat en omhoog staart met kruisende ogen (maximale domheid) -->
+            <g transform="translate(235, 450)">
+              <!-- Feet & Legs -->
+              <line x1="10" y1="14" x2="10" y2="20" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="16" y1="14" x2="16" y2="20" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M 7,20 L 12,20 M 13,20 L 18,20" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" />
+              <!-- Body -->
+              <ellipse cx="13" cy="9" rx="9" ry="7" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
+              <!-- Wing -->
+              <ellipse cx="11" cy="9" rx="5" ry="3" fill="#f59e0b" />
+              <!-- Neck -->
+              <path d="M 16,7 Q 19,0 17,-3" stroke="#fbbf24" stroke-width="4.5" stroke-linecap="round" fill="none" />
+              <!-- Head -->
+              <circle cx="16" cy="-4" r="5.2" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
+              <!-- Beak pointing straight up -->
+              <polygon points="13,-8 11,-15 17,-10" fill="#ea580c" />
+              <!-- Derp Eyes pointing in different directions -->
+              <circle cx="14" cy="-5" r="2" fill="#fff" stroke="#000" stroke-width="0.3" />
+              <circle cx="13.5" cy="-4.5" r="0.8" fill="#000" />
+              <circle cx="18" cy="-5" r="2" fill="#fff" stroke="#000" stroke-width="0.3" />
+              <circle cx="18.5" cy="-5.5" r="0.8" fill="#000" />
+            </g>
+
+            <!-- EEND 3: Eend met snavel onder water ("down under" / konten-eend) -->
+            <g transform="translate(170, 460)">
+              <!-- Water ripple around duck -->
+              <ellipse cx="10" cy="11" rx="14" ry="4" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1" />
+              <!-- Tail pointing up -->
+              <path d="M 6,10 L 10,-1 L 14,8 Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
+              <!-- Body submerged partly -->
+              <path d="M 0,10 C 0,5 6,5 10,7 C 14,5 20,5 20,10 Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
+              <!-- Underwater head indication (subtle shadow) -->
+              <ellipse cx="14" cy="15" rx="5" ry="4" fill="#fbbf24" opacity="0.35" />
+              <!-- Little orange feet paddling in the air -->
+              <line x1="5" y1="5" x2="2" y2="1" stroke="#ea580c" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="12" y1="5" x2="10" y2="0" stroke="#ea580c" stroke-width="1.2" stroke-linecap="round" />
+            </g>
+          </g>
           
           <!-- Driveway: from center gable (x=320) to right edge, rounded left corners -->
           <path d="M 320,410 Q 320,430 340,430 L ${width - translateX},430 L ${width - translateX},410 Z" fill="url(#driveway-grad)" />
