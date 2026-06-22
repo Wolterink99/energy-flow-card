@@ -621,6 +621,13 @@ export function renderHouseSvg({
           <stop offset="0%" stop-color="#1e293b" />
           <stop offset="100%" stop-color="#0f172a" />
         </linearGradient>
+        
+        <!-- Modern home battery gradient -->
+        <linearGradient id="battery-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f8fafc" />
+          <stop offset="50%" stop-color="#cbd5e1" />
+          <stop offset="100%" stop-color="#94a3b8" />
+        </linearGradient>
 
         <!-- Jaren 30 brick texture pattern -->
         <pattern id="jaren30-brick-pat" width="60" height="40" patternUnits="userSpaceOnUse">
@@ -1103,15 +1110,26 @@ export function renderHouseSvg({
           <!-- ── THUISACCU (Battery against left wing wall) ── -->
           ${showBattery ? svg`
             <g id="house-battery" class="interactiveGroup batteryGroup" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('battery'); }}>
-              <rect x="280" y="340" width="30" height="70" fill="url(#battery-body-grad)" stroke="#cbd5e1" stroke-width="1.5" rx="3" />
+              <!-- Main Sleek Battery Body with Silver-Metal Gradient -->
+              <rect x="280" y="340" width="30" height="70" fill="url(#battery-body-grad)" stroke="#64748b" stroke-width="1.2" rx="3.5" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));" />
               
-              <rect x="285" y="348" width="20" height="10" fill="rgba(0,0,0,0.72)" rx="1.5" />
-              <text x="295" y="356" text-anchor="middle" fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#10b981')}" font-size="8px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
+              <!-- Modular stack divisions -->
+              <line x1="281" y1="358" x2="309" y2="358" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+              <line x1="281" y1="359" x2="309" y2="359" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
+              <line x1="281" y1="376" x2="309" y2="376" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+              <line x1="281" y1="377" x2="309" y2="377" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
+              <line x1="281" y1="394" x2="309" y2="394" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+              <line x1="281" y1="395" x2="309" y2="395" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
+
+              <!-- Digital SOC Screen -->
+              <rect x="284" y="344" width="22" height="10" fill="#0f172a" rx="1.5" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" />
+              <text x="295" y="352" text-anchor="middle" fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#10b981')}" font-size="7.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
                 ${soc}%
               </text>
               
-              <rect x="294" y="365" width="2" height="40" fill="rgba(0,0,0,0.15)" rx="0.5" />
-              <rect x="294" y="${405 - 40 * (soc / 100)}" width="2" height="${40 * (soc / 100)}" fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#10b981')}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="0.5" />
+              <!-- Premium Vertical LED Level Bar -->
+              <rect x="293" y="364" width="4" height="40" fill="rgba(15,23,42,0.3)" rx="1" />
+              <rect x="293" y="${404 - 40 * (soc / 100)}" width="4" height="${40 * (soc / 100)}" fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#10b981')}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="1" />
             </g>
           ` : ''}
 
@@ -1129,9 +1147,9 @@ export function renderHouseSvg({
             <!-- EV Car -->
             <g id="ev-car" class="interactiveGroup evGroup" opacity="${evActive ? 1.0 : 0.4}" style="transition: opacity 0.6s ease;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('ev'); }}>
               ${carType && (carType.startsWith('/') || carType.startsWith('http') || carType.includes('.') || carType.includes('/')) ? svg`
-                <g transform="translate(490, 360)">
-                  <ellipse cx="80" cy="54" rx="80" ry="6" fill="rgba(0,0,0,0.4)" />
-                  <image href="${carType}" x="0" y="0" width="160" height="58" preserveAspectRatio="xMidYMidMeet" />
+                <g transform="translate(475, 348)">
+                  <ellipse cx="95" cy="63" rx="95" ry="7" fill="rgba(0,0,0,0.4)" />
+                  <image href="${carType}" x="0" y="0" width="190" height="69" preserveAspectRatio="xMidYMidMeet" />
                 </g>
               ` : ''}
               ${carType === 'hatchback' ? svg`
