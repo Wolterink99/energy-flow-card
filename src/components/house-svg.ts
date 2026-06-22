@@ -1044,6 +1044,12 @@ export function renderHouseSvg({
 
             <!-- EV Car (Vector drawing shifted up by 70px) -->
             <g id="ev-car" class="interactiveGroup evGroup" opacity="${evActive ? 1.0 : 0.4}" style="transition: opacity 0.6s ease;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('ev'); }}>
+              ${carType && (carType.startsWith('/') || carType.startsWith('http') || carType.includes('.') || carType.includes('/')) ? svg`
+                <g transform="translate(490, 360)">
+                  <ellipse cx="80" cy="54" rx="80" ry="6" fill="rgba(0,0,0,0.4)" />
+                  <image href="${carType}" x="0" y="0" width="160" height="58" preserveAspectRatio="xMidYMidMeet" />
+                </g>
+              ` : ''}
               ${carType === 'hatchback' ? svg`
                 <g transform="translate(490, 360)">
                   <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
