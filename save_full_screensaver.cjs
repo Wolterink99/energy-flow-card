@@ -38,7 +38,7 @@ const newConfig = {
               show_solar: true,
               show_battery: false,
               show_ev: true,
-              car_type: "pool",
+              car_type: "/local/vw_golf_id3.png",
               tap_action: {
                 action: "navigate",
                 navigation_path: "/lovelace/0"

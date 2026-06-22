@@ -1282,7 +1282,7 @@ export class EnergyFlowCard extends LitElement {
     // Check configuration flags for layout
     const showSolar = !!entities.solar || !!(entities as any).solar_power;
     const showBattery = this.debugShowBattery !== null ? this.debugShowBattery : !!entities.battery_power;
-    const showEV = this.debugShowEV !== null ? this.debugShowEV : (!!entities.charger || !!this.config.car_type);
+    const showEV = this.debugShowEV !== null ? this.debugShowEV : (charger > 0);
 
     const skyState = getSkyState(decimalHour);
     const dynamicBackground = `background: linear-gradient(to bottom, ${skyState.top} 0%, ${skyState.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;

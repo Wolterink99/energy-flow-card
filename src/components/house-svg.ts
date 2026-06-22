@@ -845,7 +845,7 @@ export function renderHouseSvg({
           <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
 
           <!-- Eendenvijver met domme eenden (Duck Pond with Silly Ducks) -->
-          <g id="duck-pond" style="pointer-events: none;" transform="translate(480, -10)">
+          <g id="duck-pond" style="pointer-events: none;" transform="translate(-60, -10)">
             <!-- Shadow under the pond -->
             <ellipse cx="210" cy="470" rx="55" ry="24" fill="rgba(0,0,0,0.22)" />
             <!-- Outer bank / shoreline -->
@@ -1126,186 +1126,184 @@ export function renderHouseSvg({
               <path d="M 455,370 C 460,390 475,400 495,395" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="3,3" />
             </g>
 
-            <!-- EV Car / Swimming Pool -->
-            ${carType === 'pool' ? svg`
-              <g id="swimming-pool" style="pointer-events: none;">
-                <!-- CSS Animation for the drifting duck -->
-                <style>
-                  @keyframes driftPoolDuck {
-                    0% { transform: translateX(0px); }
-                    45% { transform: translateX(95px); }
-                    50% { transform: translateX(95px) scaleX(-1); }
-                    95% { transform: translateX(0px) scaleX(-1); }
-                    100% { transform: translateX(0px); }
-                  }
-                  .pool-duck-animated {
-                    animation: driftPoolDuck 14s infinite ease-in-out;
-                    transform-origin: 525px 384px;
-                  }
-                </style>
-
-                <!-- Pool shadow on driveway -->
-                <ellipse cx="575" cy="425" rx="72" ry="5" fill="rgba(0,0,0,0.25)" />
-                
-                <!-- Bulging blue liner segments (between the 5 legs, creating a soft look) -->
-                <path d="M 508,388 Q 525,423 542.5,423 Q 559,423 575,423 Q 591,423 607.5,423 Q 625,423 642,422" fill="none" stroke="#0284c7" stroke-width="32" stroke-linecap="butt" opacity="0.95" />
-                <rect x="510" y="388" width="130" height="34" fill="#0284c7" />
-                
-                <!-- Intex Logo text -->
-                <text x="590" y="410" fill="rgba(255,255,255,0.4)" font-size="8px" font-family="sans-serif" font-weight="bold" letter-spacing="0.5">INTEX</text>
-
-                <!-- Water inside top of pool (light blue surface ellipse) -->
-                <ellipse cx="575" cy="389" rx="66" ry="3.5" fill="#38bdf8" stroke="#0ea5e9" stroke-width="0.8" opacity="0.95" />
-                
-                <!-- Top white frame rails -->
-                <rect x="506" y="385" width="138" height="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="1.5" />
-                <rect x="503" y="384" width="6" height="7" fill="#e2e8f0" rx="1" />
-                <rect x="641" y="384" width="6" height="7" fill="#e2e8f0" rx="1" />
-                
-                <!-- 5 U-shaped / angled white support legs -->
-                <!-- Leg 1 (angled left) -->
-                <line x1="506" y1="388" x2="501" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-                <line x1="506" y1="388" x2="501" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-                <ellipse cx="501" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-                
-                <!-- Leg 2 (straight down) -->
-                <line x1="540" y1="388" x2="540" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-                <line x1="540" y1="388" x2="540" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-                <ellipse cx="540" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-                <!-- Leg 3 (straight down, center) -->
-                <line x1="575" y1="388" x2="575" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-                <line x1="575" y1="388" x2="575" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-                <ellipse cx="575" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-                <!-- Leg 4 (straight down) -->
-                <line x1="610" y1="388" x2="610" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-                <line x1="610" y1="388" x2="610" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-                <ellipse cx="610" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-                <!-- Leg 5 (angled right) -->
-                <line x1="644" y1="388" x2="649" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-                <line x1="644" y1="388" x2="649" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-                <ellipse cx="649" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-                <!-- T-joints -->
-                <rect x="537" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
-                <rect x="572" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
-                <rect x="607" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
-
-                <!-- Silly Duck -->
-                <g class="${poolPumpActive ? 'pool-duck-animated' : ''}">
-                  <ellipse cx="525" cy="386" rx="6" ry="1.5" fill="rgba(2,132,199,0.5)" />
-                  <ellipse cx="525" cy="383" rx="7" ry="5" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
-                  <path d="M 518,382 Q 516,379 520,381" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
-                  <circle cx="530" cy="378" r="3.5" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
-                  <!-- Big Googly Eyes -->
-                  <circle cx="529" cy="377" r="1.5" fill="#fff" stroke="#000" stroke-width="0.2" />
-                  <circle cx="528.6" cy="377" r="0.6" fill="#000" />
-                  <circle cx="531.5" cy="377" r="1.5" fill="#fff" stroke="#000" stroke-width="0.2" />
-                  <circle cx="532.0" cy="377.6" r="0.6" fill="#000" />
-                  <polygon points="533,378 538,380 533,381" fill="#ea580c" />
+            <!-- EV Car -->
+            <g id="ev-car" class="interactiveGroup evGroup" opacity="${evActive ? 1.0 : 0.4}" style="transition: opacity 0.6s ease;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('ev'); }}>
+              ${carType && (carType.startsWith('/') || carType.startsWith('http') || carType.includes('.') || carType.includes('/')) ? svg`
+                <g transform="translate(490, 360)">
+                  <ellipse cx="80" cy="54" rx="80" ry="6" fill="rgba(0,0,0,0.4)" />
+                  <image href="${carType}" x="0" y="0" width="160" height="58" preserveAspectRatio="xMidYMidMeet" />
                 </g>
-              </g>
-            ` : svg`
-              <g id="ev-car" class="interactiveGroup evGroup" opacity="${evActive ? 1.0 : 0.4}" style="transition: opacity 0.6s ease;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('ev'); }}>
-                ${carType && (carType.startsWith('/') || carType.startsWith('http') || carType.includes('.') || carType.includes('/')) ? svg`
-                  <g transform="translate(490, 360)">
-                    <ellipse cx="80" cy="54" rx="80" ry="6" fill="rgba(0,0,0,0.4)" />
-                    <image href="${carType}" x="0" y="0" width="160" height="58" preserveAspectRatio="xMidYMidMeet" />
-                  </g>
-                ` : ''}
-                ${carType === 'hatchback' ? svg`
-                  <g transform="translate(490, 360)">
-                    <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
-                    <path d="M 0,44 C 0,44 4,28 18,28 C 32,28 50,8 75,6 C 100,4 118,16 132,28 C 148,40 158,44 160,44 L 158,52 L 2,52 Z"
-                      fill="#475569" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
-                    <path d="M 32,28 C 44,14 68,10 86,10 C 102,10 114,22 120,27 L 116,37 L 28,37 Z" fill="#0f172a" opacity="0.85" />
-                    <path d="M 38,29 L 68,29 L 68,36 L 34,36 Z" fill="rgba(255,255,255,0.12)" />
-                    <path d="M 72,29 L 106,29 L 112,36 L 72,36 Z" fill="rgba(255,255,255,0.12)" />
-                    <path d="M 0,44 C 4,44 7,46 9,48 L 0,50 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
-                    <path d="M 160,44 C 157,44 156,46 155,48 L 160,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
-                    <circle cx="32" cy="50" r="16" fill="#090d16" />
-                    <circle cx="32" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                    ${Array.from({ length: 6 }).map((_, idx) => {
-                      const angle = (idx * Math.PI) / 3;
-                      return svg`<line x1="32" y1="50" x2="${32 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
-                    })}
-                    <circle cx="118" cy="50" r="16" fill="#090d16" />
-                    <circle cx="118" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                    ${Array.from({ length: 6 }).map((_, idx) => {
-                      const angle = (idx * Math.PI) / 3;
-                      return svg`<line x1="118" y1="50" x2="${118 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
-                    })}
-                  </g>
-                ` : ''}
-                ${carType === 'sedan' ? svg`
-                  <g transform="translate(500, 362)">
-                    <ellipse cx="70" cy="48" rx="74" ry="4.5" fill="rgba(0,0,0,0.45)" />
-                    <path
-                      d="M 0,38 C 0,38 8,24 22,24 C 36,24 50,4 75,3 C 100,2 115,16 125,24 L 138,28 C 140,32 140,38 138,42 L 136,46 L 2,46 Z"
-                      fill="url(#car-body-grad)"
-                      stroke="rgba(255,255,255,0.2)"
-                      stroke-width="1"
-                    />
-                    <path d="M 32,23 C 44,10 68,6 84,6 C 96,6 108,14 116,21 L 112,31 L 28,31 Z" fill="#0f172a" opacity="0.85" />
-                    <path d="M 38,24 L 66,24 L 66,29 L 34,29 Z" fill="rgba(255,255,255,0.15)" />
-                    <path d="M 70,24 L 102,24 L 108,29 L 70,29 Z" fill="rgba(255,255,255,0.15)" />
-                    <path d="M 0,38 C 4,38 6,40 8,42 L 0,44 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
-                    <path d="M 138,36 C 136,36 135,38 134,40 L 138,42 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
-                    <rect x="55" y="34" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
-                    <rect x="85" y="34" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
-                    <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
-                    <circle cx="30" cy="44" r="13.5" fill="#090d16" />
-                    <circle cx="30" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                    ${Array.from({ length: 7 }).map((_, idx) => {
-                      const angle = (idx * 2 * Math.PI) / 7;
-                      return svg`<line x1="30" y1="44" x2="${30 + Math.cos(angle) * 8.5}" y2="${44 + Math.sin(angle) * 8.5}" stroke="#cbd5e1" stroke-width="1.2" />`;
-                    })}
-                    <circle cx="103" cy="44" r="13.5" fill="#090d16" />
-                    <circle cx="103" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                    ${Array.from({ length: 7 }).map((_, idx) => {
-                      const angle = (idx * 2 * Math.PI) / 7;
-                      return svg`<line x1="103" y1="44" x2="${103 + Math.cos(angle) * 8.5}" y2="${44 + Math.sin(angle) * 8.5}" stroke="#cbd5e1" stroke-width="1.2" />`;
-                    })}
-                  </g>
-                ` : ''}
-                ${carType === 'suv' ? svg`
-                  <g transform="translate(500, 352)">
-                    <ellipse cx="70" cy="58" rx="74" ry="5.5" fill="rgba(0,0,0,0.45)" />
-                    <path d="M 15,56 A 17,17 0 0,1 47,56" fill="none" stroke="#1f2937" stroke-width="3" />
-                    <path d="M 88,56 A 17,17 0 0,1 120,56" fill="none" stroke="#1f2937" stroke-width="3" />
-                    <path
-                      d="M 0,48 C 0,48 4,30 18,30 C 32,30 45,6 70,4 C 95,2 112,18 122,28 L 138,32 C 140,36 140,46 138,50 L 136,56 L 2,56 Z"
-                      fill="url(#car-body-grad)"
-                      stroke="rgba(255,255,255,0.2)"
-                      stroke-width="1"
-                    />
-                    <path d="M 32,29 C 44,12 68,8 84,8 C 98,8 108,18 116,27 L 112,38 L 28,38 Z" fill="#0f172a" opacity="0.85" />
-                    <path d="M 38,30 L 66,30 L 66,36 L 34,36 Z" fill="rgba(255,255,255,0.15)" />
-                    <path d="M 70,30 L 102,30 L 108,36 L 70,36 Z" fill="rgba(255,255,255,0.15)" />
-                    <path d="M 0,48 C 4,48 6,50 8,52 L 0,54 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
-                    <path d="M 138,44 C 136,44 135,46 134,48 L 138,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
-                    <rect x="55" y="42" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
-                    <rect x="85" y="42" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
-                    <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
-                    <circle cx="31" cy="54" r="15.5" fill="#090d16" />
-                    <circle cx="31" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                    ${Array.from({ length: 5 }).map((_, idx) => {
-                      const angle = (idx * 2 * Math.PI) / 5;
-                      return svg`<line x1="31" y1="54" x2="${31 + Math.cos(angle) * 10}" y2="${54 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.5" />`;
-                    })}
-                    <circle cx="104" cy="54" r="15.5" fill="#090d16" />
-                    <circle cx="104" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
-                    ${Array.from({ length: 5 }).map((_, idx) => {
-                      const angle = (idx * 2 * Math.PI) / 5;
-                      return svg`<line x1="104" y1="54" x2="${104 + Math.cos(angle) * 10}" y2="${54 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.5" />`;
-                    })}
-                  </g>
-                ` : ''}
-              </g>
-            `}
+              ` : ''}
+              ${carType === 'hatchback' ? svg`
+                <g transform="translate(490, 360)">
+                  <ellipse cx="90" cy="55" rx="90" ry="6" fill="rgba(0,0,0,0.4)" />
+                  <path d="M 0,44 C 0,44 4,28 18,28 C 32,28 50,8 75,6 C 100,4 118,16 132,28 C 148,40 158,44 160,44 L 158,52 L 2,52 Z"
+                    fill="#475569" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                  <path d="M 32,28 C 44,14 68,10 86,10 C 102,10 114,22 120,27 L 116,37 L 28,37 Z" fill="#0f172a" opacity="0.85" />
+                  <path d="M 38,29 L 68,29 L 68,36 L 34,36 Z" fill="rgba(255,255,255,0.12)" />
+                  <path d="M 72,29 L 106,29 L 112,36 L 72,36 Z" fill="rgba(255,255,255,0.12)" />
+                  <path d="M 0,44 C 4,44 7,46 9,48 L 0,50 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
+                  <path d="M 160,44 C 157,44 156,46 155,48 L 160,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
+                  <circle cx="32" cy="50" r="16" fill="#090d16" />
+                  <circle cx="32" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 6 }).map((_, idx) => {
+                    const angle = (idx * Math.PI) / 3;
+                    return svg`<line x1="32" y1="50" x2="${32 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                  <circle cx="118" cy="50" r="16" fill="#090d16" />
+                  <circle cx="118" cy="50" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 6 }).map((_, idx) => {
+                    const angle = (idx * Math.PI) / 3;
+                    return svg`<line x1="118" y1="50" x2="${118 + Math.cos(angle) * 10}" y2="${50 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                </g>
+              ` : ''}
+              ${carType === 'sedan' ? svg`
+                <g transform="translate(500, 362)">
+                  <ellipse cx="70" cy="48" rx="74" ry="4.5" fill="rgba(0,0,0,0.45)" />
+                  <path
+                    d="M 0,38 C 0,38 8,24 22,24 C 36,24 50,4 75,3 C 100,2 115,16 125,24 L 138,28 C 140,32 140,38 138,42 L 136,46 L 2,46 Z"
+                    fill="url(#car-body-grad)"
+                    stroke="rgba(255,255,255,0.2)"
+                    stroke-width="1"
+                  />
+                  <path d="M 28,23 C 44,10 68,6 84,6 C 96,6 108,14 116,21 L 112,31 L 28,31 Z" fill="#0f172a" opacity="0.85" />
+                  <path d="M 38,24 L 66,24 L 66,29 L 34,29 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 70,24 L 102,24 L 108,29 L 70,29 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 0,38 C 4,38 6,40 8,42 L 0,44 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
+                  <path d="M 138,36 C 136,36 135,38 134,40 L 138,42 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
+                  <rect x="55" y="34" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <rect x="85" y="34" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
+                  <circle cx="30" cy="44" r="13.5" fill="#090d16" />
+                  <circle cx="30" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 7 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 7;
+                    return svg`<line x1="30" y1="44" x2="${30 + Math.cos(angle) * 8.5}" y2="${44 + Math.sin(angle) * 8.5}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                  <circle cx="103" cy="44" r="13.5" fill="#090d16" />
+                  <circle cx="103" cy="44" r="8.5" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 7 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 7;
+                    return svg`<line x1="103" y1="44" x2="${103 + Math.cos(angle) * 8.5}" y2="${44 + Math.sin(angle) * 8.5}" stroke="#cbd5e1" stroke-width="1.2" />`;
+                  })}
+                </g>
+              ` : ''}
+              ${carType === 'suv' ? svg`
+                <g transform="translate(500, 352)">
+                  <ellipse cx="70" cy="58" rx="74" ry="5.5" fill="rgba(0,0,0,0.45)" />
+                  <path d="M 15,56 A 17,17 0 0,1 47,56" fill="none" stroke="#1f2937" stroke-width="3" />
+                  <path d="M 88,56 A 17,17 0 0,1 120,56" fill="none" stroke="#1f2937" stroke-width="3" />
+                  <path
+                    d="M 0,48 C 0,48 4,30 18,30 C 32,30 45,6 70,4 C 95,2 112,18 122,28 L 138,32 C 140,36 140,46 138,50 L 136,56 L 2,56 Z"
+                    fill="url(#car-body-grad)"
+                    stroke="rgba(255,255,255,0.2)"
+                    stroke-width="1"
+                  />
+                  <path d="M 32,29 C 44,12 68,8 84,8 C 98,8 108,18 116,27 L 112,38 L 28,38 Z" fill="#0f172a" opacity="0.85" />
+                  <path d="M 38,30 L 66,30 L 66,36 L 34,36 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 70,30 L 102,30 L 108,36 L 70,36 Z" fill="rgba(255,255,255,0.15)" />
+                  <path d="M 0,48 C 4,48 6,50 8,52 L 0,54 Z" fill="#e0f2fe" style="filter: drop-shadow(0 0 5px #00f5ff);" />
+                  <path d="M 138,44 C 136,44 135,46 134,48 L 138,50 Z" fill="#ef4444" style="filter: drop-shadow(0 0 3px #ef4444);" />
+                  <rect x="55" y="42" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <rect x="85" y="42" width="8" height="2" rx="1" fill="#1e293b" opacity="0.6" />
+                  <path d="M 28,32 C 24,32 23,30 25,30 Z" fill="url(#car-body-grad)" />
+                  <circle cx="31" cy="54" r="15.5" fill="#090d16" />
+                  <circle cx="31" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 5 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 5;
+                    return svg`<line x1="31" y1="54" x2="${31 + Math.cos(angle) * 10}" y2="${54 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.5" />`;
+                  })}
+                  <circle cx="104" cy="54" r="15.5" fill="#090d16" />
+                  <circle cx="104" cy="54" r="10" fill="#475569" stroke="#cbd5e1" stroke-width="1.5" />
+                  ${Array.from({ length: 5 }).map((_, idx) => {
+                    const angle = (idx * 2 * Math.PI) / 5;
+                    return svg`<line x1="104" y1="54" x2="${104 + Math.cos(angle) * 10}" y2="${54 + Math.sin(angle) * 10}" stroke="#cbd5e1" stroke-width="1.5" />`;
+                  })}
+                </g>
+              ` : ''}
+            </g>
           ` : ''}
+
+          <!-- Standalone Swimming Pool on the Driveway (rechts naast het huis) -->
+          <g id="swimming-pool" style="pointer-events: none;">
+            <!-- CSS Animation for the drifting duck -->
+            <style>
+              @keyframes driftPoolDuck {
+                0% { transform: translateX(0px); }
+                45% { transform: translateX(165px); }
+                50% { transform: translateX(165px) scaleX(-1); }
+                95% { transform: translateX(0px) scaleX(-1); }
+                100% { transform: translateX(0px); }
+              }
+              .pool-duck-animated {
+                animation: driftPoolDuck 14s infinite ease-in-out;
+                transform-origin: 705px 384px;
+              }
+            </style>
+
+            <!-- Pool shadow on driveway (flat, rectangular shadow matching perpendicular view) -->
+            <rect x="685" y="424" width="210" height="3" rx="1.5" fill="rgba(0,0,0,0.25)" />
+            
+            <!-- Main blue liner (clean perpendicular flat rectangle) -->
+            <rect x="695" y="388" width="190" height="36" fill="#0284c7" stroke="#0ea5e9" stroke-width="1" rx="1" />
+            
+            <!-- Intex Logo text -->
+            <text x="790" y="410" fill="rgba(255,255,255,0.4)" font-size="8px" font-family="sans-serif" font-weight="bold" letter-spacing="0.5" text-anchor="middle">INTEX</text>
+
+            <!-- Water inside pool (flat light blue line representing water level) -->
+            <rect x="695" y="387" width="190" height="2" fill="#38bdf8" stroke="#0ea5e9" stroke-width="0.5" opacity="0.95" />
+            
+            <!-- Top white frame rails -->
+            <rect x="690" y="385" width="200" height="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="1" />
+            <rect x="688" y="384" width="4" height="6" fill="#e2e8f0" rx="0.5" />
+            <rect x="888" y="384" width="4" height="6" fill="#e2e8f0" rx="0.5" />
+            
+            <!-- 5 straight vertical white support legs (flat view) -->
+            <!-- Leg 1 -->
+            <line x1="692" y1="388" x2="692" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
+            <line x1="692" y1="388" x2="692" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
+            <ellipse cx="692" cy="425" rx="4" ry="1.5" fill="#0f172a" />
+            
+            <!-- Leg 2 -->
+            <line x1="741" y1="388" x2="741" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
+            <line x1="741" y1="388" x2="741" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
+            <ellipse cx="741" cy="425" rx="4" ry="1.5" fill="#0f172a" />
+
+            <!-- Leg 3 (center) -->
+            <line x1="790" y1="388" x2="790" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
+            <line x1="790" y1="388" x2="790" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
+            <ellipse cx="790" cy="425" rx="4" ry="1.5" fill="#0f172a" />
+
+            <!-- Leg 4 -->
+            <line x1="839" y1="388" x2="839" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
+            <line x1="839" y1="388" x2="839" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
+            <ellipse cx="839" cy="425" rx="4" ry="1.5" fill="#0f172a" />
+
+            <!-- Leg 5 -->
+            <line x1="888" y1="388" x2="888" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
+            <line x1="888" y1="388" x2="888" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
+            <ellipse cx="888" cy="425" rx="4" ry="1.5" fill="#0f172a" />
+
+            <!-- T-joints -->
+            <rect x="738" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
+            <rect x="787" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
+            <rect x="836" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
+
+            <!-- Silly Duck -->
+            <g class="${poolPumpActive ? 'pool-duck-animated' : ''}">
+              <ellipse cx="705" cy="386" rx="6" ry="1.5" fill="rgba(2,132,199,0.5)" />
+              <ellipse cx="705" cy="383" rx="7" ry="5" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
+              <path d="M 698,382 Q 696,379 700,381" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
+              <circle cx="710" cy="378" r="3.5" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
+              <!-- Big Googly Eyes -->
+              <circle cx="709" cy="377" r="1.5" fill="#fff" stroke="#000" stroke-width="0.2" />
+              <circle cx="708.6" cy="377" r="0.6" fill="#000" />
+              <circle cx="711.5" cy="377" r="1.5" fill="#fff" stroke="#000" stroke-width="0.2" />
+              <circle cx="712.0" cy="377.6" r="0.6" fill="#000" />
+              <polygon points="713,378 718,380 713,381" fill="#ea580c" />
+            </g>
+          </g>
 
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
           ${showSolar ? renderCable(
