@@ -38,7 +38,7 @@ const newConfig = {
               show_solar: true,
               show_battery: false,
               show_ev: true,
-              car_type: "/local/vw_golf_id3.png",
+              car_type: "https://cdn.jsdelivr.net/gh/Wolterink99/energy-flow-card@main/volkswagen_tiguan.png",
               tap_action: {
                 action: "navigate",
                 navigation_path: "/lovelace/0"
