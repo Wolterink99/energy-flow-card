@@ -18,6 +18,8 @@ export interface EnergyFlowCardConfig {
     weather?: string;
     grid_import_today?: string;       // kWh afgenomen vandaag
     grid_export_today?: string;       // kWh teruggeleverd vandaag
+    grid_import_cost?: string;        // Kostensensor import
+    grid_export_cost?: string;        // Compensatiesensor export
     home_today?: string;              // kWh huisverbruik vandaag
     battery_charge_today?: string;    // kWh geladen vandaag
     battery_discharge_today?: string; // kWh ontladen vandaag

@@ -206,6 +206,7 @@ export class EnergyFlowCard extends LitElement {
   @state() private statsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
   @state() private hoveredPoint: any = null;
+  @state() private showCostHistory: boolean = false;
   @state() private debugWeatherState: string | null = null;
   @state() private debugTimeHour: number | null = null;
   @state() private debugWindSpeed: number | null = null;
@@ -514,6 +515,7 @@ export class EnergyFlowCard extends LitElement {
     this.activePopup = null;
     this.activePopupHistory = [];
     this.statsData = {};
+    this.showCostHistory = false;
   }
 
   private renderPopup(): TemplateResult | string {
@@ -527,6 +529,9 @@ export class EnergyFlowCard extends LitElement {
     let stat2Val = '';
     let hasSecondStat = false;
     let chartHtml: TemplateResult | string = '';
+    let canShowCost = false;
+    let totalImport = 0;
+    let totalExport = 0;
 
     const entities = this.config?.entities;
     if (!entities) return '';
@@ -781,6 +786,18 @@ export class EnergyFlowCard extends LitElement {
         expEntity = 'sensor.p1_meter_energy_export';
       }
 
+      let impCostEntity = entities.grid_import_cost;
+      let expCostEntity = entities.grid_export_cost;
+      if (!impCostEntity && this.hass?.states['sensor.p1_meter_energy_import_cost']) {
+        impCostEntity = 'sensor.p1_meter_energy_import_cost';
+      }
+      if (!expCostEntity && this.hass?.states['sensor.p1_meter_energy_export_compensation']) {
+        expCostEntity = 'sensor.p1_meter_energy_export_compensation';
+      }
+      canShowCost = !!impCostEntity || !!expCostEntity;
+      totalImport = 0;
+      totalExport = 0;
+
       if (this.activeTab === 'prices') {
         const gridPriceState = entities.grid_price ? this.hass?.states[entities.grid_price] : null;
         const forecast = gridPriceState?.attributes?.forecast || [];
@@ -1017,42 +1034,58 @@ export class EnergyFlowCard extends LitElement {
         }
       } else {
         if (this.isLoadingHistory) {
-        } else if (!impEntity || !expEntity || (!this.statsData[impEntity] && !this.statsData[expEntity])) {
-          chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
         } else {
-          const processed = this.getProcessedGridData(impEntity, expEntity);
-          const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
-          chartHtml = html`
-            <div class="scrollable-chart-container">
-              <div class="glass-bar-chart">
-                ${processed.map(item => {
-                  const importPercent = (item.importValue / maxVal) * 80;
-                  const exportPercent = (item.exportValue / maxVal) * 80;
-                  return html`
-                    <div class="chart-column" style="min-width: 60px;">
-                      <!-- Stacked values at the top of the column -->
-                      <div class="chart-values-stacked">
-                        <span class="stacked-val import-color">${item.importValue > 0 ? item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
-                        <span class="stacked-val export-color">${item.exportValue > 0 ? item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
-                      </div>
-  
-                      <div class="grid-double-bar-wrapper">
-                        <!-- Import bar -->
-                        <div class="grid-import-bar-wrapper">
-                          <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
+          const targetImp = (this.showCostHistory && canShowCost) ? (impCostEntity || '') : (impEntity || '');
+          const targetExp = (this.showCostHistory && canShowCost) ? (expCostEntity || '') : (expEntity || '');
+
+          if (!targetImp || !targetExp || (!this.statsData[targetImp] && !this.statsData[targetExp])) {
+            chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
+          } else {
+            const processed = this.getProcessedGridData(targetImp, targetExp);
+            totalImport = processed.reduce((sum, item) => sum + item.importValue, 0);
+            totalExport = processed.reduce((sum, item) => sum + item.exportValue, 0);
+
+            const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
+            chartHtml = html`
+              <div class="scrollable-chart-container">
+                <div class="glass-bar-chart">
+                  ${processed.map(item => {
+                    const importPercent = (item.importValue / maxVal) * 80;
+                    const exportPercent = (item.exportValue / maxVal) * 80;
+                    return html`
+                      <div class="chart-column" style="min-width: 60px;">
+                        <!-- Stacked values at the top of the column -->
+                        <div class="chart-values-stacked">
+                          <span class="stacked-val import-color">
+                            ${this.showCostHistory && canShowCost
+                              ? '€ ' + item.importValue.toFixed(2).replace('.', ',')
+                              : item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
+                          </span>
+                          <span class="stacked-val export-color">
+                            ${this.showCostHistory && canShowCost
+                              ? '€ ' + item.exportValue.toFixed(2).replace('.', ',')
+                              : item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
+                          </span>
                         </div>
-                        <!-- Export bar -->
-                        <div class="grid-export-bar-wrapper">
-                          <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
+    
+                        <div class="grid-double-bar-wrapper">
+                          <!-- Import bar -->
+                          <div class="grid-import-bar-wrapper">
+                            <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
+                          </div>
+                          <!-- Export bar -->
+                          <div class="grid-export-bar-wrapper">
+                            <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
+                          </div>
                         </div>
+                        <span class="chart-label">${item.label}</span>
                       </div>
-                      <span class="chart-label">${item.label}</span>
-                    </div>
-                  `;
-                })}
+                    `;
+                  })}
+                </div>
               </div>
-            </div>
-          `;
+            `;
+          }
         }
       }
     }
@@ -1081,30 +1114,72 @@ export class EnergyFlowCard extends LitElement {
             `}
           </div>
 
+          <!-- Cost/Volume toggle (only when viewing grid history) -->
+          ${this.activePopup === 'grid' && this.activeTab !== 'prices' && canShowCost ? html`
+            <div class="popup-sub-tabs" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px; margin-bottom: 5px;">
+              <button class="popup-tab-btn ${!this.showCostHistory ? 'active' : ''}" style="font-size: 11px; padding: 4px 10px; border-radius: 12px; background: ${!this.showCostHistory ? '#2563eb' : 'rgba(255,255,255,0.06)'};" @click=${() => { this.showCostHistory = false; this.requestUpdate(); }}>Volume (kWh)</button>
+              <button class="popup-tab-btn ${this.showCostHistory ? 'active' : ''}" style="font-size: 11px; padding: 4px 10px; border-radius: 12px; background: ${this.showCostHistory ? '#2563eb' : 'rgba(255,255,255,0.06)'};" @click=${() => { this.showCostHistory = true; this.requestUpdate(); }}>Kosten (€)</button>
+            </div>
+          ` : ''}
+
           <div class="glass-popup-stats">
-            ${this.activePopup === 'grid' ? html`
-              <div class="glass-popup-stat" style="grid-column: span 2;">
-                <span class="stat-label">${grid >= 0 ? 'Netto Import (Live)' : 'Netto Export (Live)'}</span>
-                <span class="stat-value" style="color: ${grid >= 0 ? '#ef4444' : '#10b981'}; display: flex; align-items: center; gap: 6px;">
-                  <ha-icon icon="${grid >= 0 ? 'mdi:transmission-tower-export' : 'mdi:transmission-tower-import'}"></ha-icon>
-                  ${Math.abs(grid) >= 1000 ? `${(Math.abs(grid) / 1000).toFixed(1)} kW` : `${Math.round(Math.abs(grid))} W`}
-                </span>
-              </div>
-              <div class="glass-popup-stat">
-                <span class="stat-label">Import vandaag</span>
-                <span class="stat-value" style="color: #ef4444; display: flex; align-items: center; gap: 6px;">
-                  <ha-icon icon="mdi:arrow-down-bold"></ha-icon>
-                  ${gridImportToday !== null ? `${gridImportToday.toFixed(1)} kWh` : '0 kWh'}
-                </span>
-              </div>
-              <div class="glass-popup-stat">
-                <span class="stat-label">Export vandaag</span>
-                <span class="stat-value" style="color: #10b981; display: flex; align-items: center; gap: 6px;">
-                  <ha-icon icon="mdi:arrow-up-bold"></ha-icon>
-                  ${gridExportToday !== null ? `${gridExportToday.toFixed(1)} kWh` : '0 kWh'}
-                </span>
-              </div>
-            ` : html`
+            ${this.activePopup === 'grid' ? (
+              this.activeTab === 'prices' ? html`
+                <div class="glass-popup-stat" style="grid-column: span 2;">
+                  <span class="stat-label">${grid >= 0 ? 'Netto Import (Live)' : 'Netto Export (Live)'}</span>
+                  <span class="stat-value" style="color: ${grid >= 0 ? '#ef4444' : '#10b981'}; display: flex; align-items: center; gap: 6px;">
+                    <ha-icon icon="${grid >= 0 ? 'mdi:transmission-tower-export' : 'mdi:transmission-tower-import'}"></ha-icon>
+                    ${Math.abs(grid) >= 1000 ? `${(Math.abs(grid) / 1000).toFixed(1)} kW` : `${Math.round(Math.abs(grid))} W`}
+                  </span>
+                </div>
+                <div class="glass-popup-stat">
+                  <span class="stat-label">Import vandaag</span>
+                  <span class="stat-value" style="color: #ef4444; display: flex; align-items: center; gap: 6px;">
+                    <ha-icon icon="mdi:arrow-down-bold"></ha-icon>
+                    ${gridImportToday !== null ? `${gridImportToday.toFixed(1)} kWh` : '0 kWh'}
+                  </span>
+                </div>
+                <div class="glass-popup-stat">
+                  <span class="stat-label">Export vandaag</span>
+                  <span class="stat-value" style="color: #10b981; display: flex; align-items: center; gap: 6px;">
+                    <ha-icon icon="mdi:arrow-up-bold"></ha-icon>
+                    ${gridExportToday !== null ? `${gridExportToday.toFixed(1)} kWh` : '0 kWh'}
+                  </span>
+                </div>
+              ` : html`
+                <div class="glass-popup-stat">
+                  <span class="stat-label">Totaal Import (periode)</span>
+                  <span class="stat-value" style="color: #ef4444; display: flex; align-items: center; gap: 6px;">
+                    <ha-icon icon="mdi:arrow-down-bold"></ha-icon>
+                    ${this.showCostHistory && canShowCost
+                      ? `€ ${totalImport.toFixed(2).replace('.', ',')}`
+                      : `${totalImport.toFixed(1)} kWh`}
+                  </span>
+                </div>
+                <div class="glass-popup-stat">
+                  <span class="stat-label">Totaal Export (periode)</span>
+                  <span class="stat-value" style="color: #10b981; display: flex; align-items: center; gap: 6px;">
+                    <ha-icon icon="mdi:arrow-up-bold"></ha-icon>
+                    ${this.showCostHistory && canShowCost
+                      ? `€ ${totalExport.toFixed(2).replace('.', ',')}`
+                      : `${totalExport.toFixed(1)} kWh`}
+                  </span>
+                </div>
+                <div class="glass-popup-stat" style="grid-column: span 2;">
+                  <span class="stat-label">Netto ${this.showCostHistory && canShowCost ? 'Kosten / Opbrengst' : 'Balans'} (periode)</span>
+                  <span class="stat-value" style="color: ${totalImport >= totalExport ? '#ef4444' : '#10b981'}; display: flex; align-items: center; gap: 6px;">
+                    <ha-icon icon="${totalImport >= totalExport ? 'mdi:clock-out' : 'mdi:clock-in'}"></ha-icon>
+                    ${this.showCostHistory && canShowCost
+                      ? (totalImport >= totalExport
+                          ? `Kosten: € ${(totalImport - totalExport).toFixed(2).replace('.', ',')}`
+                          : `Opbrengst: € ${(totalExport - totalImport).toFixed(2).replace('.', ',')}`)
+                      : (totalImport >= totalExport
+                          ? `Import: ${(totalImport - totalExport).toFixed(1)} kWh`
+                          : `Export: ${(totalExport - totalImport).toFixed(1)} kWh`)}
+                  </span>
+                </div>
+              `
+            ) : html`
               <div class="glass-popup-stat">
                 <span class="stat-label">${stat1Label}</span>
                 <span class="stat-value" style="color: #10b981;">${stat1Val}</span>
@@ -1122,7 +1197,7 @@ export class EnergyFlowCard extends LitElement {
             <div class="chart-title">
               ${this.activePopup === 'grid' && this.activeTab === 'prices'
                 ? 'Zonneplan Uurprijzen (€/kWh)'
-                : `${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (kWh)`}
+                : `${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (${this.showCostHistory && canShowCost ? '€' : 'kWh'})`}
             </div>
             ${chartHtml}
           </div>
@@ -1225,6 +1300,17 @@ export class EnergyFlowCard extends LitElement {
         }
         if (imp) entitiesToFetch.push(imp);
         if (exp) entitiesToFetch.push(exp);
+
+        let impCost = this.config?.entities.grid_import_cost;
+        let expCost = this.config?.entities.grid_export_cost;
+        if (!impCost && this.hass?.states['sensor.p1_meter_energy_import_cost']) {
+          impCost = 'sensor.p1_meter_energy_import_cost';
+        }
+        if (!expCost && this.hass?.states['sensor.p1_meter_energy_export_compensation']) {
+          expCost = 'sensor.p1_meter_energy_export_compensation';
+        }
+        if (impCost) entitiesToFetch.push(impCost);
+        if (expCost) entitiesToFetch.push(expCost);
       }
       
       if (entitiesToFetch.length > 0) {
