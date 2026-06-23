@@ -2201,26 +2201,43 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                   </span>
                 </div>
               `:C`
-                <div class="glass-popup-stat">
-                  <span class="stat-label">Totaal Import (periode)</span>
-                  <span class="stat-value" style="color: #ef4444; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="mdi:arrow-down-bold"></ha-icon>
-                    ${this.showCostHistory&&l?`€ ${d.toFixed(2).replace(".",",")}`:`${d.toFixed(1)} kWh`}
-                  </span>
-                </div>
-                <div class="glass-popup-stat">
-                  <span class="stat-label">Totaal Export (periode)</span>
-                  <span class="stat-value" style="color: #10b981; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="mdi:arrow-up-bold"></ha-icon>
-                    ${this.showCostHistory&&l?`€ ${c.toFixed(2).replace(".",",")}`:`${c.toFixed(1)} kWh`}
-                  </span>
-                </div>
-                <div class="glass-popup-stat" style="grid-column: span 2;">
-                  <span class="stat-label">Netto ${this.showCostHistory&&l?"Kosten / Opbrengst":"Balans"} (periode)</span>
-                  <span class="stat-value" style="color: ${d>=c?"#ef4444":"#10b981"}; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="${d>=c?"mdi:clock-out":"mdi:clock-in"}"></ha-icon>
-                    ${this.showCostHistory&&l?d>=c?`Kosten: € ${(d-c).toFixed(2).replace(".",",")}`:`Opbrengst: € ${(c-d).toFixed(2).replace(".",",")}`:d>=c?`Import: ${(d-c).toFixed(1)} kWh`:`Export: ${(c-d).toFixed(1)} kWh`}
-                  </span>
+                <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); width: 100%; box-sizing: border-box;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <span style="color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:arrow-down-bold" style="color: #ef4444; --mdc-icon-size: 16px;"></ha-icon>
+                      Totaal Import:
+                    </span>
+                    <span style="font-weight: bold; color: #ffffff;">
+                      ${d.toFixed(1)} kWh ${l?C`<span style="color: #ef4444; font-weight: bold; margin-left: 6px;">(€ ${d.toFixed(2).replace(".",",")})</span>`:""}
+                    </span>
+                  </div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <span style="color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:arrow-up-bold" style="color: #10b981; --mdc-icon-size: 16px;"></ha-icon>
+                      Totaal Export:
+                    </span>
+                    <span style="font-weight: bold; color: #ffffff;">
+                      ${c.toFixed(1)} kWh ${l?C`<span style="color: #10b981; font-weight: bold; margin-left: 6px;">(€ ${c.toFixed(2).replace(".",",")})</span>`:""}
+                    </span>
+                  </div>
+
+                  <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 2px 0;"></div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold;">
+                    <span style="color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:scale-balance" style="color: #3b82f6; --mdc-icon-size: 16px;"></ha-icon>
+                      Netto balans:
+                    </span>
+                    <span style="color: ${d>=c?"#ef4444":"#10b981"};">
+                      ${d>=c?`${(d-c).toFixed(1)} kWh`:`${(c-d).toFixed(1)} kWh`}
+                      ${l?C`
+                        <span style="font-weight: bold; margin-left: 6px; color: ${d>=c?"#ef4444":"#10b981"};">
+                          (${d>=c?`Kosten: € ${(d-c).toFixed(2).replace(".",",")}`:`Opbrengst: € ${(c-d).toFixed(2).replace(".",",")}`})
+                        </span>
+                      `:""}
+                    </span>
+                  </div>
                 </div>
               `:C`
               <div class="glass-popup-stat">

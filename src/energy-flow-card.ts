@@ -1147,36 +1147,43 @@ export class EnergyFlowCard extends LitElement {
                   </span>
                 </div>
               ` : html`
-                <div class="glass-popup-stat">
-                  <span class="stat-label">Totaal Import (periode)</span>
-                  <span class="stat-value" style="color: #ef4444; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="mdi:arrow-down-bold"></ha-icon>
-                    ${this.showCostHistory && canShowCost
-                      ? `€ ${totalImport.toFixed(2).replace('.', ',')}`
-                      : `${totalImport.toFixed(1)} kWh`}
-                  </span>
-                </div>
-                <div class="glass-popup-stat">
-                  <span class="stat-label">Totaal Export (periode)</span>
-                  <span class="stat-value" style="color: #10b981; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="mdi:arrow-up-bold"></ha-icon>
-                    ${this.showCostHistory && canShowCost
-                      ? `€ ${totalExport.toFixed(2).replace('.', ',')}`
-                      : `${totalExport.toFixed(1)} kWh`}
-                  </span>
-                </div>
-                <div class="glass-popup-stat" style="grid-column: span 2;">
-                  <span class="stat-label">Netto ${this.showCostHistory && canShowCost ? 'Kosten / Opbrengst' : 'Balans'} (periode)</span>
-                  <span class="stat-value" style="color: ${totalImport >= totalExport ? '#ef4444' : '#10b981'}; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="${totalImport >= totalExport ? 'mdi:clock-out' : 'mdi:clock-in'}"></ha-icon>
-                    ${this.showCostHistory && canShowCost
-                      ? (totalImport >= totalExport
-                          ? `Kosten: € ${(totalImport - totalExport).toFixed(2).replace('.', ',')}`
-                          : `Opbrengst: € ${(totalExport - totalImport).toFixed(2).replace('.', ',')}`)
-                      : (totalImport >= totalExport
-                          ? `Import: ${(totalImport - totalExport).toFixed(1)} kWh`
-                          : `Export: ${(totalExport - totalImport).toFixed(1)} kWh`)}
-                  </span>
+                <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); width: 100%; box-sizing: border-box;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <span style="color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:arrow-down-bold" style="color: #ef4444; --mdc-icon-size: 16px;"></ha-icon>
+                      Totaal Import:
+                    </span>
+                    <span style="font-weight: bold; color: #ffffff;">
+                      ${totalImport.toFixed(1)} kWh ${canShowCost ? html`<span style="color: #ef4444; font-weight: bold; margin-left: 6px;">(€ ${totalImport.toFixed(2).replace('.', ',')})</span>` : ''}
+                    </span>
+                  </div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <span style="color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:arrow-up-bold" style="color: #10b981; --mdc-icon-size: 16px;"></ha-icon>
+                      Totaal Export:
+                    </span>
+                    <span style="font-weight: bold; color: #ffffff;">
+                      ${totalExport.toFixed(1)} kWh ${canShowCost ? html`<span style="color: #10b981; font-weight: bold; margin-left: 6px;">(€ ${totalExport.toFixed(2).replace('.', ',')})</span>` : ''}
+                    </span>
+                  </div>
+
+                  <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 2px 0;"></div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold;">
+                    <span style="color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:scale-balance" style="color: #3b82f6; --mdc-icon-size: 16px;"></ha-icon>
+                      Netto balans:
+                    </span>
+                    <span style="color: ${totalImport >= totalExport ? '#ef4444' : '#10b981'};">
+                      ${totalImport >= totalExport ? `${(totalImport - totalExport).toFixed(1)} kWh` : `${(totalExport - totalImport).toFixed(1)} kWh`}
+                      ${canShowCost ? html`
+                        <span style="font-weight: bold; margin-left: 6px; color: ${totalImport >= totalExport ? '#ef4444' : '#10b981'};">
+                          (${totalImport >= totalExport ? `Kosten: € ${(totalImport - totalExport).toFixed(2).replace('.', ',')}` : `Opbrengst: € ${(totalExport - totalImport).toFixed(2).replace('.', ',')}`})
+                        </span>
+                      ` : ''}
+                    </span>
+                  </div>
                 </div>
               `
             ) : html`
