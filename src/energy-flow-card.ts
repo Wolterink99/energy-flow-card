@@ -532,6 +532,8 @@ export class EnergyFlowCard extends LitElement {
     let totalExport = 0;
     let totalImportCost = 0;
     let totalExportCost = 0;
+    let costTodayImport: number | null = null;
+    let costTodayExport: number | null = null;
 
     const entities = this.config?.entities;
     if (!entities) return '';
@@ -797,6 +799,13 @@ export class EnergyFlowCard extends LitElement {
       canShowCost = !!impCostEntity || !!expCostEntity;
       totalImport = 0;
       totalExport = 0;
+
+      if (impCostEntity && this.hass?.states[impCostEntity]) {
+        costTodayImport = parseFloat(this.hass.states[impCostEntity].state);
+      }
+      if (expCostEntity && this.hass?.states[expCostEntity]) {
+        costTodayExport = parseFloat(this.hass.states[expCostEntity].state);
+      }
 
       if (this.activeTab === 'prices') {
         const gridPriceState = entities.grid_price ? this.hass?.states[entities.grid_price] : null;
@@ -1105,7 +1114,7 @@ export class EnergyFlowCard extends LitElement {
           <!-- Tab switcher -->
           <div class="popup-tabs">
             ${this.activePopup === 'grid' ? html`
-              <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Uurprijzen</button>
+              <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Vandaag</button>
               <button class="popup-tab-btn ${this.activeTab === 'day' ? 'active' : ''}" @click=${() => this.switchTab('day')}>30 Dagen</button>
               <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
               <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
@@ -1119,26 +1128,61 @@ export class EnergyFlowCard extends LitElement {
           <div class="glass-popup-stats">
             ${this.activePopup === 'grid' ? (
               this.activeTab === 'prices' ? html`
-                <div class="glass-popup-stat" style="grid-column: span 2;">
-                  <span class="stat-label">${grid >= 0 ? 'Netto Import (Live)' : 'Netto Export (Live)'}</span>
-                  <span class="stat-value" style="color: ${grid >= 0 ? '#ef4444' : '#10b981'}; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="${grid >= 0 ? 'mdi:transmission-tower-export' : 'mdi:transmission-tower-import'}"></ha-icon>
-                    ${Math.abs(grid) >= 1000 ? `${(Math.abs(grid) / 1000).toFixed(1)} kW` : `${Math.round(Math.abs(grid))} W`}
-                  </span>
-                </div>
-                <div class="glass-popup-stat">
-                  <span class="stat-label">Import vandaag</span>
-                  <span class="stat-value" style="color: #ef4444; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="mdi:arrow-down-bold"></ha-icon>
-                    ${gridImportToday !== null ? `${gridImportToday.toFixed(1)} kWh` : '0 kWh'}
-                  </span>
-                </div>
-                <div class="glass-popup-stat">
-                  <span class="stat-label">Export vandaag</span>
-                  <span class="stat-value" style="color: #10b981; display: flex; align-items: center; gap: 6px;">
-                    <ha-icon icon="mdi:arrow-up-bold"></ha-icon>
-                    ${gridExportToday !== null ? `${gridExportToday.toFixed(1)} kWh` : '0 kWh'}
-                  </span>
+                <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); width: 100%; box-sizing: border-box;">
+                  <!-- Live power row -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <span style="color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="${grid >= 0 ? 'mdi:transmission-tower-export' : 'mdi:transmission-tower-import'}" style="color: ${grid >= 0 ? '#ef4444' : '#10b981'}; --mdc-icon-size: 16px;"></ha-icon>
+                      Actueel netto:
+                    </span>
+                    <span style="font-weight: bold; color: ${grid >= 0 ? '#ef4444' : '#10b981'};">
+                      ${grid >= 0 ? 'Import' : 'Export'}: ${Math.abs(grid) >= 1000 ? `${(Math.abs(grid) / 1000).toFixed(1)} kW` : `${Math.round(Math.abs(grid))} W`}
+                    </span>
+                  </div>
+
+                  <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 2px 0;"></div>
+
+                  <!-- Import Vandaag -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <span style="color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:arrow-down-bold" style="color: #ef4444; --mdc-icon-size: 16px;"></ha-icon>
+                      Import Vandaag:
+                    </span>
+                    <span style="font-weight: bold; color: #ffffff;">
+                      ${gridImportToday !== null ? gridImportToday.toFixed(1) : '0'} kWh 
+                      ${canShowCost && costTodayImport !== null ? html`<span style="color: #ef4444; font-weight: bold; margin-left: 6px;">(€ ${costTodayImport.toFixed(2).replace('.', ',')})</span>` : ''}
+                    </span>
+                  </div>
+
+                  <!-- Export Vandaag -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <span style="color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:arrow-up-bold" style="color: #10b981; --mdc-icon-size: 16px;"></ha-icon>
+                      Export Vandaag:
+                    </span>
+                    <span style="font-weight: bold; color: #ffffff;">
+                      ${gridExportToday !== null ? gridExportToday.toFixed(1) : '0'} kWh 
+                      ${canShowCost && costTodayExport !== null ? html`<span style="color: #10b981; font-weight: bold; margin-left: 6px;">(€ ${costTodayExport.toFixed(2).replace('.', ',')})</span>` : ''}
+                    </span>
+                  </div>
+
+                  <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 2px 0;"></div>
+
+                  <!-- Netto Balans Vandaag -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold;">
+                    <span style="color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 6px;">
+                      <ha-icon icon="mdi:scale-balance" style="color: #3b82f6; --mdc-icon-size: 16px;"></ha-icon>
+                      Netto balans:
+                    </span>
+                    <span style="color: ${(gridImportToday || 0) >= (gridExportToday || 0) ? '#ef4444' : '#10b981'};">
+                      ${(gridImportToday || 0) >= (gridExportToday || 0) ? `${((gridImportToday || 0) - (gridExportToday || 0)).toFixed(1)} kWh` : `${((gridExportToday || 0) - (gridImportToday || 0)).toFixed(1)} kWh`}
+                      ${canShowCost && costTodayImport !== null && costTodayExport !== null ? html`
+                        <span style="font-weight: bold; margin-left: 6px; color: ${costTodayImport >= costTodayExport ? '#ef4444' : '#10b981'};">
+                          (${costTodayImport >= costTodayExport ? `Kosten: € ${(costTodayImport - costTodayExport).toFixed(2).replace('.', ',')}` : `Opbrengst: € ${(costTodayExport - costTodayImport).toFixed(2).replace('.', ',')}`})
+                        </span>
+                      ` : ''}
+                    </span>
+                  </div>
                 </div>
               ` : html`
                 <div class="glass-popup-stat" style="grid-column: span 2; display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); width: 100%; box-sizing: border-box;">
