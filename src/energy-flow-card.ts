@@ -780,11 +780,35 @@ export class EnergyFlowCard extends LitElement {
       totalImport = 0;
       totalExport = 0;
 
-      if (impCostEntity && this.hass?.states[impCostEntity]) {
-        costTodayImport = parseFloat(this.hass.states[impCostEntity].state);
+      // Calculate today's costs from statistics (change value for today),
+      // NOT from raw sensor state (which is cumulative and may not reset at same time as kWh)
+      const todayDateStr = new Date().toDateString();
+      const getTodayCostFromStats = (entityId: string): number | null => {
+        const pts = this.statsData[entityId];
+        if (!pts || pts.length === 0) return null;
+        const todayPt = pts.find((p: any) => new Date(p.start).toDateString() === todayDateStr);
+        if (!todayPt) return null;
+        // Use 'change' if available (cumulative sensor), otherwise 'state'
+        const val = todayPt.change !== undefined && todayPt.change !== null ? todayPt.change : todayPt.state;
+        return typeof val === 'number' ? val : parseFloat(val);
+      };
+
+      if (impCostEntity) {
+        const fromStats = getTodayCostFromStats(impCostEntity);
+        if (fromStats !== null && !isNaN(fromStats)) {
+          costTodayImport = fromStats;
+        } else if (this.hass?.states[impCostEntity]) {
+          // Fallback to sensor state if stats not yet loaded
+          costTodayImport = parseFloat(this.hass.states[impCostEntity].state);
+        }
       }
-      if (expCostEntity && this.hass?.states[expCostEntity]) {
-        costTodayExport = parseFloat(this.hass.states[expCostEntity].state);
+      if (expCostEntity) {
+        const fromStats = getTodayCostFromStats(expCostEntity);
+        if (fromStats !== null && !isNaN(fromStats)) {
+          costTodayExport = fromStats;
+        } else if (this.hass?.states[expCostEntity]) {
+          costTodayExport = parseFloat(this.hass.states[expCostEntity].state);
+        }
       }
 
       if (this.activeTab === 'prices') {
