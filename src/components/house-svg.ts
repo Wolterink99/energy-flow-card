@@ -87,13 +87,25 @@ function interpolateColor(color1: string, color2: string, factor: number): strin
   return toHex(r, g, b);
 }
 
-export function getSkyState(hour: number) {
-  let lower = SKY_KEYFRAMES[0];
-  let upper = SKY_KEYFRAMES[SKY_KEYFRAMES.length - 1];
-  for (let i = 0; i < SKY_KEYFRAMES.length - 1; i++) {
-    if (hour >= SKY_KEYFRAMES[i].hour && hour <= SKY_KEYFRAMES[i+1].hour) {
-      lower = SKY_KEYFRAMES[i];
-      upper = SKY_KEYFRAMES[i+1];
+export function getSkyState(hour: number, sunriseHour = 6.0, sunsetHour = 21.0) {
+  const dynamicKeyframes: SkyKeyframe[] = [
+    { hour: 0,    top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+    { hour: Math.max(0, sunriseHour - 1.5), top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+    { hour: sunriseHour, top: '#1e1b4b', horizon: '#fdba74', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.35)' },
+    { hour: sunriseHour + 1.0, top: '#0ea5e9', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
+    { hour: sunsetHour - 1.0, top: '#0284c7', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
+    { hour: sunsetHour, top: '#3b0764', horizon: '#f97316', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.45)' },
+    { hour: sunsetHour + 1.0, top: '#18113c', horizon: '#ea580c', stars: 0.1, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.18)' },
+    { hour: sunsetHour + 2.0, top: '#020617', horizon: '#1e293b', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+    { hour: 24,   top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' }
+  ];
+
+  let lower = dynamicKeyframes[0];
+  let upper = dynamicKeyframes[dynamicKeyframes.length - 1];
+  for (let i = 0; i < dynamicKeyframes.length - 1; i++) {
+    if (hour >= dynamicKeyframes[i].hour && hour <= dynamicKeyframes[i+1].hour) {
+      lower = dynamicKeyframes[i];
+      upper = dynamicKeyframes[i+1];
       break;
     }
   }
@@ -384,7 +396,7 @@ export function renderHouseSvg({
   const batColor = (batteryCharging || isExportingDischarge) ? COLORS.battery : COLORS.batteryD;
   const gridColor = gridImporting ? COLORS.gridI : COLORS.gridE;
 
-  const skyState = getSkyState(timeHour);
+  const skyState = getSkyState(timeHour, sunriseHour, sunsetHour);
   const resolvedShowLights = passedShowLights !== undefined
     ? passedShowLights
     : (skyState.lights > 0.05 || visualWeather === 'rainy' || visualWeather === 'lightning');
