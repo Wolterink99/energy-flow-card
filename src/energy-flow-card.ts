@@ -205,6 +205,7 @@ export class EnergyFlowCard extends LitElement {
   @state() private activeTab: 'prices' | 'day' | 'month' | 'year' = 'day';
   @state() private statsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
+  @state() private hoveredPoint: any = null;
   @state() private debugWeatherState: string | null = null;
   @state() private debugTimeHour: number | null = null;
   @state() private debugWindSpeed: number | null = null;
@@ -841,15 +842,16 @@ export class EnergyFlowCard extends LitElement {
               label: hourLabel,
               isCurrent,
               isNeg: priceEur < 0,
-              datetime: entry.datetime
+                      datetime: entry.datetime
             };
           });
 
-          // Large Price Header (Zonneplan 0,54 €/kWh)
           const currentPt = points.find((p: any) => p.isCurrent);
-          const currentPriceFormatted = currentPt 
-            ? currentPt.price.toFixed(2).replace('.', ',') 
-            : (gridPriceState ? parseFloat(gridPriceState.state).toFixed(2).replace('.', ',') : '0,00');
+
+          // Large Price Header (Zonneplan 0,54 €/kWh) - Updates dynamically when hovering/touching
+          const headerPrice = this.hoveredPoint ? this.hoveredPoint.price : (currentPt ? currentPt.price : (gridPriceState ? parseFloat(gridPriceState.state) : 0));
+          const headerPriceFormatted = headerPrice.toFixed(2).replace('.', ',');
+          const headerTime = this.hoveredPoint ? `Om ${this.hoveredPoint.label}:` : 'Actueel tarief:';
 
           // Peak and low elements
           const maxPt = points.reduce((max: any, p: any) => p.price > max.price ? p : max, points[0]);
@@ -863,10 +865,13 @@ export class EnergyFlowCard extends LitElement {
           }
 
           chartHtml = html`
-            <div class="zonneplan-header" style="margin-top: 5px; margin-bottom: 5px; padding: 0 10px;">
-              <div style="font-size: 22px; font-weight: bold; color: #ffffff;">
-                ${currentPriceFormatted} <span style="font-size: 13px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
-              </div>
+            <div class="zonneplan-header" style="margin-top: 5px; margin-bottom: 5px; padding: 0 10px; display: flex; align-items: baseline; gap: 6px;">
+              <span style="font-size: 13px; color: rgba(255,255,255,0.45); font-weight: normal; font-family: sans-serif;">
+                ${headerTime}
+              </span>
+              <span style="font-size: 22px; font-weight: bold; color: #ffffff;">
+                ${headerPriceFormatted} <span style="font-size: 13px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
+              </span>
             </div>
 
             <div class="scrollable-chart-container" style="display: block !important; padding-top: 5px; height: 165px; overflow-y: hidden; overflow-x: hidden; position: relative;">
@@ -923,7 +928,7 @@ export class EnergyFlowCard extends LitElement {
                 })}
 
                 <!-- Peak Marker Bubble -->
-                ${maxPt ? svg`
+                ${maxPt && (!this.hoveredPoint || this.hoveredPoint !== maxPt) ? svg`
                   <circle cx="${maxPt.x}" cy="${maxPt.y}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
@@ -936,7 +941,7 @@ export class EnergyFlowCard extends LitElement {
                 ` : ''}
 
                 <!-- Dal (Lowest) Marker Bubble -->
-                ${minPt && minPt !== maxPt ? svg`
+                ${minPt && minPt !== maxPt && (!this.hoveredPoint || this.hoveredPoint !== minPt) ? svg`
                   <circle cx="${minPt.x}" cy="${minPt.y}" r="5.5" fill="${minPt.price <= 0.30 ? '#10b981' : '#ef4444'}" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
@@ -962,13 +967,56 @@ export class EnergyFlowCard extends LitElement {
                     </text>
                   `;
                 })}
+
+                <!-- Interactive Guide Line and Bubble (Active on Hover/Touch) -->
+                ${this.hoveredPoint ? svg`
+                  <line x1="${this.hoveredPoint.x}" y1="${chartTop - 10}" x2="${this.hoveredPoint.x}" y2="${chartBottom}" stroke="rgba(255,255,255,0.35)" stroke-width="1.2" stroke-dasharray="3,3" />
+                  <circle cx="${this.hoveredPoint.x}" cy="${this.hoveredPoint.y}" r="6" fill="#ffffff" stroke="${this.hoveredPoint.price > 0.30 ? '#ef4444' : (this.hoveredPoint.price > 0 ? '#10b981' : '#fbbf24')}" stroke-width="2" />
+                  <g>
+                    <!-- Hover Price Bubble -->
+                    <rect x="${this.hoveredPoint.x - 22}" y="${this.hoveredPoint.price < 0 ? this.hoveredPoint.y + 10 : this.hoveredPoint.y - 25}" width="44" height="15" rx="3.5" ry="3.5" fill="#ffffff" stroke="rgba(0,0,0,0.15)" stroke-width="0.5" style="filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));" />
+                    <text x="${this.hoveredPoint.x}" y="${this.hoveredPoint.price < 0 ? this.hoveredPoint.y + 21 : this.hoveredPoint.y - 14}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="monospace">
+                      €${this.hoveredPoint.price.toFixed(2).replace('.', ',')}
+                    </text>
+                  </g>
+                ` : ''}
+
+                <!-- Transparent Interactive Hover Zones (Catch area) -->
+                ${points.map((p: any) => {
+                  return svg`
+                    <rect x="${p.x - step / 2}" y="${chartTop - 15}" width="${step}" height="${chartHeight + 35}" 
+                          fill="transparent" style="cursor: pointer; pointer-events: all; -webkit-tap-highlight-color: transparent;"
+                          @mouseenter=${() => this.hoveredPoint = p}
+                          @mouseleave=${() => this.hoveredPoint = null}
+                          @touchstart=${(e: TouchEvent) => { e.preventDefault(); this.hoveredPoint = p; }}
+                          @touchmove=${(e: TouchEvent) => {
+                            e.preventDefault();
+                            const touch = e.touches[0];
+                            const svgEl = (e.currentTarget as any)?.ownerSVGElement;
+                            if (svgEl) {
+                              const rect = svgEl.getBoundingClientRect();
+                              const relativeX = ((touch.clientX - rect.left) / rect.width) * 500;
+                              let closest = points[0];
+                              let minD = Infinity;
+                              points.forEach((pt: any) => {
+                                const d = Math.abs(pt.x - relativeX);
+                                if (d < minD) {
+                                  minD = d;
+                                  closest = pt;
+                                }
+                              });
+                              this.hoveredPoint = closest;
+                            }
+                          }}
+                          @touchend=${() => this.hoveredPoint = null} />
+                  `;
+                })}
               </svg>
             </div>
           `;
         }
       } else {
         if (this.isLoadingHistory) {
-          chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
         } else if (!impEntity || !expEntity || (!this.statsData[impEntity] && !this.statsData[expEntity])) {
           chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
         } else {
