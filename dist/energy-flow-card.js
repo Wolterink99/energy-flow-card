@@ -813,7 +813,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         <path d="M 190,160 L 190,180" stroke-width="1.5" />
       </g>
     </g>
-  `;function St({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:i,solar:n,solarToday:a,load:o,batteryPower:l,soc:d,charger:f,grid:c,showSolar:p,showBattery:h,showEV:g,weather:u="sunny",clouds:v=[],sunriseHour:x=6,sunsetHour:y=21,gridImportToday:b=null,gridExportToday:k=null,homeToday:w=null,batteryChargeToday:V=null,batteryDischargeToday:O=null,evToday:q=null,showLights:X,gridPrice:j=null,gridPriceUnit:S="€/kWh",rainIntensity:W="normal",windSpeed:m=10,temperature:P=null,poolPumpActive:z=!1,onNodeClick:F}){let U=u;"pouring"===u||"lightning-rainy"===u?U="rainy":"snowy-rainy"===u||"hail"===u?U="snowy":"fog"===u&&(U="foggy");const Y=t||800,K=e||600,H=(Y-800)/2,B=20-H;let A=s;A=s>=x&&s<=y?6+(s-x)/(y-x)*15:s>y?21+(s-y)/(24-y)*3:s/x*6;const T=l>.05,R=l<-.05,L=c>.05,G=c<-.05,C=f>.1,E=n>20,M=o>20,D=T||R&&G?ut.battery:ut.batteryD,N=L?ut.gridI:ut.gridE,Q=bt(A,x,y),Z=void 0!==X?X:Q.lights>.05||"rainy"===U||"lightning"===U;let I=Q.top,$=Q.horizon,_=Q.clouds,tt="night"===i?.18:.48;const et=m>.5?Math.max(1.2,Math.min(18,45/(m/5))):0;"cloudy"===U?(_="#b8c5d6",$=yt(Q.horizon,"#94a3b8",.15),tt=.98):"rainy"===U||"lightning"===U?(_="#475569",I="#1f2937",$=yt(Q.horizon,"#1e293b",.55),tt=.99):"snowy"===U?(_="#7a889b",I="#475569",$=yt(Q.horizon,"#334155",.4),tt=.98):"foggy"===U?(I=yt(Q.top,"#64748b",.65),$=yt(Q.horizon,"#94a3b8",.65),_="#a8b5c6",tt=.5):"partlycloudy"===U?(I=yt(Q.top,"#475569",.1),$=yt(Q.horizon,"#64748b",.1),_="#e2e8f0",tt=.65):(_="#ffffff",tt=.48);const rt=A>=(x||6)&&A<=(y||21)-1,st=rt?"url(#window-day)":Z?"url(#window-night)":"url(#window-dark)",it=rt?"none":Z?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",nt=A>=6&&A<=21&&"rainy"!==U&&"lightning"!==U&&"cloudy"!==U&&"snowy"!==U&&"foggy"!==U,at={cx:Y/2,cy:K};let ot=0,lt="#fef08a",dt="rgba(254, 240, 138, 0.65)";if(nt){const t=(A-6)/15;at.cx=t*(Y+120)-60,at.cy=K-120-Math.sin(t*Math.PI)*(K-160),ot=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);lt=yt("#ea580c","#fef08a",e),dt=yt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const ft={cx:Y/2,cy:K};let ct=0;if((A>21||A<6)&&"rainy"!==U&&"lightning"!==U&&"cloudy"!==U&&"snowy"!==U&&"foggy"!==U){const t=A>21?(A-21)/9:(A+3)/9;ft.cx=t*(Y+120)-60,ft.cy=K-120-Math.sin(t*Math.PI)*(K-200),ct=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const pt=345,ht=350,gt=qt(B,-22,.9),xt=qt(B+145.6,112.4,.62),St=qt(B+249.6,208.4,.42),Wt=qt(B+316.4,275.6,.28),mt=qt(B+358.4,323.6,.18);let Pt=G?"↑ Teruglevering":L?"↓ Import":"Standby";null!==b&&null!==k?Pt=`↓${b.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==b?Pt=`Import: ${b.toFixed(1)} kWh`:null!==k&&(Pt=`Terug: ${k.toFixed(1)} kWh`);const zt=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:M?"Actief":"Standby";let Ft=`SoC: ${d}%`;null!==V&&null!==O?Ft=`SoC: ${d}% (↓${V.toFixed(1)} ↑${O.toFixed(1)})`:null!==V&&(Ft=`SoC: ${d}% (↓${V.toFixed(1)})`);const Ut=null!==q?`Vandaag: ${q.toFixed(1)} kWh`:C?"Laden":"Standby";let Yt="";if(null!==j){Yt=`€ ${j.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:3})}`}const Kt=[{id:"grid",title:"Stroomnet",value:wt(c),sub:Pt,color:N.stroke,active:L||G}];h&&Kt.push({id:"battery",title:"Thuisaccu",value:T||R?wt(l):"Standby",sub:Ft,color:D.stroke,active:T||R}),Kt.push({id:"home",title:"Huisverbruik",value:wt(o),sub:zt,color:ut.home.stroke,active:M}),g&&Kt.push({id:"ev",title:"Laadpaal (EV)",value:wt(f),sub:Ut,color:ut.ev.stroke,active:C});const Ht=(t,e,r,s,i,n=!1)=>J`
+  `;function St({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:i,solar:n,solarToday:a,load:o,batteryPower:l,soc:d,charger:f,grid:c,showSolar:p,showBattery:h,showEV:g,weather:u="sunny",clouds:v=[],sunriseHour:x=6,sunsetHour:y=21,gridImportToday:b=null,gridExportToday:k=null,homeToday:w=null,batteryChargeToday:V=null,batteryDischargeToday:O=null,evToday:q=null,showLights:X,gridPrice:j=null,rainIntensity:S="normal",windSpeed:W=10,temperature:m=null,poolPumpActive:P=!1,onNodeClick:z}){let F=u;"pouring"===u||"lightning-rainy"===u?F="rainy":"snowy-rainy"===u||"hail"===u?F="snowy":"fog"===u&&(F="foggy");const U=t||800,Y=e||600,K=(U-800)/2,H=20-K;let B=s;B=s>=x&&s<=y?6+(s-x)/(y-x)*15:s>y?21+(s-y)/(24-y)*3:s/x*6;const A=l>.05,T=l<-.05,R=c>.05,L=c<-.05,G=f>.1,C=n>20,E=o>20,M=A||T&&L?ut.battery:ut.batteryD,D=R?ut.gridI:ut.gridE,N=bt(B,x,y),Q=void 0!==X?X:N.lights>.05||"rainy"===F||"lightning"===F;let Z=N.top,I=N.horizon,$=N.clouds,_="night"===i?.18:.48;const tt=W>.5?Math.max(1.2,Math.min(18,45/(W/5))):0;"cloudy"===F?($="#b8c5d6",I=yt(N.horizon,"#94a3b8",.15),_=.98):"rainy"===F||"lightning"===F?($="#475569",Z="#1f2937",I=yt(N.horizon,"#1e293b",.55),_=.99):"snowy"===F?($="#7a889b",Z="#475569",I=yt(N.horizon,"#334155",.4),_=.98):"foggy"===F?(Z=yt(N.top,"#64748b",.65),I=yt(N.horizon,"#94a3b8",.65),$="#a8b5c6",_=.5):"partlycloudy"===F?(Z=yt(N.top,"#475569",.1),I=yt(N.horizon,"#64748b",.1),$="#e2e8f0",_=.65):($="#ffffff",_=.48);const et=B>=(x||6)&&B<=(y||21)-1,rt=et?"url(#window-day)":Q?"url(#window-night)":"url(#window-dark)",st=et?"none":Q?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",it=B>=6&&B<=21&&"rainy"!==F&&"lightning"!==F&&"cloudy"!==F&&"snowy"!==F&&"foggy"!==F,nt={cx:U/2,cy:Y};let at=0,ot="#fef08a",lt="rgba(254, 240, 138, 0.65)";if(it){const t=(B-6)/15;nt.cx=t*(U+120)-60,nt.cy=Y-120-Math.sin(t*Math.PI)*(Y-160),at=Math.max(0,Math.min(1,1.5*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);ot=yt("#ea580c","#fef08a",e),lt=yt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const dt={cx:U/2,cy:Y};let ft=0;if((B>21||B<6)&&"rainy"!==F&&"lightning"!==F&&"cloudy"!==F&&"snowy"!==F&&"foggy"!==F){const t=B>21?(B-21)/9:(B+3)/9;dt.cx=t*(U+120)-60,dt.cy=Y-120-Math.sin(t*Math.PI)*(Y-200),ft=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const ct=345,pt=350,ht=qt(H,-22,.9),gt=qt(H+145.6,112.4,.62),xt=qt(H+249.6,208.4,.42),St=qt(H+316.4,275.6,.28),Wt=qt(H+358.4,323.6,.18);let mt=L?"↑ Teruglevering":R?"↓ Import":"Standby";null!==b&&null!==k?mt=`↓${b.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==b?mt=`Import: ${b.toFixed(1)} kWh`:null!==k&&(mt=`Terug: ${k.toFixed(1)} kWh`);const Pt=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:E?"Actief":"Standby";let zt=`SoC: ${d}%`;null!==V&&null!==O?zt=`SoC: ${d}% (↓${V.toFixed(1)} ↑${O.toFixed(1)})`:null!==V&&(zt=`SoC: ${d}% (↓${V.toFixed(1)})`);const Ft=null!==q?`Vandaag: ${q.toFixed(1)} kWh`:G?"Laden":"Standby";let Ut="";if(null!==j){Ut=`€ ${j.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:3})}`}const Yt=[{id:"grid",title:"Stroomnet",value:wt(c),sub:mt,color:D.stroke,active:R||L}];h&&Yt.push({id:"battery",title:"Thuisaccu",value:A||T?wt(l):"Standby",sub:zt,color:M.stroke,active:A||T}),Yt.push({id:"home",title:"Huisverbruik",value:wt(o),sub:Pt,color:ut.home.stroke,active:E}),g&&Yt.push({id:"ev",title:"Laadpaal (EV)",value:wt(f),sub:Ft,color:ut.ev.stroke,active:G});const Kt=(t,e,r,s,i,n=!1)=>J`
       <path d="${t}" class="flowCable" />
       <path d="${t}" fill="none" stroke="${s}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
@@ -834,13 +834,13 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           " />
       `)}
     `:J``)(t,e,r,s,i,n)}
-    `,Bt=K-530;return J`
-    <svg viewBox="0 0 ${Y} ${K}" xmlns="http://www.w3.org/2000/svg">
+    `,Ht=Y-530;return J`
+    <svg viewBox="0 0 ${U} ${Y}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${I}" />
-          <stop offset="100%" stop-color="${$}" />
+          <stop offset="0%" stop-color="${Z}" />
+          <stop offset="100%" stop-color="${I}" />
         </linearGradient>
 
         <linearGradient id="shooting-star-grad" x1="1" y1="0" x2="0" y2="0">
@@ -911,23 +911,23 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
 
         <!-- Clip path for the whole scene -->
         <clipPath id="scene-clip">
-          <rect width="${Y}" height="${K}" rx="0" ry="0" />
+          <rect width="${U}" height="${Y}" rx="0" ry="0" />
         </clipPath>
       </defs>
 
       <g clip-path="url(#scene-clip)">
         <!-- Sky background -->
-        <rect width="${Y}" height="${K}" fill="url(#sky-grad)" />
+        <rect width="${U}" height="${Y}" fill="url(#sky-grad)" />
 
         <!-- Stars (dynamically distributed across width) -->
-        ${Q.stars>.05&&"rainy"!==U&&"lightning"!==U&&"cloudy"!==U?J`
-          <g opacity="${Q.stars}" style="pointer-events: none;">
-            <circle cx="${.1*Y}"  cy="${.08*K}"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="${.26*Y}" cy="${.16*K}"  r="1.2" class="starMed" fill="#ffffff" />
-            <circle cx="${.42*Y}" cy="${.07*K}"  r="1.0" class="starFast" fill="#ffffff" />
-            <circle cx="${.6*Y}"  cy="${.18*K}"  r="1.5" class="starSlow" fill="#ffffff" />
-            <circle cx="${.77*Y}" cy="${.11*K}"  r="1.2" class="starFast" fill="#ffffff" />
-            <circle cx="${.91*Y}" cy="${.2*K}"   r="1.0" class="starMed" fill="#ffffff" />
+        ${N.stars>.05&&"rainy"!==F&&"lightning"!==F&&"cloudy"!==F?J`
+          <g opacity="${N.stars}" style="pointer-events: none;">
+            <circle cx="${.1*U}"  cy="${.08*Y}"  r="1.0" class="starFast" fill="#ffffff" />
+            <circle cx="${.26*U}" cy="${.16*Y}"  r="1.2" class="starMed" fill="#ffffff" />
+            <circle cx="${.42*U}" cy="${.07*Y}"  r="1.0" class="starFast" fill="#ffffff" />
+            <circle cx="${.6*U}"  cy="${.18*Y}"  r="1.5" class="starSlow" fill="#ffffff" />
+            <circle cx="${.77*U}" cy="${.11*Y}"  r="1.2" class="starFast" fill="#ffffff" />
+            <circle cx="${.91*U}" cy="${.2*Y}"   r="1.0" class="starMed" fill="#ffffff" />
           </g>
           <!-- Shooting Star -->
           <g style="animation: shootingStar 18s infinite linear; animation-delay: 8s; pointer-events: none;">
@@ -937,40 +937,40 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         `:""}
 
         <!-- Dynamic Sun -->
-        ${ot>0?J`
+        ${at>0?J`
           <g style="pointer-events: none;">
-            <circle cx="${at.cx}" cy="${at.cy}" r="45" fill="${lt}" opacity="${.15*ot}" style="filter: blur(8px);" />
-            <circle cx="${at.cx}" cy="${at.cy}" r="22" fill="${lt}" opacity="${ot}" style="filter: drop-shadow(0 0 12px ${dt});" />
+            <circle cx="${nt.cx}" cy="${nt.cy}" r="45" fill="${ot}" opacity="${.15*at}" style="filter: blur(8px);" />
+            <circle cx="${nt.cx}" cy="${nt.cy}" r="22" fill="${ot}" opacity="${at}" style="filter: drop-shadow(0 0 12px ${lt});" />
           </g>
         `:""}
 
         <!-- Dynamic Moon -->
-        ${ct>0?J`
-          <g style="pointer-events: none;" opacity="${ct}">
-            <circle cx="${ft.cx}" cy="${ft.cy}" r="25" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
-            <circle cx="${ft.cx}" cy="${ft.cy}" r="14" fill="#f1f5f9" />
-            <circle cx="${ft.cx+5}" cy="${ft.cy-3}" r="13" fill="url(#sky-grad)" />
+        ${ft>0?J`
+          <g style="pointer-events: none;" opacity="${ft}">
+            <circle cx="${dt.cx}" cy="${dt.cy}" r="25" fill="#e2e8f0" opacity="0.15" style="filter: blur(4px);" />
+            <circle cx="${dt.cx}" cy="${dt.cy}" r="14" fill="#f1f5f9" />
+            <circle cx="${dt.cx+5}" cy="${dt.cy-3}" r="13" fill="url(#sky-grad)" />
           </g>
         `:""}
 
         <!-- Flying Birds during the day -->
-        ${nt&&"rainy"!==U&&"lightning"!==U&&"snowy"!==U&&"foggy"!==U?J`
+        ${it&&"rainy"!==F&&"lightning"!==F&&"snowy"!==F&&"foggy"!==F?J`
           <style>
             @keyframes flyBird1 {
               0% { transform: translate(-40px, 45px) scale(0.55); }
-              100% { transform: translate(${Y+40}px, 35px) scale(0.55); }
+              100% { transform: translate(${U+40}px, 35px) scale(0.55); }
             }
             @keyframes flyBird2 {
               0% { transform: translate(-40px, 110px) scale(0.4); }
-              100% { transform: translate(${Y+40}px, 95px) scale(0.4); }
+              100% { transform: translate(${U+40}px, 95px) scale(0.4); }
             }
             @keyframes flyBird3 {
               0% { transform: translate(-40px, 160px) scale(0.65); }
-              100% { transform: translate(${Y+40}px, 145px) scale(0.65); }
+              100% { transform: translate(${U+40}px, 145px) scale(0.65); }
             }
             @keyframes flyBird4 {
               0% { transform: translate(-40px, 80px) scale(0.48); }
-              100% { transform: translate(${Y+40}px, 70px) scale(0.48); }
+              100% { transform: translate(${U+40}px, 70px) scale(0.48); }
             }
             @keyframes flap {
               0% { transform: scaleY(1.0); }
@@ -1003,7 +1003,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         `:""}
 
         <!-- Falling precipitation -->
-        ${"rainy"===U?function(t,e="normal"){let r=18,s=.9;"light"===e?(r=36,s=1.3):"heavy"===e&&(r=9,s=.55);const i=Math.ceil(t/r);return J`
+        ${"rainy"===F?function(t,e="normal"){let r=18,s=.9;"light"===e?(r=36,s=1.3):"heavy"===e&&(r=9,s=.55);const i=Math.ceil(t/r);return J`
     <g style="pointer-events: none;">
       ${Array.from({length:i}).map((t,e)=>J`
         <line x1="${15+e*r}" y1="0" x2="${e*r-2}" y2="40"
@@ -1011,8 +1011,8 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           style="animation-delay: ${e%7*.12}s; animation-duration: ${s+e%4*.12}s;" />
       `)}
     </g>
-  `}(Y,W):""}
-        ${"snowy"===U?function(t){const e=Math.ceil(t/20);return J`
+  `}(U,S):""}
+        ${"snowy"===F?function(t){const e=Math.ceil(t/20);return J`
     <g style="pointer-events: none;">
       ${Array.from({length:e}).map((t,e)=>J`
         <circle cx="${15+20*e}" cy="0" r="${1.8+e%4*.6}"
@@ -1020,93 +1020,93 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           style="animation-delay: ${e%8*.4}s; animation-duration: ${3.5+e%5*.6}s;" />
       `)}
     </g>
-  `}(Y):""}
+  `}(U):""}
 
         <!-- Cloud layers -->
-        ${"cloudy"===U||"rainy"===U||"lightning"===U||"snowy"===U?J`
+        ${"cloudy"===F||"rainy"===F||"lightning"===F||"snowy"===F?J`
           <style>
-            @keyframes scrollCloudsBack { 0% { transform: translateX(0px); } 100% { transform: translateX(-${Y}px); } }
-            @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${Y}px); } }
-            @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${Y}px); } }
+            @keyframes scrollCloudsBack { 0% { transform: translateX(0px); } 100% { transform: translateX(-${U}px); } }
+            @keyframes scrollCloudsMid { 0% { transform: translateX(0px); } 100% { transform: translateX(-${U}px); } }
+            @keyframes scrollCloudsFront { 0% { transform: translateX(0px); } 100% { transform: translateX(-${U}px); } }
             
             .cloud-layer-back { animation: scrollCloudsBack 140s infinite linear; }
             .cloud-layer-mid { animation: scrollCloudsMid 90s infinite linear; }
             .cloud-layer-front { animation: scrollCloudsFront 50s infinite linear; }
           </style>
           
-          <g opacity="${tt}" style="pointer-events: none;">
+          <g opacity="${_}" style="pointer-events: none;">
             <!-- Layer 1 (Back - Darkest) -->
             <g class="cloud-layer-back">
               <!-- Y=95 first, Y=60 last -->
-              <path d="${Vt(Y,95,2)}" fill="${yt(_,"#111827",.2)}" />
-              <path d="${Vt(Y,95,2)}" transform="translate(${Y}, 0)" fill="${yt(_,"#111827",.2)}" />
-              <path d="${Ot(Y,95,2)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${Ot(Y,95,2)}" transform="translate(${Y}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Vt(U,95,2)}" fill="${yt($,"#111827",.2)}" />
+              <path d="${Vt(U,95,2)}" transform="translate(${U}, 0)" fill="${yt($,"#111827",.2)}" />
+              <path d="${Ot(U,95,2)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Ot(U,95,2)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
 
-              <path d="${Vt(Y,60,1)}" fill="${yt(_,"#111827",.25)}" />
-              <path d="${Vt(Y,60,1)}" transform="translate(${Y}, 0)" fill="${yt(_,"#111827",.25)}" />
-              <path d="${Ot(Y,60,1)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
-              <path d="${Ot(Y,60,1)}" transform="translate(${Y}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Vt(U,60,1)}" fill="${yt($,"#111827",.25)}" />
+              <path d="${Vt(U,60,1)}" transform="translate(${U}, 0)" fill="${yt($,"#111827",.25)}" />
+              <path d="${Ot(U,60,1)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
+              <path d="${Ot(U,60,1)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
             </g>
             
             <!-- Layer 2 (Middle - Medium) -->
             <g class="cloud-layer-mid">
               <!-- Y=120 first, Y=85 last -->
-              <path d="${Vt(Y,120,4)}" fill="${yt(_,"#1f2937",.1)}" />
-              <path d="${Vt(Y,120,4)}" transform="translate(${Y}, 0)" fill="${yt(_,"#1f2937",.1)}" />
-              <path d="${Ot(Y,120,4)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
-              <path d="${Ot(Y,120,4)}" transform="translate(${Y}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
+              <path d="${Vt(U,120,4)}" fill="${yt($,"#1f2937",.1)}" />
+              <path d="${Vt(U,120,4)}" transform="translate(${U}, 0)" fill="${yt($,"#1f2937",.1)}" />
+              <path d="${Ot(U,120,4)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
+              <path d="${Ot(U,120,4)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
 
-              <path d="${Vt(Y,85,3)}" fill="${yt(_,"#1f2937",.15)}" />
-              <path d="${Vt(Y,85,3)}" transform="translate(${Y}, 0)" fill="${yt(_,"#1f2937",.15)}" />
-              <path d="${Ot(Y,85,3)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
-              <path d="${Ot(Y,85,3)}" transform="translate(${Y}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
+              <path d="${Vt(U,85,3)}" fill="${yt($,"#1f2937",.15)}" />
+              <path d="${Vt(U,85,3)}" transform="translate(${U}, 0)" fill="${yt($,"#1f2937",.15)}" />
+              <path d="${Ot(U,85,3)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
+              <path d="${Ot(U,85,3)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
             </g>
             
             <!-- Layer 3 (Front - Main Color) -->
             <g class="cloud-layer-front">
               <!-- Y=150 first, Y=110 last -->
-              <path d="${Vt(Y,150,6)}" fill="${_}" />
-              <path d="${Vt(Y,150,6)}" transform="translate(${Y}, 0)" fill="${_}" />
-              <path d="${Ot(Y,150,6)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
-              <path d="${Ot(Y,150,6)}" transform="translate(${Y}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
+              <path d="${Vt(U,150,6)}" fill="${$}" />
+              <path d="${Vt(U,150,6)}" transform="translate(${U}, 0)" fill="${$}" />
+              <path d="${Ot(U,150,6)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
+              <path d="${Ot(U,150,6)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
 
-              <path d="${Vt(Y,110,5)}" fill="${yt(_,"#ffffff",.04)}" />
-              <path d="${Vt(Y,110,5)}" transform="translate(${Y}, 0)" fill="${yt(_,"#ffffff",.04)}" />
-              <path d="${Ot(Y,110,5)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
-              <path d="${Ot(Y,110,5)}" transform="translate(${Y}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
+              <path d="${Vt(U,110,5)}" fill="${yt($,"#ffffff",.04)}" />
+              <path d="${Vt(U,110,5)}" transform="translate(${U}, 0)" fill="${yt($,"#ffffff",.04)}" />
+              <path d="${Ot(U,110,5)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
+              <path d="${Ot(U,110,5)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
             </g>
           </g>
         `:J`
           <!-- Floating Cloud layers (Only for sunny/partlycloudy) -->
-          <g opacity="${tt}" style="pointer-events: none;">
-            ${(v||[]).map(t=>{const e=.4*K,r=Math.max(20,e-20);return function(t,e,r,s=1,i="#ffffff",n=.9,a=""){return J`
+          <g opacity="${_}" style="pointer-events: none;">
+            ${(v||[]).map(t=>{const e=.4*Y,r=Math.max(20,e-20);return function(t,e,r,s=1,i="#ffffff",n=.9,a=""){return J`
     <g transform="translate(${e}, ${r}) scale(${s})" opacity="${n}" style="transition: opacity 1.5s ease;">
       <g class="${t}" style="${a}">
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="rgba(15, 23, 42, 0.15)" transform="translate(0, 4) scale(1.02)" />
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${i}" style="transition: fill 1.5s ease;" />
       </g>
     </g>
-  `}("customDriftCloud",0,20+(void 0!==t.yFactor?t.yFactor:.5)*r,t.scale,_,t.opacityMultiplier,`animation-duration: ${t.speed}s; animation-delay: ${t.delay}s;`)})}
+  `}("customDriftCloud",0,20+(void 0!==t.yFactor?t.yFactor:.5)*r,t.scale,$,t.opacityMultiplier,`animation-duration: ${t.speed}s; animation-delay: ${t.delay}s;`)})}
           </g>
         `}
 
         <!-- Lightning bolts (background, shifted dynamically to remain centered) -->
-        ${"lightning"===U?J`
-          <path d="M ${Y/2+20},60 L ${Y/2-10},150 L ${Y/2+30},150 L ${Y/2-30},260 L ${Y/2},260 L ${Y/2-50},380" class="lightningBolt" />
-          <path d="M ${.225*Y},40 L ${.194*Y},110 L ${.225*Y},110 L ${.175*Y},180" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
+        ${"lightning"===F?J`
+          <path d="M ${U/2+20},60 L ${U/2-10},150 L ${U/2+30},150 L ${U/2-30},260 L ${U/2},260 L ${U/2-50},380" class="lightningBolt" />
+          <path d="M ${.225*U},40 L ${.194*U},110 L ${.225*U},110 L ${.175*U},180" class="lightningBolt" style="animation-delay: 1.5s; stroke-width: 2;" />
         `:""}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- GROUND, MAST, HOUSE, AND CABLES: Translated inside dynamic group-->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        <g transform="translate(${H}, ${Bt})">
+        <g transform="translate(${K}, ${Ht})">
 
           <!-- Wind Turbines in the far background (behind pylon cables and ground) -->
           <!-- Small Wind Turbine (further) -->
           <g id="wind-turbine-small" style="pointer-events: none;" opacity="0.3">
             <path d="M 93,410 L 94.5,330 L 95.5,330 L 97,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 95px 330px; ${et>0?`animation: spinWindTurbine ${1.2*et}s linear infinite; animation-delay: -0.4s;`:""}">
+            <g style="transform-origin: 95px 330px; ${tt>0?`animation: spinWindTurbine ${1.2*tt}s linear infinite; animation-delay: -0.4s;`:""}">
               <circle cx="95" cy="330" r="2.2" fill="#64748b" />
               <path d="M 95,330 Q 94,295 95,285 Q 96,295 95,330" fill="#cbd5e1" />
               <path d="M 95,330 Q 94,295 95,285 Q 96,295 95,330" fill="#cbd5e1" transform="rotate(120 95 330)" />
@@ -1116,7 +1116,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           <!-- Medium Wind Turbine -->
           <g id="wind-turbine-med" style="pointer-events: none;" opacity="0.45">
             <path d="M 51,410 L 53.5,290 L 56.5,290 L 59,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 55px 290px; ${et>0?`animation: spinWindTurbine ${et}s linear infinite;`:""}">
+            <g style="transform-origin: 55px 290px; ${tt>0?`animation: spinWindTurbine ${tt}s linear infinite;`:""}">
               <circle cx="55" cy="290" r="3.5" fill="#64748b" />
               <path d="M 55,290 Q 53,235 55,220 Q 57,235 55,290" fill="#cbd5e1" />
               <path d="M 55,290 Q 53,235 55,220 Q 57,235 55,290" fill="#cbd5e1" transform="rotate(120 55 290)" />
@@ -1125,7 +1125,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           </g>
 
           <!-- Ground (grass base spanning full screen width) -->
-          <rect x="${-H}" y="410" width="${Y}" height="120" fill="url(#garden-grad)" />
+          <rect x="${-K}" y="410" width="${U}" height="120" fill="url(#garden-grad)" />
 
           <!-- Eendenvijver met domme eenden (Duck Pond with Silly Ducks) -->
           <g id="duck-pond" style="pointer-events: none;" transform="translate(-60, -10)">
@@ -1210,63 +1210,63 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           </g>
           
           <!-- Driveway: from center gable (x=320) to right edge, rounded left corners -->
-          <path d="M 320,410 Q 320,430 340,430 L ${Y-H},430 L ${Y-H},410 Z" fill="url(#driveway-grad)" />
-          <line x1="${-H}" y1="410" x2="${Y-H}" y2="410" class="horizonLine" />
+          <path d="M 320,410 Q 320,430 340,430 L ${U-K},430 L ${U-K},410 Z" fill="url(#driveway-grad)" />
+          <line x1="${-K}" y1="410" x2="${U-K}" y2="410" class="horizonLine" />
 
           <!-- Perspective High-Voltage Electricity Pylons (Elektramasten) fading into the distance -->
           <!-- Background Pylons (Right/Far) -->
-          ${jt(B+358.4,323.6,.18,.22,"#64748b")}
-          ${jt(B+316.4,275.6,.28,.38,"#5d6d82")}
-          ${jt(B+249.6,208.4,.42,.58,"#546479")}
-          ${jt(B+145.6,112.4,.62,.78,"#4c5c71")}
+          ${jt(H+358.4,323.6,.18,.22,"#64748b")}
+          ${jt(H+316.4,275.6,.28,.38,"#5d6d82")}
+          ${jt(H+249.6,208.4,.42,.58,"#546479")}
+          ${jt(H+145.6,112.4,.62,.78,"#4c5c71")}
 
           <!-- Parallax sagging power lines between pylons -->
           <!-- Segment P5 (Far) to P4 -->
-          <path d="${Xt(mt[0],Wt[0],5)} 
-                   ${Xt(mt[1],Wt[1],5)} 
-                   ${Xt(mt[2],Wt[2],5)} 
-                   ${Xt(mt[3],Wt[3],5)}" 
+          <path d="${Xt(Wt[0],St[0],5)} 
+                   ${Xt(Wt[1],St[1],5)} 
+                   ${Xt(Wt[2],St[2],5)} 
+                   ${Xt(Wt[3],St[3],5)}" 
                 fill="none" stroke="#64748b" stroke-width="0.5" opacity="0.15" />
                 
           <!-- Segment P4 to P3 -->
-          <path d="${Xt(Wt[0],St[0],9)} 
-                   ${Xt(Wt[1],St[1],9)} 
-                   ${Xt(Wt[2],St[2],9)} 
-                   ${Xt(Wt[3],St[3],9)}" 
+          <path d="${Xt(St[0],xt[0],9)} 
+                   ${Xt(St[1],xt[1],9)} 
+                   ${Xt(St[2],xt[2],9)} 
+                   ${Xt(St[3],xt[3],9)}" 
                 fill="none" stroke="#5d6d82" stroke-width="0.8" opacity="0.32" />
 
           <!-- Segment P3 to P2 -->
-          <path d="${Xt(St[0],xt[0],14)} 
-                   ${Xt(St[1],xt[1],14)} 
-                   ${Xt(St[2],xt[2],14)} 
-                   ${Xt(St[3],xt[3],14)}" 
+          <path d="${Xt(xt[0],gt[0],14)} 
+                   ${Xt(xt[1],gt[1],14)} 
+                   ${Xt(xt[2],gt[2],14)} 
+                   ${Xt(xt[3],gt[3],14)}" 
                 fill="none" stroke="#546479" stroke-width="1.2" opacity="0.52" />
 
           <!-- Segment P2 to P1 (Foreground) -->
-          <path d="${Xt(xt[0],gt[0],22)} 
-                   ${Xt(xt[1],gt[1],22)} 
-                   ${Xt(xt[2],gt[2],22)} 
-                   ${Xt(xt[3],gt[3],22)}" 
+          <path d="${Xt(gt[0],ht[0],22)} 
+                   ${Xt(gt[1],ht[1],22)} 
+                   ${Xt(gt[2],ht[2],22)} 
+                   ${Xt(gt[3],ht[3],22)}" 
                 fill="none" stroke="#4c5c71" stroke-width="1.6" opacity="0.75" />
 
           <!-- Wires going off-screen left from foreground P1 -->
-          <path d="${Xt({x:-H,y:gt[0].y-35},gt[0],30)} 
-                   ${Xt({x:-H,y:gt[1].y-35},gt[1],30)} 
-                   ${Xt({x:-H,y:gt[3].y-35},gt[3],30)}" 
+          <path d="${Xt({x:-K,y:ht[0].y-35},ht[0],30)} 
+                   ${Xt({x:-K,y:ht[1].y-35},ht[1],30)} 
+                   ${Xt({x:-K,y:ht[3].y-35},ht[3],30)}" 
                 fill="none" stroke="#4c5c71" stroke-width="1.8" opacity="0.8" />
 
           <!-- Wires extending past P5 into the horizon -->
-          <path d="M ${mt[0].x},${mt[0].y} L ${mt[0].x+50},${mt[0].y-2} 
-                   M ${mt[1].x},${mt[1].y} L ${mt[1].x+50},${mt[1].y-2} 
-                   M ${mt[2].x},${mt[2].y} L ${mt[2].x+50},${mt[2].y-2} 
-                   M ${mt[3].x},${mt[3].y} L ${mt[3].x+50},${mt[3].y-2}" 
+          <path d="M ${Wt[0].x},${Wt[0].y} L ${Wt[0].x+50},${Wt[0].y-2} 
+                   M ${Wt[1].x},${Wt[1].y} L ${Wt[1].x+50},${Wt[1].y-2} 
+                   M ${Wt[2].x},${Wt[2].y} L ${Wt[2].x+50},${Wt[2].y-2} 
+                   M ${Wt[3].x},${Wt[3].y} L ${Wt[3].x+50},${Wt[3].y-2}" 
                 fill="none" stroke="#64748b" stroke-width="0.3" opacity="0.1" />
 
           <!-- Interactive Foreground Mast (Pylon 1) -->
-          <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${()=>F("grid")}>
-            ${jt(B,-22,.9,1,"#475569")}
+          <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${()=>z("grid")}>
+            ${jt(H,-22,.9,1,"#475569")}
             <!-- Larger transparent tap target for tablets -->
-            <rect x="${B}" y="100" width="200" height="380" fill="transparent" style="cursor: pointer;" />
+            <rect x="${H}" y="100" width="200" height="380" fill="transparent" style="cursor: pointer;" />
           </g>
 
           <!-- Transformer / Distribution Box -->
@@ -1279,7 +1279,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           </g>
 
           <!-- ── HOUSE GEOMETRY ── -->
-          <g id="house-structure" class="interactiveGroup homeGroup" @click=${()=>F("home")}>
+          <g id="house-structure" class="interactiveGroup homeGroup" @click=${()=>z("home")}>
             <!-- LEFT WING -->
             <g id="left-wing">
               <rect x="180" y="300" width="140" height="110" fill="url(#jaren30-brick-pat)" stroke="#0f172a" stroke-width="2" />
@@ -1293,7 +1293,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
               <line x1="205" y1="260" x2="320" y2="260" stroke="#1e293b" stroke-width="4" />
               
               <!-- Window -->
-              <rect x="230" y="320" width="40" height="45" fill="${st}" stroke="#0f172a" stroke-width="2" style="filter: ${it}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="230" y="320" width="40" height="45" fill="${rt}" stroke="#0f172a" stroke-width="2" style="filter: ${st}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="250" y1="320" x2="250" y2="365" stroke="#0f172a" stroke-width="1.2" />
               <line x1="230" y1="342.5" x2="270" y2="342.5" stroke="#0f172a" stroke-width="1.2" />
             </g>
@@ -1309,16 +1309,16 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
               <line x1="692" y1="284" x2="500" y2="60" stroke="#1e293b" stroke-width="8"  stroke-linecap="round" />
               
               <!-- Downstairs windows -->
-              <rect x="465" y="315" width="40" height="45" fill="${st}" stroke="#0f172a" stroke-width="2" style="filter: ${it}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="465" y="315" width="40" height="45" fill="${rt}" stroke="#0f172a" stroke-width="2" style="filter: ${st}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="485" y1="315" x2="485" y2="360" stroke="#0f172a" stroke-width="1.2" />
               <line x1="465" y1="337.5" x2="505" y2="337.5" stroke="#0f172a" stroke-width="1.2" />
               
-              <rect x="555" y="315" width="40" height="45" fill="${st}" stroke="#0f172a" stroke-width="2" style="filter: ${it}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="555" y="315" width="40" height="45" fill="${rt}" stroke="#0f172a" stroke-width="2" style="filter: ${st}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="575" y1="315" x2="575" y2="360" stroke="#0f172a" stroke-width="1.2" />
               <line x1="555" y1="337.5" x2="595" y2="337.5" stroke="#0f172a" stroke-width="1.2" />
               
               <!-- Upstairs window -->
-              <rect x="480" y="210" width="40" height="40" fill="${st}" stroke="#0f172a" stroke-width="2" style="filter: ${it}; transition: fill 0.5s ease, filter 0.5s ease;" />
+              <rect x="480" y="210" width="40" height="40" fill="${rt}" stroke="#0f172a" stroke-width="2" style="filter: ${st}; transition: fill 0.5s ease, filter 0.5s ease;" />
               <line x1="500" y1="210" x2="500" y2="250" stroke="#0f172a" stroke-width="1.2" />
               <line x1="480" y1="230" x2="520" y2="230" stroke="#0f172a" stroke-width="1.2" />
             </g>
@@ -1340,7 +1340,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
 
           <!-- ── SOLAR PANELS (continuous array flat on roof slope) ── -->
           ${p?J`
-            <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),F("solar")}}>
+            <g id="solar-panels" class="interactiveGroup solarGroup" @click=${t=>{t.stopPropagation(),z("solar")}}>
               <g transform="translate(320, 270) rotate(-49.4)">
                 <!-- Mounting rods -->
                 <line x1="25"  y1="-7" x2="25"  y2="0" stroke="#0f172a" stroke-width="2" />
@@ -1380,12 +1380,12 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           <!-- ── METERKAST location ── -->
           <g id="house-inverter">
             <rect x="${340}" y="${340}" width="10" height="20" fill="#1e293b" rx="1" />
-            <circle cx="${pt}" cy="${ht}" r="2.5" fill="${E||T||R||L||G||C?"#10b981":"#ef4444"}" style="transition: fill 0.6s ease;" />
+            <circle cx="${ct}" cy="${pt}" r="2.5" fill="${C||A||T||R||L||G?"#10b981":"#ef4444"}" style="transition: fill 0.6s ease;" />
           </g>
 
           <!-- ── THUISACCU (Battery against left wing wall) ── -->
           ${h?J`
-            <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),F("battery")}}>
+            <g id="house-battery" class="interactiveGroup batteryGroup" @click=${t=>{t.stopPropagation(),z("battery")}}>
               <!-- Main Sleek Battery Body with Silver-Metal Gradient -->
               <rect x="280" y="340" width="30" height="70" fill="url(#battery-body-grad)" stroke="#64748b" stroke-width="1.2" rx="3.5" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));" />
               
@@ -1399,29 +1399,29 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
 
               <!-- Digital SOC Screen -->
               <rect x="284" y="344" width="22" height="10" fill="#0f172a" rx="1.5" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" />
-              <text x="295" y="352" text-anchor="middle" fill="${d<20?"#ef4444":R?"#f97316":"#10b981"}" font-size="7.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
+              <text x="295" y="352" text-anchor="middle" fill="${d<20?"#ef4444":T?"#f97316":"#10b981"}" font-size="7.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
                 ${d}%
               </text>
               
               <!-- Premium Vertical LED Level Bar -->
               <rect x="293" y="364" width="4" height="40" fill="rgba(15,23,42,0.3)" rx="1" />
-              <rect x="293" y="${404-d/100*40}" width="4" height="${d/100*40}" fill="${d<20?"#ef4444":R?"#f97316":"#10b981"}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="1" />
+              <rect x="293" y="${404-d/100*40}" width="4" height="${d/100*40}" fill="${d<20?"#ef4444":T?"#f97316":"#10b981"}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="1" />
             </g>
           `:""}
 
           <!-- ── EV CHARGER ── -->
           ${g?J`
-            <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),F("ev")}}>
+            <g id="ev-charger" class="interactiveGroup evGroup" @click=${t=>{t.stopPropagation(),z("ev")}}>
               <rect x="450" y="355" width="10" height="55" fill="#1e293b" rx="1" />
               <circle cx="455" cy="365" r="3.5"
-                fill="${C?"#a855f7":"#10b981"}"
-                style="filter: ${C?"drop-shadow(0 0 6px #a855f7)":"none"}; transition: fill 0.5s ease;" />
+                fill="${G?"#a855f7":"#10b981"}"
+                style="filter: ${G?"drop-shadow(0 0 6px #a855f7)":"none"}; transition: fill 0.5s ease;" />
               <!-- Charging cable -->
               <path d="M 455,370 C 460,390 475,400 495,395" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="3,3" />
             </g>
 
             <!-- EV Car -->
-            <g id="ev-car" class="interactiveGroup evGroup" opacity="${C?1:.4}" style="transition: opacity 0.6s ease;" @click=${t=>{t.stopPropagation(),F("ev")}}>
+            <g id="ev-car" class="interactiveGroup evGroup" opacity="${G?1:.4}" style="transition: opacity 0.6s ease;" @click=${t=>{t.stopPropagation(),z("ev")}}>
               ${r&&(r.startsWith("/")||r.startsWith("http")||r.includes(".")||r.includes("/"))?J`
                 <g transform="translate(475, 348)">
                   <ellipse cx="95" cy="63" rx="95" ry="7" fill="rgba(0,0,0,0.4)" />
@@ -1567,7 +1567,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
             <rect x="836" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
 
             <!-- Silly Duck -->
-            <g class="${z?"pool-duck-animated":""}">
+            <g class="${P?"pool-duck-animated":""}">
               <ellipse cx="705" cy="386" rx="6" ry="1.5" fill="rgba(2,132,199,0.5)" />
               <ellipse cx="705" cy="383" rx="7" ry="5" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
               <path d="M 698,382 Q 696,379 700,381" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
@@ -1582,41 +1582,41 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           </g>
 
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
-          ${p?Ht("M 380,230 L 380,270 L 345,270 L 345,350",E,kt(n),ut.solar.stroke,ut.solar.glow):""}
+          ${p?Kt("M 380,230 L 380,270 L 345,270 L 345,350",C,kt(n),ut.solar.stroke,ut.solar.glow):""}
 
           <!-- Grid cable: underground from transformer box to meterkast (no pylon-to-box cable) -->
-          ${Ht("M 13,410 L 13,440 L 345,440 L 345,350",L||G,kt(c),N.stroke,N.glow,G)}
+          ${Kt("M 13,410 L 13,440 L 345,440 L 345,350",R||L,kt(c),D.stroke,D.glow,L)}
 
-          ${h?Ht("M 310,350 L 345,350",T||R,kt(l),D.stroke,D.glow,T):""}
+          ${h?Kt("M 310,350 L 345,350",A||T,kt(l),M.stroke,M.glow,A):""}
 
-          ${g?Ht("M 345,350 L 345,440 L 455,440 L 455,395",C,kt(f),ut.ev.stroke,ut.ev.glow):""}
+          ${g?Kt("M 345,350 L 345,440 L 455,440 L 455,395",G,kt(f),ut.ev.stroke,ut.ev.glow):""}
 
         </g>
         <!-- End of translate group -->
 
         <!-- Lightning Screen Flashes -->
-        ${"lightning"===U?J`
-          <rect width="${Y}" height="${K}" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
+        ${"lightning"===F?J`
+          <rect width="${U}" height="${Y}" fill="#fde047" opacity="0" style="mix-blend-mode: overlay; pointer-events: none; animation: lightningFlash 4s infinite;" />
         `:""}
 
         <!-- Fog overlay -->
-        ${"foggy"===U?J`
-          <rect width="${Y}" height="${K}" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
-          <rect width="${Y}" height="${K}" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
+        ${"foggy"===F?J`
+          <rect width="${U}" height="${Y}" fill="rgba(203, 213, 225, 0.45)" style="filter: blur(8px); pointer-events: none;" />
+          <rect width="${U}" height="${Y}" fill="rgba(241, 245, 249, 0.25)" style="filter: blur(4px); pointer-events: none;" />
         `:""}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- WEATHER HUD CARD (Top left sky area, aligned with Stroomnet)    -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${u?J`
-          <g class="interactiveGroup weatherGroup" @click=${()=>F("weather")}>
-            <g transform="translate(${Y-190}, 20)">
+          <g class="interactiveGroup weatherGroup" @click=${()=>z("weather")}>
+            <g transform="translate(${U-190}, 20)">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard"
                 rx="8" ry="8" />
               <text x="12" y="20" class="hudTitle">Weer</text>
               <text x="12" y="39" class="hudValue">
-                ${null!==P?`${P.toFixed(1)} °C`:"—"}
+                ${null!==m?`${m.toFixed(1)} °C`:"—"}
               </text>
               <text x="12" y="53" class="hudSub">
                 ${vt[u]||u}
@@ -1629,22 +1629,22 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         <!-- SOLAR HUD CARD (Top right sky area, dynamically aligned)        -->
         <!-- ════════════════════════════════════════════════════════════════ -->
         ${p?J`
-          <g class="interactiveGroup solarGroup" @click=${()=>F("solar")}>
+          <g class="interactiveGroup solarGroup" @click=${()=>z("solar")}>
             <!-- Solar panels are at design x=320, y=270 (inside translate group)
                  So SVG x = translateX+320, SVG y = translateY+270
                  Card goes LEFT of the panels at the same roof height -->
-            <g transform="translate(${H+130}, ${Bt+90})">
+            <g transform="translate(${K+130}, ${Ht+90})">
               <rect x="0" y="0" width="170" height="65"
-                class="hudCard ${E?"hudCardActive":""}"
+                class="hudCard ${C?"hudCardActive":""}"
                 rx="8" ry="8"
-                style="${E?`color: ${ut.solar.stroke}`:""}" />
+                style="${C?`color: ${ut.solar.stroke}`:""}" />
               <text x="12" y="20" class="hudTitle">Zonnepanelen</text>
-              <text x="12" y="39" class="hudValue ${E?"hudActiveText":""}"
-                style="${E?`color: ${ut.solar.stroke}`:""}">
-                ${E?wt(n):"—"}
+              <text x="12" y="39" class="hudValue ${C?"hudActiveText":""}"
+                style="${C?`color: ${ut.solar.stroke}`:""}">
+                ${C?wt(n):"—"}
               </text>
               <text x="12" y="53" class="hudSub">
-                ${null!==a?`Vandaag: ${a.toFixed(1)} kWh`:E?"Opwek actief":"Geen opwek"}
+                ${null!==a?`Vandaag: ${a.toFixed(1)} kWh`:C?"Opwek actief":"Geen opwek"}
               </text>
             </g>
           </g>
@@ -1667,72 +1667,72 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         ──────────────────────────────────────────────────────────────────────────── -->
 
         <!-- 1. Stroomnet — onder de masten (mast is altijd op SVG x=20) -->
-        <g class="interactiveGroup gridGroup" @click=${()=>F("grid")}>
-          <g transform="translate(20, ${K-75})">
+        <g class="interactiveGroup gridGroup" @click=${()=>z("grid")}>
+          <g transform="translate(20, ${Y-75})">
             <rect x="0" y="0" width="170" height="65"
-              class="hudCard ${L||G?"hudCardActive":""}"
+              class="hudCard ${R||L?"hudCardActive":""}"
               rx="8" ry="8"
-              style="${L||G?`color: ${N.stroke}`:""}" />
+              style="${R||L?`color: ${D.stroke}`:""}" />
             <text x="12" y="20" class="hudTitle">Stroomnet</text>
-            ${Yt?J`
-              <text x="158" y="20" class="hudTitle" text-anchor="end" fill="#fbbf24" font-weight="bold">${Yt}</text>
+            ${Ut?J`
+              <text x="158" y="20" class="hudTitle" text-anchor="end" fill="#fbbf24" font-weight="bold">${Ut}</text>
             `:""}
-            <text x="12" y="39" class="hudValue ${L||G?"hudActiveText":""}"
-              style="${L||G?`color: ${N.stroke}`:""}">
-              ${L||G?wt(c):"—"}
+            <text x="12" y="39" class="hudValue ${R||L?"hudActiveText":""}"
+              style="${R||L?`color: ${D.stroke}`:""}">
+              ${R||L?wt(c):"—"}
             </text>
-            <text x="12" y="53" class="hudSub">${Pt}</text>
+            <text x="12" y="53" class="hudSub">${mt}</text>
           </g>
         </g>
 
         <!-- 2. Thuisaccu — ruimte gereserveerd onder de accupositie (design x=280, SVG x=translateX+280) -->
         ${h?J`
-          <g class="interactiveGroup batteryGroup" @click=${()=>F("battery")}>
-            <g transform="translate(${H+195}, ${K-75})">
+          <g class="interactiveGroup batteryGroup" @click=${()=>z("battery")}>
+            <g transform="translate(${K+195}, ${Y-75})">
               <rect x="0" y="0" width="170" height="65"
-                class="hudCard ${T||R?"hudCardActive":""}"
+                class="hudCard ${A||T?"hudCardActive":""}"
                 rx="8" ry="8"
-                style="${T||R?`color: ${D.stroke}`:""}" />
+                style="${A||T?`color: ${M.stroke}`:""}" />
               <text x="12" y="20" class="hudTitle">Thuisaccu</text>
-              <text x="12" y="39" class="hudValue ${T||R?"hudActiveText":""}"
-                style="${T||R?`color: ${D.stroke}`:""}">
-                ${T||R?wt(l):"Standby"}
+              <text x="12" y="39" class="hudValue ${A||T?"hudActiveText":""}"
+                style="${A||T?`color: ${M.stroke}`:""}">
+                ${A||T?wt(l):"Standby"}
               </text>
-              <text x="12" y="53" class="hudSub">${Ft}</text>
+              <text x="12" y="53" class="hudSub">${zt}</text>
             </g>
           </g>
         `:""}
 
         <!-- 3. Huisverbruik — onder de meterkast (mkX=345, gecentreerd: translateX+345-85=translateX+260) -->
-        <g class="interactiveGroup homeGroup" @click=${()=>F("home")}>
-          <g transform="translate(${H+260}, ${K-75})">
+        <g class="interactiveGroup homeGroup" @click=${()=>z("home")}>
+          <g transform="translate(${K+260}, ${Y-75})">
             <rect x="0" y="0" width="170" height="65"
-              class="hudCard ${M?"hudCardActive":""}"
+              class="hudCard ${E?"hudCardActive":""}"
               rx="8" ry="8"
-              style="${M?`color: ${ut.home.stroke}`:""}" />
+              style="${E?`color: ${ut.home.stroke}`:""}" />
             <text x="12" y="20" class="hudTitle">Huisverbruik</text>
-            <text x="12" y="39" class="hudValue ${M?"hudActiveText":""}"
-              style="${M?`color: ${ut.home.stroke}`:""}">
-              ${M?wt(o):"—"}
+            <text x="12" y="39" class="hudValue ${E?"hudActiveText":""}"
+              style="${E?`color: ${ut.home.stroke}`:""}">
+              ${E?wt(o):"—"}
             </text>
-            <text x="12" y="53" class="hudSub">${zt}</text>
+            <text x="12" y="53" class="hudSub">${Pt}</text>
           </g>
         </g>
 
         <!-- 4. Laadpaal (EV) — onder de laadpaal (design x=455, gecentreerd: translateX+455-85=translateX+370) -->
         ${g?J`
-          <g class="interactiveGroup evGroup" @click=${()=>F("ev")}>
-            <g transform="translate(${H+370}, ${K-75})">
+          <g class="interactiveGroup evGroup" @click=${()=>z("ev")}>
+            <g transform="translate(${K+370}, ${Y-75})">
               <rect x="0" y="0" width="170" height="65"
-                class="hudCard ${C?"hudCardActive":""}"
+                class="hudCard ${G?"hudCardActive":""}"
                 rx="8" ry="8"
-                style="${C?`color: ${ut.ev.stroke}`:""}" />
+                style="${G?`color: ${ut.ev.stroke}`:""}" />
               <text x="12" y="20" class="hudTitle">Laadpaal (EV)</text>
-              <text x="12" y="39" class="hudValue ${C?"hudActiveText":""}"
-                style="${C?`color: ${ut.ev.stroke}`:""}">
-                ${C?wt(f):"—"}
+              <text x="12" y="39" class="hudValue ${G?"hudActiveText":""}"
+                style="${G?`color: ${ut.ev.stroke}`:""}">
+                ${G?wt(f):"—"}
               </text>
-              <text x="12" y="53" class="hudSub">${Ut}</text>
+              <text x="12" y="53" class="hudSub">${Ft}</text>
             </g>
           </g>
         `:""}
@@ -2002,35 +2002,64 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 `})}
             </div>
           </div>
-        `}else o=C`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`}else if("grid"===this.activePopup){t="Stroomnet",e="Netbelasting & Historie";const d=this.getEntityValue(l.grid||l.grid_power),f=this.parseEntityFloat(l.grid_import_today),c=this.parseEntityFloat(l.grid_export_today);r=d>=0?"Netto Import (Live)":"Netto Export (Live)",s=Math.abs(d)>=1e3?`${(Math.abs(d)/1e3).toFixed(1)} kW`:`${Math.round(Math.abs(d))} W`,i="Import / Export Vandaag",n=`${null!==f?f.toFixed(1):"0"} / ${null!==c?c.toFixed(1):"0"} kWh`,a=!0;let p=l.grid_import_today,h=l.grid_export_today;if(this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(p="sensor.p1_meter_energy_import",h="sensor.p1_meter_energy_export"),"prices"===this.activeTab){const t=l.grid_price?this.hass?.states[l.grid_price]:null,e=t?.attributes?.forecast||[];if(0===e.length)o=C`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;else{const t=new Date(Date.now()-72e5);t.setMinutes(0,0,0);const r=new Date;r.setMinutes(0,0,0);const s=e.filter(e=>new Date(e.datetime)>=t);o=C`
-            <div class="price-table-container">
-              <table class="price-table">
-                <thead>
-                  <tr>
-                    <th>Tijd</th>
-                    <th>Tarief</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${s.map(t=>{const e=new Date(t.datetime),s=e.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}),i=parseFloat(t.electricity_price)/1e7,n=e.getTime()===r.getTime(),a=i<0;let o="Normaal",l="#38bdf8";return a?(o="Verdienen",l="#fbbf24"):"high"===t.tariff_group?(o="Piek",l="#ef4444"):"low"===t.tariff_group&&(o="Dal",l="#10b981"),C`
-                      <tr class="${n?"current-hour-row":""}">
-                        <td>
-                          ${s}
-                          ${n?C`<span class="current-badge">Nu</span>`:""}
-                        </td>
-                        <td style="color: ${a?"#fbbf24":"#ffffff"}; font-weight: bold; font-family: monospace;">
-                          € ${i.toFixed(3)}
-                        </td>
-                        <td>
-                          <span class="status-badge" style="background: ${l}22; color: ${l}; border: 1px solid ${l}44;">
-                            ${o}
-                          </span>
-                        </td>
-                      </tr>
-                    `})}
-                </tbody>
-              </table>
+        `}else o=C`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`}else if("grid"===this.activePopup){t="Stroomnet",e="Netbelasting & Historie";const d=this.getEntityValue(l.grid||l.grid_power),f=this.parseEntityFloat(l.grid_import_today),c=this.parseEntityFloat(l.grid_export_today);r=d>=0?"Netto Import (Live)":"Netto Export (Live)",s=Math.abs(d)>=1e3?`${(Math.abs(d)/1e3).toFixed(1)} kW`:`${Math.round(Math.abs(d))} W`,i="Import / Export Vandaag",n=`${null!==f?f.toFixed(1):"0"} / ${null!==c?c.toFixed(1):"0"} kWh`,a=!0;let p=l.grid_import_today,h=l.grid_export_today;if(this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(p="sensor.p1_meter_energy_import",h="sensor.p1_meter_energy_export"),"prices"===this.activeTab){const t=l.grid_price?this.hass?.states[l.grid_price]:null,e=t?.attributes?.forecast||[];if(0===e.length)o=C`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;else{const t=new Date(Date.now()-72e5);t.setMinutes(0,0,0);const r=new Date;r.setMinutes(0,0,0);const s=e.filter(e=>new Date(e.datetime)>=t),i=Math.max(...s.map(t=>Math.abs(parseFloat(t.electricity_price)/1e7)))||.1,n=38,a=90,l=25,d=45,f=s.map((t,e)=>{const s=new Date(t.datetime),a=s.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}),o=parseFloat(t.electricity_price)/1e7;return{x:e*n+25,y:d-o/i*32,price:o,label:a,isCurrent:s.getTime()===r.getTime(),isNeg:o<0}}),c=f.length*n+25,p=f.map((t,e)=>`${0===e?"M":"L"} ${t.x} ${t.y}`).join(" "),h=`${p} L ${f[f.length-1].x} ${a} L ${f[0].x} ${a} Z`;o=C`
+            <div class="scrollable-chart-container" style="padding-top: 15px; margin-top: 10px; height: 160px; overflow-y: hidden;">
+              <svg width="${c}" height="${a+l}" style="display: block;">
+                <defs>
+                  <linearGradient id="price-fill-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
+                    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0" />
+                  </linearGradient>
+                  
+                  <linearGradient id="price-line-grad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#06b6d4" />
+                    <stop offset="100%" stop-color="#10b981" />
+                  </linearGradient>
+                </defs>
+ 
+                <!-- Zero Baseline -->
+                <line x1="0" y1="${d}" x2="${c}" y2="${d}" stroke="rgba(255,255,255,0.15)" stroke-dasharray="3,3" />
+                <text x="5" y="${d-4}" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">€0.00</text>
+ 
+                <!-- Filled Area -->
+                <path d="${h}" fill="url(#price-fill-grad)" />
+ 
+                <!-- Line Path -->
+                <path d="${p}" fill="none" stroke="url(#price-line-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+ 
+                <!-- Dots and Tooltips -->
+                ${f.map(t=>{const e=t.isCurrent;return C`
+                    <!-- Interactive Point Area for hover tooltip -->
+                    <g class="chart-point-group">
+                      <circle cx="${t.x}" cy="${t.y}" r="${t.isCurrent?5:3}" 
+                              fill="${t.isCurrent?"#10b981":t.isNeg?"#fbbf24":"#06b6d4"}" 
+                              stroke="#0f172a" stroke-width="1" />
+                      
+                      ${t.isCurrent?C`
+                        <circle cx="${t.x}" cy="${t.y}" r="9" fill="none" stroke="#10b981" stroke-width="1" class="pulse-ring" style="transform-origin: ${t.x}px ${t.y}px; animation: pulse 2s infinite;" />
+                      `:""}
+
+                      <!-- Value Text -->
+                      ${e?C`
+                        <text x="${t.x}" y="${t.y-10}" text-anchor="middle" 
+                              fill="${t.isCurrent?"#10b981":t.isNeg?"#fbbf24":"#ffffff"}" 
+                              font-size="9px" font-weight="bold" font-family="monospace">
+                          €${t.price.toFixed(2)}
+                        </text>
+                      `:""}
+
+                      <!-- Native SVG Tooltip -->
+                      <title>Tijd: ${t.label}\nTarief: €${t.price.toFixed(3)} / kWh</title>
+                    </g>
+                    
+                    <!-- Time Label on X-axis -->
+                    <text x="${t.x}" y="${a+15}" text-anchor="middle" 
+                          fill="${t.isCurrent?"#10b981":"rgba(255,255,255,0.4)"}" 
+                          font-size="9px" font-weight="${t.isCurrent?"bold":"normal"}" font-family="sans-serif">
+                      ${t.label}
+                    </text>
+                  `})}
+              </svg>
             </div>
           `}}else if(this.isLoadingHistory)o=C`<div class="chart-loading">Gegevens laden...</div>`;else if(p&&h&&(this.statsData[p]||this.statsData[h])){const t=this.getProcessedGridData(p,h),e=Math.max(...t.map(t=>Math.max(t.importValue,t.exportValue)))||1;o=C`
             <div class="scrollable-chart-container">
@@ -2127,7 +2156,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           </div>
         </div>
       </div>
-    `}switchTab(t){this.activeTab=t,setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)}getClouds(t){if(this.clouds.length>0&&this.lastWeather===t)return this.clouds;const e="cloudy"===t||"rainy"===t||"lightning"===t||"snowy"===t,r=e?24:3,s=[];for(let t=0;t<r;t++){const t=e?1.8+1.2*Math.random():1.2+.8*Math.random(),r=e?100+140*Math.random():80+100*Math.random(),i=-Math.random()*r,n=Math.random(),a=e?.85+.15*Math.random():.6+.3*Math.random();s.push({yFactor:n,scale:t,speed:r,delay:i,opacityMultiplier:a})}return this.clouds=s,this.lastWeather=t,this.clouds}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}async handleNodeClick(t){if(console.info(`[energy-flow-card] Click registered on node: ${t}`),"solar"===t||"home"===t||"grid"===t||"weather"===t){this.activePopup=t,this.activeTab="grid"===t?"prices":"day",this.statsData={};const e=[];if("solar"===t){const t=this.config?.entities.solar_energy_today||(this.config?.entities).solar_today;t&&e.push(t)}else if("home"===t){const t=this.config?.entities.home_today;t&&e.push(t)}else if("grid"===t){let t=this.config?.entities.grid_import_today,r=this.config?.entities.grid_export_today;this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(t="sensor.p1_meter_energy_import",r="sensor.p1_meter_energy_export"),t&&e.push(t),r&&e.push(r)}if(e.length>0&&(await this.fetchStatsData(e),setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)),"weather"===t){this.weatherForecast=[];const t=this.config?.entities.weather;if(t)try{this.isLoadingHistory=!0;const e=await this.hass.callWS({type:"call_service",domain:"weather",service:"get_forecasts",service_data:{entity_id:t,type:"daily"},return_response:!0});this.weatherForecast=e?.response?.[t]?.forecast||[]}catch(t){console.warn("[energy-flow-card] Failed to fetch weather forecast:",t),this.weatherForecast=[]}finally{this.isLoadingHistory=!1}}return}const e=`${t}_tap_action`,r=this.config[e];if(r){if(console.log(`[energy-flow-card] Executing custom action for node '${t}':`,r),"navigate"===r.action&&r.navigation_path){const t=r.navigation_path;if(t.startsWith("#"))return void(window.location.hash=t);{window.history.pushState(null,"",t);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}}const e=new CustomEvent("hass-action",{detail:{config:{tap_action:r},action:"tap",action_config:r},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}this.selectedNode=this.selectedNode===t?null:t;let s=t;"battery"===t?s=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?s=this.config?.entities.load?"load":"home_power":"ev"===t?s="charger":"grid"===t?s=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(s=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const i=this.config?.entities?this.config.entities[s]:void 0,n=Array.isArray(i)?i[0]:i;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${s}', resolved entity ID: '${n}'`),n){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${n}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:n},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}handleCardClick(t){if(this.activePopup)return;if(!t.composedPath().some(t=>t instanceof Element&&(t.classList.contains("interactiveGroup")||t.closest?.(".interactiveGroup")))&&this.config?.tap_action){const t=this.config.tap_action;if("navigate"===t.action&&t.navigation_path){this.restoreSidebarAndHeader(),window.history.pushState(null,"",t.navigation_path);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});this.dispatchEvent(e)}}}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date;let r=e.getHours()+e.getMinutes()/60;null!==this.debugTimeHour?r=this.debugTimeHour:void 0!==this.config.time_override&&(r=this.config.time_override);let s="afternoon";s=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const i=this.getEntityValue(t.solar||t.solar_power),n=this.getEntityValue(t.load||t.home_power),a=null!==this.debugBatteryPower?this.debugBatteryPower:this.getEntityValue(t.battery_power),o=null!==this.debugBatterySoc?this.debugBatterySoc:t.battery_soc?this.getEntityValue(t.battery_soc):0,l=null!==this.debugEVPower?this.debugEVPower:this.getEntityValue(t.charger);let d=0;(t.grid||t.grid_power)&&(d=this.getEntityValue(t.grid||t.grid_power));let f=a;if(void 0!==this.config.battery_invert){f=!0===this.config.battery_invert?a:-a}else if(t.grid){const t=i+d-n-l;f=Math.abs(a)>.05&&Math.abs(t)>.15?t*a<0?-a:a:-a}else f=-a;const c=this.parseEntityFloat(t.solar_energy_today||t.solar_today),p=this.parseEntityFloat(t.grid_import_today),h=this.parseEntityFloat(t.grid_export_today),g=this.parseEntityFloat(t.home_today),u=this.parseEntityFloat(t.battery_charge_today),v=this.parseEntityFloat(t.battery_discharge_today),x=this.parseEntityFloat(t.ev_today),y=t.grid_price?this.hass?.states[t.grid_price]:null,b=y?parseFloat(y.state):null,k=y&&y.attributes.unit_of_measurement||"€/kWh";let w="sunny",V=t.weather;if(!V&&this.hass){const t=Object.keys(this.hass.states).find(t=>t.startsWith("weather."));t&&(V=t,console.info(`[energy-flow-card] Auto-detected weather entity: ${V}`))}let O=V&&this.hass?.states[V]?this.hass.states[V]:null;null!==this.debugWeatherState?w=this.debugWeatherState:this.config.weather_override?w=this.config.weather_override:O&&(w=O.state);const q=null!==this.debugWindSpeed?this.debugWindSpeed:void 0!==O?.attributes?.wind_speed?parseFloat(O.attributes.wind_speed):10;let X=null!==this.debugTemperature?this.debugTemperature:null;null===X&&(t.temperature?X=this.parseEntityFloat(t.temperature):void 0!==O?.attributes?.temperature&&(X=parseFloat(O.attributes.temperature)));let j="normal";if(null!==this.debugRainIntensity)j=this.debugRainIntensity;else{if(void 0!==O?.attributes?.precipitation){const t=parseFloat(O.attributes.precipitation);t>0&&(t<1?j="light":t>=4&&(j="heavy"))}"pouring"!==w&&"lightning-rainy"!==w||(j="heavy")}let S=6,W=21;const m=this.hass?.states["sun.sun"];if(m)try{const t=new Date(m.attributes.next_rising),e=new Date(m.attributes.next_setting);S=t.getHours()+t.getMinutes()/60,W=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}let P=!1;if(null!==this.debugPoolPumpActive)P=this.debugPoolPumpActive;else{let e=t.pool_pump;if(!e&&this.hass){const t=Object.keys(this.hass.states).find(t=>t.includes("zwembadpomp")||t.includes("pool_pump"));t&&(e=t)}if(e&&this.hass?.states[e]){const t=this.hass.states[e].state;P="on"===t||"active"===t||"true"===t}}t.grid||t.grid_power||(d=n+l-i-f);const z=!!t.solar||!!t.solar_power,F=null!==this.debugShowBattery?this.debugShowBattery:!!t.battery_power,U=null!==this.debugShowEV?this.debugShowEV:l>0,Y=bt(r,S,W),K=`background: linear-gradient(to bottom, ${Y.top} 0%, ${Y.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;let H,B=t.light;if(!B&&this.hass){const t="light.woonkamer_dimmerlinks_ecodim_dimmer_switch_zb3_0_licht",e="light.woonkamer_dimmerrechts_ecodim_dimmer_switch_zb3_0_licht";(this.hass.states[t]||this.hass.states[e])&&(B=[t,e])}if(B){const t=t=>{const e=this.hass?.states[t];return"on"===e?.state};H=Array.isArray(B)?B.some(e=>t(e)):t(B)}const A=this.config.screensaver?C`
+    `}switchTab(t){this.activeTab=t,setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)}getClouds(t){if(this.clouds.length>0&&this.lastWeather===t)return this.clouds;const e="cloudy"===t||"rainy"===t||"lightning"===t||"snowy"===t,r=e?24:3,s=[];for(let t=0;t<r;t++){const t=e?1.8+1.2*Math.random():1.2+.8*Math.random(),r=e?100+140*Math.random():80+100*Math.random(),i=-Math.random()*r,n=Math.random(),a=e?.85+.15*Math.random():.6+.3*Math.random();s.push({yFactor:n,scale:t,speed:r,delay:i,opacityMultiplier:a})}return this.clouds=s,this.lastWeather=t,this.clouds}static getStubConfig(){return{title:"Energieverloop",entities:{}}}setConfig(t){if(!t)throw new Error("Ongeldige configuratie");this.config=t}getEntityValue(t){if(!t||!this.hass)return 0;const e=t=>{const e=this.hass?.states[t];if(!e)return 0;const r=parseFloat(e.state);return isNaN(r)?0:r};return Array.isArray(t)?t.reduce((t,r)=>t+e(r),0):e(t)}async handleNodeClick(t){if(console.info(`[energy-flow-card] Click registered on node: ${t}`),"solar"===t||"home"===t||"grid"===t||"weather"===t){this.activePopup=t,this.activeTab="grid"===t?"prices":"day",this.statsData={};const e=[];if("solar"===t){const t=this.config?.entities.solar_energy_today||(this.config?.entities).solar_today;t&&e.push(t)}else if("home"===t){const t=this.config?.entities.home_today;t&&e.push(t)}else if("grid"===t){let t=this.config?.entities.grid_import_today,r=this.config?.entities.grid_export_today;this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(t="sensor.p1_meter_energy_import",r="sensor.p1_meter_energy_export"),t&&e.push(t),r&&e.push(r)}if(e.length>0&&(await this.fetchStatsData(e),setTimeout(()=>{const t=this.shadowRoot?.querySelector(".scrollable-chart-container");t&&(t.scrollLeft=t.scrollWidth)},100)),"weather"===t){this.weatherForecast=[];const t=this.config?.entities.weather;if(t)try{this.isLoadingHistory=!0;const e=await this.hass.callWS({type:"call_service",domain:"weather",service:"get_forecasts",service_data:{entity_id:t,type:"daily"},return_response:!0});this.weatherForecast=e?.response?.[t]?.forecast||[]}catch(t){console.warn("[energy-flow-card] Failed to fetch weather forecast:",t),this.weatherForecast=[]}finally{this.isLoadingHistory=!1}}return}const e=`${t}_tap_action`,r=this.config[e];if(r){if(console.log(`[energy-flow-card] Executing custom action for node '${t}':`,r),"navigate"===r.action&&r.navigation_path){const t=r.navigation_path;if(t.startsWith("#"))return void(window.location.hash=t);{window.history.pushState(null,"",t);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}}const e=new CustomEvent("hass-action",{detail:{config:{tap_action:r},action:"tap",action_config:r},bubbles:!0,composed:!0});return void this.dispatchEvent(e)}this.selectedNode=this.selectedNode===t?null:t;let s=t;"battery"===t?s=this.config?.entities.battery_power?"battery_power":"battery_soc":"home"===t?s=this.config?.entities.load?"load":"home_power":"ev"===t?s="charger":"grid"===t?s=this.config?.entities.grid?"grid":(this.config?.entities).grid_power?"grid_power":"solar":"solar"===t&&(s=this.config?.entities.solar?"solar":(this.config?.entities).solar_power?"solar_power":"solar_energy_today");const i=this.config?.entities?this.config.entities[s]:void 0,n=Array.isArray(i)?i[0]:i;if(console.info(`[energy-flow-card] Node '${t}' mapped to key '${s}', resolved entity ID: '${n}'`),n){console.info(`[energy-flow-card] Dispatching 'hass-more-info' event for entity: ${n}`);const t=new CustomEvent("hass-more-info",{detail:{entityId:n},bubbles:!0,composed:!0});this.dispatchEvent(t)}else console.warn(`[energy-flow-card] Could not dispatch popup: No entity configured for node '${t}'`)}handleCardClick(t){if(this.activePopup)return;if(!t.composedPath().some(t=>t instanceof Element&&(t.classList.contains("interactiveGroup")||t.closest?.(".interactiveGroup")))&&this.config?.tap_action){const t=this.config.tap_action;if("navigate"===t.action&&t.navigation_path){this.restoreSidebarAndHeader(),window.history.pushState(null,"",t.navigation_path);const e=new CustomEvent("location-changed",{detail:{replace:!1},bubbles:!0,composed:!0});this.dispatchEvent(e)}}}render(){if(!this.config||!this.hass)return C`<p style="color: red; padding: 16px;">Wachten op Home Assistant...</p>`;const{entities:t}=this.config,e=new Date;let r=e.getHours()+e.getMinutes()/60;null!==this.debugTimeHour?r=this.debugTimeHour:void 0!==this.config.time_override&&(r=this.config.time_override);let s="afternoon";s=r>=5&&r<9?"morning":r>=9&&r<18?"afternoon":r>=18&&r<22?"evening":"night";const i=this.getEntityValue(t.solar||t.solar_power),n=this.getEntityValue(t.load||t.home_power),a=null!==this.debugBatteryPower?this.debugBatteryPower:this.getEntityValue(t.battery_power),o=null!==this.debugBatterySoc?this.debugBatterySoc:t.battery_soc?this.getEntityValue(t.battery_soc):0,l=null!==this.debugEVPower?this.debugEVPower:this.getEntityValue(t.charger);let d=0;(t.grid||t.grid_power)&&(d=this.getEntityValue(t.grid||t.grid_power));let f=a;if(void 0!==this.config.battery_invert){f=!0===this.config.battery_invert?a:-a}else if(t.grid){const t=i+d-n-l;f=Math.abs(a)>.05&&Math.abs(t)>.15?t*a<0?-a:a:-a}else f=-a;const c=this.parseEntityFloat(t.solar_energy_today||t.solar_today),p=this.parseEntityFloat(t.grid_import_today),h=this.parseEntityFloat(t.grid_export_today),g=this.parseEntityFloat(t.home_today),u=this.parseEntityFloat(t.battery_charge_today),v=this.parseEntityFloat(t.battery_discharge_today),x=this.parseEntityFloat(t.ev_today),y=t.grid_price?this.hass?.states[t.grid_price]:null,b=y?parseFloat(y.state):null;!y||y.attributes.unit_of_measurement;let k="sunny",w=t.weather;if(!w&&this.hass){const t=Object.keys(this.hass.states).find(t=>t.startsWith("weather."));t&&(w=t,console.info(`[energy-flow-card] Auto-detected weather entity: ${w}`))}let V=w&&this.hass?.states[w]?this.hass.states[w]:null;null!==this.debugWeatherState?k=this.debugWeatherState:this.config.weather_override?k=this.config.weather_override:V&&(k=V.state);const O=null!==this.debugWindSpeed?this.debugWindSpeed:void 0!==V?.attributes?.wind_speed?parseFloat(V.attributes.wind_speed):10;let q=null!==this.debugTemperature?this.debugTemperature:null;null===q&&(t.temperature?q=this.parseEntityFloat(t.temperature):void 0!==V?.attributes?.temperature&&(q=parseFloat(V.attributes.temperature)));let X="normal";if(null!==this.debugRainIntensity)X=this.debugRainIntensity;else{if(void 0!==V?.attributes?.precipitation){const t=parseFloat(V.attributes.precipitation);t>0&&(t<1?X="light":t>=4&&(X="heavy"))}"pouring"!==k&&"lightning-rainy"!==k||(X="heavy")}let j=6,S=21;const W=this.hass?.states["sun.sun"];if(W)try{const t=new Date(W.attributes.next_rising),e=new Date(W.attributes.next_setting);j=t.getHours()+t.getMinutes()/60,S=e.getHours()+e.getMinutes()/60}catch(t){console.warn("[energy-flow-card] Fout bij parsen van sun.sun tijden:",t)}let m=!1;if(null!==this.debugPoolPumpActive)m=this.debugPoolPumpActive;else{let e=t.pool_pump;if(!e&&this.hass){const t=Object.keys(this.hass.states).find(t=>t.includes("zwembadpomp")||t.includes("pool_pump"));t&&(e=t)}if(e&&this.hass?.states[e]){const t=this.hass.states[e].state;m="on"===t||"active"===t||"true"===t}}t.grid||t.grid_power||(d=n+l-i-f);const P=!!t.solar||!!t.solar_power,z=null!==this.debugShowBattery?this.debugShowBattery:!!t.battery_power,F=null!==this.debugShowEV?this.debugShowEV:l>0,U=bt(r,j,S),Y=`background: linear-gradient(to bottom, ${U.top} 0%, ${U.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;let K,H=t.light;if(!H&&this.hass){const t="light.woonkamer_dimmerlinks_ecodim_dimmer_switch_zb3_0_licht",e="light.woonkamer_dimmerrechts_ecodim_dimmer_switch_zb3_0_licht";(this.hass.states[t]||this.hass.states[e])&&(H=[t,e])}if(H){const t=t=>{const e=this.hass?.states[t];return"on"===e?.state};K=Array.isArray(H)?H.some(e=>t(e)):t(H)}const B=this.config.screensaver?C`
           <style>
             :host {
               position: fixed !important;
@@ -2150,7 +2179,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
               width: 100% !important;
             }
           </style>
-        `:"",T=C`
+        `:"",A=C`
       <style>
         @keyframes rainFall {
           0%   { transform: translateY(-40px); opacity: 0; }
@@ -2168,9 +2197,9 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         }
       </style>
     `;return C`
+      ${B}
       ${A}
-      ${T}
-      <ha-card style="${K}" @click=${this.handleCardClick}>
+      <ha-card style="${Y}" @click=${this.handleCardClick}>
         <div class="card-container">
           ${this.config.title?C`
             <div class="card-header">
@@ -2179,7 +2208,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           `:""}
 
           <div class="sceneWrapper">
-            ${St({containerWidth:this.cardWidth,containerHeight:this.cardHeight,timeHour:r,timeOfDay:s,solar:i,solarToday:c,load:n,batteryPower:f,soc:o,charger:l,grid:d,showSolar:z,showBattery:F,showEV:U,weather:w,clouds:this.getClouds(w),sunriseHour:S,sunsetHour:W,gridImportToday:p,gridExportToday:h,homeToday:g,batteryChargeToday:u,batteryDischargeToday:v,evToday:x,houseStyle:this.config?.house_style,carType:this.config?.car_type,showLights:H,gridPrice:b,gridPriceUnit:k,rainIntensity:j,windSpeed:q,temperature:X,poolPumpActive:P,onNodeClick:t=>this.handleNodeClick(t)})}
+            ${St({containerWidth:this.cardWidth,containerHeight:this.cardHeight,timeHour:r,timeOfDay:s,solar:i,solarToday:c,load:n,batteryPower:f,soc:o,charger:l,grid:d,showSolar:P,showBattery:z,showEV:F,weather:k,clouds:this.getClouds(k),sunriseHour:j,sunsetHour:S,gridImportToday:p,gridExportToday:h,homeToday:g,batteryChargeToday:u,batteryDischargeToday:v,evToday:x,houseStyle:this.config?.house_style,carType:this.config?.car_type,showLights:K,gridPrice:b,rainIntensity:X,windSpeed:O,temperature:q,poolPumpActive:m,onNodeClick:t=>this.handleNodeClick(t)})}
           </div>
 
           <!-- Glassmorphism Custom Popup Overlay -->
@@ -2238,7 +2267,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                     <span style="color: #10b981;">${null!==this.debugWindSpeed?`${this.debugWindSpeed} km/h`:"Standaard"}</span>
                   </div>
                   <div style="display: flex; gap: 8px; align-items: center;">
-                    <input type="range" min="0" max="120" step="1" .value=${null!==this.debugWindSpeed?this.debugWindSpeed:q} @input=${t=>this.debugWindSpeed=parseInt(t.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                    <input type="range" min="0" max="120" step="1" .value=${null!==this.debugWindSpeed?this.debugWindSpeed:O} @input=${t=>this.debugWindSpeed=parseInt(t.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
                     ${null!==this.debugWindSpeed?C`<button @click=${()=>this.debugWindSpeed=null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>`:""}
                   </div>
                 </div>
@@ -2262,7 +2291,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                     <span style="color: #10b981;">${null!==this.debugTemperature?`${this.debugTemperature} °C`:"Standaard"}</span>
                   </div>
                   <div style="display: flex; gap: 8px; align-items: center;">
-                    <input type="range" min="-15" max="40" step="0.5" .value=${null!==this.debugTemperature?this.debugTemperature:null!==X?X:15} @input=${t=>this.debugTemperature=parseFloat(t.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
+                    <input type="range" min="-15" max="40" step="0.5" .value=${null!==this.debugTemperature?this.debugTemperature:null!==q?q:15} @input=${t=>this.debugTemperature=parseFloat(t.target.value)} style="flex: 1; cursor: pointer; accent-color: #10b981;" />
                     ${null!==this.debugTemperature?C`<button @click=${()=>this.debugTemperature=null} style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">Reset</button>`:""}
                   </div>
                 </div>
@@ -2284,7 +2313,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 </div>
 
                 <!-- Battery Power Slider -->
-                ${F?C`
+                ${z?C`
                   <div style="display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
                       <span>BATTERIJ VERMOGEN (W)</span>
@@ -2326,7 +2355,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 </div>
 
                 <!-- EV Charger Power Slider -->
-                ${U?C`
+                ${F?C`
                   <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
                     <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold;">
                       <span>LAADPAAL VERMOGEN (W)</span>

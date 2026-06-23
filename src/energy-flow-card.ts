@@ -198,9 +198,9 @@ export class EnergyFlowCard extends LitElement {
   @state() private selectedNode: string | null = null;
   @state() private cardWidth: number = 800;
   @state() private cardHeight: number = 600;
-  @state() private hasActiveHash: boolean = false;
+  @state() protected hasActiveHash: boolean = false;
   @state() private activePopup: string | null = null;
-  @state() private activePopupHistory: { day: string; value: number }[] = [];
+  @state() protected activePopupHistory: { day: string; value: number }[] = [];
   @state() private isLoadingHistory: boolean = false;
   @state() private activeTab: 'prices' | 'day' | 'month' | 'year' = 'day';
   @state() private statsData: Record<string, any[]> = {};
@@ -797,57 +797,99 @@ export class EnergyFlowCard extends LitElement {
             const entryDate = new Date(entry.datetime);
             return entryDate >= twoHoursAgo;
           });
-          
+
+          // Map points
+          const maxVal = Math.max(...filtered.map((i: any) => Math.abs(parseFloat(i.electricity_price) / 10000000))) || 0.1;
+          const spacing = 38;
+          const height = 90;
+          const paddingBottom = 25;
+          const zeroY = 45; // Center of the 90px height chart
+
+          const points = filtered.map((entry: any, idx: number) => {
+            const date = new Date(entry.datetime);
+            const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+            const priceEur = parseFloat(entry.electricity_price) / 10000000;
+            const x = idx * spacing + 25;
+            
+            // Calculate y: price > 0 goes up (subtract), price < 0 goes down (add)
+            const y = zeroY - (priceEur / maxVal) * 32;
+            const isCurrent = date.getTime() === currentHourStart.getTime();
+
+            return {
+              x,
+              y,
+              price: priceEur,
+              label: hourLabel,
+              isCurrent,
+              isNeg: priceEur < 0
+            };
+          });
+
+          const svgWidth = points.length * spacing + 25;
+          const pathD = points.map((p: any, idx: number) => `${idx === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+          const fillD = `${pathD} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
           chartHtml = html`
-            <div class="price-table-container">
-              <table class="price-table">
-                <thead>
-                  <tr>
-                    <th>Tijd</th>
-                    <th>Tarief</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${filtered.map((entry: any) => {
-                    const date = new Date(entry.datetime);
-                    const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-                    const priceEur = parseFloat(entry.electricity_price) / 10000000;
-                    const isCurrent = date.getTime() === currentHourStart.getTime();
-                    const isNeg = priceEur < 0;
+            <div class="scrollable-chart-container" style="padding-top: 15px; margin-top: 10px; height: 160px; overflow-y: hidden;">
+              <svg width="${svgWidth}" height="${height + paddingBottom}" style="display: block;">
+                <defs>
+                  <linearGradient id="price-fill-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
+                    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0" />
+                  </linearGradient>
+                  
+                  <linearGradient id="price-line-grad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#06b6d4" />
+                    <stop offset="100%" stop-color="#10b981" />
+                  </linearGradient>
+                </defs>
+ 
+                <!-- Zero Baseline -->
+                <line x1="0" y1="${zeroY}" x2="${svgWidth}" y2="${zeroY}" stroke="rgba(255,255,255,0.15)" stroke-dasharray="3,3" />
+                <text x="5" y="${zeroY - 4}" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">€0.00</text>
+ 
+                <!-- Filled Area -->
+                <path d="${fillD}" fill="url(#price-fill-grad)" />
+ 
+                <!-- Line Path -->
+                <path d="${pathD}" fill="none" stroke="url(#price-line-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+ 
+                <!-- Dots and Tooltips -->
+                ${points.map((p: any) => {
+                  const showLabel = p.isCurrent;
+
+                  return html`
+                    <!-- Interactive Point Area for hover tooltip -->
+                    <g class="chart-point-group">
+                      <circle cx="${p.x}" cy="${p.y}" r="${p.isCurrent ? 5 : 3}" 
+                              fill="${p.isCurrent ? '#10b981' : (p.isNeg ? '#fbbf24' : '#06b6d4')}" 
+                              stroke="#0f172a" stroke-width="1" />
+                      
+                      ${p.isCurrent ? html`
+                        <circle cx="${p.x}" cy="${p.y}" r="9" fill="none" stroke="#10b981" stroke-width="1" class="pulse-ring" style="transform-origin: ${p.x}px ${p.y}px; animation: pulse 2s infinite;" />
+                      ` : ''}
+
+                      <!-- Value Text -->
+                      ${showLabel ? html`
+                        <text x="${p.x}" y="${p.y - 10}" text-anchor="middle" 
+                              fill="${p.isCurrent ? '#10b981' : (p.isNeg ? '#fbbf24' : '#ffffff')}" 
+                              font-size="9px" font-weight="bold" font-family="monospace">
+                          €${p.price.toFixed(2)}
+                        </text>
+                      ` : ''}
+
+                      <!-- Native SVG Tooltip -->
+                      <title>Tijd: ${p.label}\nTarief: €${p.price.toFixed(3)} / kWh</title>
+                    </g>
                     
-                    let statusText = 'Normaal';
-                    let statusColor = '#38bdf8';
-                    if (isNeg) {
-                      statusText = 'Verdienen';
-                      statusColor = '#fbbf24';
-                    } else if (entry.tariff_group === 'high') {
-                      statusText = 'Piek';
-                      statusColor = '#ef4444';
-                    } else if (entry.tariff_group === 'low') {
-                      statusText = 'Dal';
-                      statusColor = '#10b981';
-                    }
-                    
-                    return html`
-                      <tr class="${isCurrent ? 'current-hour-row' : ''}">
-                        <td>
-                          ${hourLabel}
-                          ${isCurrent ? html`<span class="current-badge">Nu</span>` : ''}
-                        </td>
-                        <td style="color: ${isNeg ? '#fbbf24' : '#ffffff'}; font-weight: bold; font-family: monospace;">
-                          € ${priceEur.toFixed(3)}
-                        </td>
-                        <td>
-                          <span class="status-badge" style="background: ${statusColor}22; color: ${statusColor}; border: 1px solid ${statusColor}44;">
-                            ${statusText}
-                          </span>
-                        </td>
-                      </tr>
-                    `;
-                  })}
-                </tbody>
-              </table>
+                    <!-- Time Label on X-axis -->
+                    <text x="${p.x}" y="${height + 15}" text-anchor="middle" 
+                          fill="${p.isCurrent ? '#10b981' : 'rgba(255,255,255,0.4)'}" 
+                          font-size="9px" font-weight="${p.isCurrent ? 'bold' : 'normal'}" font-family="sans-serif">
+                      ${p.label}
+                    </text>
+                  `;
+                })}
+              </svg>
             </div>
           `;
         }

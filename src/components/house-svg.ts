@@ -40,17 +40,6 @@ interface SkyKeyframe {
   clouds: string;
 }
 
-const SKY_KEYFRAMES: SkyKeyframe[] = [
-  { hour: 0,    top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
-  { hour: 4.5,  top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
-  { hour: 6.0,  top: '#1e1b4b', horizon: '#fdba74', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.35)' },
-  { hour: 8.0,  top: '#0ea5e9', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
-  { hour: 17.0, top: '#0284c7', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
-  { hour: 19.5, top: '#3b0764', horizon: '#f97316', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.45)' },
-  { hour: 21.0, top: '#18113c', horizon: '#ea580c', stars: 0.1, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.18)' },
-  { hour: 22.5, top: '#020617', horizon: '#1e293b', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
-  { hour: 24,   top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' }
-];
 
 function parseHex(hex: string) {
   const c = hex.replace('#', '');
@@ -347,7 +336,6 @@ export function renderHouseSvg({
   evToday = null,
   showLights: passedShowLights = undefined,
   gridPrice = null,
-  gridPriceUnit = '€/kWh',
   rainIntensity = 'normal',
   windSpeed = 10,
   temperature = null,
@@ -409,8 +397,6 @@ export function renderHouseSvg({
 
 
   const turbineDuration = windSpeed > 0.5 ? Math.max(1.2, Math.min(18, 45 / (windSpeed / 5))) : 0;
-
-  const showLights = resolvedShowLights;
 
   if (visualWeather === 'cloudy') {
     cloudColor = '#b8c5d6'; // nice overcast light gray-blue
