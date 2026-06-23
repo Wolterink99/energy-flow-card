@@ -2002,11 +2002,11 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 `})}
             </div>
           </div>
-        `}else o=C`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`}else if("grid"===this.activePopup){t="Stroomnet",e="Netbelasting & Historie";const d=this.getEntityValue(l.grid||l.grid_power),f=this.parseEntityFloat(l.grid_import_today),c=this.parseEntityFloat(l.grid_export_today);r=d>=0?"Netto Import (Live)":"Netto Export (Live)",s=Math.abs(d)>=1e3?`${(Math.abs(d)/1e3).toFixed(1)} kW`:`${Math.round(Math.abs(d))} W`,i="Import / Export Vandaag",n=`${null!==f?f.toFixed(1):"0"} / ${null!==c?c.toFixed(1):"0"} kWh`,a=!0;let p=l.grid_import_today,h=l.grid_export_today;if(this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(p="sensor.p1_meter_energy_import",h="sensor.p1_meter_energy_export"),"prices"===this.activeTab){const t=l.grid_price?this.hass?.states[l.grid_price]:null,e=t?.attributes?.forecast||[];if(0===e.length)o=C`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;else{const r=new Date(Date.now()-72e5);r.setMinutes(0,0,0);const s=new Date;s.setMinutes(0,0,0);const i=e.filter(t=>new Date(t.datetime)>=r),n=i.map(t=>parseFloat(t.electricity_price)/1e7),a=Math.max(...n,.4),l=Math.min(...n,0),d=Math.max(.4,Math.ceil(5*a)/5),f=l<0?Math.floor(5*l)/5:0,c=d-f,p=50,h=485,g=35,u=110,v=g+u,x=v-(0-f)/c*u,y=(h-p)/i.length,b=Math.max(4,y-6),k=i.map((t,e)=>{const r=new Date(t.datetime),i=r.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}),n=parseFloat(t.electricity_price)/1e7;return{x:p+e*y+y/2,y:v-(n-f)/c*u,price:n,label:i,isCurrent:r.getTime()===s.getTime(),isNeg:n<0,datetime:t.datetime}}),w=k.find(t=>t.isCurrent),V=w?w.price.toFixed(2).replace(".",","):t?parseFloat(t.state).toFixed(2).replace(".",","):"0,00",O=k.reduce((t,e)=>e.price>t.price?e:t,k[0]),q=k.reduce((t,e)=>e.price<t.price?e:t,k[0]),X=[];for(let t=f;t<=d+.001;t+=.2){const e=v-(t-f)/c*u;X.push({val:t,y:e})}o=C`
+        `}else o=C`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`}else if("grid"===this.activePopup){t="Stroomnet",e="Netbelasting & Historie";const d=this.getEntityValue(l.grid||l.grid_power),f=this.parseEntityFloat(l.grid_import_today),c=this.parseEntityFloat(l.grid_export_today);r=d>=0?"Netto Import (Live)":"Netto Export (Live)",s=Math.abs(d)>=1e3?`${(Math.abs(d)/1e3).toFixed(1)} kW`:`${Math.round(Math.abs(d))} W`,i="Import / Export Vandaag",n=`${null!==f?f.toFixed(1):"0"} / ${null!==c?c.toFixed(1):"0"} kWh`,a=!0;let p=l.grid_import_today,h=l.grid_export_today;if(this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(p="sensor.p1_meter_energy_import",h="sensor.p1_meter_energy_export"),"prices"===this.activeTab){const t=l.grid_price?this.hass?.states[l.grid_price]:null,e=t?.attributes?.forecast||[];if(0===e.length)o=C`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;else{const r=Date.now();let s=0,i=1/0;e.forEach((t,e)=>{const n=Math.abs(new Date(t.datetime).getTime()-r);n<i&&(i=n,s=e)});const n=Math.max(0,s-2),a=e.slice(n),l=new Date(e[s].datetime),d=a.map(t=>parseFloat(t.electricity_price)/1e7),f=Math.max(...d,.4),c=Math.min(...d,0),p=Math.max(.4,Math.ceil(5*f)/5),h=c<0?Math.floor(5*c)/5:0,g=p-h,u=50,v=485,x=35,y=110,b=x+y,k=b-(0-h)/g*y,w=(v-u)/a.length,V=Math.max(4,w-6),O=a.map((t,e)=>{const r=new Date(t.datetime),s=r.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}),i=parseFloat(t.electricity_price)/1e7;return{x:u+e*w+w/2,y:b-(i-h)/g*y,price:i,label:s,isCurrent:r.getTime()===l.getTime(),isNeg:i<0,datetime:t.datetime}}),q=O.find(t=>t.isCurrent),X=q?q.price.toFixed(2).replace(".",","):t?parseFloat(t.state).toFixed(2).replace(".",","):"0,00",j=O.reduce((t,e)=>e.price>t.price?e:t,O[0]),S=O.reduce((t,e)=>e.price<t.price?e:t,O[0]),W=[];for(let t=h;t<=p+.001;t+=.2){const e=b-(t-h)/g*y;W.push({val:t,y:e})}o=C`
             <div class="zonneplan-header" style="margin-top: 10px; margin-bottom: 5px; padding: 0 10px;">
               <div style="font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: capitalize;">Zonneplan</div>
               <div style="font-size: 32px; font-weight: bold; color: #ffffff; margin-top: 2px;">
-                ${V} <span style="font-size: 15px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
+                ${X} <span style="font-size: 15px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
               </div>
             </div>
 
@@ -2028,23 +2028,23 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 </defs>
 
                 <!-- Gridlines -->
-                ${X.map(t=>C`
-                  <line x1="${p}" y1="${t.y}" x2="${h}" y2="${t.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${0===t.val?"0":"2,2"}" />
-                  <text x="${p-8}" y="${t.y+3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
+                ${W.map(t=>C`
+                  <line x1="${u}" y1="${t.y}" x2="${v}" y2="${t.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${0===t.val?"0":"2,2"}" />
+                  <text x="${u-8}" y="${t.y+3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
                     € ${t.val.toFixed(2)}
                   </text>
                 `)}
 
                 <!-- Current Time Marker Line -->
-                ${w?C`
-                  <line x1="${w.x}" y1="${g}" x2="${w.x}" y2="${v}" stroke="rgba(239,68,68,0.4)" stroke-width="1.5" stroke-dasharray="2,2" />
+                ${q?C`
+                  <line x1="${q.x}" y1="${x}" x2="${q.x}" y2="${b}" stroke="rgba(239,68,68,0.4)" stroke-width="1.5" stroke-dasharray="2,2" />
                 `:""}
 
                 <!-- Bars -->
-                ${k.map(t=>{const e=t.price>.3,r=t.price>0&&t.price<=.3,s=e?"bar-red":r?"bar-green":"bar-yellow",i=t.price>=0,n=i?t.y:x,a=i?Math.max(1.5,x-t.y):Math.max(1.5,t.y-x);return C`
+                ${O.map(t=>{const e=t.price>.3,r=t.price>0&&t.price<=.3,s=e?"bar-red":r?"bar-green":"bar-yellow",i=t.price>=0,n=i?t.y:k,a=i?Math.max(1.5,k-t.y):Math.max(1.5,t.y-k);return C`
                     <g class="chart-point-group">
                       <!-- Bar -->
-                      <rect x="${t.x-b/2}" y="${n}" width="${b}" height="${a}" 
+                      <rect x="${t.x-V/2}" y="${n}" width="${V}" height="${a}" 
                             fill="url(#${s})" rx="1.5" ry="1.5"
                             style="opacity: ${t.isCurrent?1:.82};" />
                       
@@ -2054,34 +2054,34 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                   `})}
 
                 <!-- Peak Marker Bubble -->
-                ${O?C`
-                  <circle cx="${O.x}" cy="${O.y}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+                ${j?C`
+                  <circle cx="${j.x}" cy="${j.y}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
-                    <rect x="${O.x-17}" y="${O.y-23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
+                    <rect x="${j.x-17}" y="${j.y-23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
                     <!-- Value text -->
-                    <text x="${O.x}" y="${O.y-13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
-                      ${O.price.toFixed(2).replace(".",",")}
+                    <text x="${j.x}" y="${j.y-13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
+                      ${j.price.toFixed(2).replace(".",",")}
                     </text>
                   </g>
                 `:""}
 
                 <!-- Dal (Lowest) Marker Bubble -->
-                ${q&&q!==O?C`
-                  <circle cx="${q.x}" cy="${q.y}" r="5.5" fill="${q.price<=.3?"#10b981":"#ef4444"}" stroke="#ffffff" stroke-width="1.5" />
+                ${S&&S!==j?C`
+                  <circle cx="${S.x}" cy="${S.y}" r="5.5" fill="${S.price<=.3?"#10b981":"#ef4444"}" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
-                    <rect x="${q.x-17}" y="${q.price<0?q.y+10:q.y-23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
+                    <rect x="${S.x-17}" y="${S.price<0?S.y+10:S.y-23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
                     <!-- Value text -->
-                    <text x="${q.x}" y="${q.price<0?q.y+20:q.y-13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
-                      ${q.price.toFixed(2).replace(".",",")}
+                    <text x="${S.x}" y="${S.price<0?S.y+20:S.y-13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
+                      ${S.price.toFixed(2).replace(".",",")}
                     </text>
                   </g>
                 `:""}
 
                 <!-- X Axis Labels (every 4 hours to avoid overlap) -->
-                ${k.map(t=>new Date(t.datetime).getHours()%4==0?C`
-                    <text x="${t.x}" y="${v+16}" text-anchor="middle" 
+                ${O.map(t=>new Date(t.datetime).getHours()%4==0?C`
+                    <text x="${t.x}" y="${b+16}" text-anchor="middle" 
                           fill="${t.isCurrent?"#ef4444":"rgba(255,255,255,0.45)"}" 
                           font-size="9px" font-weight="${t.isCurrent?"bold":"normal"}" font-family="sans-serif">
                       ${t.label}

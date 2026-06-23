@@ -787,16 +787,21 @@ export class EnergyFlowCard extends LitElement {
         if (forecast.length === 0) {
           chartHtml = html`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;
         } else {
-          const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-          twoHoursAgo.setMinutes(0, 0, 0);
-          
-          const currentHourStart = new Date();
-          currentHourStart.setMinutes(0, 0, 0);
-          
-          const filtered = forecast.filter((entry: any) => {
-            const entryDate = new Date(entry.datetime);
-            return entryDate >= twoHoursAgo;
+          const nowTime = Date.now();
+          let closestIdx = 0;
+          let minDiff = Infinity;
+          forecast.forEach((entry: any, idx: number) => {
+            const diff = Math.abs(new Date(entry.datetime).getTime() - nowTime);
+            if (diff < minDiff) {
+              minDiff = diff;
+              closestIdx = idx;
+            }
           });
+
+          const startIndex = Math.max(0, closestIdx - 2);
+          const filtered = forecast.slice(startIndex);
+          
+          const currentHourStart = new Date(forecast[closestIdx].datetime);
 
           // Calculate Y bounds
           const pricesOnly = filtered.map((entry: any) => parseFloat(entry.electricity_price) / 10000000);
