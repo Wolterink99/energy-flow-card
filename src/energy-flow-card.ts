@@ -787,40 +787,67 @@ export class EnergyFlowCard extends LitElement {
         if (forecast.length === 0) {
           chartHtml = html`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;
         } else {
-          const parsed = forecast.map((entry: any) => {
-            const date = new Date(entry.datetime);
-            const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-            const priceEur = parseFloat(entry.electricity_price) / 10000000;
-            return { label: hourLabel, value: priceEur };
+          const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+          twoHoursAgo.setMinutes(0, 0, 0);
+          
+          const currentHourStart = new Date();
+          currentHourStart.setMinutes(0, 0, 0);
+          
+          const filtered = forecast.filter((entry: any) => {
+            const entryDate = new Date(entry.datetime);
+            return entryDate >= twoHoursAgo;
           });
           
-          const maxVal = Math.max(...parsed.map((i: any) => Math.abs(i.value))) || 0.1;
-          
           chartHtml = html`
-            <div class="scrollable-chart-container" style="align-items: center; padding-top: 10px;">
-              <div class="price-chart">
-                <div class="price-zero-line"></div>
-                ${parsed.map((item: any) => {
-                  const isNeg = item.value < 0;
-                  const percentHeight = (Math.abs(item.value) / maxVal) * 45; // max 45% from center
-                  
-                  return html`
-                    <div class="price-column">
-                      <div class="price-value-stacked" style="color: ${isNeg ? '#fbbf24' : '#ffffff'};">
-                        ${isNeg ? '-' : ''}€${Math.abs(item.value).toFixed(2)}
-                      </div>
-                      
-                      <div class="price-bar-wrapper">
-                        <div class="price-bar ${isNeg ? 'negative' : 'positive'}"
-                             style="height: ${Math.max(3, percentHeight)}%; ${isNeg ? `top: 50%;` : `bottom: 50%;`}">
-                        </div>
-                      </div>
-                      
-                      <span class="price-label">${item.label}</span>
-                    </div>
-                  `;
-                })}
-              </div>
+            <div class="price-table-container">
+              <table class="price-table">
+                <thead>
+                  <tr>
+                    <th>Tijd</th>
+                    <th>Tarief</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filtered.map((entry: any) => {
+                    const date = new Date(entry.datetime);
+                    const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+                    const priceEur = parseFloat(entry.electricity_price) / 10000000;
+                    const isCurrent = date.getTime() === currentHourStart.getTime();
+                    const isNeg = priceEur < 0;
+                    
+                    let statusText = 'Normaal';
+                    let statusColor = '#38bdf8';
+                    if (isNeg) {
+                      statusText = 'Verdienen';
+                      statusColor = '#fbbf24';
+                    } else if (entry.tariff_group === 'high') {
+                      statusText = 'Piek';
+                      statusColor = '#ef4444';
+                    } else if (entry.tariff_group === 'low') {
+                      statusText = 'Dal';
+                      statusColor = '#10b981';
+                    }
+                    
+                    return html`
+                      <tr class="${isCurrent ? 'current-hour-row' : ''}">
+                        <td>
+                          ${hourLabel}
+                          ${isCurrent ? html`<span class="current-badge">Nu</span>` : ''}
+                        </td>
+                        <td style="color: ${isNeg ? '#fbbf24' : '#ffffff'}; font-weight: bold; font-family: monospace;">
+                          € ${priceEur.toFixed(3)}
+                        </td>
+                        <td>
+                          <span class="status-badge" style="background: ${statusColor}22; color: ${statusColor}; border: 1px solid ${statusColor}44;">
+                            ${statusText}
+                          </span>
+                        </td>
+                      </tr>
+                    `;
+                  })}
+                </tbody>
+              </table>
             </div>
           `;
         }

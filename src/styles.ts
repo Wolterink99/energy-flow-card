@@ -698,4 +698,82 @@ export const styles = css`
     12% { transform: translate(-200px, 150px) rotate(-20deg); opacity: 0; }
     100% { transform: translate(-200px, 150px) rotate(-20deg); opacity: 0; }
   }
+
+  /* Price Table styles */
+  .price-table-container {
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.01);
+  }
+
+  .price-table-container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .price-table-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+  }
+
+  .price-table th {
+    padding: 10px 14px;
+    background: rgba(15, 23, 42, 0.4);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .price-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #cbd5e1;
+    vertical-align: middle;
+  }
+
+  .price-table tr.current-hour-row {
+    background: rgba(16, 185, 129, 0.15);
+  }
+
+  .price-table tr.current-hour-row td {
+    border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+    color: #ffffff;
+    font-weight: 500;
+  }
+
+  .current-badge {
+    background: #10b981;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    display: inline-block;
+  }
 `;
