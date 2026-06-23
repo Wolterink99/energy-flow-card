@@ -206,7 +206,6 @@ export class EnergyFlowCard extends LitElement {
   @state() private statsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
   @state() private hoveredPoint: any = null;
-  @state() private showCostHistory: boolean = false;
   @state() private debugWeatherState: string | null = null;
   @state() private debugTimeHour: number | null = null;
   @state() private debugWindSpeed: number | null = null;
@@ -515,7 +514,6 @@ export class EnergyFlowCard extends LitElement {
     this.activePopup = null;
     this.activePopupHistory = [];
     this.statsData = {};
-    this.showCostHistory = false;
   }
 
   private renderPopup(): TemplateResult | string {
@@ -532,6 +530,8 @@ export class EnergyFlowCard extends LitElement {
     let canShowCost = false;
     let totalImport = 0;
     let totalExport = 0;
+    let totalImportCost = 0;
+    let totalExportCost = 0;
 
     const entities = this.config?.entities;
     if (!entities) return '';
@@ -1035,8 +1035,8 @@ export class EnergyFlowCard extends LitElement {
       } else {
         if (this.isLoadingHistory) {
         } else {
-          const targetImp = (this.showCostHistory && canShowCost) ? (impCostEntity || '') : (impEntity || '');
-          const targetExp = (this.showCostHistory && canShowCost) ? (expCostEntity || '') : (expEntity || '');
+          const targetImp = impEntity || '';
+          const targetExp = expEntity || '';
 
           if (!targetImp || !targetExp || (!this.statsData[targetImp] && !this.statsData[targetExp])) {
             chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
@@ -1044,6 +1044,12 @@ export class EnergyFlowCard extends LitElement {
             const processed = this.getProcessedGridData(targetImp, targetExp);
             totalImport = processed.reduce((sum, item) => sum + item.importValue, 0);
             totalExport = processed.reduce((sum, item) => sum + item.exportValue, 0);
+
+            if (canShowCost) {
+              const processedCost = this.getProcessedGridData(impCostEntity || '', expCostEntity || '');
+              totalImportCost = processedCost.reduce((sum, item) => sum + item.importValue, 0);
+              totalExportCost = processedCost.reduce((sum, item) => sum + item.exportValue, 0);
+            }
 
             const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
             chartHtml = html`
@@ -1054,17 +1060,13 @@ export class EnergyFlowCard extends LitElement {
                     const exportPercent = (item.exportValue / maxVal) * 80;
                     return html`
                       <div class="chart-column" style="min-width: 60px;">
-                        <!-- Stacked values at the top of the column -->
+                        <!-- Stacked values at the top of the column (always in kWh) -->
                         <div class="chart-values-stacked">
                           <span class="stacked-val import-color">
-                            ${this.showCostHistory && canShowCost
-                              ? '€ ' + item.importValue.toFixed(2).replace('.', ',')
-                              : item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
+                            ${item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
                           </span>
                           <span class="stacked-val export-color">
-                            ${this.showCostHistory && canShowCost
-                              ? '€ ' + item.exportValue.toFixed(2).replace('.', ',')
-                              : item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
+                            ${item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
                           </span>
                         </div>
     
@@ -1114,14 +1116,6 @@ export class EnergyFlowCard extends LitElement {
             `}
           </div>
 
-          <!-- Cost/Volume toggle (only when viewing grid history) -->
-          ${this.activePopup === 'grid' && this.activeTab !== 'prices' && canShowCost ? html`
-            <div class="popup-sub-tabs" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px; margin-bottom: 5px;">
-              <button class="popup-tab-btn ${!this.showCostHistory ? 'active' : ''}" style="font-size: 11px; padding: 4px 10px; border-radius: 12px; background: ${!this.showCostHistory ? '#2563eb' : 'rgba(255,255,255,0.06)'};" @click=${() => { this.showCostHistory = false; this.requestUpdate(); }}>Volume (kWh)</button>
-              <button class="popup-tab-btn ${this.showCostHistory ? 'active' : ''}" style="font-size: 11px; padding: 4px 10px; border-radius: 12px; background: ${this.showCostHistory ? '#2563eb' : 'rgba(255,255,255,0.06)'};" @click=${() => { this.showCostHistory = true; this.requestUpdate(); }}>Kosten (€)</button>
-            </div>
-          ` : ''}
-
           <div class="glass-popup-stats">
             ${this.activePopup === 'grid' ? (
               this.activeTab === 'prices' ? html`
@@ -1154,7 +1148,7 @@ export class EnergyFlowCard extends LitElement {
                       Totaal Import:
                     </span>
                     <span style="font-weight: bold; color: #ffffff;">
-                      ${totalImport.toFixed(1)} kWh ${canShowCost ? html`<span style="color: #ef4444; font-weight: bold; margin-left: 6px;">(€ ${totalImport.toFixed(2).replace('.', ',')})</span>` : ''}
+                      ${totalImport.toFixed(1)} kWh ${canShowCost ? html`<span style="color: #ef4444; font-weight: bold; margin-left: 6px;">(€ ${totalImportCost.toFixed(2).replace('.', ',')})</span>` : ''}
                     </span>
                   </div>
 
@@ -1164,7 +1158,7 @@ export class EnergyFlowCard extends LitElement {
                       Totaal Export:
                     </span>
                     <span style="font-weight: bold; color: #ffffff;">
-                      ${totalExport.toFixed(1)} kWh ${canShowCost ? html`<span style="color: #10b981; font-weight: bold; margin-left: 6px;">(€ ${totalExport.toFixed(2).replace('.', ',')})</span>` : ''}
+                      ${totalExport.toFixed(1)} kWh ${canShowCost ? html`<span style="color: #10b981; font-weight: bold; margin-left: 6px;">(€ ${totalExportCost.toFixed(2).replace('.', ',')})</span>` : ''}
                     </span>
                   </div>
 
@@ -1178,8 +1172,8 @@ export class EnergyFlowCard extends LitElement {
                     <span style="color: ${totalImport >= totalExport ? '#ef4444' : '#10b981'};">
                       ${totalImport >= totalExport ? `${(totalImport - totalExport).toFixed(1)} kWh` : `${(totalExport - totalImport).toFixed(1)} kWh`}
                       ${canShowCost ? html`
-                        <span style="font-weight: bold; margin-left: 6px; color: ${totalImport >= totalExport ? '#ef4444' : '#10b981'};">
-                          (${totalImport >= totalExport ? `Kosten: € ${(totalImport - totalExport).toFixed(2).replace('.', ',')}` : `Opbrengst: € ${(totalExport - totalImport).toFixed(2).replace('.', ',')}`})
+                        <span style="font-weight: bold; margin-left: 6px; color: ${totalImportCost >= totalExportCost ? '#ef4444' : '#10b981'};">
+                          (${totalImportCost >= totalExportCost ? `Kosten: € ${(totalImportCost - totalExportCost).toFixed(2).replace('.', ',')}` : `Opbrengst: € ${(totalExportCost - totalImportCost).toFixed(2).replace('.', ',')}`})
                         </span>
                       ` : ''}
                     </span>
@@ -1204,7 +1198,7 @@ export class EnergyFlowCard extends LitElement {
             <div class="chart-title">
               ${this.activePopup === 'grid' && this.activeTab === 'prices'
                 ? 'Zonneplan Uurprijzen (€/kWh)'
-                : `${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (${this.showCostHistory && canShowCost ? '€' : 'kWh'})`}
+                : `${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (kWh)`}
             </div>
             ${chartHtml}
           </div>
