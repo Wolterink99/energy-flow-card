@@ -448,7 +448,7 @@ export function renderHouseSvg({
     const tSun = (timeHour - 6.0) / 15.0;
     sunPos.cx = -60 + tSun * (width + 120);
     sunPos.cy = (height - 120) - Math.sin(tSun * Math.PI) * (height - 160);
-    sunOpacity = Math.max(0, Math.min(1.0, Math.sin(tSun * Math.PI) * 1.5));
+    sunOpacity = Math.max(0, Math.min(1.0, Math.sin(tSun * Math.PI) * 12.0));
     const fSun = Math.sin(tSun * Math.PI);
     sunColor = interpolateColor('#ea580c', '#fef08a', fSun);
     sunGlow = interpolateColor('rgba(234, 88, 12, 0.65)', 'rgba(254, 240, 138, 0.75)', fSun);
