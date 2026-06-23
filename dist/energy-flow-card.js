@@ -813,7 +813,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         <path d="M 190,160 L 190,180" stroke-width="1.5" />
       </g>
     </g>
-  `;function St({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:i,solar:n,solarToday:a,load:o,batteryPower:l,soc:d,charger:f,grid:c,showSolar:p,showBattery:h,showEV:g,weather:u="sunny",clouds:v=[],sunriseHour:x=6,sunsetHour:y=21,gridImportToday:b=null,gridExportToday:k=null,homeToday:w=null,batteryChargeToday:V=null,batteryDischargeToday:O=null,evToday:q=null,showLights:X,gridPrice:j=null,rainIntensity:S="normal",windSpeed:W=10,temperature:m=null,poolPumpActive:P=!1,onNodeClick:z}){let F=u;"pouring"===u||"lightning-rainy"===u?F="rainy":"snowy-rainy"===u||"hail"===u?F="snowy":"fog"===u&&(F="foggy");const U=t||800,Y=e||600,K=(U-800)/2,H=20-K;let B=s;B=s>=x&&s<=y?6+(s-x)/(y-x)*15:s>y?21+(s-y)/(24-y)*3:s/x*6;const A=l>.05,T=l<-.05,R=c>.05,L=c<-.05,G=f>.1,C=n>20,E=o>20,M=A||T&&L?ut.battery:ut.batteryD,D=R?ut.gridI:ut.gridE,N=bt(s,x,y),Q=void 0!==X?X:N.lights>.05||"rainy"===F||"lightning"===F;let Z=N.top,I=N.horizon,$=N.clouds,_="night"===i?.18:.48;const tt=W>.5?Math.max(1.2,Math.min(18,45/(W/5))):0;"cloudy"===F?($="#b8c5d6",I=yt(N.horizon,"#94a3b8",.15),_=.98):"rainy"===F||"lightning"===F?($="#475569",Z="#1f2937",I=yt(N.horizon,"#1e293b",.55),_=.99):"snowy"===F?($="#7a889b",Z="#475569",I=yt(N.horizon,"#334155",.4),_=.98):"foggy"===F?(Z=yt(N.top,"#64748b",.65),I=yt(N.horizon,"#94a3b8",.65),$="#a8b5c6",_=.5):"partlycloudy"===F?(Z=yt(N.top,"#475569",.1),I=yt(N.horizon,"#64748b",.1),$="#e2e8f0",_=.65):($="#ffffff",_=.48);const et=B>=(x||6)&&B<=(y||21)-1,rt=et?"url(#window-day)":Q?"url(#window-night)":"url(#window-dark)",st=et?"none":Q?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",it=B>=6&&B<=21&&"rainy"!==F&&"lightning"!==F&&"cloudy"!==F&&"snowy"!==F&&"foggy"!==F,nt={cx:U/2,cy:Y};let at=0,ot="#fef08a",lt="rgba(254, 240, 138, 0.65)";if(it){const t=(B-6)/15;nt.cx=t*(U+120)-60,nt.cy=Y-120-Math.sin(t*Math.PI)*(Y-160),at=Math.max(0,Math.min(1,12*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);ot=yt("#ea580c","#fef08a",e),lt=yt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const dt={cx:U/2,cy:Y};let ft=0;if((B>21||B<6)&&"rainy"!==F&&"lightning"!==F&&"cloudy"!==F&&"snowy"!==F&&"foggy"!==F){const t=B>21?(B-21)/9:(B+3)/9;dt.cx=t*(U+120)-60,dt.cy=Y-120-Math.sin(t*Math.PI)*(Y-200),ft=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const ct=345,pt=350,ht=qt(H,-22,.9),gt=qt(H+145.6,112.4,.62),xt=qt(H+249.6,208.4,.42),St=qt(H+316.4,275.6,.28),Wt=qt(H+358.4,323.6,.18);let mt=L?"↑ Teruglevering":R?"↓ Import":"Standby";null!==b&&null!==k?mt=`↓${b.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==b?mt=`Import: ${b.toFixed(1)} kWh`:null!==k&&(mt=`Terug: ${k.toFixed(1)} kWh`);const Pt=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:E?"Actief":"Standby";let zt=`SoC: ${d}%`;null!==V&&null!==O?zt=`SoC: ${d}% (↓${V.toFixed(1)} ↑${O.toFixed(1)})`:null!==V&&(zt=`SoC: ${d}% (↓${V.toFixed(1)})`);const Ft=null!==q?`Vandaag: ${q.toFixed(1)} kWh`:G?"Laden":"Standby";let Ut="";if(null!==j){Ut=`€ ${j.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:3})}`}const Yt=[{id:"grid",title:"Stroomnet",value:wt(c),sub:mt,color:D.stroke,active:R||L}];h&&Yt.push({id:"battery",title:"Thuisaccu",value:A||T?wt(l):"Standby",sub:zt,color:M.stroke,active:A||T}),Yt.push({id:"home",title:"Huisverbruik",value:wt(o),sub:Pt,color:ut.home.stroke,active:E}),g&&Yt.push({id:"ev",title:"Laadpaal (EV)",value:wt(f),sub:Ft,color:ut.ev.stroke,active:G});const Kt=(t,e,r,s,i,n=!1)=>J`
+  `;function St({containerWidth:t,containerHeight:e,carType:r="hatchback",timeHour:s,timeOfDay:i,solar:n,solarToday:a,load:o,batteryPower:l,soc:d,charger:f,grid:c,showSolar:p,showBattery:h,showEV:g,weather:u="sunny",clouds:v=[],sunriseHour:x=6,sunsetHour:y=21,gridImportToday:b=null,gridExportToday:k=null,homeToday:w=null,batteryChargeToday:V=null,batteryDischargeToday:O=null,evToday:q=null,showLights:X,gridPrice:j=null,rainIntensity:S="normal",windSpeed:W=10,temperature:m=null,poolPumpActive:P=!1,onNodeClick:z}){let F=u;"pouring"===u||"lightning-rainy"===u?F="rainy":"snowy-rainy"===u||"hail"===u?F="snowy":"fog"===u&&(F="foggy");const U=t||800,Y=e||600,K=(U-800)/2,H=20-K;let B=s;B=s>=x&&s<=y?6+(s-x)/(y-x)*15:s>y?21+(s-y)/(24-y)*3:s/x*6;const A=l>.05,T=l<-.05,R=c>.05,L=c<-.05,G=f>.1,C=n>20,E=o>20,M=A||T&&L?ut.battery:ut.batteryD,D=R?ut.gridI:ut.gridE,N=bt(s,x,y),Q=void 0!==X?X:N.lights>.05||"rainy"===F||"lightning"===F,Z=B>=(x||6)&&B<=(y||21)-1;let I=N.top,$=N.horizon,_=N.clouds,tt="night"===i?.18:.48;const et=W>.5?Math.max(1.2,Math.min(18,45/(W/5))):0;"cloudy"===F?(_=Z?"#b8c5d6":"#222d3d",$=yt(N.horizon,Z?"#94a3b8":"#0f172a",.15),tt=.98):"rainy"===F||"lightning"===F?(_=Z?"#475569":"#18202c",I=Z?"#1f2937":"#0f172a",$=yt(N.horizon,Z?"#1e293b":"#090d16",.55),tt=.99):"snowy"===F?(_=Z?"#7a889b":"#273142",I=Z?"#475569":"#1c2230",$=yt(N.horizon,Z?"#334155":"#0f172a",.4),tt=.98):"foggy"===F?(I=yt(N.top,Z?"#64748b":"#1a202c",.65),$=yt(N.horizon,Z?"#94a3b8":"#0f172a",.65),_=Z?"#a8b5c6":"#27303f",tt=.5):"partlycloudy"===F?(I=yt(N.top,Z?"#475569":"#111622",.1),$=yt(N.horizon,Z?"#64748b":"#0a0d14",.1),_=Z?"#e2e8f0":"#1b2230",tt=.65):(_=Z?"#ffffff":"#1a2233",tt=Z?.48:.15);const rt=Z?"url(#window-day)":Q?"url(#window-night)":"url(#window-dark)",st=Z?"none":Q?"drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))":"none",it=B>=6&&B<=21&&"rainy"!==F&&"lightning"!==F&&"cloudy"!==F&&"snowy"!==F&&"foggy"!==F,nt={cx:U/2,cy:Y};let at=0,ot="#fef08a",lt="rgba(254, 240, 138, 0.65)";if(it){const t=(B-6)/15;nt.cx=t*(U+120)-60,nt.cy=Y-120-Math.sin(t*Math.PI)*(Y-160),at=Math.max(0,Math.min(1,12*Math.sin(t*Math.PI)));const e=Math.sin(t*Math.PI);ot=yt("#ea580c","#fef08a",e),lt=yt("rgba(234, 88, 12, 0.65)","rgba(254, 240, 138, 0.75)",e)}const dt={cx:U/2,cy:Y};let ft=0;if((B>21||B<6)&&"rainy"!==F&&"lightning"!==F&&"cloudy"!==F&&"snowy"!==F&&"foggy"!==F){const t=B>21?(B-21)/9:(B+3)/9;dt.cx=t*(U+120)-60,dt.cy=Y-120-Math.sin(t*Math.PI)*(Y-200),ft=Math.max(0,Math.min(.9,1.8*Math.sin(t*Math.PI)))}const ct=345,pt=350,ht=qt(H,-22,.9),gt=qt(H+145.6,112.4,.62),xt=qt(H+249.6,208.4,.42),St=qt(H+316.4,275.6,.28),Wt=qt(H+358.4,323.6,.18);let mt=L?"↑ Teruglevering":R?"↓ Import":"Standby";null!==b&&null!==k?mt=`↓${b.toFixed(1)} ↑${k.toFixed(1)} kWh`:null!==b?mt=`Import: ${b.toFixed(1)} kWh`:null!==k&&(mt=`Terug: ${k.toFixed(1)} kWh`);const Pt=null!==w?`Vandaag: ${w.toFixed(1)} kWh`:E?"Actief":"Standby";let zt=`SoC: ${d}%`;null!==V&&null!==O?zt=`SoC: ${d}% (↓${V.toFixed(1)} ↑${O.toFixed(1)})`:null!==V&&(zt=`SoC: ${d}% (↓${V.toFixed(1)})`);const Ft=null!==q?`Vandaag: ${q.toFixed(1)} kWh`:G?"Laden":"Standby";let Ut="";if(null!==j){Ut=`€ ${j.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:3})}`}const Yt=[{id:"grid",title:"Stroomnet",value:wt(c),sub:mt,color:D.stroke,active:R||L}];h&&Yt.push({id:"battery",title:"Thuisaccu",value:A||T?wt(l):"Standby",sub:zt,color:M.stroke,active:A||T}),Yt.push({id:"home",title:"Huisverbruik",value:wt(o),sub:Pt,color:ut.home.stroke,active:E}),g&&Yt.push({id:"ev",title:"Laadpaal (EV)",value:wt(f),sub:Ft,color:ut.ev.stroke,active:G});const Kt=(t,e,r,s,i,n=!1)=>J`
       <path d="${t}" class="flowCable" />
       <path d="${t}" fill="none" stroke="${s}" stroke-width="3" stroke-linecap="round"
         opacity="${e?.25:0}"
@@ -839,8 +839,8 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
       <defs>
         <!-- Sky gradient -->
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${Z}" />
-          <stop offset="100%" stop-color="${I}" />
+          <stop offset="0%" stop-color="${I}" />
+          <stop offset="100%" stop-color="${$}" />
         </linearGradient>
 
         <linearGradient id="shooting-star-grad" x1="1" y1="0" x2="0" y2="0">
@@ -1034,17 +1034,17 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
             .cloud-layer-front { animation: scrollCloudsFront 50s infinite linear; }
           </style>
           
-          <g opacity="${_}" style="pointer-events: none;">
+          <g opacity="${tt}" style="pointer-events: none;">
             <!-- Layer 1 (Back - Darkest) -->
             <g class="cloud-layer-back">
               <!-- Y=95 first, Y=60 last -->
-              <path d="${Vt(U,95,2)}" fill="${yt($,"#111827",.2)}" />
-              <path d="${Vt(U,95,2)}" transform="translate(${U}, 0)" fill="${yt($,"#111827",.2)}" />
+              <path d="${Vt(U,95,2)}" fill="${yt(_,"#111827",.2)}" />
+              <path d="${Vt(U,95,2)}" transform="translate(${U}, 0)" fill="${yt(_,"#111827",.2)}" />
               <path d="${Ot(U,95,2)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
               <path d="${Ot(U,95,2)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
 
-              <path d="${Vt(U,60,1)}" fill="${yt($,"#111827",.25)}" />
-              <path d="${Vt(U,60,1)}" transform="translate(${U}, 0)" fill="${yt($,"#111827",.25)}" />
+              <path d="${Vt(U,60,1)}" fill="${yt(_,"#111827",.25)}" />
+              <path d="${Vt(U,60,1)}" transform="translate(${U}, 0)" fill="${yt(_,"#111827",.25)}" />
               <path d="${Ot(U,60,1)}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
               <path d="${Ot(U,60,1)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.22));" />
             </g>
@@ -1052,13 +1052,13 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
             <!-- Layer 2 (Middle - Medium) -->
             <g class="cloud-layer-mid">
               <!-- Y=120 first, Y=85 last -->
-              <path d="${Vt(U,120,4)}" fill="${yt($,"#1f2937",.1)}" />
-              <path d="${Vt(U,120,4)}" transform="translate(${U}, 0)" fill="${yt($,"#1f2937",.1)}" />
+              <path d="${Vt(U,120,4)}" fill="${yt(_,"#1f2937",.1)}" />
+              <path d="${Vt(U,120,4)}" transform="translate(${U}, 0)" fill="${yt(_,"#1f2937",.1)}" />
               <path d="${Ot(U,120,4)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
               <path d="${Ot(U,120,4)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
 
-              <path d="${Vt(U,85,3)}" fill="${yt($,"#1f2937",.15)}" />
-              <path d="${Vt(U,85,3)}" transform="translate(${U}, 0)" fill="${yt($,"#1f2937",.15)}" />
+              <path d="${Vt(U,85,3)}" fill="${yt(_,"#1f2937",.15)}" />
+              <path d="${Vt(U,85,3)}" transform="translate(${U}, 0)" fill="${yt(_,"#1f2937",.15)}" />
               <path d="${Ot(U,85,3)}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
               <path d="${Ot(U,85,3)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" style="filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25));" />
             </g>
@@ -1066,20 +1066,20 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
             <!-- Layer 3 (Front - Main Color) -->
             <g class="cloud-layer-front">
               <!-- Y=150 first, Y=110 last -->
-              <path d="${Vt(U,150,6)}" fill="${$}" />
-              <path d="${Vt(U,150,6)}" transform="translate(${U}, 0)" fill="${$}" />
+              <path d="${Vt(U,150,6)}" fill="${_}" />
+              <path d="${Vt(U,150,6)}" transform="translate(${U}, 0)" fill="${_}" />
               <path d="${Ot(U,150,6)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
               <path d="${Ot(U,150,6)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
 
-              <path d="${Vt(U,110,5)}" fill="${yt($,"#ffffff",.04)}" />
-              <path d="${Vt(U,110,5)}" transform="translate(${U}, 0)" fill="${yt($,"#ffffff",.04)}" />
+              <path d="${Vt(U,110,5)}" fill="${yt(_,"#ffffff",.04)}" />
+              <path d="${Vt(U,110,5)}" transform="translate(${U}, 0)" fill="${yt(_,"#ffffff",.04)}" />
               <path d="${Ot(U,110,5)}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
               <path d="${Ot(U,110,5)}" transform="translate(${U}, 0)" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));" />
             </g>
           </g>
         `:J`
           <!-- Floating Cloud layers (Only for sunny/partlycloudy) -->
-          <g opacity="${_}" style="pointer-events: none;">
+          <g opacity="${tt}" style="pointer-events: none;">
             ${(v||[]).map(t=>{const e=.4*Y,r=Math.max(20,e-20);return function(t,e,r,s=1,i="#ffffff",n=.9,a=""){return J`
     <g transform="translate(${e}, ${r}) scale(${s})" opacity="${n}" style="transition: opacity 1.5s ease;">
       <g class="${t}" style="${a}">
@@ -1087,7 +1087,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
         <path d="M 20,40 Q 10,25 25,15 Q 40,5 60,15 Q 80,0 100,15 Q 120,5 130,25 Q 140,40 120,45 Q 100,50 60,45 Q 20,50 20,40 Z" fill="${i}" style="transition: fill 1.5s ease;" />
       </g>
     </g>
-  `}("customDriftCloud",0,20+(void 0!==t.yFactor?t.yFactor:.5)*r,t.scale,$,t.opacityMultiplier,`animation-duration: ${t.speed}s; animation-delay: ${t.delay}s;`)})}
+  `}("customDriftCloud",0,20+(void 0!==t.yFactor?t.yFactor:.5)*r,t.scale,_,t.opacityMultiplier,`animation-duration: ${t.speed}s; animation-delay: ${t.delay}s;`)})}
           </g>
         `}
 
@@ -1106,7 +1106,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           <!-- Small Wind Turbine (further) -->
           <g id="wind-turbine-small" style="pointer-events: none;" opacity="0.3">
             <path d="M 93,410 L 94.5,330 L 95.5,330 L 97,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 95px 330px; ${tt>0?`animation: spinWindTurbine ${1.2*tt}s linear infinite; animation-delay: -0.4s;`:""}">
+            <g style="transform-origin: 95px 330px; ${et>0?`animation: spinWindTurbine ${1.2*et}s linear infinite; animation-delay: -0.4s;`:""}">
               <circle cx="95" cy="330" r="2.2" fill="#64748b" />
               <path d="M 95,330 Q 94,295 95,285 Q 96,295 95,330" fill="#cbd5e1" />
               <path d="M 95,330 Q 94,295 95,285 Q 96,295 95,330" fill="#cbd5e1" transform="rotate(120 95 330)" />
@@ -1116,7 +1116,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
           <!-- Medium Wind Turbine -->
           <g id="wind-turbine-med" style="pointer-events: none;" opacity="0.45">
             <path d="M 51,410 L 53.5,290 L 56.5,290 L 59,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 55px 290px; ${tt>0?`animation: spinWindTurbine ${tt}s linear infinite;`:""}">
+            <g style="transform-origin: 55px 290px; ${et>0?`animation: spinWindTurbine ${et}s linear infinite;`:""}">
               <circle cx="55" cy="290" r="3.5" fill="#64748b" />
               <path d="M 55,290 Q 53,235 55,220 Q 57,235 55,290" fill="#cbd5e1" />
               <path d="M 55,290 Q 53,235 55,220 Q 57,235 55,290" fill="#cbd5e1" transform="rotate(120 55 290)" />

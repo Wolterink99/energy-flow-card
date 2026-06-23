@@ -392,6 +392,8 @@ export function renderHouseSvg({
     ? passedShowLights
     : (skyState.lights > 0.05 || visualWeather === 'rainy' || visualWeather === 'lightning');
 
+  const isDay = timeHour >= (sunriseHour || 6.0) && timeHour <= ((sunsetHour || 21.0) - 1.0);
+
   // Sky colors with weather adaptation
   let skyTop = skyState.top;
   let skyHorizon = skyState.horizon;
@@ -402,37 +404,36 @@ export function renderHouseSvg({
   const turbineDuration = windSpeed > 0.5 ? Math.max(1.2, Math.min(18, 45 / (windSpeed / 5))) : 0;
 
   if (visualWeather === 'cloudy') {
-    cloudColor = '#b8c5d6'; // nice overcast light gray-blue
-    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.15);
+    cloudColor = isDay ? '#b8c5d6' : '#222d3d'; // nice overcast light gray-blue by day, dark slate-blue by night
+    skyHorizon = interpolateColor(skyState.horizon, isDay ? '#94a3b8' : '#0f172a', 0.15);
     cloudOpacity = 0.98;
   } else if (visualWeather === 'rainy' || visualWeather === 'lightning') {
-    cloudColor = '#475569'; // dark rain clouds
-    skyTop = '#1f2937';
-    skyHorizon = interpolateColor(skyState.horizon, '#1e293b', 0.55);
+    cloudColor = isDay ? '#475569' : '#18202c'; // dark rain clouds by day, almost black storm clouds by night
+    skyTop = isDay ? '#1f2937' : '#0f172a';
+    skyHorizon = interpolateColor(skyState.horizon, isDay ? '#1e293b' : '#090d16', 0.55);
     cloudOpacity = 0.99;
   } else if (visualWeather === 'snowy') {
-    cloudColor = '#7a889b'; // cold snowy slate gray
-    skyTop = '#475569';
-    skyHorizon = interpolateColor(skyState.horizon, '#334155', 0.4);
+    cloudColor = isDay ? '#7a889b' : '#273142'; // cold snowy slate gray by day, dark blue-slate by night
+    skyTop = isDay ? '#475569' : '#1c2230';
+    skyHorizon = interpolateColor(skyState.horizon, isDay ? '#334155' : '#0f172a', 0.4);
     cloudOpacity = 0.98;
   } else if (visualWeather === 'foggy') {
-    skyTop = interpolateColor(skyState.top, '#64748b', 0.65);
-    skyHorizon = interpolateColor(skyState.horizon, '#94a3b8', 0.65);
-    cloudColor = '#a8b5c6';
+    skyTop = interpolateColor(skyState.top, isDay ? '#64748b' : '#1a202c', 0.65);
+    skyHorizon = interpolateColor(skyState.horizon, isDay ? '#94a3b8' : '#0f172a', 0.65);
+    cloudColor = isDay ? '#a8b5c6' : '#27303f';
     cloudOpacity = 0.50;
   } else if (visualWeather === 'partlycloudy') {
-    skyTop = interpolateColor(skyState.top, '#475569', 0.1);
-    skyHorizon = interpolateColor(skyState.horizon, '#64748b', 0.1);
-    cloudColor = '#e2e8f0'; // very light gray-white
+    skyTop = interpolateColor(skyState.top, isDay ? '#475569' : '#111622', 0.1);
+    skyHorizon = interpolateColor(skyState.horizon, isDay ? '#64748b' : '#0a0d14', 0.1);
+    cloudColor = isDay ? '#e2e8f0' : '#1b2230'; // very light gray-white by day, dark charcoal-blue by night
     cloudOpacity = 0.65;
   } else {
     // Default/sunny: pure white
-    cloudColor = '#ffffff';
-    cloudOpacity = 0.48;
+    cloudColor = isDay ? '#ffffff' : '#1a2233'; // pure white by day, dark slate by night
+    cloudOpacity = isDay ? 0.48 : 0.15; // much fainter decorative clouds at night
   }
 
   // ── Window appearance ──
-  const isDay = timeHour >= (sunriseHour || 6.0) && timeHour <= ((sunsetHour || 21.0) - 1.0);
   const windowFill = isDay
     ? 'url(#window-day)'
     : (resolvedShowLights ? 'url(#window-night)' : 'url(#window-dark)');
