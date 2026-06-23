@@ -1,0 +1,490 @@
+{
+  "entity_id": "sensor.zonneplan_current_electricity_tariff",
+  "state": "0.8307634",
+  "attributes": {
+    "state_class": "measurement",
+    "forecast": [
+      {
+        "electricity_price": 4548134,
+        "electricity_price_excl_tax": 3439653,
+        "tariff_group": "normal",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-22T18:00:00.000000Z",
+        "sustainability_score": 823
+      },
+      {
+        "electricity_price": 4441745,
+        "electricity_price_excl_tax": 3333264,
+        "tariff_group": "normal",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-22T19:00:00.000000Z",
+        "sustainability_score": 580
+      },
+      {
+        "electricity_price": 3628443,
+        "electricity_price_excl_tax": 2519962,
+        "tariff_group": "normal",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-22T20:00:00.000000Z",
+        "sustainability_score": 378
+      },
+      {
+        "electricity_price": 3245811,
+        "electricity_price_excl_tax": 2137330,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-22T21:00:00.000000Z",
+        "sustainability_score": 312
+      },
+      {
+        "electricity_price": 3071601,
+        "electricity_price_excl_tax": 1963120,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-22T22:00:00.000000Z",
+        "sustainability_score": 315
+      },
+      {
+        "electricity_price": 2976374,
+        "electricity_price_excl_tax": 1867893,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-22T23:00:00.000000Z",
+        "sustainability_score": 296
+      },
+      {
+        "electricity_price": 2931998,
+        "electricity_price_excl_tax": 1823517,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T00:00:00.000000Z",
+        "sustainability_score": 268
+      },
+      {
+        "electricity_price": 2935476,
+        "electricity_price_excl_tax": 1826995,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T01:00:00.000000Z",
+        "sustainability_score": 280
+      },
+      {
+        "electricity_price": 2963668,
+        "electricity_price_excl_tax": 1855187,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T02:00:00.000000Z",
+        "sustainability_score": 291
+      },
+      {
+        "electricity_price": 3015034,
+        "electricity_price_excl_tax": 1906553,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T03:00:00.000000Z",
+        "sustainability_score": 241
+      },
+      {
+        "electricity_price": 3399813,
+        "electricity_price_excl_tax": 2291332,
+        "gas_price": 13056813,
+        "gas_price_excl_tax": 5788827,
+        "tariff_group": "normal",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T04:00:00.000000Z",
+        "sustainability_score": 196
+      },
+      {
+        "electricity_price": 3325066,
+        "electricity_price_excl_tax": 2216585,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T05:00:00.000000Z",
+        "sustainability_score": 200
+      },
+      {
+        "electricity_price": 2997580,
+        "electricity_price_excl_tax": 1889099,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T06:00:00.000000Z",
+        "sustainability_score": 389
+      },
+      {
+        "electricity_price": 2673390,
+        "electricity_price_excl_tax": 1564909,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T07:00:00.000000Z",
+        "sustainability_score": 658
+      },
+      {
+        "electricity_price": 2476493,
+        "electricity_price_excl_tax": 1368012,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T08:00:00.000000Z",
+        "sustainability_score": 943
+      },
+      {
+        "electricity_price": 2230954,
+        "electricity_price_excl_tax": 1122473,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T09:00:00.000000Z",
+        "sustainability_score": 1311
+      },
+      {
+        "electricity_price": 2028973,
+        "electricity_price_excl_tax": 920492,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T10:00:00.000000Z",
+        "sustainability_score": 1570
+      },
+      {
+        "electricity_price": 1835193,
+        "electricity_price_excl_tax": 726712,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T11:00:00.000000Z",
+        "sustainability_score": 1798
+      },
+      {
+        "electricity_price": 1807091,
+        "electricity_price_excl_tax": 698610,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T12:00:00.000000Z",
+        "sustainability_score": 1929
+      },
+      {
+        "electricity_price": 1972740,
+        "electricity_price_excl_tax": 864259,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T13:00:00.000000Z",
+        "sustainability_score": 1885
+      },
+      {
+        "electricity_price": 2514215,
+        "electricity_price_excl_tax": 1405734,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T14:00:00.000000Z",
+        "sustainability_score": 1831
+      },
+      {
+        "electricity_price": 2784166,
+        "electricity_price_excl_tax": 1675685,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T15:00:00.000000Z",
+        "sustainability_score": 1502
+      },
+      {
+        "electricity_price": 3362817,
+        "electricity_price_excl_tax": 2254336,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T16:00:00.000000Z",
+        "sustainability_score": 1107
+      },
+      {
+        "electricity_price": 5387511,
+        "electricity_price_excl_tax": 4279030,
+        "tariff_group": "normal",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T17:00:00.000000Z",
+        "sustainability_score": 776
+      },
+      {
+        "electricity_price": 8307634,
+        "electricity_price_excl_tax": 7199153,
+        "tariff_group": "high",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T18:00:00.000000Z",
+        "sustainability_score": 529
+      },
+      {
+        "electricity_price": 8125620,
+        "electricity_price_excl_tax": 7017139,
+        "tariff_group": "high",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T19:00:00.000000Z",
+        "sustainability_score": 287
+      },
+      {
+        "electricity_price": 5543480,
+        "electricity_price_excl_tax": 4434999,
+        "tariff_group": "normal",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T20:00:00.000000Z",
+        "sustainability_score": 179
+      },
+      {
+        "electricity_price": 3835444,
+        "electricity_price_excl_tax": 2726963,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T21:00:00.000000Z",
+        "sustainability_score": 161
+      },
+      {
+        "electricity_price": 3605482,
+        "electricity_price_excl_tax": 2497001,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T22:00:00.000000Z",
+        "sustainability_score": 146
+      },
+      {
+        "electricity_price": 3384870,
+        "electricity_price_excl_tax": 2276389,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-23T23:00:00.000000Z",
+        "sustainability_score": 136
+      },
+      {
+        "electricity_price": 3138575,
+        "electricity_price_excl_tax": 2030094,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T00:00:00.000000Z",
+        "sustainability_score": 110
+      },
+      {
+        "electricity_price": 3120334,
+        "electricity_price_excl_tax": 2011853,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T01:00:00.000000Z",
+        "sustainability_score": 91
+      },
+      {
+        "electricity_price": 3182891,
+        "electricity_price_excl_tax": 2074410,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T02:00:00.000000Z",
+        "sustainability_score": 71
+      },
+      {
+        "electricity_price": 3255219,
+        "electricity_price_excl_tax": 2146738,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T03:00:00.000000Z",
+        "sustainability_score": 52
+      },
+      {
+        "electricity_price": 3595197,
+        "electricity_price_excl_tax": 2486716,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T04:00:00.000000Z",
+        "sustainability_score": 49
+      },
+      {
+        "electricity_price": 3535576,
+        "electricity_price_excl_tax": 2427095,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T05:00:00.000000Z",
+        "sustainability_score": 134
+      },
+      {
+        "electricity_price": 3164983,
+        "electricity_price_excl_tax": 2056502,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T06:00:00.000000Z",
+        "sustainability_score": 385
+      },
+      {
+        "electricity_price": 2769162,
+        "electricity_price_excl_tax": 1660681,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T07:00:00.000000Z",
+        "sustainability_score": 710
+      },
+      {
+        "electricity_price": 2573112,
+        "electricity_price_excl_tax": 1464631,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T08:00:00.000000Z",
+        "sustainability_score": 982
+      },
+      {
+        "electricity_price": 2309150,
+        "electricity_price_excl_tax": 1200669,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T09:00:00.000000Z",
+        "sustainability_score": 1323
+      },
+      {
+        "electricity_price": 2128437,
+        "electricity_price_excl_tax": 1019956,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T10:00:00.000000Z",
+        "sustainability_score": 1674
+      },
+      {
+        "electricity_price": 2113584,
+        "electricity_price_excl_tax": 1005103,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T11:00:00.000000Z",
+        "sustainability_score": 1810
+      },
+      {
+        "electricity_price": 2063399,
+        "electricity_price_excl_tax": 954918,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T12:00:00.000000Z",
+        "sustainability_score": 1883
+      },
+      {
+        "electricity_price": 2103450,
+        "electricity_price_excl_tax": 994969,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T13:00:00.000000Z",
+        "sustainability_score": 2054
+      },
+      {
+        "electricity_price": 2628711,
+        "electricity_price_excl_tax": 1520230,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T14:00:00.000000Z",
+        "sustainability_score": 1996
+      },
+      {
+        "electricity_price": 2878818,
+        "electricity_price_excl_tax": 1770337,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T15:00:00.000000Z",
+        "sustainability_score": 1600
+      },
+      {
+        "electricity_price": 3707667,
+        "electricity_price_excl_tax": 2599186,
+        "tariff_group": "low",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T16:00:00.000000Z",
+        "sustainability_score": 1166
+      },
+      {
+        "electricity_price": 7432803,
+        "electricity_price_excl_tax": 6324322,
+        "tariff_group": "high",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T17:00:00.000000Z",
+        "sustainability_score": 866
+      },
+      {
+        "electricity_price": 10794880,
+        "electricity_price_excl_tax": 9686399,
+        "tariff_group": "high",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T18:00:00.000000Z",
+        "sustainability_score": 663
+      },
+      {
+        "electricity_price": 10980676,
+        "electricity_price_excl_tax": 9872195,
+        "tariff_group": "high",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T19:00:00.000000Z",
+        "sustainability_score": 431
+      },
+      {
+        "electricity_price": 8179919,
+        "electricity_price_excl_tax": 7071438,
+        "tariff_group": "high",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T20:00:00.000000Z",
+        "sustainability_score": 304
+      },
+      {
+        "electricity_price": 4964919,
+        "electricity_price_excl_tax": 3856438,
+        "tariff_group": "normal",
+        "solar_percentage": 0,
+        "solar_yield": 0,
+        "datetime": "2026-06-24T21:00:00.000000Z",
+        "sustainability_score": 254
+      }
+    ],
+    "unit_of_measurement": "€/kWh",
+    "icon": "mdi:cash",
+    "friendly_name": "Stroom tegen uurprijzen Huidig elektriciteitstarief"
+  },
+  "last_changed": "2026-06-23T18:00:00.007471+00:00",
+  "last_reported": "2026-06-23T18:09:46.252761+00:00",
+  "last_updated": "2026-06-23T18:09:46.252761+00:00",
+  "context": {
+    "id": "01KVTTS2RCRQTP129711GTNJTN",
+    "parent_id": null,
+    "user_id": null
+  }
+}

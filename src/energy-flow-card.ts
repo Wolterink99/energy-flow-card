@@ -202,7 +202,7 @@ export class EnergyFlowCard extends LitElement {
   @state() private activePopup: string | null = null;
   @state() protected activePopupHistory: { day: string; value: number }[] = [];
   @state() private isLoadingHistory: boolean = false;
-  @state() private activeTab: 'prices' | 'day' | 'month' | 'year' = 'day';
+  @state() private activeTab: 'prices' | 'month' | 'year' = 'month';
   @state() private statsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
   @state() private hoveredPoint: any = null;
@@ -373,21 +373,29 @@ export class EnergyFlowCard extends LitElement {
 
   private getProcessedSingleData(entityId: string): { label: string; value: number }[] {
     const raw = this.statsData[entityId] || [];
-    if (this.activeTab === 'day') {
-      return raw.slice(-30).map(point => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    if (this.activeTab === 'month') {
+      const dailyPoints = raw.filter(point => {
+        const date = new Date(point.start);
+        return date.getFullYear() === currentYear && date.getMonth() === currentMonth;
+      });
+      return dailyPoints.map(point => {
         const date = new Date(point.start);
         return {
           label: date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }),
           value: this.getStatPointValue(point, entityId)
         };
       });
-    } else if (this.activeTab === 'month') {
+    } else if (this.activeTab === 'year') {
       const monthlyGroups: Record<string, { label: string; sum: number }> = {};
       raw.forEach(point => {
         const date = new Date(point.start);
-        const year = date.getFullYear();
+        if (date.getFullYear() !== currentYear) return;
         const month = date.getMonth();
-        const monthKey = `${year}-${month.toString().padStart(2, '0')}`;
+        const monthKey = `${currentYear}-${month.toString().padStart(2, '0')}`;
         const monthLabel = date.toLocaleDateString('nl-NL', { month: 'short' });
         if (!monthlyGroups[monthKey]) {
           monthlyGroups[monthKey] = { label: monthLabel, sum: 0 };
@@ -396,27 +404,12 @@ export class EnergyFlowCard extends LitElement {
       });
       return Object.keys(monthlyGroups)
         .sort()
-        .slice(-12)
         .map(key => ({
           label: monthlyGroups[key].label,
           value: monthlyGroups[key].sum
         }));
     } else {
-      const yearlyGroups: Record<string, number> = {};
-      raw.forEach(point => {
-        const date = new Date(point.start);
-        const year = date.getFullYear().toString();
-        if (!yearlyGroups[year]) {
-          yearlyGroups[year] = 0;
-        }
-        yearlyGroups[year] += this.getStatPointValue(point, entityId);
-      });
-      return Object.keys(yearlyGroups)
-        .sort()
-        .map(year => ({
-          label: year,
-          value: yearlyGroups[year]
-        }));
+      return [];
     }
   }
 
@@ -439,9 +432,17 @@ export class EnergyFlowCard extends LitElement {
     exportRaw.forEach(p => allStarts.add(p.start));
 
     const sortedStarts = Array.from(allStarts).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
 
-    if (this.activeTab === 'day') {
-      return sortedStarts.slice(-30).map(startStr => {
+    if (this.activeTab === 'month') {
+      const currentMonthStarts = sortedStarts.filter(startStr => {
+        const date = new Date(startStr);
+        return date.getFullYear() === currentYear && date.getMonth() === currentMonth;
+      });
+
+      return currentMonthStarts.map(startStr => {
         const date = new Date(startStr);
         const dateKey = date.toDateString();
         return {
@@ -450,13 +451,14 @@ export class EnergyFlowCard extends LitElement {
           exportValue: exportMap.get(dateKey) || 0
         };
       });
-    } else if (this.activeTab === 'month') {
+    } else {
+      // activeTab === 'year'
       const monthlyGroups: Record<string, { label: string; importSum: number; exportSum: number }> = {};
       sortedStarts.forEach(startStr => {
         const date = new Date(startStr);
-        const year = date.getFullYear();
+        if (date.getFullYear() !== currentYear) return;
         const month = date.getMonth();
-        const monthKey = `${year}-${month.toString().padStart(2, '0')}`;
+        const monthKey = `${currentYear}-${month.toString().padStart(2, '0')}`;
         const monthLabel = date.toLocaleDateString('nl-NL', { month: 'short' });
         const dateKey = date.toDateString();
         
@@ -469,32 +471,10 @@ export class EnergyFlowCard extends LitElement {
 
       return Object.keys(monthlyGroups)
         .sort()
-        .slice(-12)
         .map(key => ({
           label: monthlyGroups[key].label,
           importValue: monthlyGroups[key].importSum,
           exportValue: monthlyGroups[key].exportSum
-        }));
-    } else {
-      const yearlyGroups: Record<string, { importSum: number; exportSum: number }> = {};
-      sortedStarts.forEach(startStr => {
-        const date = new Date(startStr);
-        const year = date.getFullYear().toString();
-        const dateKey = date.toDateString();
-
-        if (!yearlyGroups[year]) {
-          yearlyGroups[year] = { importSum: 0, exportSum: 0 };
-        }
-        yearlyGroups[year].importSum += importMap.get(dateKey) || 0;
-        yearlyGroups[year].exportSum += exportMap.get(dateKey) || 0;
-      });
-
-      return Object.keys(yearlyGroups)
-        .sort()
-        .map(year => ({
-          label: year,
-          importValue: yearlyGroups[year].importSum,
-          exportValue: yearlyGroups[year].exportSum
         }));
     }
   }
@@ -716,7 +696,7 @@ export class EnergyFlowCard extends LitElement {
                   <div class="chart-column">
                     <div class="chart-bar-wrapper">
                       <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
-                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>
+                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'month' ? 1 : 0)}</span>
                       </div>
                     </div>
                     <span class="chart-label">${item.label}</span>
@@ -756,7 +736,7 @@ export class EnergyFlowCard extends LitElement {
                   <div class="chart-column">
                     <div class="chart-bar-wrapper">
                       <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
-                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'day' ? 1 : 0)}</span>
+                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'month' ? 1 : 0)}</span>
                       </div>
                     </div>
                     <span class="chart-label">${item.label}</span>
@@ -1072,10 +1052,10 @@ export class EnergyFlowCard extends LitElement {
                         <!-- Stacked values at the top of the column (always in kWh) -->
                         <div class="chart-values-stacked">
                           <span class="stacked-val import-color">
-                            ${item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
+                            ${item.importValue.toFixed(this.activeTab === 'month' ? 1 : 0)}
                           </span>
                           <span class="stacked-val export-color">
-                            ${item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0)}
+                            ${item.exportValue.toFixed(this.activeTab === 'month' ? 1 : 0)}
                           </span>
                         </div>
     
@@ -1115,11 +1095,9 @@ export class EnergyFlowCard extends LitElement {
           <div class="popup-tabs">
             ${this.activePopup === 'grid' ? html`
               <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Vandaag</button>
-              <button class="popup-tab-btn ${this.activeTab === 'day' ? 'active' : ''}" @click=${() => this.switchTab('day')}>30 Dagen</button>
               <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
               <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
             ` : html`
-              <button class="popup-tab-btn ${this.activeTab === 'day' ? 'active' : ''}" @click=${() => this.switchTab('day')}>Dag</button>
               <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
               <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
             `}
@@ -1242,7 +1220,7 @@ export class EnergyFlowCard extends LitElement {
             <div class="chart-title">
               ${this.activePopup === 'grid' && this.activeTab === 'prices'
                 ? 'Zonneplan Uurprijzen (€/kWh)'
-                : `${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (kWh)`}
+                : `${this.activeTab === 'month' ? 'Afgelopen maand' : 'Jaaroverzicht'} (kWh)`}
             </div>
             ${chartHtml}
           </div>
@@ -1251,7 +1229,7 @@ export class EnergyFlowCard extends LitElement {
     `;
   }
 
-  private switchTab(tab: 'prices' | 'day' | 'month' | 'year'): void {
+  private switchTab(tab: 'prices' | 'month' | 'year'): void {
     this.activeTab = tab;
     setTimeout(() => {
       const container = this.shadowRoot?.querySelector('.scrollable-chart-container');
@@ -1326,7 +1304,7 @@ export class EnergyFlowCard extends LitElement {
     
     if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'weather') {
       this.activePopup = nodeId;
-      this.activeTab = nodeId === 'grid' ? 'prices' : 'day';
+      this.activeTab = nodeId === 'grid' ? 'prices' : 'month';
       this.statsData = {};
       
       const entitiesToFetch: string[] = [];
