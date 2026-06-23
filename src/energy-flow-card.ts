@@ -865,8 +865,8 @@ export class EnergyFlowCard extends LitElement {
               </div>
             </div>
 
-            <div class="scrollable-chart-container" style="padding-top: 5px; height: 200px; overflow-y: hidden; overflow-x: hidden; position: relative;">
-              <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: auto;">
+            <div class="scrollable-chart-container" style="display: block !important; padding-top: 5px; height: 200px; overflow-y: hidden; overflow-x: hidden; position: relative;">
+              <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: 190px !important;">
                 <defs>
                   <linearGradient id="bar-red" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stop-color="#ef4444" />
