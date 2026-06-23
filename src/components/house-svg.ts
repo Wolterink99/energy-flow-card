@@ -443,7 +443,7 @@ export function renderHouseSvg({
   }
 
   // ── Window appearance ──
-  const isDay = timeHour >= 8.0 && timeHour <= 18.0;
+  const isDay = timeHour >= (sunriseHour || 6.0) && timeHour <= ((sunsetHour || 21.0) - 1.0);
   const windowFill = isDay
     ? 'url(#window-day)'
     : (resolvedShowLights ? 'url(#window-night)' : 'url(#window-dark)');
