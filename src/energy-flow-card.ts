@@ -795,20 +795,12 @@ export class EnergyFlowCard extends LitElement {
 
       if (impCostEntity) {
         const fromStats = getTodayCostFromStats(impCostEntity);
-        if (fromStats !== null && !isNaN(fromStats)) {
-          costTodayImport = fromStats;
-        } else if (this.hass?.states[impCostEntity]) {
-          // Fallback to sensor state if stats not yet loaded
-          costTodayImport = parseFloat(this.hass.states[impCostEntity].state);
-        }
+        // Only use stats value; if no today entry yet (e.g. just after midnight), show 0
+        costTodayImport = (fromStats !== null && !isNaN(fromStats)) ? fromStats : 0;
       }
       if (expCostEntity) {
         const fromStats = getTodayCostFromStats(expCostEntity);
-        if (fromStats !== null && !isNaN(fromStats)) {
-          costTodayExport = fromStats;
-        } else if (this.hass?.states[expCostEntity]) {
-          costTodayExport = parseFloat(this.hass.states[expCostEntity].state);
-        }
+        costTodayExport = (fromStats !== null && !isNaN(fromStats)) ? fromStats : 0;
       }
 
       if (this.activeTab === 'prices') {
