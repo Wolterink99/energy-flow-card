@@ -863,10 +863,9 @@ export class EnergyFlowCard extends LitElement {
           }
 
           chartHtml = html`
-            <div class="zonneplan-header" style="margin-top: 10px; margin-bottom: 5px; padding: 0 10px;">
-              <div style="font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: capitalize;">Zonneplan</div>
-              <div style="font-size: 32px; font-weight: bold; color: #ffffff; margin-top: 2px;">
-                ${currentPriceFormatted} <span style="font-size: 15px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
+            <div class="zonneplan-header" style="margin-top: 5px; margin-bottom: 5px; padding: 0 10px;">
+              <div style="font-size: 22px; font-weight: bold; color: #ffffff;">
+                ${currentPriceFormatted} <span style="font-size: 13px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
               </div>
             </div>
 
