@@ -2002,63 +2002,91 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 `})}
             </div>
           </div>
-        `}else o=C`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`}else if("grid"===this.activePopup){t="Stroomnet",e="Netbelasting & Historie";const d=this.getEntityValue(l.grid||l.grid_power),f=this.parseEntityFloat(l.grid_import_today),c=this.parseEntityFloat(l.grid_export_today);r=d>=0?"Netto Import (Live)":"Netto Export (Live)",s=Math.abs(d)>=1e3?`${(Math.abs(d)/1e3).toFixed(1)} kW`:`${Math.round(Math.abs(d))} W`,i="Import / Export Vandaag",n=`${null!==f?f.toFixed(1):"0"} / ${null!==c?c.toFixed(1):"0"} kWh`,a=!0;let p=l.grid_import_today,h=l.grid_export_today;if(this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(p="sensor.p1_meter_energy_import",h="sensor.p1_meter_energy_export"),"prices"===this.activeTab){const t=l.grid_price?this.hass?.states[l.grid_price]:null,e=t?.attributes?.forecast||[];if(0===e.length)o=C`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;else{const t=new Date(Date.now()-72e5);t.setMinutes(0,0,0);const r=new Date;r.setMinutes(0,0,0);const s=e.filter(e=>new Date(e.datetime)>=t),i=Math.max(...s.map(t=>Math.abs(parseFloat(t.electricity_price)/1e7)))||.1,n=38,a=90,l=25,d=45,f=s.map((t,e)=>{const s=new Date(t.datetime),a=s.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}),o=parseFloat(t.electricity_price)/1e7;return{x:e*n+25,y:d-o/i*32,price:o,label:a,isCurrent:s.getTime()===r.getTime(),isNeg:o<0}}),c=f.length*n+25,p=f.map((t,e)=>`${0===e?"M":"L"} ${t.x} ${t.y}`).join(" "),h=`${p} L ${f[f.length-1].x} ${a} L ${f[0].x} ${a} Z`;o=C`
-            <div class="scrollable-chart-container" style="padding-top: 15px; margin-top: 10px; height: 160px; overflow-y: hidden;">
-              <svg width="${c}" height="${a+l}" style="display: block;">
+        `}else o=C`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`}else if("grid"===this.activePopup){t="Stroomnet",e="Netbelasting & Historie";const d=this.getEntityValue(l.grid||l.grid_power),f=this.parseEntityFloat(l.grid_import_today),c=this.parseEntityFloat(l.grid_export_today);r=d>=0?"Netto Import (Live)":"Netto Export (Live)",s=Math.abs(d)>=1e3?`${(Math.abs(d)/1e3).toFixed(1)} kW`:`${Math.round(Math.abs(d))} W`,i="Import / Export Vandaag",n=`${null!==f?f.toFixed(1):"0"} / ${null!==c?c.toFixed(1):"0"} kWh`,a=!0;let p=l.grid_import_today,h=l.grid_export_today;if(this.hass?.states["sensor.p1_meter_energy_import"]&&this.hass?.states["sensor.p1_meter_energy_export"]&&(p="sensor.p1_meter_energy_import",h="sensor.p1_meter_energy_export"),"prices"===this.activeTab){const t=l.grid_price?this.hass?.states[l.grid_price]:null,e=t?.attributes?.forecast||[];if(0===e.length)o=C`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;else{const r=new Date(Date.now()-72e5);r.setMinutes(0,0,0);const s=new Date;s.setMinutes(0,0,0);const i=e.filter(t=>new Date(t.datetime)>=r),n=i.map(t=>parseFloat(t.electricity_price)/1e7),a=Math.max(...n,.4),l=Math.min(...n,0),d=Math.max(.4,Math.ceil(5*a)/5),f=l<0?Math.floor(5*l)/5:0,c=d-f,p=50,h=485,g=35,u=110,v=g+u,x=v-(0-f)/c*u,y=(h-p)/i.length,b=Math.max(4,y-6),k=i.map((t,e)=>{const r=new Date(t.datetime),i=r.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}),n=parseFloat(t.electricity_price)/1e7;return{x:p+e*y+y/2,y:v-(n-f)/c*u,price:n,label:i,isCurrent:r.getTime()===s.getTime(),isNeg:n<0,datetime:t.datetime}}),w=k.find(t=>t.isCurrent),V=w?w.price.toFixed(2).replace(".",","):t?parseFloat(t.state).toFixed(2).replace(".",","):"0,00",O=k.reduce((t,e)=>e.price>t.price?e:t,k[0]),q=k.reduce((t,e)=>e.price<t.price?e:t,k[0]),X=[];for(let t=f;t<=d+.001;t+=.2){const e=v-(t-f)/c*u;X.push({val:t,y:e})}o=C`
+            <div class="zonneplan-header" style="margin-top: 10px; margin-bottom: 5px; padding: 0 10px;">
+              <div style="font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: capitalize;">Zonneplan</div>
+              <div style="font-size: 32px; font-weight: bold; color: #ffffff; margin-top: 2px;">
+                ${V} <span style="font-size: 15px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
+              </div>
+            </div>
+
+            <div class="scrollable-chart-container" style="padding-top: 5px; height: 200px; overflow-y: hidden; overflow-x: hidden; position: relative;">
+              <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: auto;">
                 <defs>
-                  <linearGradient id="price-fill-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
-                    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0" />
+                  <linearGradient id="bar-red" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ef4444" />
+                    <stop offset="100%" stop-color="#991b1b" />
                   </linearGradient>
-                  
-                  <linearGradient id="price-line-grad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#06b6d4" />
-                    <stop offset="100%" stop-color="#10b981" />
+                  <linearGradient id="bar-green" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10b981" />
+                    <stop offset="100%" stop-color="#065f46" />
+                  </linearGradient>
+                  <linearGradient id="bar-yellow" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#fbbf24" />
+                    <stop offset="100%" stop-color="#b45309" />
                   </linearGradient>
                 </defs>
- 
-                <!-- Zero Baseline -->
-                <line x1="0" y1="${d}" x2="${c}" y2="${d}" stroke="rgba(255,255,255,0.15)" stroke-dasharray="3,3" />
-                <text x="5" y="${d-4}" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">€0.00</text>
- 
-                <!-- Filled Area -->
-                <path d="${h}" fill="url(#price-fill-grad)" />
- 
-                <!-- Line Path -->
-                <path d="${p}" fill="none" stroke="url(#price-line-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
- 
-                <!-- Dots and Tooltips -->
-                ${f.map(t=>{const e=t.isCurrent;return C`
-                    <!-- Interactive Point Area for hover tooltip -->
+
+                <!-- Gridlines -->
+                ${X.map(t=>C`
+                  <line x1="${p}" y1="${t.y}" x2="${h}" y2="${t.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${0===t.val?"0":"2,2"}" />
+                  <text x="${p-8}" y="${t.y+3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
+                    € ${t.val.toFixed(2)}
+                  </text>
+                `)}
+
+                <!-- Current Time Marker Line -->
+                ${w?C`
+                  <line x1="${w.x}" y1="${g}" x2="${w.x}" y2="${v}" stroke="rgba(239,68,68,0.4)" stroke-width="1.5" stroke-dasharray="2,2" />
+                `:""}
+
+                <!-- Bars -->
+                ${k.map(t=>{const e=t.price>.3,r=t.price>0&&t.price<=.3,s=e?"bar-red":r?"bar-green":"bar-yellow",i=t.price>=0,n=i?t.y:x,a=i?Math.max(1.5,x-t.y):Math.max(1.5,t.y-x);return C`
                     <g class="chart-point-group">
-                      <circle cx="${t.x}" cy="${t.y}" r="${t.isCurrent?5:3}" 
-                              fill="${t.isCurrent?"#10b981":t.isNeg?"#fbbf24":"#06b6d4"}" 
-                              stroke="#0f172a" stroke-width="1" />
+                      <!-- Bar -->
+                      <rect x="${t.x-b/2}" y="${n}" width="${b}" height="${a}" 
+                            fill="url(#${s})" rx="1.5" ry="1.5"
+                            style="opacity: ${t.isCurrent?1:.82};" />
                       
-                      ${t.isCurrent?C`
-                        <circle cx="${t.x}" cy="${t.y}" r="9" fill="none" stroke="#10b981" stroke-width="1" class="pulse-ring" style="transform-origin: ${t.x}px ${t.y}px; animation: pulse 2s infinite;" />
-                      `:""}
-
-                      <!-- Value Text -->
-                      ${e?C`
-                        <text x="${t.x}" y="${t.y-10}" text-anchor="middle" 
-                              fill="${t.isCurrent?"#10b981":t.isNeg?"#fbbf24":"#ffffff"}" 
-                              font-size="9px" font-weight="bold" font-family="monospace">
-                          €${t.price.toFixed(2)}
-                        </text>
-                      `:""}
-
-                      <!-- Native SVG Tooltip -->
-                      <title>Tijd: ${t.label}\nTarief: €${t.price.toFixed(3)} / kWh</title>
+                      <!-- Native hover title -->
+                      <title>${t.label} - € ${t.price.toFixed(3)}/kWh</title>
                     </g>
-                    
-                    <!-- Time Label on X-axis -->
-                    <text x="${t.x}" y="${a+15}" text-anchor="middle" 
-                          fill="${t.isCurrent?"#10b981":"rgba(255,255,255,0.4)"}" 
+                  `})}
+
+                <!-- Peak Marker Bubble -->
+                ${O?C`
+                  <circle cx="${O.x}" cy="${O.y}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+                  <g>
+                    <!-- White background pill -->
+                    <rect x="${O.x-17}" y="${O.y-23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
+                    <!-- Value text -->
+                    <text x="${O.x}" y="${O.y-13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
+                      ${O.price.toFixed(2).replace(".",",")}
+                    </text>
+                  </g>
+                `:""}
+
+                <!-- Dal (Lowest) Marker Bubble -->
+                ${q&&q!==O?C`
+                  <circle cx="${q.x}" cy="${q.y}" r="5.5" fill="${q.price<=.3?"#10b981":"#ef4444"}" stroke="#ffffff" stroke-width="1.5" />
+                  <g>
+                    <!-- White background pill -->
+                    <rect x="${q.x-17}" y="${q.price<0?q.y+10:q.y-23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
+                    <!-- Value text -->
+                    <text x="${q.x}" y="${q.price<0?q.y+20:q.y-13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
+                      ${q.price.toFixed(2).replace(".",",")}
+                    </text>
+                  </g>
+                `:""}
+
+                <!-- X Axis Labels (every 4 hours to avoid overlap) -->
+                ${k.map(t=>new Date(t.datetime).getHours()%4==0?C`
+                    <text x="${t.x}" y="${v+16}" text-anchor="middle" 
+                          fill="${t.isCurrent?"#ef4444":"rgba(255,255,255,0.45)"}" 
                           font-size="9px" font-weight="${t.isCurrent?"bold":"normal"}" font-family="sans-serif">
                       ${t.label}
                     </text>
-                  `})}
+                  `:"")}
               </svg>
             </div>
           `}}else if(this.isLoadingHistory)o=C`<div class="chart-loading">Gegevens laden...</div>`;else if(p&&h&&(this.statsData[p]||this.statsData[h])){const t=this.getProcessedGridData(p,h),e=Math.max(...t.map(t=>Math.max(t.importValue,t.exportValue)))||1;o=C`

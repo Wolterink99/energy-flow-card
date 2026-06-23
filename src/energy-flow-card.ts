@@ -798,21 +798,35 @@ export class EnergyFlowCard extends LitElement {
             return entryDate >= twoHoursAgo;
           });
 
-          // Map points
-          const maxVal = Math.max(...filtered.map((i: any) => Math.abs(parseFloat(i.electricity_price) / 10000000))) || 0.1;
-          const spacing = 38;
-          const height = 90;
-          const paddingBottom = 25;
-          const zeroY = 45; // Center of the 90px height chart
+          // Calculate Y bounds
+          const pricesOnly = filtered.map((entry: any) => parseFloat(entry.electricity_price) / 10000000);
+          const maxPriceVal = Math.max(...pricesOnly, 0.40);
+          const minPriceVal = Math.min(...pricesOnly, 0.0);
+          
+          // Next multiples of 0.20
+          const maxY = Math.max(0.40, Math.ceil(maxPriceVal * 5) / 5);
+          const minY = minPriceVal < 0 ? Math.floor(minPriceVal * 5) / 5 : 0.0;
+          const priceRange = maxY - minY;
 
+          // Chart area within 500x190 viewBox
+          const chartLeft = 50;
+          const chartRight = 485;
+          const chartWidth = chartRight - chartLeft;
+          const chartTop = 35;
+          const chartHeight = 110;
+          const chartBottom = chartTop + chartHeight;
+          const zeroY = chartBottom - ((0.0 - minY) / priceRange) * chartHeight;
+
+          const step = chartWidth / filtered.length;
+          const barWidth = Math.max(4, step - 6);
+
+          // Map points
           const points = filtered.map((entry: any, idx: number) => {
             const date = new Date(entry.datetime);
             const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
             const priceEur = parseFloat(entry.electricity_price) / 10000000;
-            const x = idx * spacing + 25;
-            
-            // Calculate y: price > 0 goes up (subtract), price < 0 goes down (add)
-            const y = zeroY - (priceEur / maxVal) * 32;
+            const x = chartLeft + idx * step + step / 2;
+            const y = chartBottom - ((priceEur - minY) / priceRange) * chartHeight;
             const isCurrent = date.getTime() === currentHourStart.getTime();
 
             return {
@@ -821,69 +835,124 @@ export class EnergyFlowCard extends LitElement {
               price: priceEur,
               label: hourLabel,
               isCurrent,
-              isNeg: priceEur < 0
+              isNeg: priceEur < 0,
+              datetime: entry.datetime
             };
           });
 
-          const svgWidth = points.length * spacing + 25;
-          const pathD = points.map((p: any, idx: number) => `${idx === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-          const fillD = `${pathD} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
+          // Large Price Header (Zonneplan 0,54 €/kWh)
+          const currentPt = points.find((p: any) => p.isCurrent);
+          const currentPriceFormatted = currentPt 
+            ? currentPt.price.toFixed(2).replace('.', ',') 
+            : (gridPriceState ? parseFloat(gridPriceState.state).toFixed(2).replace('.', ',') : '0,00');
+
+          // Peak and low elements
+          const maxPt = points.reduce((max: any, p: any) => p.price > max.price ? p : max, points[0]);
+          const minPt = points.reduce((min: any, p: any) => p.price < min.price ? p : min, points[0]);
+
+          // Grid lines
+          const gridLines = [];
+          for (let val = minY; val <= maxY + 0.001; val += 0.20) {
+            const yLine = chartBottom - ((val - minY) / priceRange) * chartHeight;
+            gridLines.push({ val, y: yLine });
+          }
+
           chartHtml = html`
-            <div class="scrollable-chart-container" style="padding-top: 15px; margin-top: 10px; height: 160px; overflow-y: hidden;">
-              <svg width="${svgWidth}" height="${height + paddingBottom}" style="display: block;">
+            <div class="zonneplan-header" style="margin-top: 10px; margin-bottom: 5px; padding: 0 10px;">
+              <div style="font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: capitalize;">Zonneplan</div>
+              <div style="font-size: 32px; font-weight: bold; color: #ffffff; margin-top: 2px;">
+                ${currentPriceFormatted} <span style="font-size: 15px; font-weight: normal; color: rgba(255,255,255,0.5); vertical-align: middle; margin-left: 2px;">€/kWh</span>
+              </div>
+            </div>
+
+            <div class="scrollable-chart-container" style="padding-top: 5px; height: 200px; overflow-y: hidden; overflow-x: hidden; position: relative;">
+              <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: auto;">
                 <defs>
-                  <linearGradient id="price-fill-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
-                    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0" />
+                  <linearGradient id="bar-red" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ef4444" />
+                    <stop offset="100%" stop-color="#991b1b" />
                   </linearGradient>
-                  
-                  <linearGradient id="price-line-grad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#06b6d4" />
-                    <stop offset="100%" stop-color="#10b981" />
+                  <linearGradient id="bar-green" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10b981" />
+                    <stop offset="100%" stop-color="#065f46" />
+                  </linearGradient>
+                  <linearGradient id="bar-yellow" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#fbbf24" />
+                    <stop offset="100%" stop-color="#b45309" />
                   </linearGradient>
                 </defs>
- 
-                <!-- Zero Baseline -->
-                <line x1="0" y1="${zeroY}" x2="${svgWidth}" y2="${zeroY}" stroke="rgba(255,255,255,0.15)" stroke-dasharray="3,3" />
-                <text x="5" y="${zeroY - 4}" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">€0.00</text>
- 
-                <!-- Filled Area -->
-                <path d="${fillD}" fill="url(#price-fill-grad)" />
- 
-                <!-- Line Path -->
-                <path d="${pathD}" fill="none" stroke="url(#price-line-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
- 
-                <!-- Dots and Tooltips -->
+
+                <!-- Gridlines -->
+                ${gridLines.map(g => html`
+                  <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${g.val === 0.0 ? '0' : '2,2'}" />
+                  <text x="${chartLeft - 8}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
+                    € ${g.val.toFixed(2)}
+                  </text>
+                `)}
+
+                <!-- Current Time Marker Line -->
+                ${currentPt ? html`
+                  <line x1="${currentPt.x}" y1="${chartTop}" x2="${currentPt.x}" y2="${chartBottom}" stroke="rgba(239,68,68,0.4)" stroke-width="1.5" stroke-dasharray="2,2" />
+                ` : ''}
+
+                <!-- Bars -->
                 ${points.map((p: any) => {
-                  const showLabel = p.isCurrent;
+                  const isRed = p.price > 0.30;
+                  const isGreen = p.price > 0 && p.price <= 0.30;
+                  const gradId = isRed ? 'bar-red' : (isGreen ? 'bar-green' : 'bar-yellow');
+                  
+                  const isPos = p.price >= 0;
+                  const yStart = isPos ? p.y : zeroY;
+                  const h = isPos ? Math.max(1.5, zeroY - p.y) : Math.max(1.5, p.y - zeroY);
 
                   return html`
-                    <!-- Interactive Point Area for hover tooltip -->
                     <g class="chart-point-group">
-                      <circle cx="${p.x}" cy="${p.y}" r="${p.isCurrent ? 5 : 3}" 
-                              fill="${p.isCurrent ? '#10b981' : (p.isNeg ? '#fbbf24' : '#06b6d4')}" 
-                              stroke="#0f172a" stroke-width="1" />
+                      <!-- Bar -->
+                      <rect x="${p.x - barWidth / 2}" y="${yStart}" width="${barWidth}" height="${h}" 
+                            fill="url(#${gradId})" rx="1.5" ry="1.5"
+                            style="opacity: ${p.isCurrent ? 1.0 : 0.82};" />
                       
-                      ${p.isCurrent ? html`
-                        <circle cx="${p.x}" cy="${p.y}" r="9" fill="none" stroke="#10b981" stroke-width="1" class="pulse-ring" style="transform-origin: ${p.x}px ${p.y}px; animation: pulse 2s infinite;" />
-                      ` : ''}
-
-                      <!-- Value Text -->
-                      ${showLabel ? html`
-                        <text x="${p.x}" y="${p.y - 10}" text-anchor="middle" 
-                              fill="${p.isCurrent ? '#10b981' : (p.isNeg ? '#fbbf24' : '#ffffff')}" 
-                              font-size="9px" font-weight="bold" font-family="monospace">
-                          €${p.price.toFixed(2)}
-                        </text>
-                      ` : ''}
-
-                      <!-- Native SVG Tooltip -->
-                      <title>Tijd: ${p.label}\nTarief: €${p.price.toFixed(3)} / kWh</title>
+                      <!-- Native hover title -->
+                      <title>${p.label} - € ${p.price.toFixed(3)}/kWh</title>
                     </g>
-                    
-                    <!-- Time Label on X-axis -->
-                    <text x="${p.x}" y="${height + 15}" text-anchor="middle" 
-                          fill="${p.isCurrent ? '#10b981' : 'rgba(255,255,255,0.4)'}" 
+                  `;
+                })}
+
+                <!-- Peak Marker Bubble -->
+                ${maxPt ? html`
+                  <circle cx="${maxPt.x}" cy="${maxPt.y}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+                  <g>
+                    <!-- White background pill -->
+                    <rect x="${maxPt.x - 17}" y="${maxPt.y - 23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
+                    <!-- Value text -->
+                    <text x="${maxPt.x}" y="${maxPt.y - 13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
+                      ${maxPt.price.toFixed(2).replace('.', ',')}
+                    </text>
+                  </g>
+                ` : ''}
+
+                <!-- Dal (Lowest) Marker Bubble -->
+                ${minPt && minPt !== maxPt ? html`
+                  <circle cx="${minPt.x}" cy="${minPt.y}" r="5.5" fill="${minPt.price <= 0.30 ? '#10b981' : '#ef4444'}" stroke="#ffffff" stroke-width="1.5" />
+                  <g>
+                    <!-- White background pill -->
+                    <rect x="${minPt.x - 17}" y="${minPt.price < 0 ? minPt.y + 10 : minPt.y - 23}" width="34" height="13" rx="3.5" ry="3.5" fill="#ffffff" />
+                    <!-- Value text -->
+                    <text x="${minPt.x}" y="${minPt.price < 0 ? minPt.y + 20 : minPt.y - 13}" text-anchor="middle" fill="#0f172a" font-size="8.5px" font-weight="bold" font-family="sans-serif">
+                      ${minPt.price.toFixed(2).replace('.', ',')}
+                    </text>
+                  </g>
+                ` : ''}
+
+                <!-- X Axis Labels (every 4 hours to avoid overlap) -->
+                ${points.map((p: any) => {
+                  const date = new Date(p.datetime);
+                  const showLabel = date.getHours() % 4 === 0;
+
+                  if (!showLabel) return '';
+                  return html`
+                    <text x="${p.x}" y="${chartBottom + 16}" text-anchor="middle" 
+                          fill="${p.isCurrent ? '#ef4444' : 'rgba(255,255,255,0.45)'}" 
                           font-size="9px" font-weight="${p.isCurrent ? 'bold' : 'normal'}" font-family="sans-serif">
                       ${p.label}
                     </text>
