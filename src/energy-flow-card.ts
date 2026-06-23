@@ -202,7 +202,7 @@ export class EnergyFlowCard extends LitElement {
   @state() private activePopup: string | null = null;
   @state() private activePopupHistory: { day: string; value: number }[] = [];
   @state() private isLoadingHistory: boolean = false;
-  @state() private activeTab: 'day' | 'month' | 'year' = 'day';
+  @state() private activeTab: 'prices' | 'day' | 'month' | 'year' = 'day';
   @state() private statsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
   @state() private debugWeatherState: string | null = null;
@@ -780,44 +780,90 @@ export class EnergyFlowCard extends LitElement {
         expEntity = 'sensor.p1_meter_energy_export';
       }
 
-      if (this.isLoadingHistory) {
-        chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
-      } else if (!impEntity || !expEntity || (!this.statsData[impEntity] && !this.statsData[expEntity])) {
-        chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
-      } else {
-        const processed = this.getProcessedGridData(impEntity, expEntity);
-        const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
-        chartHtml = html`
-          <div class="scrollable-chart-container">
-            <div class="glass-bar-chart">
-              ${processed.map(item => {
-                const importPercent = (item.importValue / maxVal) * 80;
-                const exportPercent = (item.exportValue / maxVal) * 80;
-                return html`
-                  <div class="chart-column" style="min-width: 60px;">
-                    <!-- Stacked values at the top of the column -->
-                    <div class="chart-values-stacked">
-                      <span class="stacked-val import-color">${item.importValue > 0 ? item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
-                      <span class="stacked-val export-color">${item.exportValue > 0 ? item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
-                    </div>
-
-                    <div class="grid-double-bar-wrapper">
-                      <!-- Import bar -->
-                      <div class="grid-import-bar-wrapper">
-                        <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
+      if (this.activeTab === 'prices') {
+        const gridPriceState = entities.grid_price ? this.hass?.states[entities.grid_price] : null;
+        const forecast = gridPriceState?.attributes?.forecast || [];
+        
+        if (forecast.length === 0) {
+          chartHtml = html`<div class="chart-no-data">Geen prijsinformatie beschikbaar.</div>`;
+        } else {
+          const parsed = forecast.map((entry: any) => {
+            const date = new Date(entry.datetime);
+            const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+            const priceEur = parseFloat(entry.electricity_price) / 10000000;
+            return { label: hourLabel, value: priceEur };
+          });
+          
+          const maxVal = Math.max(...parsed.map((i: any) => Math.abs(i.value))) || 0.1;
+          
+          chartHtml = html`
+            <div class="scrollable-chart-container" style="align-items: center; padding-top: 10px;">
+              <div class="price-chart">
+                <div class="price-zero-line"></div>
+                ${parsed.map((item: any) => {
+                  const isNeg = item.value < 0;
+                  const percentHeight = (Math.abs(item.value) / maxVal) * 45; // max 45% from center
+                  
+                  return html`
+                    <div class="price-column">
+                      <div class="price-value-stacked" style="color: ${isNeg ? '#fbbf24' : '#ffffff'};">
+                        ${isNeg ? '-' : ''}€${Math.abs(item.value).toFixed(2)}
                       </div>
-                      <!-- Export bar -->
-                      <div class="grid-export-bar-wrapper">
-                        <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
+                      
+                      <div class="price-bar-wrapper">
+                        <div class="price-bar ${isNeg ? 'negative' : 'positive'}"
+                             style="height: ${Math.max(3, percentHeight)}%; ${isNeg ? `top: 50%;` : `bottom: 50%;`}">
+                        </div>
                       </div>
+                      
+                      <span class="price-label">${item.label}</span>
                     </div>
-                    <span class="chart-label">${item.label}</span>
-                  </div>
-                `;
-              })}
+                  `;
+                })}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
+      } else {
+        if (this.isLoadingHistory) {
+          chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+        } else if (!impEntity || !expEntity || (!this.statsData[impEntity] && !this.statsData[expEntity])) {
+          chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
+        } else {
+          const processed = this.getProcessedGridData(impEntity, expEntity);
+          const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
+          chartHtml = html`
+            <div class="scrollable-chart-container">
+              <div class="glass-bar-chart">
+                ${processed.map(item => {
+                  const importPercent = (item.importValue / maxVal) * 80;
+                  const exportPercent = (item.exportValue / maxVal) * 80;
+                  return html`
+                    <div class="chart-column" style="min-width: 60px;">
+                      <!-- Stacked values at the top of the column -->
+                      <div class="chart-values-stacked">
+                        <span class="stacked-val import-color">${item.importValue > 0 ? item.importValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
+                        <span class="stacked-val export-color">${item.exportValue > 0 ? item.exportValue.toFixed(this.activeTab === 'day' ? 1 : 0) : '0'}</span>
+                      </div>
+  
+                      <div class="grid-double-bar-wrapper">
+                        <!-- Import bar -->
+                        <div class="grid-import-bar-wrapper">
+                          <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
+                        </div>
+                        <!-- Export bar -->
+                        <div class="grid-export-bar-wrapper">
+                          <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
+                        </div>
+                      </div>
+                      <span class="chart-label">${item.label}</span>
+                    </div>
+                  `;
+                })}
+              </div>
+            </div>
+          `;
+        }
       }
     }
 
@@ -833,9 +879,16 @@ export class EnergyFlowCard extends LitElement {
 
           <!-- Tab switcher -->
           <div class="popup-tabs">
-            <button class="popup-tab-btn ${this.activeTab === 'day' ? 'active' : ''}" @click=${() => this.switchTab('day')}>Dag</button>
-            <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
-            <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
+            ${this.activePopup === 'grid' ? html`
+              <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Uurprijzen</button>
+              <button class="popup-tab-btn ${this.activeTab === 'day' ? 'active' : ''}" @click=${() => this.switchTab('day')}>30 Dagen</button>
+              <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
+              <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
+            ` : html`
+              <button class="popup-tab-btn ${this.activeTab === 'day' ? 'active' : ''}" @click=${() => this.switchTab('day')}>Dag</button>
+              <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
+              <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
+            `}
           </div>
 
           <div class="glass-popup-stats">
@@ -877,7 +930,9 @@ export class EnergyFlowCard extends LitElement {
 
           <div class="glass-popup-chart-container">
             <div class="chart-title">
-              ${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (kWh)
+              ${this.activePopup === 'grid' && this.activeTab === 'prices'
+                ? 'Zonneplan Uurprijzen (€/kWh)'
+                : `${this.activeTab === 'day' ? 'Afgelopen 30 dagen' : (this.activeTab === 'month' ? 'Afgelopen 12 maanden' : 'Jaaroverzicht')} (kWh)`}
             </div>
             ${chartHtml}
           </div>
@@ -886,7 +941,7 @@ export class EnergyFlowCard extends LitElement {
     `;
   }
 
-  private switchTab(tab: 'day' | 'month' | 'year'): void {
+  private switchTab(tab: 'prices' | 'day' | 'month' | 'year'): void {
     this.activeTab = tab;
     setTimeout(() => {
       const container = this.shadowRoot?.querySelector('.scrollable-chart-container');
@@ -961,7 +1016,7 @@ export class EnergyFlowCard extends LitElement {
     
     if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'weather') {
       this.activePopup = nodeId;
-      this.activeTab = 'day';
+      this.activeTab = nodeId === 'grid' ? 'prices' : 'day';
       this.statsData = {};
       
       const entitiesToFetch: string[] = [];

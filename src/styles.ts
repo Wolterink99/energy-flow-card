@@ -569,6 +569,88 @@ export const styles = css`
     white-space: nowrap;
   }
 
+  /* Price Chart styles */
+  .price-chart-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .price-chart {
+    display: flex;
+    flex-direction: row;
+    height: 140px;
+    align-items: stretch;
+    gap: 6px;
+    position: relative;
+    min-width: max-content;
+    padding: 0 10px;
+  }
+
+  .price-zero-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    border-top: 1px dashed rgba(255, 255, 255, 0.35);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .price-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 44px;
+    height: 100%;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .price-bar-wrapper {
+    height: 110px;
+    width: 14px;
+    position: relative;
+  }
+
+  .price-bar {
+    position: absolute;
+    width: 100%;
+    border-radius: 2px;
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1), top 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .price-bar.positive {
+    background: linear-gradient(to top, #06b6d4, #22d3ee);
+    bottom: 50%;
+  }
+
+  .price-bar.negative {
+    background: linear-gradient(to bottom, #fbbf24, #f59e0b);
+    top: 50%;
+  }
+
+  .price-value-stacked {
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    font-family: monospace;
+    z-index: 2;
+  }
+
+  .price-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 4px;
+  }
+
   .import-color {
     color: #f87171;
   }
