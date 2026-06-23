@@ -2028,7 +2028,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 </defs>
 
                 <!-- Gridlines -->
-                ${W.map(t=>C`
+                ${W.map(t=>J`
                   <line x1="${u}" y1="${t.y}" x2="${v}" y2="${t.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${0===t.val?"0":"2,2"}" />
                   <text x="${u-8}" y="${t.y+3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
                     € ${t.val.toFixed(2)}
@@ -2036,12 +2036,12 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 `)}
 
                 <!-- Current Time Marker Line -->
-                ${q?C`
+                ${q?J`
                   <line x1="${q.x}" y1="${x}" x2="${q.x}" y2="${b}" stroke="rgba(239,68,68,0.4)" stroke-width="1.5" stroke-dasharray="2,2" />
                 `:""}
 
                 <!-- Bars -->
-                ${O.map(t=>{const e=t.price>.3,r=t.price>0&&t.price<=.3,s=e?"bar-red":r?"bar-green":"bar-yellow",i=t.price>=0,n=i?t.y:k,a=i?Math.max(1.5,k-t.y):Math.max(1.5,t.y-k);return C`
+                ${O.map(t=>{const e=t.price>.3,r=t.price>0&&t.price<=.3,s=e?"bar-red":r?"bar-green":"bar-yellow",i=t.price>=0,n=i?t.y:k,a=i?Math.max(1.5,k-t.y):Math.max(1.5,t.y-k);return J`
                     <g class="chart-point-group">
                       <!-- Bar -->
                       <rect x="${t.x-V/2}" y="${n}" width="${V}" height="${a}" 
@@ -2054,7 +2054,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                   `})}
 
                 <!-- Peak Marker Bubble -->
-                ${j?C`
+                ${j?J`
                   <circle cx="${j.x}" cy="${j.y}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
@@ -2067,7 +2067,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 `:""}
 
                 <!-- Dal (Lowest) Marker Bubble -->
-                ${S&&S!==j?C`
+                ${S&&S!==j?J`
                   <circle cx="${S.x}" cy="${S.y}" r="5.5" fill="${S.price<=.3?"#10b981":"#ef4444"}" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
@@ -2080,7 +2080,7 @@ function t(t,e,r,s){var i,n=arguments.length,a=n<3?e:null===s?s=Object.getOwnPro
                 `:""}
 
                 <!-- X Axis Labels (every 4 hours to avoid overlap) -->
-                ${O.map(t=>new Date(t.datetime).getHours()%4==0?C`
+                ${O.map(t=>new Date(t.datetime).getHours()%4==0?J`
                     <text x="${t.x}" y="${b+16}" text-anchor="middle" 
                           fill="${t.isCurrent?"#ef4444":"rgba(255,255,255,0.45)"}" 
                           font-size="9px" font-weight="${t.isCurrent?"bold":"normal"}" font-family="sans-serif">

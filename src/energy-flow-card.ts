@@ -1,4 +1,4 @@
-import { LitElement, html, TemplateResult } from 'lit';
+import { LitElement, html, svg, TemplateResult } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { HomeAssistant, EnergyFlowCardConfig } from './types';
 import { styles } from './styles';
@@ -888,7 +888,7 @@ export class EnergyFlowCard extends LitElement {
                 </defs>
 
                 <!-- Gridlines -->
-                ${gridLines.map(g => html`
+                ${gridLines.map(g => svg`
                   <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${g.val === 0.0 ? '0' : '2,2'}" />
                   <text x="${chartLeft - 8}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
                     € ${g.val.toFixed(2)}
@@ -896,7 +896,7 @@ export class EnergyFlowCard extends LitElement {
                 `)}
 
                 <!-- Current Time Marker Line -->
-                ${currentPt ? html`
+                ${currentPt ? svg`
                   <line x1="${currentPt.x}" y1="${chartTop}" x2="${currentPt.x}" y2="${chartBottom}" stroke="rgba(239,68,68,0.4)" stroke-width="1.5" stroke-dasharray="2,2" />
                 ` : ''}
 
@@ -910,7 +910,7 @@ export class EnergyFlowCard extends LitElement {
                   const yStart = isPos ? p.y : zeroY;
                   const h = isPos ? Math.max(1.5, zeroY - p.y) : Math.max(1.5, p.y - zeroY);
 
-                  return html`
+                  return svg`
                     <g class="chart-point-group">
                       <!-- Bar -->
                       <rect x="${p.x - barWidth / 2}" y="${yStart}" width="${barWidth}" height="${h}" 
@@ -924,7 +924,7 @@ export class EnergyFlowCard extends LitElement {
                 })}
 
                 <!-- Peak Marker Bubble -->
-                ${maxPt ? html`
+                ${maxPt ? svg`
                   <circle cx="${maxPt.x}" cy="${maxPt.y}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
@@ -937,7 +937,7 @@ export class EnergyFlowCard extends LitElement {
                 ` : ''}
 
                 <!-- Dal (Lowest) Marker Bubble -->
-                ${minPt && minPt !== maxPt ? html`
+                ${minPt && minPt !== maxPt ? svg`
                   <circle cx="${minPt.x}" cy="${minPt.y}" r="5.5" fill="${minPt.price <= 0.30 ? '#10b981' : '#ef4444'}" stroke="#ffffff" stroke-width="1.5" />
                   <g>
                     <!-- White background pill -->
@@ -955,7 +955,7 @@ export class EnergyFlowCard extends LitElement {
                   const showLabel = date.getHours() % 4 === 0;
 
                   if (!showLabel) return '';
-                  return html`
+                  return svg`
                     <text x="${p.x}" y="${chartBottom + 16}" text-anchor="middle" 
                           fill="${p.isCurrent ? '#ef4444' : 'rgba(255,255,255,0.45)'}" 
                           font-size="9px" font-weight="${p.isCurrent ? 'bold' : 'normal'}" font-family="sans-serif">
