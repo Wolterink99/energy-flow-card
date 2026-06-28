@@ -2575,14 +2575,11 @@ class EnergyFlowCard extends i {
         if (point.mean !== undefined && point.mean !== null) {
             val = point.mean;
         }
+        else if (point.change !== undefined && point.change !== null) {
+            val = point.change;
+        }
         else {
-            const isCumulative = !entityId.includes('vandaag') && !entityId.includes('today');
-            if (isCumulative && point.change !== undefined && point.change !== null) {
-                val = point.change;
-            }
-            else {
-                val = point.state !== undefined ? point.state : 0;
-            }
+            val = point.state !== undefined ? point.state : 0;
         }
         const parsed = typeof val === 'number' ? val : parseFloat(val);
         return isNaN(parsed) ? 0 : parsed;
