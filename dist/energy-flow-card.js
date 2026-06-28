@@ -2549,21 +2549,24 @@ class EnergyFlowCard extends i {
         try {
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).toISOString();
-            const end = now.toISOString();
             const entityIds = [];
             if (solarEnt)
                 entityIds.push(solarEnt);
             if (homeEnt)
                 entityIds.push(homeEnt);
-            const res = await this.hass.callWS({
-                type: 'history/period',
-                start_time: start,
-                end_time: end,
-                entity_ids: entityIds,
-                minimal_response: true,
-                no_attributes: true
-            });
-            this.hourlyHistoryData = res || {};
+            const res = await this.hass.callApi('GET', `history/period/${start}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`);
+            const historyMap = {};
+            if (Array.isArray(res)) {
+                res.forEach((entityHistory) => {
+                    if (entityHistory && entityHistory.length > 0) {
+                        const entId = entityHistory[0].entity_id;
+                        if (entId) {
+                            historyMap[entId] = entityHistory;
+                        }
+                    }
+                });
+            }
+            this.hourlyHistoryData = historyMap;
         }
         catch (e) {
             console.error('[energy-flow-card] Failed to fetch history:', e);
