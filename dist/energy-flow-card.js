@@ -2755,91 +2755,187 @@ class EnergyFlowCard extends i {
         }
         return data;
     }
-    renderLineChart(processed, type) {
-        const currentHour = new Date().getHours();
-        const activePoints = processed.filter((_, idx) => idx <= currentHour);
-        if (activePoints.length === 0) {
-            return b `<div class="chart-no-data">Geen gegevens beschikbaar voor vandaag.</div>`;
+    renderUnifiedLineChart(solarEntity, homeEntity) {
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        const currentDate = now.getDate();
+        const gridPriceState = this.config?.entities.grid_price ? this.hass?.states[this.config.entities.grid_price] : null;
+        const forecast = gridPriceState?.attributes?.forecast || [];
+        const solarRaw = this.hourlyStatsData[solarEntity] || [];
+        const homeRaw = this.hourlyStatsData[homeEntity] || [];
+        const solarMap = new Map();
+        const homeMap = new Map();
+        solarRaw.forEach(p => {
+            const d = new Date(p.start);
+            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate) {
+                solarMap.set(d.getHours(), this.getStatPointValue(p, solarEntity) * 1000); // convert to W
+            }
+        });
+        homeRaw.forEach(p => {
+            const d = new Date(p.start);
+            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate) {
+                homeMap.set(d.getHours(), this.getStatPointValue(p, homeEntity) * 1000); // convert to W
+            }
+        });
+        const points = [];
+        const prices = [];
+        const powers = [];
+        for (let hour = 0; hour < 24; hour++) {
+            const forecastEntry = forecast.find((entry) => {
+                const d = new Date(entry.datetime);
+                return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate && d.getHours() === hour;
+            });
+            const price = forecastEntry ? parseFloat(forecastEntry.electricity_price) / 10000000 : 0;
+            prices.push(price);
+            const solarVal = solarMap.get(hour) || 0;
+            const homeVal = homeMap.get(hour) || 0;
+            powers.push(solarVal, homeVal);
+            const hourStr = `${hour.toString().padStart(2, '0')}:00`;
+            points.push({
+                hour,
+                label: hourStr,
+                price,
+                solar: solarVal,
+                home: homeVal
+            });
         }
-        let values = [];
-        if (type === 'grid') {
-            values = activePoints.map(p => p.importValue - p.exportValue);
-        }
-        else {
-            values = activePoints.map(p => p.value);
-        }
-        const maxVal = Math.max(...values.map(Math.abs), 0.5);
-        const minVal = type === 'grid' ? -maxVal : 0;
-        const valRange = maxVal - minVal;
-        const chartLeft = 50;
-        const chartRight = 485;
+        const maxPower = Math.max(...powers, 1000);
+        const maxPrice = Math.max(...prices, 0.40);
+        const minPrice = Math.min(...prices, 0.0);
+        const priceRange = maxPrice - minPrice;
+        const chartLeft = 45;
+        const chartRight = 450;
         const chartWidth = chartRight - chartLeft;
         const chartTop = 20;
         const chartHeight = 120;
         const chartBottom = chartTop + chartHeight;
-        const zeroY = chartBottom - ((0.0 - minVal) / valRange) * chartHeight;
         const step = chartWidth / 23;
-        const points = activePoints.map((item, idx) => {
-            const val = type === 'grid' ? (item.importValue - item.exportValue) : item.value;
+        const svgPoints = points.map((p, idx) => {
             const x = chartLeft + idx * step;
-            const y = chartBottom - ((val - minVal) / valRange) * chartHeight;
-            return { x, y, val, label: item.label, price: item.price };
+            const ySolar = chartBottom - (p.solar / maxPower) * chartHeight;
+            const yHome = chartBottom - (p.home / maxPower) * chartHeight;
+            const yPrice = chartBottom - ((p.price - minPrice) / (priceRange || 1)) * chartHeight;
+            return {
+                ...p,
+                x,
+                ySolar,
+                yHome,
+                yPrice
+            };
         });
-        let linePath = '';
-        let areaPath = '';
-        if (points.length > 0) {
-            linePath = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
-            if (type === 'grid') {
-                areaPath = `M ${points[0].x} ${zeroY} ` + points.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${points[points.length - 1].x} ${zeroY} Z`;
-            }
-            else {
-                areaPath = `M ${points[0].x} ${chartBottom} ` + points.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${points[points.length - 1].x} ${chartBottom} Z`;
-            }
+        const pastPoints = svgPoints.filter(p => p.hour <= currentHour);
+        let solarLinePath = '';
+        let solarAreaPath = '';
+        let homeLinePath = '';
+        let homeAreaPath = '';
+        let priceLinePath = '';
+        let priceAreaPath = '';
+        if (pastPoints.length > 0) {
+            solarLinePath = `M ${pastPoints[0].x} ${pastPoints[0].ySolar} ` + pastPoints.slice(1).map(p => `L ${p.x} ${p.ySolar}`).join(' ');
+            solarAreaPath = `M ${pastPoints[0].x} ${chartBottom} ` + pastPoints.map(p => `L ${p.x} ${p.ySolar}`).join(' ') + ` L ${pastPoints[pastPoints.length - 1].x} ${chartBottom} Z`;
+            homeLinePath = `M ${pastPoints[0].x} ${pastPoints[0].yHome} ` + pastPoints.slice(1).map(p => `L ${p.x} ${p.yHome}`).join(' ');
+            homeAreaPath = `M ${pastPoints[0].x} ${chartBottom} ` + pastPoints.map(p => `L ${p.x} ${p.yHome}`).join(' ') + ` L ${pastPoints[pastPoints.length - 1].x} ${chartBottom} Z`;
         }
-        const color = type === 'solar' ? '#fbbf24' : (type === 'home' ? '#a78bfa' : '#ef4444');
-        const gradId = `area-grad-${type}`;
+        if (svgPoints.length > 0) {
+            priceLinePath = `M ${svgPoints[0].x} ${svgPoints[0].yPrice} ` + svgPoints.slice(1).map(p => `L ${p.x} ${p.yPrice}`).join(' ');
+            priceAreaPath = `M ${svgPoints[0].x} ${chartBottom} ` + svgPoints.map(p => `L ${p.x} ${p.yPrice}`).join(' ') + ` L ${svgPoints[svgPoints.length - 1].x} ${chartBottom} Z`;
+        }
         const gridLines = [];
         const gridCount = 4;
         for (let i = 0; i <= gridCount; i++) {
-            const val = minVal + (valRange * i) / gridCount;
-            const y = chartBottom - ((val - minVal) / valRange) * chartHeight;
-            gridLines.push({ val, y });
+            const powerVal = (maxPower * i) / gridCount;
+            const y = chartBottom - (powerVal / maxPower) * chartHeight;
+            gridLines.push({ powerVal, y });
         }
+        const priceLabels = [];
+        for (let i = 0; i <= gridCount; i++) {
+            const priceVal = minPrice + (priceRange * i) / gridCount;
+            const y = chartBottom - ((priceVal - minPrice) / (priceRange || 1)) * chartHeight;
+            priceLabels.push({ priceVal, y });
+        }
+        const solarLive = this.getEntityValue(this.config?.entities.solar || (this.config?.entities).solar_power);
+        const homeLive = this.getEntityValue(this.config?.entities.load || (this.config?.entities).home_power);
+        const priceLive = gridPriceState ? parseFloat(gridPriceState.state) : 0;
+        const homeTodayVal = this.parseEntityFloat(this.config?.entities.home_today) || 0;
+        const solarTodayVal = this.parseEntityFloat(this.config?.entities.solar_energy_today || (this.config?.entities).solar_today) || 0;
         return b `
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; padding: 0 4px; box-sizing: border-box; text-align: center;">
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 2px;">
+          <div style="font-size: 13px; font-weight: bold; color: #fbbf24; white-space: nowrap;">${solarLive >= 1000 ? `${(solarLive / 1000).toFixed(1)} kW` : `${Math.round(solarLive)} W`}</div>
+          <div style="font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; font-weight: bold; white-space: nowrap;">Solar (Live)</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 2px;">
+          <div style="font-size: 13px; font-weight: bold; color: #a78bfa; white-space: nowrap;">${homeLive >= 1000 ? `${(homeLive / 1000).toFixed(1)} kW` : `${Math.round(homeLive)} W`}</div>
+          <div style="font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; font-weight: bold; white-space: nowrap;">Huis (Live)</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 2px;">
+          <div style="font-size: 13px; font-weight: bold; color: #f59e0b; white-space: nowrap;">€${priceLive.toFixed(2).replace('.', ',')}</div>
+          <div style="font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; font-weight: bold; white-space: nowrap;">Tarief</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 2px;">
+          <div style="font-size: 13px; font-weight: bold; color: #60a5fa; white-space: nowrap;">${homeTodayVal.toFixed(1)} kWh</div>
+          <div style="font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; font-weight: bold; white-space: nowrap;">Verbruik</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 2px;">
+          <div style="font-size: 13px; font-weight: bold; color: #10b981; white-space: nowrap;">${solarTodayVal.toFixed(1)} kWh</div>
+          <div style="font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; font-weight: bold; white-space: nowrap;">Opwek</div>
+        </div>
+      </div>
+
       <div class="scrollable-chart-container" style="display: block !important; padding-top: 5px; height: 165px; overflow-y: hidden; overflow-x: hidden; position: relative;">
         <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: 155px !important;">
           <defs>
-            <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="${color}" stop-opacity="0.4" />
-              <stop offset="100%" stop-color="${color}" stop-opacity="0.0" />
+            <linearGradient id="solar-area-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.0" />
+            </linearGradient>
+            <linearGradient id="home-area-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0" />
+            </linearGradient>
+            <linearGradient id="price-area-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.05" />
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
             </linearGradient>
           </defs>
 
-          <!-- Gridlines -->
+          <!-- Gridlines & Left Y-Axis labels (Power) -->
           ${gridLines.map(g => b `
-            <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${g.val === 0.0 ? '0' : '2,2'}" />
-            <text x="${chartLeft - 8}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
-              ${Number(g.val).toFixed(1)} kW
+            <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.06)" stroke-width="0.8" stroke-dasharray="2,2" />
+            <text x="${chartLeft - 6}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="8.5px" font-family="sans-serif">
+              ${g.powerVal >= 1000 ? `${(g.powerVal / 1000).toFixed(1)} kW` : `${Math.round(g.powerVal)} W`}
             </text>
           `)}
 
-          <!-- Zero line for grid -->
-          ${type === 'grid' ? b `
-            <line x1="${chartLeft}" y1="${zeroY}" x2="${chartRight}" y2="${zeroY}" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
+          <!-- Right Y-Axis labels (Price) -->
+          ${priceLabels.map(p => b `
+            <text x="${chartRight + 6}" y="${p.y + 3}" text-anchor="start" fill="rgba(255,255,255,0.35)" font-size="8.5px" font-family="sans-serif">
+              €${p.priceVal.toFixed(2).replace('.', ',')}
+            </text>
+          `)}
+
+          <!-- Price Forecast Area & Line (Subtle background) -->
+          ${svgPoints.length > 0 ? b `
+            <path d="${priceAreaPath}" fill="url(#price-area-grad)" />
+            <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.2" stroke-dasharray="3,3" />
           ` : ''}
 
-          <!-- Filled Area -->
-          ${points.length > 0 ? b `
-            <path d="${areaPath}" fill="url(#${gradId})" />
+          <!-- Solar Area & Line -->
+          ${pastPoints.length > 0 ? b `
+            <path d="${solarAreaPath}" fill="url(#solar-area-grad)" />
+            <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
-          <!-- Line -->
-          ${points.length > 0 ? b `
-            <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Home Area & Line -->
+          ${pastPoints.length > 0 ? b `
+            <path d="${homeAreaPath}" fill="url(#home-area-grad)" />
+            <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- X Axis Labels (every 4 hours) -->
-          ${processed.map((item, idx) => {
+          ${points.map((item, idx) => {
             if (idx % 4 !== 0)
                 return '';
             const x = chartLeft + idx * step;
@@ -2847,18 +2943,17 @@ class EnergyFlowCard extends i {
               <text x="${x}" y="${chartBottom + 16}" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="9px" font-family="sans-serif">
                 ${item.label}
               </text>
-              ${type === 'grid' ? b `
-                <text x="${x}" y="${chartBottom + 27}" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">
-                  €${Number(item.price).toFixed(2).replace('.', ',')}
-                </text>
-              ` : ''}
             `;
         })}
 
-          <!-- Points -->
-          ${points.map((p) => b `
-            <circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}" stroke="#0f172a" stroke-width="1" />
-            <title>${p.label}: ${Number(p.val).toFixed(2)} kW${p.price ? ` - € ${Number(p.price).toFixed(3)}` : ''}</title>
+          <!-- Points & Tooltips -->
+          ${pastPoints.map(p => b `
+            <circle cx="${p.x}" cy="${p.ySolar}" r="2.5" fill="#fbbf24" stroke="#0f172a" stroke-width="1" />
+            <circle cx="${p.x}" cy="${p.yHome}" r="2.5" fill="#a78bfa" stroke="#0f172a" stroke-width="1" />
+            <title>Om ${p.label}:
+Solar: ${p.solar >= 1000 ? `${(p.solar / 1000).toFixed(2)} kW` : `${Math.round(p.solar)} W`}
+Huis: ${p.home >= 1000 ? `${(p.home / 1000).toFixed(2)} kW` : `${Math.round(p.home)} W`}
+Tarief: €${p.price.toFixed(3).replace('.', ',')}</title>
           `)}
         </svg>
       </div>
@@ -3062,12 +3157,13 @@ class EnergyFlowCard extends i {
                     chartHtml = b `<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
                 }
                 else {
-                    const currentHour = new Date().getHours();
-                    const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
-                    if (this.showPowerValue) {
-                        chartHtml = this.renderLineChart(processed, 'solar');
+                    const homeEnt = entities.home_today || '';
+                    if (this.showPowerValue && homeEnt) {
+                        chartHtml = this.renderUnifiedLineChart(entityId, homeEnt);
                     }
                     else {
+                        const currentHour = new Date().getHours();
+                        const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
                         const maxVal = Math.max(...processed.map(i => i.value)) || 1;
                         chartHtml = b `
               <div class="scrollable-chart-container">
@@ -3142,12 +3238,13 @@ class EnergyFlowCard extends i {
                     chartHtml = b `<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
                 }
                 else {
-                    const currentHour = new Date().getHours();
-                    const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
-                    if (this.showPowerValue) {
-                        chartHtml = this.renderLineChart(processed, 'home');
+                    const solarEnt = entities.solar_energy_today || entities.solar_today || '';
+                    if (this.showPowerValue && solarEnt) {
+                        chartHtml = this.renderUnifiedLineChart(solarEnt, entityId);
                     }
                     else {
+                        const currentHour = new Date().getHours();
+                        const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
                         const maxVal = Math.max(...processed.map(i => i.value)) || 1;
                         chartHtml = b `
               <div class="scrollable-chart-container">
@@ -3485,13 +3582,15 @@ class EnergyFlowCard extends i {
                         chartHtml = b `<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
                     }
                     else {
-                        const currentHour = new Date().getHours();
-                        const processed = this.getProcessedHourlyGridData(targetImp, targetExp).filter((_, idx) => idx <= currentHour);
-                        // Chronological order (no price sorting)
-                        if (this.showPowerValue) {
-                            chartHtml = this.renderLineChart(processed, 'grid');
+                        const solarEnt = entities.solar_energy_today || entities.solar_today || '';
+                        const homeEnt = entities.home_today || '';
+                        if (this.showPowerValue && solarEnt && homeEnt) {
+                            chartHtml = this.renderUnifiedLineChart(solarEnt, homeEnt);
                         }
                         else {
+                            const currentHour = new Date().getHours();
+                            const processed = this.getProcessedHourlyGridData(targetImp, targetExp).filter((_, idx) => idx <= currentHour);
+                            // Chronological order (no price sorting)
                             const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
                             chartHtml = b `
                 <div class="scrollable-chart-container">
