@@ -876,6 +876,28 @@ export class EnergyFlowCard extends LitElement {
   private renderPopup(): TemplateResult | string {
     if (!this.activePopup) return '';
     
+    if (this.activePopup === 'unified_chart') {
+      const solarPowerEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power || '';
+      const homePowerEnt = this.config?.entities.load || (this.config?.entities as any).home_power || '';
+
+      return html`
+        <div class="glass-popup-overlay" @click=${this.closePopup}>
+          <div class="glass-popup-card" style="height: auto; width: 550px; max-width: 95vw; padding: 20px;" @click=${(e: Event) => e.stopPropagation()}>
+            <button class="glass-popup-close" @click=${this.closePopup}>&times;</button>
+            
+            <div class="glass-popup-header" style="margin-bottom: 16px;">
+              <div class="glass-popup-title">Prestaties & Tarieven Vandaag</div>
+              <div class="glass-popup-subtitle">Live vermogen en prijsverloop</div>
+            </div>
+
+            <div class="glass-popup-chart-container" style="background: transparent; border: none; padding: 0;">
+              ${this.renderUnifiedLineChart(solarPowerEnt, homePowerEnt)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     let title = '';
     let subtitle = '';
     let stat1Label = '';
@@ -1772,6 +1794,13 @@ export class EnergyFlowCard extends LitElement {
     }, 100);
   }
 
+  private openUnifiedChartPopup(): void {
+    this.activePopup = 'unified_chart';
+    this.activeTab = 'today';
+    this.showPowerValue = true;
+    this.fetchHighResolutionHistory();
+  }
+
   private togglePowerUnit(e: Event): void {
     e.stopPropagation();
     this.showPowerValue = !this.showPowerValue;
@@ -2260,6 +2289,14 @@ export class EnergyFlowCard extends LitElement {
       ${dynamicAnimations}
       <ha-card style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
+          <!-- Floating Grafiek Button (Top Right) -->
+          <div style="position: absolute; right: 16px; top: 16px; z-index: 100;" @click=${(e: Event) => e.stopPropagation()}>
+            <button @click=${(e: Event) => { e.stopPropagation(); this.openUnifiedChartPopup(); }} style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: background 0.2s ease;">
+              <ha-icon icon="mdi:chart-line" style="--mdc-icon-size: 14px; width: 14px; height: 14px; color: #10b981;"></ha-icon>
+              Prestaties Grafiek
+            </button>
+          </div>
+
           ${this.config.title ? html`
             <div class="card-header">
               <div class="card-title">${this.config.title}</div>
