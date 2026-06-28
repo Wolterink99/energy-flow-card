@@ -2961,9 +2961,12 @@ class EnergyFlowCard extends i {
         </div>
       </div>
 
-      <div class="scrollable-chart-container" style="display: block !important; padding-top: 5px; height: 165px; overflow-y: hidden; overflow-x: hidden; position: relative;">
+      <div style="display: block !important; width: 100% !important; height: 170px !important; position: relative !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;">
         ${this.isFetchingHistory && solarHistory.length === 0 ? b `<div class="chart-loading" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15,23,42,0.4); z-index: 10;">Geschiedenis laden...</div>` : ''}
-        <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: 155px !important;">
+        <svg viewBox="0 0 500 190" style="display: block !important; width: 100% !important; height: 155px !important; margin: 0 !important; padding: 0 !important; background: rgba(255,0,0,0.1) !important;">
+          <!-- Diagnostic red rectangle to verify SVG visibility -->
+          <rect x="0" y="0" width="500" height="190" fill="rgba(255, 0, 0, 0.25)" />
+          
           <defs>
             <linearGradient id="solar-area-grad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.2" />
