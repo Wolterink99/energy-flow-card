@@ -2815,14 +2815,25 @@ class EnergyFlowCard extends i {
         const maxPrice = Math.max(...prices, 0.40);
         const minPrice = Math.min(...prices, 0.0);
         const priceRange = maxPrice - minPrice;
-        // 2. Parse high-resolution history curves
         const parseHistory = (entId) => {
             const raw = this.hourlyHistoryData[entId] || [];
-            return raw.map((p) => {
+            const parsed = raw.map((p) => {
                 const state = parseFloat(p.s !== undefined ? p.s : p.state);
                 const time = (p.t !== undefined ? p.t * 1000 : new Date(p.last_changed || p.last_updated).getTime());
                 return { state: isNaN(state) ? 0 : state, time };
             }).sort((a, b) => a.time - b.time);
+            if (parsed.length > 300) {
+                const factor = Math.ceil(parsed.length / 300);
+                const downsampled = [];
+                for (let i = 0; i < parsed.length; i += factor) {
+                    downsampled.push(parsed[i]);
+                }
+                if (downsampled[downsampled.length - 1] !== parsed[parsed.length - 1]) {
+                    downsampled.push(parsed[parsed.length - 1]);
+                }
+                return downsampled;
+            }
+            return parsed;
         };
         const solarPowerEnt = this.config?.entities.solar || (this.config?.entities).solar_power || '';
         const homePowerEnt = this.config?.entities.load || (this.config?.entities).home_power || '';

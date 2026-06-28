@@ -649,14 +649,26 @@ export class EnergyFlowCard extends LitElement {
     const minPrice = Math.min(...prices, 0.0);
     const priceRange = maxPrice - minPrice;
 
-    // 2. Parse high-resolution history curves
     const parseHistory = (entId: string) => {
       const raw = this.hourlyHistoryData[entId] || [];
-      return raw.map((p: any) => {
+      const parsed = raw.map((p: any) => {
         const state = parseFloat(p.s !== undefined ? p.s : p.state);
         const time = (p.t !== undefined ? p.t * 1000 : new Date(p.last_changed || p.last_updated).getTime());
         return { state: isNaN(state) ? 0 : state, time };
       }).sort((a, b) => a.time - b.time);
+
+      if (parsed.length > 300) {
+        const factor = Math.ceil(parsed.length / 300);
+        const downsampled = [];
+        for (let i = 0; i < parsed.length; i += factor) {
+          downsampled.push(parsed[i]);
+        }
+        if (downsampled[downsampled.length - 1] !== parsed[parsed.length - 1]) {
+          downsampled.push(parsed[parsed.length - 1]);
+        }
+        return downsampled;
+      }
+      return parsed;
     };
 
     const solarPowerEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power || '';
