@@ -917,7 +917,7 @@ export class EnergyFlowCard extends LitElement {
               <div class="glass-popup-subtitle">Live vermogen en prijsverloop</div>
             </div>
 
-            <div class="glass-popup-chart-container" style="background: transparent; border: none; padding: 0;">
+            <div class="glass-popup-chart-container" style="background: transparent; border: none; padding: 0; display: block; height: 180px; width: 100%;">
               ${this.renderUnifiedLineChart(solarPowerEnt, homePowerEnt)}
             </div>
           </div>
