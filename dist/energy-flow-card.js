@@ -2932,6 +2932,8 @@ class EnergyFlowCard extends i {
             const y = chartBottom - ((priceVal - minPrice) / (priceRange || 1)) * chartHeight;
             priceLabels.push({ priceVal, y });
         }
+        console.info(`[energy-flow-card] solarLinePath: ${solarLinePath}`);
+        console.info(`[energy-flow-card] homeLinePath: ${homeLinePath}`);
         const solarLive = this.getEntityValue(this.config?.entities.solar || (this.config?.entities).solar_power);
         const homeLive = this.getEntityValue(this.config?.entities.load || (this.config?.entities).home_power);
         const priceLive = gridPriceState ? parseFloat(gridPriceState.state) : 0;
@@ -2963,10 +2965,7 @@ class EnergyFlowCard extends i {
 
       <div style="display: block !important; width: 100% !important; height: 170px !important; position: relative !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;">
         ${this.isFetchingHistory && solarHistory.length === 0 ? b `<div class="chart-loading" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15,23,42,0.4); z-index: 10;">Geschiedenis laden...</div>` : ''}
-        <svg viewBox="0 0 500 190" style="display: block !important; width: 100% !important; height: 155px !important; margin: 0 !important; padding: 0 !important; background: rgba(255,0,0,0.1) !important;">
-          <!-- Diagnostic red rectangle to verify SVG visibility -->
-          <rect x="0" y="0" width="500" height="190" fill="rgba(255, 0, 0, 0.25)" />
-          
+        <svg viewBox="0 0 500 190" style="display: block !important; width: 100% !important; height: 155px !important; margin: 0 !important; padding: 0 !important; background: rgba(255,255,255,0.03) !important;">
           <defs>
             <linearGradient id="solar-area-grad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.2" />
@@ -2984,15 +2983,15 @@ class EnergyFlowCard extends i {
 
           <!-- Gridlines & Left Y-Axis labels (Power) -->
           ${gridLines.map(g => b `
-            <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.06)" stroke-width="0.8" stroke-dasharray="2,2" />
-            <text x="${chartLeft - 6}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="8.5px" font-family="sans-serif">
+            <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="2,2" />
+            <text x="${chartLeft - 6}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.6)" font-size="8.5px" font-family="sans-serif">
               ${g.powerVal >= 1000 ? `${(g.powerVal / 1000).toFixed(1)} kW` : `${Math.round(g.powerVal)} W`}
             </text>
           `)}
 
           <!-- Right Y-Axis labels (Price) -->
           ${priceLabels.map(p => b `
-            <text x="${chartRight + 6}" y="${p.y + 3}" text-anchor="start" fill="rgba(255,255,255,0.35)" font-size="8.5px" font-family="sans-serif">
+            <text x="${chartRight + 6}" y="${p.y + 3}" text-anchor="start" fill="rgba(255,255,255,0.6)" font-size="8.5px" font-family="sans-serif">
               €${p.priceVal.toFixed(2).replace('.', ',')}
             </text>
           `)}
@@ -3000,19 +2999,19 @@ class EnergyFlowCard extends i {
           <!-- Price Forecast Area & Line (Subtle background) -->
           ${priceLinePath ? b `
             <path d="${priceAreaPath}" fill="url(#price-area-grad)" />
-            <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.2" stroke-dasharray="3,3" />
+            <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3,3" />
           ` : ''}
 
           <!-- Solar Area & Line -->
           ${solarLinePath ? b `
             <path d="${solarAreaPath}" fill="url(#solar-area-grad)" />
-            <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Home Area & Line -->
           ${homeLinePath ? b `
             <path d="${homeAreaPath}" fill="url(#home-area-grad)" />
-            <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- X Axis Labels (every 4 hours) -->
