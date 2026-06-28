@@ -641,7 +641,7 @@ export class EnergyFlowCard extends LitElement {
           </defs>
 
           <!-- Gridlines -->
-          ${gridLines.map(g => svg`
+          ${gridLines.map(g => html`
             <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${g.val === 0.0 ? '0' : '2,2'}" />
             <text x="${chartLeft - 8}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
               ${g.val.toFixed(1)} kW
@@ -649,17 +649,17 @@ export class EnergyFlowCard extends LitElement {
           `)}
 
           <!-- Zero line for grid -->
-          ${type === 'grid' ? svg`
+          ${type === 'grid' ? html`
             <line x1="${chartLeft}" y1="${zeroY}" x2="${chartRight}" y2="${zeroY}" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
           ` : ''}
 
           <!-- Filled Area -->
-          ${points.length > 0 ? svg`
+          ${points.length > 0 ? html`
             <path d="${areaPath}" fill="url(#${gradId})" />
           ` : ''}
 
           <!-- Line -->
-          ${points.length > 0 ? svg`
+          ${points.length > 0 ? html`
             <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
@@ -667,11 +667,11 @@ export class EnergyFlowCard extends LitElement {
           ${processed.map((item: any, idx: number) => {
             if (idx % 4 !== 0) return '';
             const x = chartLeft + idx * step;
-            return svg`
+            return html`
               <text x="${x}" y="${chartBottom + 16}" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="9px" font-family="sans-serif">
                 ${item.label}
               </text>
-              ${type === 'grid' ? svg`
+              ${type === 'grid' ? html`
                 <text x="${x}" y="${chartBottom + 27}" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">
                   €${item.price.toFixed(2).replace('.', ',')}
                 </text>
@@ -680,7 +680,7 @@ export class EnergyFlowCard extends LitElement {
           })}
 
           <!-- Points -->
-          ${points.map((p: any) => svg`
+          ${points.map((p: any) => html`
             <circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}" stroke="#0f172a" stroke-width="1" />
             <title>${p.label}: ${p.val.toFixed(2)} kW${p.price ? ` - € ${p.price.toFixed(3)}` : ''}</title>
           `)}
@@ -896,7 +896,8 @@ export class EnergyFlowCard extends LitElement {
         } else if (!entityId || !this.hourlyStatsData[entityId] || this.hourlyStatsData[entityId].length === 0) {
           chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
         } else {
-          const processed = this.getProcessedHourlySingleData(entityId);
+          const currentHour = new Date().getHours();
+          const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
           if (this.showPowerValue) {
             chartHtml = this.renderLineChart(processed, 'solar');
           } else {
@@ -970,7 +971,8 @@ export class EnergyFlowCard extends LitElement {
         } else if (!entityId || !this.hourlyStatsData[entityId] || this.hourlyStatsData[entityId].length === 0) {
           chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
         } else {
-          const processed = this.getProcessedHourlySingleData(entityId);
+          const currentHour = new Date().getHours();
+          const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
           if (this.showPowerValue) {
             chartHtml = this.renderLineChart(processed, 'home');
           } else {
@@ -1325,7 +1327,8 @@ export class EnergyFlowCard extends LitElement {
           if (!targetImp || !targetExp || (!this.hourlyStatsData[targetImp] && !this.hourlyStatsData[targetExp])) {
             chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
           } else {
-            const processed = this.getProcessedHourlyGridData(targetImp, targetExp);
+            const currentHour = new Date().getHours();
+            const processed = this.getProcessedHourlyGridData(targetImp, targetExp).filter((_, idx) => idx <= currentHour);
             // Chronological order (no price sorting)
 
             if (this.showPowerValue) {
@@ -1454,7 +1457,7 @@ export class EnergyFlowCard extends LitElement {
             </div>
 
             ${this.activeTab === 'today' ? html`
-              <button class="popup-tab-btn" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; font-size: 11px; text-transform: uppercase; font-weight: bold; border-radius: 6px; letter-spacing: 0.02em;" @click=${() => this.showPowerValue = !this.showPowerValue}>
+              <button class="popup-tab-btn" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; font-size: 11px; text-transform: uppercase; font-weight: bold; border-radius: 6px; letter-spacing: 0.02em;" @click=${this.togglePowerUnit}>
                 ${this.showPowerValue ? 'Toon kWh' : 'Toon kW'}
               </button>
             ` : ''}
@@ -1594,6 +1597,12 @@ export class EnergyFlowCard extends LitElement {
         container.scrollLeft = container.scrollWidth;
       }
     }, 100);
+  }
+
+  private togglePowerUnit(e: Event): void {
+    e.stopPropagation();
+    this.showPowerValue = !this.showPowerValue;
+    console.info(`[energy-flow-card] Toggled showPowerValue to: ${this.showPowerValue}`);
   }
 
   private getClouds(weather: string): any[] {

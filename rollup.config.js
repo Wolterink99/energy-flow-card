@@ -13,11 +13,11 @@ export default {
     nodeResolve(),
     typescript({
       tsconfig: './tsconfig.json'
-    }),
-    terser({
-      output: {
-        comments: false
-      }
     })
+    // terser({
+    //   output: {
+    //     comments: false
+    //   }
+    // })
   ]
 };
