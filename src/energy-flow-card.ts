@@ -202,8 +202,9 @@ export class EnergyFlowCard extends LitElement {
   @state() private activePopup: string | null = null;
   @state() protected activePopupHistory: { day: string; value: number }[] = [];
   @state() private isLoadingHistory: boolean = false;
-  @state() private activeTab: 'prices' | 'month' | 'year' = 'month';
+  @state() private activeTab: 'today' | 'prices' | 'month' | 'year' = 'today';
   @state() private statsData: Record<string, any[]> = {};
+  @state() private hourlyStatsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
   @state() private hoveredPoint: any = null;
   @state() private debugWeatherState: string | null = null;
@@ -354,9 +355,19 @@ export class EnergyFlowCard extends LitElement {
         period: 'day'
       });
       this.statsData = res || {};
+
+      const hourlyStartTime = new Date(now.getTime() - 30 * 60 * 60 * 1000).toISOString();
+      const hourlyRes = await (this.hass as any).callWS({
+        type: 'recorder/statistics_during_period',
+        start_time: hourlyStartTime,
+        statistic_ids: entityIds,
+        period: 'hour'
+      });
+      this.hourlyStatsData = hourlyRes || {};
     } catch (e) {
       console.warn('[energy-flow-card] Failed to fetch stats via WS:', e);
       this.statsData = {};
+      this.hourlyStatsData = {};
     } finally {
       this.isLoadingHistory = false;
     }
@@ -477,6 +488,77 @@ export class EnergyFlowCard extends LitElement {
           exportValue: monthlyGroups[key].exportSum
         }));
     }
+  }
+
+  private getProcessedHourlySingleData(entityId: string): { label: string; value: number }[] {
+    const raw = this.hourlyStatsData[entityId] || [];
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentDate = now.getDate();
+
+    const hourlyPoints = raw.filter(point => {
+      const date = new Date(point.start);
+      return date.getFullYear() === currentYear && date.getMonth() === currentMonth && date.getDate() === currentDate;
+    });
+
+    return hourlyPoints.map(point => {
+      const date = new Date(point.start);
+      const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+      return {
+        label: hourLabel,
+        value: this.getStatPointValue(point, entityId)
+      };
+    });
+  }
+
+  private getProcessedHourlyGridData(importEntity: string, exportEntity: string): { label: string; importValue: number; exportValue: number; price: number; timeLabel: string }[] {
+    const importRaw = this.hourlyStatsData[importEntity] || [];
+    const exportRaw = this.hourlyStatsData[exportEntity] || [];
+
+    const importMap = new Map<number, number>();
+    const exportMap = new Map<number, number>();
+
+    importRaw.forEach(p => {
+      const d = new Date(p.start);
+      importMap.set(d.getHours(), this.getStatPointValue(p, importEntity));
+    });
+    exportRaw.forEach(p => {
+      const d = new Date(p.start);
+      exportMap.set(d.getHours(), this.getStatPointValue(p, exportEntity));
+    });
+
+    const gridPriceState = this.config?.entities.grid_price ? this.hass?.states[this.config.entities.grid_price] : null;
+    const forecast = gridPriceState?.attributes?.forecast || [];
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentDate = now.getDate();
+
+    const data = [];
+    for (let hour = 0; hour < 24; hour++) {
+      const forecastEntry = forecast.find((entry: any) => {
+        const d = new Date(entry.datetime);
+        return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate && d.getHours() === hour;
+      });
+
+      const price = forecastEntry ? parseFloat(forecastEntry.electricity_price) / 10000000 : 0;
+      const hourStr = `${hour.toString().padStart(2, '0')}:00`;
+      
+      const importValue = importMap.get(hour) || 0;
+      const exportValue = exportMap.get(hour) || 0;
+
+      data.push({
+        label: hourStr,
+        importValue,
+        exportValue,
+        price,
+        timeLabel: hourStr
+      });
+    }
+
+    return data;
   }
 
   private parseEntityFloat(entId?: string): number | null {
@@ -680,32 +762,62 @@ export class EnergyFlowCard extends LitElement {
       hasSecondStat = true;
 
       const entityId = entities.solar_energy_today || (entities as any).solar_today;
-      if (this.isLoadingHistory) {
-        chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
-      } else if (!entityId || !this.statsData[entityId] || this.statsData[entityId].length === 0) {
-        chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
-      } else {
-        const processed = this.getProcessedSingleData(entityId);
-        const maxVal = Math.max(...processed.map(i => i.value)) || 1;
-        chartHtml = html`
-          <div class="scrollable-chart-container">
-            <div class="glass-bar-chart">
-              ${processed.map(item => {
-                const percent = (item.value / maxVal) * 80; // max 80% height
-                return html`
-                  <div class="chart-column">
-                    <div class="chart-bar-wrapper">
-                      <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
-                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'month' ? 1 : 0)}</span>
+      if (this.activeTab === 'today') {
+        if (this.isLoadingHistory) {
+          chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+        } else if (!entityId || !this.hourlyStatsData[entityId] || this.hourlyStatsData[entityId].length === 0) {
+          chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
+        } else {
+          const processed = this.getProcessedHourlySingleData(entityId);
+          const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+          chartHtml = html`
+            <div class="scrollable-chart-container">
+              <div class="glass-bar-chart">
+                ${processed.map(item => {
+                  const percent = (item.value / maxVal) * 80;
+                  return html`
+                    <div class="chart-column">
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
+                          <span class="bar-value">${item.value.toFixed(1)}</span>
+                        </div>
                       </div>
+                      <span class="chart-label">${item.label}</span>
                     </div>
-                    <span class="chart-label">${item.label}</span>
-                  </div>
-                `;
-              })}
+                  `;
+                })}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
+      } else {
+        if (this.isLoadingHistory) {
+          chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+        } else if (!entityId || !this.statsData[entityId] || this.statsData[entityId].length === 0) {
+          chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
+        } else {
+          const processed = this.getProcessedSingleData(entityId);
+          const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+          chartHtml = html`
+            <div class="scrollable-chart-container">
+              <div class="glass-bar-chart">
+                ${processed.map(item => {
+                  const percent = (item.value / maxVal) * 80; // max 80% height
+                  return html`
+                    <div class="chart-column">
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
+                          <span class="bar-value">${item.value.toFixed(this.activeTab === 'month' ? 1 : 0)}</span>
+                        </div>
+                      </div>
+                      <span class="chart-label">${item.label}</span>
+                    </div>
+                  `;
+                })}
+              </div>
+            </div>
+          `;
+        }
       }
     } else if (this.activePopup === 'home') {
       title = 'Huisverbruik';
@@ -720,32 +832,62 @@ export class EnergyFlowCard extends LitElement {
       hasSecondStat = true;
 
       const entityId = entities.home_today;
-      if (this.isLoadingHistory) {
-        chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
-      } else if (!entityId || !this.statsData[entityId] || this.statsData[entityId].length === 0) {
-        chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
-      } else {
-        const processed = this.getProcessedSingleData(entityId);
-        const maxVal = Math.max(...processed.map(i => i.value)) || 1;
-        chartHtml = html`
-          <div class="scrollable-chart-container">
-            <div class="glass-bar-chart">
-              ${processed.map(item => {
-                const percent = (item.value / maxVal) * 80;
-                return html`
-                  <div class="chart-column">
-                    <div class="chart-bar-wrapper">
-                      <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
-                        <span class="bar-value">${item.value.toFixed(this.activeTab === 'month' ? 1 : 0)}</span>
+      if (this.activeTab === 'today') {
+        if (this.isLoadingHistory) {
+          chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+        } else if (!entityId || !this.hourlyStatsData[entityId] || this.hourlyStatsData[entityId].length === 0) {
+          chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
+        } else {
+          const processed = this.getProcessedHourlySingleData(entityId);
+          const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+          chartHtml = html`
+            <div class="scrollable-chart-container">
+              <div class="glass-bar-chart">
+                ${processed.map(item => {
+                  const percent = (item.value / maxVal) * 80;
+                  return html`
+                    <div class="chart-column">
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
+                          <span class="bar-value">${item.value.toFixed(1)}</span>
+                        </div>
                       </div>
+                      <span class="chart-label">${item.label}</span>
                     </div>
-                    <span class="chart-label">${item.label}</span>
-                  </div>
-                `;
-              })}
+                  `;
+                })}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
+      } else {
+        if (this.isLoadingHistory) {
+          chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+        } else if (!entityId || !this.statsData[entityId] || this.statsData[entityId].length === 0) {
+          chartHtml = html`<div class="chart-no-data">Geen historische gegevens beschikbaar.</div>`;
+        } else {
+          const processed = this.getProcessedSingleData(entityId);
+          const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+          chartHtml = html`
+            <div class="scrollable-chart-container">
+              <div class="glass-bar-chart">
+                ${processed.map(item => {
+                  const percent = (item.value / maxVal) * 80;
+                  return html`
+                    <div class="chart-column">
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
+                          <span class="bar-value">${item.value.toFixed(this.activeTab === 'month' ? 1 : 0)}</span>
+                        </div>
+                      </div>
+                      <span class="chart-label">${item.label}</span>
+                    </div>
+                  `;
+                })}
+              </div>
+            </div>
+          `;
+        }
       }
     } else if (this.activePopup === 'grid') {
       title = 'Stroomnet';
@@ -1037,6 +1179,55 @@ export class EnergyFlowCard extends LitElement {
             </div>
           `;
         }
+      } else if (this.activeTab === 'today') {
+        if (this.isLoadingHistory) {
+          chartHtml = html`<div class="chart-loading">Gegevens laden...</div>`;
+        } else {
+          const targetImp = impEntity || '';
+          const targetExp = expEntity || '';
+
+          if (!targetImp || !targetExp || (!this.hourlyStatsData[targetImp] && !this.hourlyStatsData[targetExp])) {
+            chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
+          } else {
+            const processed = this.getProcessedHourlyGridData(targetImp, targetExp);
+            processed.sort((a, b) => a.price - b.price);
+
+            const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
+            chartHtml = html`
+              <div class="scrollable-chart-container">
+                <div class="glass-bar-chart">
+                  ${processed.map(item => {
+                    const importPercent = (item.importValue / maxVal) * 80;
+                    const exportPercent = (item.exportValue / maxVal) * 80;
+                    return html`
+                      <div class="chart-column" style="min-width: 60px;">
+                        <div class="chart-values-stacked">
+                          <span class="stacked-val import-color">
+                            ${item.importValue > 0 ? item.importValue.toFixed(1) : ''}
+                          </span>
+                          <span class="stacked-val export-color">
+                            ${item.exportValue > 0 ? item.exportValue.toFixed(1) : ''}
+                          </span>
+                        </div>
+    
+                        <div class="grid-double-bar-wrapper">
+                          <div class="grid-import-bar-wrapper">
+                            <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
+                          </div>
+                          <div class="grid-export-bar-wrapper">
+                            <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
+                          </div>
+                        </div>
+                        <span class="chart-label" style="font-size: 9px; margin-top: 4px;">€ ${item.price.toFixed(2).replace('.', ',')}</span>
+                        <span style="font-size: 9px; color: rgba(255,255,255,0.3); font-weight: normal;">${item.timeLabel}</span>
+                      </div>
+                    `;
+                  })}
+                </div>
+              </div>
+            `;
+          }
+        }
       } else {
         if (this.isLoadingHistory) {
         } else {
@@ -1110,10 +1301,12 @@ export class EnergyFlowCard extends LitElement {
           <!-- Tab switcher -->
           <div class="popup-tabs">
             ${this.activePopup === 'grid' ? html`
-              <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Vandaag</button>
+              <button class="popup-tab-btn ${this.activeTab === 'today' ? 'active' : ''}" @click=${() => this.switchTab('today')}>Vandaag</button>
+              <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Prijs</button>
               <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
               <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
             ` : html`
+              <button class="popup-tab-btn ${this.activeTab === 'today' ? 'active' : ''}" @click=${() => this.switchTab('today')}>Vandaag</button>
               <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
               <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
             `}
@@ -1245,7 +1438,7 @@ export class EnergyFlowCard extends LitElement {
     `;
   }
 
-  private switchTab(tab: 'prices' | 'month' | 'year'): void {
+  private switchTab(tab: 'today' | 'prices' | 'month' | 'year'): void {
     this.activeTab = tab;
     setTimeout(() => {
       const container = this.shadowRoot?.querySelector('.scrollable-chart-container');
@@ -1320,8 +1513,9 @@ export class EnergyFlowCard extends LitElement {
     
     if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'weather') {
       this.activePopup = nodeId;
-      this.activeTab = nodeId === 'grid' ? 'prices' : 'month';
+      this.activeTab = 'today';
       this.statsData = {};
+      this.hourlyStatsData = {};
       
       const entitiesToFetch: string[] = [];
       if (nodeId === 'solar') {
