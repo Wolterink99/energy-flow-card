@@ -2824,8 +2824,10 @@ class EnergyFlowCard extends i {
                 return { state: isNaN(state) ? 0 : state, time };
             }).sort((a, b) => a.time - b.time);
         };
-        const solarHistory = parseHistory(solarEntity);
-        const homeHistory = parseHistory(homeEntity);
+        const solarPowerEnt = this.config?.entities.solar || (this.config?.entities).solar_power || '';
+        const homePowerEnt = this.config?.entities.load || (this.config?.entities).home_power || '';
+        const solarHistory = parseHistory(solarPowerEnt);
+        const homeHistory = parseHistory(homePowerEnt);
         // Get max power for Y scaling
         const allPowerValues = [...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state)];
         const maxPower = Math.max(...allPowerValues, 1000);

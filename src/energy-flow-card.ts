@@ -659,8 +659,11 @@ export class EnergyFlowCard extends LitElement {
       }).sort((a, b) => a.time - b.time);
     };
 
-    const solarHistory = parseHistory(solarEntity);
-    const homeHistory = parseHistory(homeEntity);
+    const solarPowerEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power || '';
+    const homePowerEnt = this.config?.entities.load || (this.config?.entities as any).home_power || '';
+
+    const solarHistory = parseHistory(solarPowerEnt);
+    const homeHistory = parseHistory(homePowerEnt);
 
     // Get max power for Y scaling
     const allPowerValues = [...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state)];
