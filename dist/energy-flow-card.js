@@ -2543,8 +2543,9 @@ class EnergyFlowCard extends i {
             return;
         const solarEnt = this.config?.entities.solar || (this.config?.entities).solar_power;
         const homeEnt = this.config?.entities.load || (this.config?.entities).home_power;
-        console.info('[energy-flow-card] Configured entities for history:', { solarEnt, homeEnt });
-        if (!solarEnt && !homeEnt)
+        const gridEnt = this.config?.entities.grid || (this.config?.entities).grid_power;
+        console.info('[energy-flow-card] Configured entities for history:', { solarEnt, homeEnt, gridEnt });
+        if (!solarEnt && !homeEnt && !gridEnt)
             return;
         this.isFetchingHistory = true;
         try {
@@ -2555,6 +2556,8 @@ class EnergyFlowCard extends i {
                 entityIds.push(solarEnt);
             if (homeEnt)
                 entityIds.push(homeEnt);
+            if (gridEnt)
+                entityIds.push(gridEnt);
             console.info('[energy-flow-card] Fetching history from REST API for:', entityIds);
             const token = this.hass.auth?.accessToken;
             const headers = {
@@ -2803,7 +2806,7 @@ class EnergyFlowCard extends i {
         }
         return data;
     }
-    renderUnifiedLineChart(solarEntity, homeEntity) {
+    renderUnifiedLineChart(chartType = 'unified') {
         const now = new Date();
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth();
@@ -2820,13 +2823,16 @@ class EnergyFlowCard extends i {
                 const d = new Date(entry.datetime);
                 return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate && d.getHours() === hour;
             });
-            const price = forecastEntry ? parseFloat(forecastEntry.electricity_price) / 10000000 : 0;
+            let rawPrice = forecastEntry ? parseFloat(forecastEntry.electricity_price) : 0;
+            if (isNaN(rawPrice))
+                rawPrice = 0;
+            const price = rawPrice / 10000000;
             prices.push(price);
             pricePoints.push({ hour, price });
         }
-        const maxPrice = Math.max(...prices, 0.40);
-        const minPrice = Math.min(...prices, 0.0);
-        const priceRange = maxPrice - minPrice;
+        const maxPrice = isNaN(Math.max(...prices, 0.40)) ? 0.40 : Math.max(...prices, 0.40);
+        const minPrice = isNaN(Math.min(...prices, 0.0)) ? 0.0 : Math.min(...prices, 0.0);
+        const priceRange = maxPrice - minPrice || 0.40;
         const parseHistory = (entId) => {
             const raw = this.hourlyHistoryData[entId] || [];
             const parsed = raw.map((p) => {
@@ -2849,21 +2855,26 @@ class EnergyFlowCard extends i {
         };
         const solarPowerEnt = this.config?.entities.solar || (this.config?.entities).solar_power || '';
         const homePowerEnt = this.config?.entities.load || (this.config?.entities).home_power || '';
+        const gridPowerEnt = this.config?.entities.grid || (this.config?.entities).grid_power || '';
         const solarHistory = parseHistory(solarPowerEnt);
         const homeHistory = parseHistory(homePowerEnt);
-        console.info(`[energy-flow-card] solarHistory count: ${solarHistory.length}, first: ${solarHistory.length > 0 ? JSON.stringify(solarHistory[0]) : 'none'}, last: ${solarHistory.length > 0 ? JSON.stringify(solarHistory[solarHistory.length - 1]) : 'none'}`);
-        console.info(`[energy-flow-card] homeHistory count: ${homeHistory.length}, first: ${homeHistory.length > 0 ? JSON.stringify(homeHistory[0]) : 'none'}, last: ${homeHistory.length > 0 ? JSON.stringify(homeHistory[homeHistory.length - 1]) : 'none'}`);
-        console.info('[energy-flow-card] rendering unified line chart:', {
-            solarPowerEnt,
-            homePowerEnt,
-            solarHistoryLen: solarHistory.length,
-            homeHistoryLen: homeHistory.length,
-            maxPower: Math.max(...[...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state)], 1000),
-            isFetchingHistory: this.isFetchingHistory
-        });
-        // Get max power for Y scaling
-        const allPowerValues = [...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state)];
-        const maxPower = Math.max(...allPowerValues, 1000);
+        // Get max power for Y scaling based on type
+        let maxPower = 1000;
+        if (chartType === 'solar') {
+            maxPower = Math.max(...solarHistory.map(p => p.state), 1000);
+        }
+        else if (chartType === 'home') {
+            maxPower = Math.max(...homeHistory.map(p => p.state), 1000);
+        }
+        else if (chartType === 'grid') {
+            const gridRaw = parseHistory(gridPowerEnt);
+            const importStates = gridRaw.map(p => p.state > 0 ? p.state : 0);
+            const exportStates = gridRaw.map(p => p.state < 0 ? Math.abs(p.state) : 0);
+            maxPower = Math.max(...importStates, ...exportStates, 1000);
+        }
+        else {
+            maxPower = Math.max(...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state), 1000);
+        }
         // SVG Layout
         const chartLeft = 45;
         const chartRight = 450;
@@ -2880,13 +2891,13 @@ class EnergyFlowCard extends i {
         // Helper to map time & price value to SVG coordinates
         const getPriceCoords = (time, price) => {
             const x = chartLeft + ((time - startTime) / (endTime - startTime)) * chartWidth;
-            const y = chartBottom - ((price - minPrice) / (priceRange || 1)) * chartHeight;
+            const y = chartBottom - ((price - minPrice) / (priceRange)) * chartHeight;
             return { x: Math.min(chartRight, Math.max(chartLeft, x)), y: Math.min(chartBottom, Math.max(chartTop, y)) };
         };
         // Build Solar Line & Area Paths
         let solarLinePath = '';
         let solarAreaPath = '';
-        if (solarHistory.length > 0) {
+        if ((chartType === 'unified' || chartType === 'solar') && solarHistory.length > 0) {
             const pts = solarHistory.map(p => getCoords(p.time, p.state));
             solarLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
             solarAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
@@ -2894,7 +2905,7 @@ class EnergyFlowCard extends i {
         // Build Home Line & Area Paths
         let homeLinePath = '';
         let homeAreaPath = '';
-        if (homeHistory.length > 0) {
+        if ((chartType === 'unified' || chartType === 'home') && homeHistory.length > 0) {
             const pts = homeHistory.map(p => getCoords(p.time, p.state));
             homeLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
             homeAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
@@ -2902,7 +2913,7 @@ class EnergyFlowCard extends i {
         // Build Price stepped path (spanning full 24h)
         let priceLinePath = '';
         let priceAreaPath = '';
-        if (pricePoints.length > 0) {
+        if (chartType === 'unified' && pricePoints.length > 0) {
             const pts = [];
             pricePoints.forEach((p, idx) => {
                 const hourStart = startTime + p.hour * 60 * 60 * 1000;
@@ -2917,6 +2928,24 @@ class EnergyFlowCard extends i {
             priceLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
             priceAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
         }
+        // Build Grid Import (Afname) & Grid Export (Teruglevering) Paths
+        let gridImportLinePath = '';
+        let gridImportAreaPath = '';
+        let gridExportLinePath = '';
+        let gridExportAreaPath = '';
+        if (chartType === 'grid') {
+            const gridRaw = parseHistory(gridPowerEnt);
+            const importPts = gridRaw.map(p => getCoords(p.time, p.state > 0 ? p.state : 0));
+            const exportPts = gridRaw.map(p => getCoords(p.time, p.state < 0 ? Math.abs(p.state) : 0));
+            if (importPts.length > 0) {
+                gridImportLinePath = `M ${importPts[0].x} ${importPts[0].y} ` + importPts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+                gridImportAreaPath = `M ${importPts[0].x} ${chartBottom} ` + importPts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${importPts[importPts.length - 1].x} ${chartBottom} Z`;
+            }
+            if (exportPts.length > 0) {
+                gridExportLinePath = `M ${exportPts[0].x} ${exportPts[0].y} ` + exportPts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+                gridExportAreaPath = `M ${exportPts[0].x} ${chartBottom} ` + exportPts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${exportPts[exportPts.length - 1].x} ${chartBottom} Z`;
+            }
+        }
         // Y Gridlines
         const gridLines = [];
         const gridCount = 4;
@@ -2927,19 +2956,21 @@ class EnergyFlowCard extends i {
         }
         // Price Labels
         const priceLabels = [];
-        for (let i = 0; i <= gridCount; i++) {
-            const priceVal = minPrice + (priceRange * i) / gridCount;
-            const y = chartBottom - ((priceVal - minPrice) / (priceRange || 1)) * chartHeight;
-            priceLabels.push({ priceVal, y });
+        if (chartType === 'unified') {
+            for (let i = 0; i <= gridCount; i++) {
+                const priceVal = minPrice + (priceRange * i) / gridCount;
+                const y = chartBottom - ((priceVal - minPrice) / (priceRange)) * chartHeight;
+                priceLabels.push({ priceVal, y });
+            }
         }
-        console.info(`[energy-flow-card] solarLinePath: ${solarLinePath}`);
-        console.info(`[energy-flow-card] homeLinePath: ${homeLinePath}`);
+        console.info(`[energy-flow-card] chart rendering: type=${chartType}, solarHistoryCount=${solarHistory.length}, homeHistoryCount=${homeHistory.length}, maxPower=${maxPower}`);
         const solarLive = this.getEntityValue(this.config?.entities.solar || (this.config?.entities).solar_power);
         const homeLive = this.getEntityValue(this.config?.entities.load || (this.config?.entities).home_power);
         const priceLive = gridPriceState ? parseFloat(gridPriceState.state) : 0;
         const homeTodayVal = this.parseEntityFloat(this.config?.entities.home_today) || 0;
         const solarTodayVal = this.parseEntityFloat(this.config?.entities.solar_energy_today || (this.config?.entities).solar_today) || 0;
         return b `
+      ${chartType === 'unified' ? b `
       <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; padding: 0 4px; box-sizing: border-box; text-align: center;">
         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 2px;">
           <div style="font-size: 13px; font-weight: bold; color: #fbbf24; white-space: nowrap;">${solarLive >= 1000 ? `${(solarLive / 1000).toFixed(1)} kW` : `${Math.round(solarLive)} W`}</div>
@@ -2961,7 +2992,7 @@ class EnergyFlowCard extends i {
           <div style="font-size: 13px; font-weight: bold; color: #10b981; white-space: nowrap;">${solarTodayVal.toFixed(1)} kWh</div>
           <div style="font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; font-weight: bold; white-space: nowrap;">Opwek</div>
         </div>
-      </div>
+      </div>` : ''}
 
       <div style="display: block !important; width: 100% !important; height: 260px !important; position: relative !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;">
         ${this.isFetchingHistory && solarHistory.length === 0 ? b `<div class="chart-loading" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15,23,42,0.4); z-index: 10;">Geschiedenis laden...</div>` : ''}
@@ -2974,6 +3005,14 @@ class EnergyFlowCard extends i {
             <linearGradient id="home-area-grad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.25" />
               <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0" />
+            </linearGradient>
+            <linearGradient id="grid-import-area-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.0" />
+            </linearGradient>
+            <linearGradient id="grid-export-area-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0.0" />
             </linearGradient>
             <linearGradient id="price-area-grad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#ffffff" stop-opacity="0.05" />
@@ -2990,28 +3029,40 @@ class EnergyFlowCard extends i {
           `)}
 
           <!-- Right Y-Axis labels (Price) -->
-          ${priceLabels.map(p => w `
+          ${chartType === 'unified' ? priceLabels.map(p => w `
             <text x="${chartRight + 6}" y="${p.y + 3}" text-anchor="start" fill="rgba(255,255,255,0.6)" font-size="8.5px" font-family="sans-serif">
               €${p.priceVal.toFixed(2).replace('.', ',')}
             </text>
-          `)}
+          `) : ''}
 
           <!-- Price Forecast Area & Line (Subtle background) -->
-          ${priceLinePath ? w `
+          ${chartType === 'unified' && priceLinePath ? w `
             <path d="${priceAreaPath}" fill="url(#price-area-grad)" />
             <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.8" stroke-dasharray="3,3" />
           ` : ''}
 
           <!-- Solar Area & Line -->
-          ${solarLinePath ? w `
+          ${(chartType === 'unified' || chartType === 'solar') && solarLinePath ? w `
             <path d="${solarAreaPath}" fill="url(#solar-area-grad)" />
             <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Home Area & Line -->
-          ${homeLinePath ? w `
+          ${(chartType === 'unified' || chartType === 'home') && homeLinePath ? w `
             <path d="${homeAreaPath}" fill="url(#home-area-grad)" />
             <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          ` : ''}
+
+          <!-- Grid Import (Afname) Area & Line -->
+          ${chartType === 'grid' && gridImportLinePath ? w `
+            <path d="${gridImportAreaPath}" fill="url(#grid-import-area-grad)" />
+            <path d="${gridImportLinePath}" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          ` : ''}
+
+          <!-- Grid Export (Teruglevering) Area & Line -->
+          ${chartType === 'grid' && gridExportLinePath ? w `
+            <path d="${gridExportAreaPath}" fill="url(#grid-export-area-grad)" />
+            <path d="${gridExportLinePath}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- X Axis Labels (every 4 hours) -->
@@ -3050,8 +3101,8 @@ class EnergyFlowCard extends i {
         if (!this.activePopup)
             return '';
         if (this.activePopup === 'unified_chart') {
-            const solarPowerEnt = this.config?.entities.solar || (this.config?.entities).solar_power || '';
-            const homePowerEnt = this.config?.entities.load || (this.config?.entities).home_power || '';
+            this.config?.entities.solar || (this.config?.entities).solar_power || '';
+            this.config?.entities.load || (this.config?.entities).home_power || '';
             return b `
         <div class="glass-popup-overlay" @click=${this.closePopup}>
           <div class="glass-popup-card" style="height: auto; width: 550px; max-width: 95vw; padding: 20px;" @click=${(e) => e.stopPropagation()}>
@@ -3063,7 +3114,7 @@ class EnergyFlowCard extends i {
             </div>
 
             <div class="glass-popup-chart-container" style="background: transparent; border: none; padding: 0; display: block; height: 270px; width: 100%;">
-              ${this.renderUnifiedLineChart(solarPowerEnt, homePowerEnt)}
+              ${this.renderUnifiedLineChart('unified')}
             </div>
           </div>
         </div>
@@ -3249,7 +3300,7 @@ class EnergyFlowCard extends i {
                 else {
                     const homeEnt = entities.home_today || '';
                     if (this.showPowerValue && homeEnt) {
-                        chartHtml = this.renderUnifiedLineChart(entityId, homeEnt);
+                        chartHtml = this.renderUnifiedLineChart('solar');
                     }
                     else {
                         const currentHour = new Date().getHours();
@@ -3330,7 +3381,7 @@ class EnergyFlowCard extends i {
                 else {
                     const solarEnt = entities.solar_energy_today || entities.solar_today || '';
                     if (this.showPowerValue && solarEnt) {
-                        chartHtml = this.renderUnifiedLineChart(solarEnt, entityId);
+                        chartHtml = this.renderUnifiedLineChart('home');
                     }
                     else {
                         const currentHour = new Date().getHours();
@@ -3675,7 +3726,7 @@ class EnergyFlowCard extends i {
                         const solarEnt = entities.solar_energy_today || entities.solar_today || '';
                         const homeEnt = entities.home_today || '';
                         if (this.showPowerValue && solarEnt && homeEnt) {
-                            chartHtml = this.renderUnifiedLineChart(solarEnt, homeEnt);
+                            chartHtml = this.renderUnifiedLineChart('grid');
                         }
                         else {
                             const currentHour = new Date().getHours();
