@@ -838,7 +838,7 @@ export class EnergyFlowCard extends LitElement {
           </defs>
 
           <!-- Gridlines & Left Y-Axis labels (Power) -->
-          ${gridLines.map(g => html`
+          ${gridLines.map(g => svg`
             <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="2,2" />
             <text x="${chartLeft - 6}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.6)" font-size="8.5px" font-family="sans-serif">
               ${g.powerVal >= 1000 ? `${(g.powerVal / 1000).toFixed(1)} kW` : `${Math.round(g.powerVal)} W`}
@@ -846,26 +846,26 @@ export class EnergyFlowCard extends LitElement {
           `)}
 
           <!-- Right Y-Axis labels (Price) -->
-          ${priceLabels.map(p => html`
+          ${priceLabels.map(p => svg`
             <text x="${chartRight + 6}" y="${p.y + 3}" text-anchor="start" fill="rgba(255,255,255,0.6)" font-size="8.5px" font-family="sans-serif">
               €${p.priceVal.toFixed(2).replace('.', ',')}
             </text>
           `)}
 
           <!-- Price Forecast Area & Line (Subtle background) -->
-          ${priceLinePath ? html`
+          ${priceLinePath ? svg`
             <path d="${priceAreaPath}" fill="url(#price-area-grad)" />
             <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3,3" />
           ` : ''}
 
           <!-- Solar Area & Line -->
-          ${solarLinePath ? html`
+          ${solarLinePath ? svg`
             <path d="${solarAreaPath}" fill="url(#solar-area-grad)" />
             <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Home Area & Line -->
-          ${homeLinePath ? html`
+          ${homeLinePath ? svg`
             <path d="${homeAreaPath}" fill="url(#home-area-grad)" />
             <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
@@ -875,7 +875,7 @@ export class EnergyFlowCard extends LitElement {
             const hour = i * 4;
             const hourStr = `${hour.toString().padStart(2, '0')}:00`;
             const x = chartLeft + (hour / 24) * chartWidth;
-            return html`
+            return svg`
               <text x="${x}" y="${chartBottom + 16}" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="9px" font-family="sans-serif">
                 ${hourStr}
               </text>
