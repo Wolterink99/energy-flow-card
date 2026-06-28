@@ -2571,11 +2571,21 @@ class EnergyFlowCard extends i {
     getStatPointValue(point, entityId) {
         if (!point)
             return 0;
-        const isCumulative = !entityId.includes('vandaag') && !entityId.includes('today');
-        if (isCumulative && point.change !== undefined && point.change !== null) {
-            return point.change;
+        let val = 0;
+        if (point.mean !== undefined && point.mean !== null) {
+            val = point.mean;
         }
-        return point.state || 0;
+        else {
+            const isCumulative = !entityId.includes('vandaag') && !entityId.includes('today');
+            if (isCumulative && point.change !== undefined && point.change !== null) {
+                val = point.change;
+            }
+            else {
+                val = point.state !== undefined ? point.state : 0;
+            }
+        }
+        const parsed = typeof val === 'number' ? val : parseFloat(val);
+        return isNaN(parsed) ? 0 : parsed;
     }
     getProcessedSingleData(entityId) {
         const raw = this.statsData[entityId] || [];
@@ -2809,7 +2819,7 @@ class EnergyFlowCard extends i {
           ${gridLines.map(g => b `
             <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${g.val === 0.0 ? '0' : '2,2'}" />
             <text x="${chartLeft - 8}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
-              ${g.val.toFixed(1)} kW
+              ${Number(g.val).toFixed(1)} kW
             </text>
           `)}
 
@@ -2839,7 +2849,7 @@ class EnergyFlowCard extends i {
               </text>
               ${type === 'grid' ? b `
                 <text x="${x}" y="${chartBottom + 27}" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">
-                  €${item.price.toFixed(2).replace('.', ',')}
+                  €${Number(item.price).toFixed(2).replace('.', ',')}
                 </text>
               ` : ''}
             `;
@@ -2848,7 +2858,7 @@ class EnergyFlowCard extends i {
           <!-- Points -->
           ${points.map((p) => b `
             <circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}" stroke="#0f172a" stroke-width="1" />
-            <title>${p.label}: ${p.val.toFixed(2)} kW${p.price ? ` - € ${p.price.toFixed(3)}` : ''}</title>
+            <title>${p.label}: ${Number(p.val).toFixed(2)} kW${p.price ? ` - € ${Number(p.price).toFixed(3)}` : ''}</title>
           `)}
         </svg>
       </div>
