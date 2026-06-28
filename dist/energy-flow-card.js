@@ -2851,6 +2851,8 @@ class EnergyFlowCard extends i {
         const homePowerEnt = this.config?.entities.load || (this.config?.entities).home_power || '';
         const solarHistory = parseHistory(solarPowerEnt);
         const homeHistory = parseHistory(homePowerEnt);
+        console.info(`[energy-flow-card] solarHistory count: ${solarHistory.length}, first: ${solarHistory.length > 0 ? JSON.stringify(solarHistory[0]) : 'none'}, last: ${solarHistory.length > 0 ? JSON.stringify(solarHistory[solarHistory.length - 1]) : 'none'}`);
+        console.info(`[energy-flow-card] homeHistory count: ${homeHistory.length}, first: ${homeHistory.length > 0 ? JSON.stringify(homeHistory[0]) : 'none'}, last: ${homeHistory.length > 0 ? JSON.stringify(homeHistory[homeHistory.length - 1]) : 'none'}`);
         console.info('[energy-flow-card] rendering unified line chart:', {
             solarPowerEnt,
             homePowerEnt,
