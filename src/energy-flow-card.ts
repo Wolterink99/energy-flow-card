@@ -498,19 +498,24 @@ export class EnergyFlowCard extends LitElement {
     const currentMonth = now.getMonth();
     const currentDate = now.getDate();
 
-    const hourlyPoints = raw.filter(point => {
+    const data = [];
+    const pointsMap = new Map<number, number>();
+
+    raw.forEach(point => {
       const date = new Date(point.start);
-      return date.getFullYear() === currentYear && date.getMonth() === currentMonth && date.getDate() === currentDate;
+      if (date.getFullYear() === currentYear && date.getMonth() === currentMonth && date.getDate() === currentDate) {
+        pointsMap.set(date.getHours(), this.getStatPointValue(point, entityId));
+      }
     });
 
-    return hourlyPoints.map(point => {
-      const date = new Date(point.start);
-      const hourLabel = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-      return {
-        label: hourLabel,
-        value: this.getStatPointValue(point, entityId)
-      };
-    });
+    for (let hour = 0; hour < 24; hour++) {
+      const hourStr = `${hour.toString().padStart(2, '0')}:00`;
+      data.push({
+        label: hourStr,
+        value: pointsMap.get(hour) || 0
+      });
+    }
+    return data;
   }
 
   private getProcessedHourlyGridData(importEntity: string, exportEntity: string): { label: string; importValue: number; exportValue: number; price: number; timeLabel: string }[] {
@@ -520,22 +525,26 @@ export class EnergyFlowCard extends LitElement {
     const importMap = new Map<number, number>();
     const exportMap = new Map<number, number>();
 
-    importRaw.forEach(p => {
-      const d = new Date(p.start);
-      importMap.set(d.getHours(), this.getStatPointValue(p, importEntity));
-    });
-    exportRaw.forEach(p => {
-      const d = new Date(p.start);
-      exportMap.set(d.getHours(), this.getStatPointValue(p, exportEntity));
-    });
-
-    const gridPriceState = this.config?.entities.grid_price ? this.hass?.states[this.config.entities.grid_price] : null;
-    const forecast = gridPriceState?.attributes?.forecast || [];
-
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
     const currentDate = now.getDate();
+
+    importRaw.forEach(p => {
+      const d = new Date(p.start);
+      if (d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate) {
+        importMap.set(d.getHours(), this.getStatPointValue(p, importEntity));
+      }
+    });
+    exportRaw.forEach(p => {
+      const d = new Date(p.start);
+      if (d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate) {
+        exportMap.set(d.getHours(), this.getStatPointValue(p, exportEntity));
+      }
+    });
+
+    const gridPriceState = this.config?.entities.grid_price ? this.hass?.states[this.config.entities.grid_price] : null;
+    const forecast = gridPriceState?.attributes?.forecast || [];
 
     const data = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -560,6 +569,124 @@ export class EnergyFlowCard extends LitElement {
     }
 
     return data;
+  }
+
+  private renderLineChart(processed: any[], type: 'solar' | 'home' | 'grid'): TemplateResult {
+    const currentHour = new Date().getHours();
+    
+    const activePoints = processed.filter((_: any, idx: number) => idx <= currentHour);
+    if (activePoints.length === 0) {
+      return html`<div class="chart-no-data">Geen gegevens beschikbaar voor vandaag.</div>`;
+    }
+
+    let values: number[] = [];
+    if (type === 'grid') {
+      values = activePoints.map(p => p.importValue - p.exportValue);
+    } else {
+      values = activePoints.map(p => p.value);
+    }
+
+    const maxVal = Math.max(...values.map(Math.abs), 0.5);
+    const minVal = type === 'grid' ? -maxVal : 0;
+    const valRange = maxVal - minVal;
+
+    const chartLeft = 50;
+    const chartRight = 485;
+    const chartWidth = chartRight - chartLeft;
+    const chartTop = 20;
+    const chartHeight = 120;
+    const chartBottom = chartTop + chartHeight;
+    const zeroY = chartBottom - ((0.0 - minVal) / valRange) * chartHeight;
+
+    const step = chartWidth / 23;
+
+    const points = activePoints.map((item: any, idx: number) => {
+      const val = type === 'grid' ? (item.importValue - item.exportValue) : item.value;
+      const x = chartLeft + idx * step;
+      const y = chartBottom - ((val - minVal) / valRange) * chartHeight;
+      return { x, y, val, label: item.label, price: item.price };
+    });
+
+    let linePath = '';
+    let areaPath = '';
+
+    if (points.length > 0) {
+      linePath = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+      if (type === 'grid') {
+        areaPath = `M ${points[0].x} ${zeroY} ` + points.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${points[points.length-1].x} ${zeroY} Z`;
+      } else {
+        areaPath = `M ${points[0].x} ${chartBottom} ` + points.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${points[points.length-1].x} ${chartBottom} Z`;
+      }
+    }
+
+    const color = type === 'solar' ? '#fbbf24' : (type === 'home' ? '#a78bfa' : '#ef4444');
+    const gradId = `area-grad-${type}`;
+
+    const gridLines = [];
+    const gridCount = 4;
+    for (let i = 0; i <= gridCount; i++) {
+      const val = minVal + (valRange * i) / gridCount;
+      const y = chartBottom - ((val - minVal) / valRange) * chartHeight;
+      gridLines.push({ val, y });
+    }
+
+    return html`
+      <div class="scrollable-chart-container" style="display: block !important; padding-top: 5px; height: 165px; overflow-y: hidden; overflow-x: hidden; position: relative;">
+        <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: 155px !important;">
+          <defs>
+            <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${color}" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="${color}" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          <!-- Gridlines -->
+          ${gridLines.map(g => svg`
+            <line x1="${chartLeft}" y1="${g.y}" x2="${chartRight}" y2="${g.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="${g.val === 0.0 ? '0' : '2,2'}" />
+            <text x="${chartLeft - 8}" y="${g.y + 3}" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="9px" font-family="sans-serif">
+              ${g.val.toFixed(1)} kW
+            </text>
+          `)}
+
+          <!-- Zero line for grid -->
+          ${type === 'grid' ? svg`
+            <line x1="${chartLeft}" y1="${zeroY}" x2="${chartRight}" y2="${zeroY}" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
+          ` : ''}
+
+          <!-- Filled Area -->
+          ${points.length > 0 ? svg`
+            <path d="${areaPath}" fill="url(#${gradId})" />
+          ` : ''}
+
+          <!-- Line -->
+          ${points.length > 0 ? svg`
+            <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          ` : ''}
+
+          <!-- X Axis Labels (every 4 hours) -->
+          ${processed.map((item: any, idx: number) => {
+            if (idx % 4 !== 0) return '';
+            const x = chartLeft + idx * step;
+            return svg`
+              <text x="${x}" y="${chartBottom + 16}" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="9px" font-family="sans-serif">
+                ${item.label}
+              </text>
+              ${type === 'grid' ? svg`
+                <text x="${x}" y="${chartBottom + 27}" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="8px" font-family="sans-serif">
+                  €${item.price.toFixed(2).replace('.', ',')}
+                </text>
+              ` : ''}
+            `;
+          })}
+
+          <!-- Points -->
+          ${points.map((p: any) => svg`
+            <circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}" stroke="#0f172a" stroke-width="1" />
+            <title>${p.label}: ${p.val.toFixed(2)} kW${p.price ? ` - € ${p.price.toFixed(3)}` : ''}</title>
+          `)}
+        </svg>
+      </div>
+    `;
   }
 
   private parseEntityFloat(entId?: string): number | null {
@@ -770,26 +897,30 @@ export class EnergyFlowCard extends LitElement {
           chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
         } else {
           const processed = this.getProcessedHourlySingleData(entityId);
-          const maxVal = Math.max(...processed.map(i => i.value)) || 1;
-          chartHtml = html`
-            <div class="scrollable-chart-container">
-              <div class="glass-bar-chart">
-                ${processed.map(item => {
-                  const percent = (item.value / maxVal) * 80;
-                  return html`
-                    <div class="chart-column">
-                      <div class="chart-bar-wrapper">
-                        <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
-                          <span class="bar-value">${item.value.toFixed(1)}</span>
+          if (this.showPowerValue) {
+            chartHtml = this.renderLineChart(processed, 'solar');
+          } else {
+            const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+            chartHtml = html`
+              <div class="scrollable-chart-container">
+                <div class="glass-bar-chart">
+                  ${processed.map(item => {
+                    const percent = (item.value / maxVal) * 80;
+                    return html`
+                      <div class="chart-column">
+                        <div class="chart-bar-wrapper">
+                          <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
+                            <span class="bar-value">${item.value.toFixed(1)}</span>
+                          </div>
                         </div>
+                        <span class="chart-label">${item.label}</span>
                       </div>
-                      <span class="chart-label">${item.label}</span>
-                    </div>
-                  `;
-                })}
+                    `;
+                  })}
+                </div>
               </div>
-            </div>
-          `;
+            `;
+          }
         }
       } else {
         if (this.isLoadingHistory) {
@@ -840,26 +971,30 @@ export class EnergyFlowCard extends LitElement {
           chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
         } else {
           const processed = this.getProcessedHourlySingleData(entityId);
-          const maxVal = Math.max(...processed.map(i => i.value)) || 1;
-          chartHtml = html`
-            <div class="scrollable-chart-container">
-              <div class="glass-bar-chart">
-                ${processed.map(item => {
-                  const percent = (item.value / maxVal) * 80;
-                  return html`
-                    <div class="chart-column">
-                      <div class="chart-bar-wrapper">
-                        <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
-                          <span class="bar-value">${item.value.toFixed(1)}</span>
+          if (this.showPowerValue) {
+            chartHtml = this.renderLineChart(processed, 'home');
+          } else {
+            const maxVal = Math.max(...processed.map(i => i.value)) || 1;
+            chartHtml = html`
+              <div class="scrollable-chart-container">
+                <div class="glass-bar-chart">
+                  ${processed.map(item => {
+                    const percent = (item.value / maxVal) * 80;
+                    return html`
+                      <div class="chart-column">
+                        <div class="chart-bar-wrapper">
+                          <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
+                            <span class="bar-value">${item.value.toFixed(1)}</span>
+                          </div>
                         </div>
+                        <span class="chart-label">${item.label}</span>
                       </div>
-                      <span class="chart-label">${item.label}</span>
-                    </div>
-                  `;
-                })}
+                    `;
+                  })}
+                </div>
               </div>
-            </div>
-          `;
+            `;
+          }
         }
       } else {
         if (this.isLoadingHistory) {
@@ -1193,40 +1328,44 @@ export class EnergyFlowCard extends LitElement {
             const processed = this.getProcessedHourlyGridData(targetImp, targetExp);
             // Chronological order (no price sorting)
 
-            const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
-            chartHtml = html`
-              <div class="scrollable-chart-container">
-                <div class="glass-bar-chart">
-                  ${processed.map(item => {
-                    const importPercent = (item.importValue / maxVal) * 80;
-                    const exportPercent = (item.exportValue / maxVal) * 80;
-                    return html`
-                      <div class="chart-column" style="min-width: 60px;">
-                        <div class="chart-values-stacked">
-                          <span class="stacked-val import-color">
-                            ${item.importValue > 0 ? item.importValue.toFixed(1) : ''}
-                          </span>
-                          <span class="stacked-val export-color">
-                            ${item.exportValue > 0 ? item.exportValue.toFixed(1) : ''}
-                          </span>
-                        </div>
-    
-                        <div class="grid-double-bar-wrapper">
-                          <div class="grid-import-bar-wrapper">
-                            <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
+            if (this.showPowerValue) {
+              chartHtml = this.renderLineChart(processed, 'grid');
+            } else {
+              const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
+              chartHtml = html`
+                <div class="scrollable-chart-container">
+                  <div class="glass-bar-chart">
+                    ${processed.map(item => {
+                      const importPercent = (item.importValue / maxVal) * 80;
+                      const exportPercent = (item.exportValue / maxVal) * 80;
+                      return html`
+                        <div class="chart-column" style="min-width: 60px;">
+                          <div class="chart-values-stacked">
+                            <span class="stacked-val import-color">
+                              ${item.importValue > 0 ? item.importValue.toFixed(1) : ''}
+                            </span>
+                            <span class="stacked-val export-color">
+                              ${item.exportValue > 0 ? item.exportValue.toFixed(1) : ''}
+                            </span>
                           </div>
-                          <div class="grid-export-bar-wrapper">
-                            <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
+      
+                          <div class="grid-double-bar-wrapper">
+                            <div class="grid-import-bar-wrapper">
+                              <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
+                            </div>
+                            <div class="grid-export-bar-wrapper">
+                              <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
+                            </div>
                           </div>
+                          <span class="chart-label" style="font-size: 10px; margin-top: 4px; font-weight: bold; color: #ffffff;">${item.timeLabel}</span>
+                          <span style="font-size: 9px; color: rgba(255,255,255,0.45); font-weight: normal; margin-top: 2px;">€ ${item.price.toFixed(2).replace('.', ',')}</span>
                         </div>
-                        <span class="chart-label" style="font-size: 10px; margin-top: 4px; font-weight: bold; color: #ffffff;">${item.timeLabel}</span>
-                        <span style="font-size: 9px; color: rgba(255,255,255,0.45); font-weight: normal; margin-top: 2px;">€ ${item.price.toFixed(2).replace('.', ',')}</span>
-                      </div>
-                    `;
-                  })}
+                      `;
+                    })}
+                  </div>
                 </div>
-              </div>
-            `;
+              `;
+            }
           }
         }
       } else {
