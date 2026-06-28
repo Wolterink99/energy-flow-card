@@ -203,6 +203,7 @@ export class EnergyFlowCard extends LitElement {
   @state() protected activePopupHistory: { day: string; value: number }[] = [];
   @state() private isLoadingHistory: boolean = false;
   @state() private activeTab: 'today' | 'prices' | 'month' | 'year' = 'today';
+  @state() private showPowerValue: boolean = false;
   @state() private statsData: Record<string, any[]> = {};
   @state() private hourlyStatsData: Record<string, any[]> = {};
   @state() private weatherForecast: any[] = [];
@@ -1190,7 +1191,7 @@ export class EnergyFlowCard extends LitElement {
             chartHtml = html`<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
           } else {
             const processed = this.getProcessedHourlyGridData(targetImp, targetExp);
-            processed.sort((a, b) => a.price - b.price);
+            // Chronological order (no price sorting)
 
             const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
             chartHtml = html`
@@ -1218,8 +1219,8 @@ export class EnergyFlowCard extends LitElement {
                             <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
                           </div>
                         </div>
-                        <span class="chart-label" style="font-size: 9px; margin-top: 4px;">€ ${item.price.toFixed(2).replace('.', ',')}</span>
-                        <span style="font-size: 9px; color: rgba(255,255,255,0.3); font-weight: normal;">${item.timeLabel}</span>
+                        <span class="chart-label" style="font-size: 10px; margin-top: 4px; font-weight: bold; color: #ffffff;">${item.timeLabel}</span>
+                        <span style="font-size: 9px; color: rgba(255,255,255,0.45); font-weight: normal; margin-top: 2px;">€ ${item.price.toFixed(2).replace('.', ',')}</span>
                       </div>
                     `;
                   })}
@@ -1299,17 +1300,25 @@ export class EnergyFlowCard extends LitElement {
           </div>
 
           <!-- Tab switcher -->
-          <div class="popup-tabs">
-            ${this.activePopup === 'grid' ? html`
-              <button class="popup-tab-btn ${this.activeTab === 'today' ? 'active' : ''}" @click=${() => this.switchTab('today')}>Vandaag</button>
-              <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Prijs</button>
-              <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
-              <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
-            ` : html`
-              <button class="popup-tab-btn ${this.activeTab === 'today' ? 'active' : ''}" @click=${() => this.switchTab('today')}>Vandaag</button>
-              <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
-              <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
-            `}
+          <div class="popup-tabs" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 8px;">
+              ${this.activePopup === 'grid' ? html`
+                <button class="popup-tab-btn ${this.activeTab === 'today' ? 'active' : ''}" @click=${() => this.switchTab('today')}>Vandaag</button>
+                <button class="popup-tab-btn ${this.activeTab === 'prices' ? 'active' : ''}" @click=${() => this.switchTab('prices')}>Prijs</button>
+                <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
+                <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
+              ` : html`
+                <button class="popup-tab-btn ${this.activeTab === 'today' ? 'active' : ''}" @click=${() => this.switchTab('today')}>Vandaag</button>
+                <button class="popup-tab-btn ${this.activeTab === 'month' ? 'active' : ''}" @click=${() => this.switchTab('month')}>Maand</button>
+                <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
+              `}
+            </div>
+
+            ${this.activeTab === 'today' ? html`
+              <button class="popup-tab-btn" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; font-size: 11px; text-transform: uppercase; font-weight: bold; border-radius: 6px; letter-spacing: 0.02em;" @click=${() => this.showPowerValue = !this.showPowerValue}>
+                ${this.showPowerValue ? 'Toon kWh' : 'Toon kW'}
+              </button>
+            ` : ''}
           </div>
 
           <div class="glass-popup-stats">
@@ -1429,7 +1438,7 @@ export class EnergyFlowCard extends LitElement {
             <div class="chart-title">
               ${this.activePopup === 'grid' && this.activeTab === 'prices'
                 ? 'Zonneplan Uurprijzen (€/kWh)'
-                : `${this.activeTab === 'month' ? 'Afgelopen maand' : 'Jaaroverzicht'} (kWh)`}
+                : `${this.activeTab === 'month' ? 'Afgelopen maand' : (this.activeTab === 'today' ? 'Vandaag' : 'Jaaroverzicht')} (${this.showPowerValue && this.activeTab === 'today' ? 'kW' : 'kWh'})`}
             </div>
             ${chartHtml}
           </div>
