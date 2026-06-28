@@ -3289,42 +3289,7 @@ class EnergyFlowCard extends i {
             hasSecondStat = true;
             const entityId = entities.solar_energy_today || entities.solar_today;
             if (this.activeTab === 'today') {
-                if (this.isLoadingHistory) {
-                    chartHtml = b `<div class="chart-loading">Gegevens laden...</div>`;
-                }
-                else if (!entityId || !this.hourlyStatsData[entityId] || this.hourlyStatsData[entityId].length === 0) {
-                    chartHtml = b `<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
-                }
-                else {
-                    const homeEnt = entities.home_today || '';
-                    if (this.showPowerValue && homeEnt) {
-                        chartHtml = this.renderUnifiedLineChart('solar');
-                    }
-                    else {
-                        const currentHour = new Date().getHours();
-                        const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
-                        const maxVal = Math.max(...processed.map(i => i.value)) || 1;
-                        chartHtml = b `
-              <div class="scrollable-chart-container">
-                <div class="glass-bar-chart">
-                  ${processed.map(item => {
-                            const percent = (item.value / maxVal) * 80;
-                            return b `
-                      <div class="chart-column">
-                        <div class="chart-bar-wrapper">
-                          <div class="chart-bar solar-bar" style="height: ${Math.max(4, percent)}%;">
-                            <span class="bar-value">${item.value.toFixed(1)}</span>
-                          </div>
-                        </div>
-                        <span class="chart-label">${item.label}</span>
-                      </div>
-                    `;
-                        })}
-                </div>
-              </div>
-            `;
-                    }
-                }
+                chartHtml = this.renderUnifiedLineChart('solar');
             }
             else {
                 if (this.isLoadingHistory) {
@@ -3370,42 +3335,7 @@ class EnergyFlowCard extends i {
             hasSecondStat = true;
             const entityId = entities.home_today;
             if (this.activeTab === 'today') {
-                if (this.isLoadingHistory) {
-                    chartHtml = b `<div class="chart-loading">Gegevens laden...</div>`;
-                }
-                else if (!entityId || !this.hourlyStatsData[entityId] || this.hourlyStatsData[entityId].length === 0) {
-                    chartHtml = b `<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
-                }
-                else {
-                    const solarEnt = entities.solar_energy_today || entities.solar_today || '';
-                    if (this.showPowerValue && solarEnt) {
-                        chartHtml = this.renderUnifiedLineChart('home');
-                    }
-                    else {
-                        const currentHour = new Date().getHours();
-                        const processed = this.getProcessedHourlySingleData(entityId).filter((_, idx) => idx <= currentHour);
-                        const maxVal = Math.max(...processed.map(i => i.value)) || 1;
-                        chartHtml = b `
-              <div class="scrollable-chart-container">
-                <div class="glass-bar-chart">
-                  ${processed.map(item => {
-                            const percent = (item.value / maxVal) * 80;
-                            return b `
-                      <div class="chart-column">
-                        <div class="chart-bar-wrapper">
-                          <div class="chart-bar home-bar" style="height: ${Math.max(4, percent)}%;">
-                            <span class="bar-value">${item.value.toFixed(1)}</span>
-                          </div>
-                        </div>
-                        <span class="chart-label">${item.label}</span>
-                      </div>
-                    `;
-                        })}
-                </div>
-              </div>
-            `;
-                    }
-                }
+                chartHtml = this.renderUnifiedLineChart('home');
             }
             else {
                 if (this.isLoadingHistory) {
@@ -3711,62 +3641,7 @@ class EnergyFlowCard extends i {
                 }
             }
             else if (this.activeTab === 'today') {
-                if (this.isLoadingHistory) {
-                    chartHtml = b `<div class="chart-loading">Gegevens laden...</div>`;
-                }
-                else {
-                    const targetImp = impEntity || '';
-                    const targetExp = expEntity || '';
-                    if (!targetImp || !targetExp || (!this.hourlyStatsData[targetImp] && !this.hourlyStatsData[targetExp])) {
-                        chartHtml = b `<div class="chart-no-data">Geen uurlijkse gegevens beschikbaar voor vandaag.</div>`;
-                    }
-                    else {
-                        const solarEnt = entities.solar_energy_today || entities.solar_today || '';
-                        const homeEnt = entities.home_today || '';
-                        if (this.showPowerValue && solarEnt && homeEnt) {
-                            chartHtml = this.renderUnifiedLineChart('grid');
-                        }
-                        else {
-                            const currentHour = new Date().getHours();
-                            const processed = this.getProcessedHourlyGridData(targetImp, targetExp).filter((_, idx) => idx <= currentHour);
-                            // Chronological order (no price sorting)
-                            const maxVal = Math.max(...processed.map(i => Math.max(i.importValue, i.exportValue))) || 1;
-                            chartHtml = b `
-                <div class="scrollable-chart-container">
-                  <div class="glass-bar-chart">
-                    ${processed.map(item => {
-                                const importPercent = (item.importValue / maxVal) * 80;
-                                const exportPercent = (item.exportValue / maxVal) * 80;
-                                return b `
-                        <div class="chart-column" style="min-width: 60px;">
-                          <div class="chart-values-stacked">
-                            <span class="stacked-val import-color">
-                              ${item.importValue > 0 ? item.importValue.toFixed(1) : ''}
-                            </span>
-                            <span class="stacked-val export-color">
-                              ${item.exportValue > 0 ? item.exportValue.toFixed(1) : ''}
-                            </span>
-                          </div>
-      
-                          <div class="grid-double-bar-wrapper">
-                            <div class="grid-import-bar-wrapper">
-                              <div class="grid-import-bar" style="height: ${Math.max(4, importPercent)}%;"></div>
-                            </div>
-                            <div class="grid-export-bar-wrapper">
-                              <div class="grid-export-bar" style="height: ${Math.max(4, exportPercent)}%;"></div>
-                            </div>
-                          </div>
-                          <span class="chart-label" style="font-size: 10px; margin-top: 4px; font-weight: bold; color: #ffffff;">${item.timeLabel}</span>
-                          <span style="font-size: 9px; color: rgba(255,255,255,0.45); font-weight: normal; margin-top: 2px;">€ ${item.price.toFixed(2).replace('.', ',')}</span>
-                        </div>
-                      `;
-                            })}
-                  </div>
-                </div>
-              `;
-                        }
-                    }
-                }
+                chartHtml = this.renderUnifiedLineChart('grid');
             }
             else {
                 if (this.isLoadingHistory) ;
@@ -3849,12 +3724,6 @@ class EnergyFlowCard extends i {
                 <button class="popup-tab-btn ${this.activeTab === 'year' ? 'active' : ''}" @click=${() => this.switchTab('year')}>Jaar</button>
               `}
             </div>
-
-            ${this.activeTab === 'today' ? b `
-              <button class="popup-tab-btn" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; font-size: 11px; text-transform: uppercase; font-weight: bold; border-radius: 6px; letter-spacing: 0.02em;" @click=${this.togglePowerUnit}>
-                ${this.showPowerValue ? 'Toon kWh' : 'Toon kW'}
-              </button>
-            ` : ''}
           </div>
 
           <div class="glass-popup-stats">
