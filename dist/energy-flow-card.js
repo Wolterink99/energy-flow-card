@@ -2402,6 +2402,8 @@ class EnergyFlowCard extends i {
         this.isLoadingHistory = false;
         this.activeTab = 'today';
         this.showPowerValue = false;
+        this.hourlyHistoryData = {};
+        this.isFetchingHistory = false;
         this.statsData = {};
         this.hourlyStatsData = {};
         this.weatherForecast = [];
@@ -2534,6 +2536,40 @@ class EnergyFlowCard extends i {
         }
         catch (e) {
             console.warn('[energy-flow-card] Failed to restore sidebar/header via JS:', e);
+        }
+    }
+    async fetchHighResolutionHistory() {
+        if (!this.hass)
+            return;
+        const solarEnt = this.config?.entities.solar || (this.config?.entities).solar_power;
+        const homeEnt = this.config?.entities.load || (this.config?.entities).home_power;
+        if (!solarEnt && !homeEnt)
+            return;
+        this.isFetchingHistory = true;
+        try {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).toISOString();
+            const end = now.toISOString();
+            const entityIds = [];
+            if (solarEnt)
+                entityIds.push(solarEnt);
+            if (homeEnt)
+                entityIds.push(homeEnt);
+            const res = await this.hass.callWS({
+                type: 'history/period',
+                start_time: start,
+                end_time: end,
+                entity_ids: entityIds,
+                minimal_response: true,
+                no_attributes: true
+            });
+            this.hourlyHistoryData = res || {};
+        }
+        catch (e) {
+            console.error('[energy-flow-card] Failed to fetch history:', e);
+        }
+        finally {
+            this.isFetchingHistory = false;
         }
     }
     async fetchStatsData(entityIds) {
@@ -2754,31 +2790,16 @@ class EnergyFlowCard extends i {
     }
     renderUnifiedLineChart(solarEntity, homeEntity) {
         const now = new Date();
-        const currentHour = now.getHours();
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth();
         const currentDate = now.getDate();
+        const startTime = new Date(currentYear, currentMonth, currentDate, 0, 0, 0).getTime();
+        const endTime = new Date(currentYear, currentMonth, currentDate, 23, 59, 59).getTime();
+        // 1. Fetch today's price forecast
         const gridPriceState = this.config?.entities.grid_price ? this.hass?.states[this.config.entities.grid_price] : null;
         const forecast = gridPriceState?.attributes?.forecast || [];
-        const solarRaw = this.hourlyStatsData[solarEntity] || [];
-        const homeRaw = this.hourlyStatsData[homeEntity] || [];
-        const solarMap = new Map();
-        const homeMap = new Map();
-        solarRaw.forEach(p => {
-            const d = new Date(p.start);
-            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate) {
-                solarMap.set(d.getHours(), this.getStatPointValue(p, solarEntity) * 1000); // convert to W
-            }
-        });
-        homeRaw.forEach(p => {
-            const d = new Date(p.start);
-            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate) {
-                homeMap.set(d.getHours(), this.getStatPointValue(p, homeEntity) * 1000); // convert to W
-            }
-        });
-        const points = [];
         const prices = [];
-        const powers = [];
+        const pricePoints = [];
         for (let hour = 0; hour < 24; hour++) {
             const forecastEntry = forecast.find((entry) => {
                 const d = new Date(entry.datetime);
@@ -2786,59 +2807,79 @@ class EnergyFlowCard extends i {
             });
             const price = forecastEntry ? parseFloat(forecastEntry.electricity_price) / 10000000 : 0;
             prices.push(price);
-            const solarVal = solarMap.get(hour) || 0;
-            const homeVal = homeMap.get(hour) || 0;
-            powers.push(solarVal, homeVal);
-            const hourStr = `${hour.toString().padStart(2, '0')}:00`;
-            points.push({
-                hour,
-                label: hourStr,
-                price,
-                solar: solarVal,
-                home: homeVal
-            });
+            pricePoints.push({ hour, price });
         }
-        const maxPower = Math.max(...powers, 1000);
         const maxPrice = Math.max(...prices, 0.40);
         const minPrice = Math.min(...prices, 0.0);
         const priceRange = maxPrice - minPrice;
+        // 2. Parse high-resolution history curves
+        const parseHistory = (entId) => {
+            const raw = this.hourlyHistoryData[entId] || [];
+            return raw.map((p) => {
+                const state = parseFloat(p.s !== undefined ? p.s : p.state);
+                const time = (p.t !== undefined ? p.t * 1000 : new Date(p.last_changed || p.last_updated).getTime());
+                return { state: isNaN(state) ? 0 : state, time };
+            }).sort((a, b) => a.time - b.time);
+        };
+        const solarHistory = parseHistory(solarEntity);
+        const homeHistory = parseHistory(homeEntity);
+        // Get max power for Y scaling
+        const allPowerValues = [...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state)];
+        const maxPower = Math.max(...allPowerValues, 1000);
+        // SVG Layout
         const chartLeft = 45;
         const chartRight = 450;
         const chartWidth = chartRight - chartLeft;
         const chartTop = 20;
         const chartHeight = 120;
         const chartBottom = chartTop + chartHeight;
-        const step = chartWidth / 23;
-        const svgPoints = points.map((p, idx) => {
-            const x = chartLeft + idx * step;
-            const ySolar = chartBottom - (p.solar / maxPower) * chartHeight;
-            const yHome = chartBottom - (p.home / maxPower) * chartHeight;
-            const yPrice = chartBottom - ((p.price - minPrice) / (priceRange || 1)) * chartHeight;
-            return {
-                ...p,
-                x,
-                ySolar,
-                yHome,
-                yPrice
-            };
-        });
-        const pastPoints = svgPoints.filter(p => p.hour <= currentHour);
+        // Helper to map time & power value to SVG coordinates
+        const getCoords = (time, value) => {
+            const x = chartLeft + ((time - startTime) / (endTime - startTime)) * chartWidth;
+            const y = chartBottom - (Math.max(0, value) / maxPower) * chartHeight;
+            return { x: Math.min(chartRight, Math.max(chartLeft, x)), y: Math.min(chartBottom, Math.max(chartTop, y)) };
+        };
+        // Helper to map time & price value to SVG coordinates
+        const getPriceCoords = (time, price) => {
+            const x = chartLeft + ((time - startTime) / (endTime - startTime)) * chartWidth;
+            const y = chartBottom - ((price - minPrice) / (priceRange || 1)) * chartHeight;
+            return { x: Math.min(chartRight, Math.max(chartLeft, x)), y: Math.min(chartBottom, Math.max(chartTop, y)) };
+        };
+        // Build Solar Line & Area Paths
         let solarLinePath = '';
         let solarAreaPath = '';
+        if (solarHistory.length > 0) {
+            const pts = solarHistory.map(p => getCoords(p.time, p.state));
+            solarLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+            solarAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
+        }
+        // Build Home Line & Area Paths
         let homeLinePath = '';
         let homeAreaPath = '';
+        if (homeHistory.length > 0) {
+            const pts = homeHistory.map(p => getCoords(p.time, p.state));
+            homeLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+            homeAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
+        }
+        // Build Price stepped path (spanning full 24h)
         let priceLinePath = '';
         let priceAreaPath = '';
-        if (pastPoints.length > 0) {
-            solarLinePath = `M ${pastPoints[0].x} ${pastPoints[0].ySolar} ` + pastPoints.slice(1).map(p => `L ${p.x} ${p.ySolar}`).join(' ');
-            solarAreaPath = `M ${pastPoints[0].x} ${chartBottom} ` + pastPoints.map(p => `L ${p.x} ${p.ySolar}`).join(' ') + ` L ${pastPoints[pastPoints.length - 1].x} ${chartBottom} Z`;
-            homeLinePath = `M ${pastPoints[0].x} ${pastPoints[0].yHome} ` + pastPoints.slice(1).map(p => `L ${p.x} ${p.yHome}`).join(' ');
-            homeAreaPath = `M ${pastPoints[0].x} ${chartBottom} ` + pastPoints.map(p => `L ${p.x} ${p.yHome}`).join(' ') + ` L ${pastPoints[pastPoints.length - 1].x} ${chartBottom} Z`;
+        if (pricePoints.length > 0) {
+            const pts = [];
+            pricePoints.forEach((p, idx) => {
+                const hourStart = startTime + p.hour * 60 * 60 * 1000;
+                const hourEnd = hourStart + 60 * 60 * 1000;
+                const startCoords = getPriceCoords(hourStart, p.price);
+                const endCoords = getPriceCoords(hourEnd, p.price);
+                if (idx === 0) {
+                    pts.push(startCoords);
+                }
+                pts.push(endCoords);
+            });
+            priceLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+            priceAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
         }
-        if (svgPoints.length > 0) {
-            priceLinePath = `M ${svgPoints[0].x} ${svgPoints[0].yPrice} ` + svgPoints.slice(1).map(p => `L ${p.x} ${p.yPrice}`).join(' ');
-            priceAreaPath = `M ${svgPoints[0].x} ${chartBottom} ` + svgPoints.map(p => `L ${p.x} ${p.yPrice}`).join(' ') + ` L ${svgPoints[svgPoints.length - 1].x} ${chartBottom} Z`;
-        }
+        // Y Gridlines
         const gridLines = [];
         const gridCount = 4;
         for (let i = 0; i <= gridCount; i++) {
@@ -2846,6 +2887,7 @@ class EnergyFlowCard extends i {
             const y = chartBottom - (powerVal / maxPower) * chartHeight;
             gridLines.push({ powerVal, y });
         }
+        // Price Labels
         const priceLabels = [];
         for (let i = 0; i <= gridCount; i++) {
             const priceVal = minPrice + (priceRange * i) / gridCount;
@@ -2882,18 +2924,19 @@ class EnergyFlowCard extends i {
       </div>
 
       <div class="scrollable-chart-container" style="display: block !important; padding-top: 5px; height: 165px; overflow-y: hidden; overflow-x: hidden; position: relative;">
+        ${this.isFetchingHistory && solarHistory.length === 0 ? b `<div class="chart-loading" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15,23,42,0.4); z-index: 10;">Geschiedenis laden...</div>` : ''}
         <svg viewBox="0 0 500 190" style="display: block; width: 100%; height: 155px !important;">
           <defs>
             <linearGradient id="solar-area-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.25" />
+              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.2" />
               <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.0" />
             </linearGradient>
             <linearGradient id="home-area-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.25" />
+              <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.2" />
               <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0" />
             </linearGradient>
             <linearGradient id="price-area-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.05" />
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.04" />
               <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
             </linearGradient>
           </defs>
@@ -2914,44 +2957,34 @@ class EnergyFlowCard extends i {
           `)}
 
           <!-- Price Forecast Area & Line (Subtle background) -->
-          ${svgPoints.length > 0 ? b `
+          ${priceLinePath ? b `
             <path d="${priceAreaPath}" fill="url(#price-area-grad)" />
             <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.2" stroke-dasharray="3,3" />
           ` : ''}
 
           <!-- Solar Area & Line -->
-          ${pastPoints.length > 0 ? b `
+          ${solarLinePath ? b `
             <path d="${solarAreaPath}" fill="url(#solar-area-grad)" />
-            <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Home Area & Line -->
-          ${pastPoints.length > 0 ? b `
+          ${homeLinePath ? b `
             <path d="${homeAreaPath}" fill="url(#home-area-grad)" />
-            <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- X Axis Labels (every 4 hours) -->
-          ${points.map((item, idx) => {
-            if (idx % 4 !== 0)
-                return '';
-            const x = chartLeft + idx * step;
+          ${Array.from({ length: 7 }).map((_, i) => {
+            const hour = i * 4;
+            const hourStr = `${hour.toString().padStart(2, '0')}:00`;
+            const x = chartLeft + (hour / 24) * chartWidth;
             return b `
               <text x="${x}" y="${chartBottom + 16}" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="9px" font-family="sans-serif">
-                ${item.label}
+                ${hourStr}
               </text>
             `;
         })}
-
-          <!-- Points & Tooltips -->
-          ${pastPoints.map(p => b `
-            <circle cx="${p.x}" cy="${p.ySolar}" r="2.5" fill="#fbbf24" stroke="#0f172a" stroke-width="1" />
-            <circle cx="${p.x}" cy="${p.yHome}" r="2.5" fill="#a78bfa" stroke="#0f172a" stroke-width="1" />
-            <title>Om ${p.label}:
-Solar: ${p.solar >= 1000 ? `${(p.solar / 1000).toFixed(2)} kW` : `${Math.round(p.solar)} W`}
-Huis: ${p.home >= 1000 ? `${(p.home / 1000).toFixed(2)} kW` : `${Math.round(p.home)} W`}
-Tarief: €${p.price.toFixed(3).replace('.', ',')}</title>
-          `)}
         </svg>
       </div>
     `;
@@ -3840,6 +3873,9 @@ Tarief: €${p.price.toFixed(3).replace('.', ',')}</title>
     }
     switchTab(tab) {
         this.activeTab = tab;
+        if (tab === 'today' && this.showPowerValue) {
+            this.fetchHighResolutionHistory();
+        }
         setTimeout(() => {
             const container = this.shadowRoot?.querySelector('.scrollable-chart-container');
             if (container) {
@@ -3850,6 +3886,9 @@ Tarief: €${p.price.toFixed(3).replace('.', ',')}</title>
     togglePowerUnit(e) {
         e.stopPropagation();
         this.showPowerValue = !this.showPowerValue;
+        if (this.showPowerValue && this.activeTab === 'today') {
+            this.fetchHighResolutionHistory();
+        }
         console.info(`[energy-flow-card] Toggled showPowerValue to: ${this.showPowerValue}`);
     }
     getClouds(weather) {
@@ -4603,6 +4642,12 @@ __decorate([
 __decorate([
     r()
 ], EnergyFlowCard.prototype, "showPowerValue", void 0);
+__decorate([
+    r()
+], EnergyFlowCard.prototype, "hourlyHistoryData", void 0);
+__decorate([
+    r()
+], EnergyFlowCard.prototype, "isFetchingHistory", void 0);
 __decorate([
     r()
 ], EnergyFlowCard.prototype, "statsData", void 0);
