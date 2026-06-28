@@ -2869,7 +2869,7 @@ class EnergyFlowCard extends i {
         const chartRight = 450;
         const chartWidth = chartRight - chartLeft;
         const chartTop = 20;
-        const chartHeight = 120;
+        const chartHeight = 190;
         const chartBottom = chartTop + chartHeight;
         // Helper to map time & power value to SVG coordinates
         const getCoords = (time, value) => {
@@ -2963,20 +2963,20 @@ class EnergyFlowCard extends i {
         </div>
       </div>
 
-      <div style="display: block !important; width: 100% !important; height: 170px !important; position: relative !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;">
+      <div style="display: block !important; width: 100% !important; height: 260px !important; position: relative !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;">
         ${this.isFetchingHistory && solarHistory.length === 0 ? b `<div class="chart-loading" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15,23,42,0.4); z-index: 10;">Geschiedenis laden...</div>` : ''}
-        <svg viewBox="0 0 500 190" style="display: block !important; width: 100% !important; height: 155px !important; margin: 0 !important; padding: 0 !important; background: rgba(255,255,255,0.03) !important;">
+        <svg viewBox="0 0 500 240" style="display: block !important; width: 100% !important; height: 250px !important; margin: 0 !important; padding: 0 !important; background: rgba(255,255,255,0.02) !important; border-radius: 8px;">
           <defs>
             <linearGradient id="solar-area-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.2" />
+              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.25" />
               <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.0" />
             </linearGradient>
             <linearGradient id="home-area-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.2" />
+              <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.25" />
               <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0" />
             </linearGradient>
             <linearGradient id="price-area-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.04" />
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.05" />
               <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
             </linearGradient>
           </defs>
@@ -2999,7 +2999,7 @@ class EnergyFlowCard extends i {
           <!-- Price Forecast Area & Line (Subtle background) -->
           ${priceLinePath ? w `
             <path d="${priceAreaPath}" fill="url(#price-area-grad)" />
-            <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3,3" />
+            <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.8" stroke-dasharray="3,3" />
           ` : ''}
 
           <!-- Solar Area & Line -->
@@ -3020,7 +3020,7 @@ class EnergyFlowCard extends i {
             const hourStr = `${hour.toString().padStart(2, '0')}:00`;
             const x = chartLeft + (hour / 24) * chartWidth;
             return w `
-              <text x="${x}" y="${chartBottom + 16}" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="9px" font-family="sans-serif">
+              <text x="${x}" y="${chartBottom + 16}" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9px" font-family="sans-serif">
                 ${hourStr}
               </text>
             `;
@@ -3062,7 +3062,7 @@ class EnergyFlowCard extends i {
               <div class="glass-popup-subtitle">Live vermogen en prijsverloop</div>
             </div>
 
-            <div class="glass-popup-chart-container" style="background: transparent; border: none; padding: 0; display: block; height: 180px; width: 100%;">
+            <div class="glass-popup-chart-container" style="background: transparent; border: none; padding: 0; display: block; height: 270px; width: 100%;">
               ${this.renderUnifiedLineChart(solarPowerEnt, homePowerEnt)}
             </div>
           </div>
