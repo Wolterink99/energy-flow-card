@@ -350,6 +350,7 @@ export class EnergyFlowCard extends LitElement {
     
     const solarEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power;
     const homeEnt = this.config?.entities.load || (this.config?.entities as any).home_power;
+    console.info('[energy-flow-card] Configured entities for history:', { solarEnt, homeEnt });
     if (!solarEnt && !homeEnt) return;
 
     this.isFetchingHistory = true;
@@ -361,10 +362,23 @@ export class EnergyFlowCard extends LitElement {
       if (solarEnt) entityIds.push(solarEnt);
       if (homeEnt) entityIds.push(homeEnt);
 
-      const res = await (this.hass as any).callApi(
-        'GET',
-        `history/period/${start}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`
+      console.info('[energy-flow-card] Fetching history from REST API for:', entityIds);
+      
+      const token = (this.hass as any).auth?.accessToken;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `/api/history/period/${start}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`,
+        { headers }
       );
+      const res = await response.json();
+
+      console.info('[energy-flow-card] History response received, length:', res ? res.length : 0);
 
       const historyMap: Record<string, any[]> = {};
       if (Array.isArray(res)) {
@@ -373,6 +387,7 @@ export class EnergyFlowCard extends LitElement {
             const entId = entityHistory[0].entity_id;
             if (entId) {
               historyMap[entId] = entityHistory;
+              console.info(`[energy-flow-card] Stored history for ${entId}, points: ${entityHistory.length}`);
             }
           }
         });
@@ -676,6 +691,15 @@ export class EnergyFlowCard extends LitElement {
 
     const solarHistory = parseHistory(solarPowerEnt);
     const homeHistory = parseHistory(homePowerEnt);
+
+    console.info('[energy-flow-card] rendering unified line chart:', {
+      solarPowerEnt,
+      homePowerEnt,
+      solarHistoryLen: solarHistory.length,
+      homeHistoryLen: homeHistory.length,
+      maxPower: Math.max(...[...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state)], 1000),
+      isFetchingHistory: this.isFetchingHistory
+    });
 
     // Get max power for Y scaling
     const allPowerValues = [...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state)];
