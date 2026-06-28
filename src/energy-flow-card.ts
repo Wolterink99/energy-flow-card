@@ -953,8 +953,6 @@ export class EnergyFlowCard extends LitElement {
     if (!this.activePopup) return '';
     
     if (this.activePopup === 'unified_chart') {
-      const solarPowerEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power || '';
-      const homePowerEnt = this.config?.entities.load || (this.config?.entities as any).home_power || '';
 
       return html`
         <div class="glass-popup-overlay" @click=${this.closePopup}>

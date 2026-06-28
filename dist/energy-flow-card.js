@@ -3101,8 +3101,6 @@ class EnergyFlowCard extends i {
         if (!this.activePopup)
             return '';
         if (this.activePopup === 'unified_chart') {
-            this.config?.entities.solar || (this.config?.entities).solar_power || '';
-            this.config?.entities.load || (this.config?.entities).home_power || '';
             return b `
         <div class="glass-popup-overlay" @click=${this.closePopup}>
           <div class="glass-popup-card" style="height: auto; width: 550px; max-width: 95vw; padding: 20px;" @click=${(e) => e.stopPropagation()}>
