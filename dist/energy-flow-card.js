@@ -921,21 +921,36 @@ function interpolateColor(color1, color2, factor) {
     const b = c1.b + (c2.b - c1.b) * factor;
     return toHex(r, g, b);
 }
-function getSkyState(hour, sunriseHour = 6.0, sunsetHour = 21.0) {
-    const dynamicKeyframes = [
-        { hour: 0, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
-        { hour: Math.max(0, sunriseHour - 1.5), top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
-        { hour: sunriseHour - 1.0, top: '#020617', horizon: '#1c223a', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
-        { hour: sunriseHour - 0.5, top: '#1c163a', horizon: '#8a315e', stars: 0.4, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.25)' },
-        { hour: sunriseHour, top: '#1e1b4b', horizon: '#fdba74', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.35)' },
-        { hour: sunriseHour + 1.0, top: '#0ea5e9', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
-        { hour: sunsetHour - 1.0, top: '#0284c7', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
-        { hour: sunsetHour, top: '#3b0764', horizon: '#f97316', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.45)' },
-        { hour: sunsetHour + 0.5, top: '#1c163a', horizon: '#8a315e', stars: 0.2, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.25)' },
-        { hour: sunsetHour + 1.0, top: '#020617', horizon: '#1c223a', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
-        { hour: sunsetHour + 1.5, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
-        { hour: 24, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' }
-    ];
+function getSkyState(hour, sunriseHour = 6.0, sunsetHour = 21.0, screensaver = false) {
+    const dynamicKeyframes = screensaver
+        ? [
+            { hour: 0, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+            { hour: Math.max(0, sunriseHour - 1.5), top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+            { hour: sunriseHour - 1.0, top: '#0a0a23', horizon: '#1a1f33', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
+            { hour: sunriseHour - 0.5, top: '#1c163a', horizon: '#7c3f58', stars: 0.4, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.20)' },
+            { hour: sunriseHour, top: '#2e1065', horizon: '#ffedd5', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.30)' },
+            { hour: sunriseHour + 1.0, top: '#93c5fd', horizon: '#f0f9ff', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.45)' },
+            { hour: sunsetHour - 1.0, top: '#7dd3fc', horizon: '#f0f9ff', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.45)' },
+            { hour: sunsetHour, top: '#4c1d95', horizon: '#ffedd5', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.35)' },
+            { hour: sunsetHour + 0.5, top: '#1c163a', horizon: '#7c3f58', stars: 0.2, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.20)' },
+            { hour: sunsetHour + 1.0, top: '#020617', horizon: '#1a1f33', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
+            { hour: sunsetHour + 1.5, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+            { hour: 24, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' }
+        ]
+        : [
+            { hour: 0, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+            { hour: Math.max(0, sunriseHour - 1.5), top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+            { hour: sunriseHour - 1.0, top: '#020617', horizon: '#1c223a', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
+            { hour: sunriseHour - 0.5, top: '#1c163a', horizon: '#8a315e', stars: 0.4, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.25)' },
+            { hour: sunriseHour, top: '#1e1b4b', horizon: '#fdba74', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.35)' },
+            { hour: sunriseHour + 1.0, top: '#0ea5e9', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
+            { hour: sunsetHour - 1.0, top: '#0284c7', horizon: '#bae6fd', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.65)' },
+            { hour: sunsetHour, top: '#3b0764', horizon: '#f97316', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.45)' },
+            { hour: sunsetHour + 0.5, top: '#1c163a', horizon: '#8a315e', stars: 0.2, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.25)' },
+            { hour: sunsetHour + 1.0, top: '#020617', horizon: '#1c223a', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
+            { hour: sunsetHour + 1.5, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' },
+            { hour: 24, top: '#020617', horizon: '#0f172a', stars: 0.8, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.08)' }
+        ];
     let lower = dynamicKeyframes[0];
     let upper = dynamicKeyframes[dynamicKeyframes.length - 1];
     for (let i = 0; i < dynamicKeyframes.length - 1; i++) {
@@ -1113,7 +1128,7 @@ const renderSinglePylon = (x, y, scale, opacity, strokeColor) => {
     </g>
   `;
 };
-function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback', timeHour: rawTimeHour, timeOfDay, solar, solarToday, load, batteryPower, soc, charger, grid, showSolar, showBattery, showEV, weather = 'sunny', clouds = [], sunriseHour = 6.0, sunsetHour = 21.0, gridImportToday = null, gridExportToday = null, homeToday = null, batteryChargeToday = null, batteryDischargeToday = null, evToday = null, showLights: passedShowLights = undefined, gridPrice = null, rainIntensity = 'normal', windSpeed = 10, temperature = null, poolPumpActive = false, onNodeClick }) {
+function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback', timeHour: rawTimeHour, timeOfDay, solar, solarToday, load, batteryPower, soc, charger, grid, showSolar, showBattery, showEV, weather = 'sunny', clouds = [], sunriseHour = 6.0, sunsetHour = 21.0, gridImportToday = null, gridExportToday = null, homeToday = null, batteryChargeToday = null, batteryDischargeToday = null, evToday = null, showLights: passedShowLights = undefined, gridPrice = null, rainIntensity = 'normal', windSpeed = 10, temperature = null, poolPumpActive = false, screensaver = false, onNodeClick }) {
     // Map weather states to primary visual groups
     let visualWeather = weather;
     if (weather === 'pouring' || weather === 'lightning-rainy') {
@@ -1153,7 +1168,7 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
     const isExportingDischarge = batteryDischarging && gridExporting;
     const batColor = (batteryCharging || isExportingDischarge) ? COLORS.battery : COLORS.batteryD;
     const gridColor = gridImporting ? COLORS.gridI : COLORS.gridE;
-    const skyState = getSkyState(rawTimeHour, sunriseHour, sunsetHour);
+    const skyState = getSkyState(rawTimeHour, sunriseHour, sunsetHour, screensaver);
     const resolvedShowLights = passedShowLights !== undefined
         ? passedShowLights
         : (skyState.lights > 0.05 || visualWeather === 'rainy' || visualWeather === 'lightning');
@@ -1353,8 +1368,8 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
         </linearGradient>
 
         <linearGradient id="garden-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#0f3f26" />
-          <stop offset="100%" stop-color="#0a2919" />
+          <stop offset="0%" stop-color="${screensaver ? '#1f4834' : '#0f3f26'}" />
+          <stop offset="100%" stop-color="${screensaver ? '#143122' : '#0a2919'}" />
         </linearGradient>
 
         <linearGradient id="driveway-grad" x1="0" y1="0" x2="0" y2="1">
@@ -4250,10 +4265,6 @@ class EnergyFlowCard extends i {
               border-radius: 0 !important;
               border: none !important;
               box-shadow: none !important;
-              
-              /* Ambient painterly/e-ink effect: desaturate and soften brightness */
-              filter: saturate(0.55) brightness(0.82) sepia(0.12) contrast(0.95) !important;
-              transition: filter 1.0s ease-in-out;
             }
             svg {
               height: 100% !important;
@@ -4345,6 +4356,7 @@ class EnergyFlowCard extends i {
             windSpeed,
             temperature,
             poolPumpActive,
+            screensaver: this.config.screensaver,
             onNodeClick: (node) => this.handleNodeClick(node)
         })}
           </div>
