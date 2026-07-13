@@ -544,6 +544,8 @@ export function renderHouseSvg({
             animation-delay: ${-(i / count) * speed}s;
             animation-direction: ${reverse ? 'reverse' : 'normal'};
             filter: drop-shadow(0 0 5px ${glow}) drop-shadow(0 0 2px ${color});
+            will-change: transform;
+            transform: translate3d(0, 0, 0);
           " />
       `)}
     `;

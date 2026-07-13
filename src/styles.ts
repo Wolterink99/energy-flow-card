@@ -776,4 +776,21 @@ export const styles = css`
     letter-spacing: 0.02em;
     display: inline-block;
   }
+
+  /* GPU hardware acceleration overrides for animated elements to reduce CPU load on wall displays */
+  .customDriftCloud,
+  .cloud-layer-back,
+  .cloud-layer-mid,
+  .cloud-layer-front,
+  .rainDrop,
+  .snowFlake,
+  .bird,
+  .inverterRing,
+  #wind-turbine-small g,
+  #wind-turbine-med g {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
 `;
