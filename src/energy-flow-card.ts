@@ -2264,25 +2264,6 @@ export class EnergyFlowCard extends LitElement {
               height: 100% !important;
               width: 100% !important;
             }
-
-            /* GPU/CPU Performance optimization for low-power wall displays in screensaver mode */
-            .screensaver-active * {
-              filter: none !important;
-              backdrop-filter: none !important;
-              text-shadow: none !important;
-              box-shadow: none !important;
-            }
-            .screensaver-active [style*="filter"],
-            .screensaver-active [style*="drop-shadow"] {
-              filter: none !important;
-            }
-            /* Replace complex patterns with solid colors to prevent GPU re-rasterization */
-            .screensaver-active [fill="url(#jaren30-brick-pat)"] {
-              fill: #4b5563 !important;
-            }
-            .screensaver-active [fill="url(#tiles-pat)"] {
-              fill: #1e293b !important;
-            }
           </style>
         `
       : '';
