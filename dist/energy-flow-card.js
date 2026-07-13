@@ -1242,7 +1242,7 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
     const p4Tips = getPylonTips(mastX + 316.4, 275.6, 0.28);
     const p5Tips = getPylonTips(mastX + 358.4, 323.6, 0.18);
     // Cable paths between components and the meterkast
-    const gridPath = `M 13,410 L 13,440 L ${mkX},440 L ${mkX},${mkY}`;
+    const gridPath = `M ${mastX + 176},410 L ${mastX + 176},440 L ${mkX},440 L ${mkX},${mkY}`;
     const solarPath = `M ${invX},${invY} L ${invX},270 L ${mkX},270 L ${mkX},${mkY}`;
     const batteryPath = `M 310,350 L ${mkX},${mkY}`;
     const evPath = `M ${mkX},${mkY} L ${mkX},440 L 455,440 L 455,395`;
@@ -1679,7 +1679,7 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
           </g>
 
           <!-- Transformer / Distribution Box -->
-          <g id="grid-transformer-box">
+          <g id="grid-transformer-box" transform="translate(${mastX + 163}, 0)">
             <rect x="-3" y="365" width="32" height="45" fill="#334155" stroke="#1e293b" stroke-width="1.8" rx="3" />
             <line x1="13" y1="365" x2="13" y2="410" stroke="#1e293b" stroke-width="1" />
             <circle cx="5" cy="390" r="1.5" fill="#1e293b" />
