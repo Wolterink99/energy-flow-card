@@ -241,6 +241,10 @@ export class EnergyFlowCard extends LitElement {
     this.handleHashChange();
   }
 
+  protected firstUpdated(): void {
+    this.fetchHighResolutionHistory();
+  }
+
   public disconnectedCallback(): void {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
@@ -1829,6 +1833,10 @@ export class EnergyFlowCard extends LitElement {
       this.activeTab = 'today';
       this.statsData = {};
       this.hourlyStatsData = {};
+      
+      if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid') {
+        this.fetchHighResolutionHistory();
+      }
       
       const entitiesToFetch: string[] = [];
       if (nodeId === 'solar') {

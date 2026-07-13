@@ -2460,6 +2460,9 @@ class EnergyFlowCard extends i {
         window.addEventListener('hashchange', this.handleHashChange);
         this.handleHashChange();
     }
+    firstUpdated() {
+        this.fetchHighResolutionHistory();
+    }
     disconnectedCallback() {
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
@@ -3956,6 +3959,9 @@ class EnergyFlowCard extends i {
             this.activeTab = 'today';
             this.statsData = {};
             this.hourlyStatsData = {};
+            if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid') {
+                this.fetchHighResolutionHistory();
+            }
             const entitiesToFetch = [];
             if (nodeId === 'solar') {
                 const ent = this.config?.entities.solar_energy_today || (this.config?.entities).solar_today;
