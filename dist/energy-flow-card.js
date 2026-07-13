@@ -4236,6 +4236,25 @@ class EnergyFlowCard extends i {
               height: 100% !important;
               width: 100% !important;
             }
+
+            /* GPU/CPU Performance optimization for low-power wall displays in screensaver mode */
+            .screensaver-active * {
+              filter: none !important;
+              backdrop-filter: none !important;
+              text-shadow: none !important;
+              box-shadow: none !important;
+            }
+            .screensaver-active [style*="filter"],
+            .screensaver-active [style*="drop-shadow"] {
+              filter: none !important;
+            }
+            /* Replace complex patterns with solid colors to prevent GPU re-rasterization */
+            .screensaver-active [fill="url(#jaren30-brick-pat)"] {
+              fill: #4b5563 !important;
+            }
+            .screensaver-active [fill="url(#tiles-pat)"] {
+              fill: #1e293b !important;
+            }
           </style>
         `
             : '';
@@ -4260,7 +4279,7 @@ class EnergyFlowCard extends i {
         return b `
       ${screensaverStyles}
       ${dynamicAnimations}
-      <ha-card style="${dynamicBackground}" @click=${this.handleCardClick}>
+      <ha-card class="${this.config.screensaver ? 'screensaver-active' : ''}" style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
           <!-- Digital Clock in the Top Center (Screensaver layout) -->
           <div style="position: absolute; left: 50%; top: 24px; transform: translateX(-50%); z-index: 90; text-align: center; pointer-events: none;">
