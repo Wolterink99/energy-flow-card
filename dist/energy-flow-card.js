@@ -929,8 +929,8 @@ function getSkyState(hour, sunriseHour = 6.0, sunsetHour = 21.0, screensaver = f
             { hour: sunriseHour - 1.0, top: '#0a0a23', horizon: '#1a1f33', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
             { hour: sunriseHour - 0.5, top: '#1c163a', horizon: '#7c3f58', stars: 0.4, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.20)' },
             { hour: sunriseHour, top: '#2e1065', horizon: '#ffedd5', stars: 0.2, lights: 0.3, clouds: 'rgba(255, 255, 255, 0.30)' },
-            { hour: sunriseHour + 1.0, top: '#78909c', horizon: '#eceff1', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.45)' },
-            { hour: sunsetHour - 1.0, top: '#78909c', horizon: '#eceff1', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.45)' },
+            { hour: sunriseHour + 1.0, top: '#6a9bd1', horizon: '#e2ecf7', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.45)' },
+            { hour: sunsetHour - 1.0, top: '#6a9bd1', horizon: '#e2ecf7', stars: 0.0, lights: 0.0, clouds: 'rgba(255, 255, 255, 0.45)' },
             { hour: sunsetHour, top: '#4c1d95', horizon: '#ffedd5', stars: 0.0, lights: 0.5, clouds: 'rgba(255, 255, 255, 0.35)' },
             { hour: sunsetHour + 0.5, top: '#1c163a', horizon: '#7c3f58', stars: 0.2, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.20)' },
             { hour: sunsetHour + 1.0, top: '#020617', horizon: '#1a1f33', stars: 0.6, lights: 1.0, clouds: 'rgba(255, 255, 255, 0.10)' },
@@ -1678,13 +1678,6 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
                    ${drawSaggingWire({ x: -translateX, y: p1Tips[1].y - 35 }, p1Tips[1], 30)} 
                    ${drawSaggingWire({ x: -translateX, y: p1Tips[3].y - 35 }, p1Tips[3], 30)}" 
                 fill="none" stroke="#4c5c71" stroke-width="1.8" opacity="0.8" />
-
-          <!-- Wires extending past P5 into the horizon -->
-          <path d="M ${p5Tips[0].x},${p5Tips[0].y} L ${p5Tips[0].x + 50},${p5Tips[0].y - 2} 
-                   M ${p5Tips[1].x},${p5Tips[1].y} L ${p5Tips[1].x + 50},${p5Tips[1].y - 2} 
-                   M ${p5Tips[2].x},${p5Tips[2].y} L ${p5Tips[2].x + 50},${p5Tips[2].y - 2} 
-                   M ${p5Tips[3].x},${p5Tips[3].y} L ${p5Tips[3].x + 50},${p5Tips[3].y - 2}" 
-                fill="none" stroke="#64748b" stroke-width="0.3" opacity="0.1" />
 
           <!-- Interactive Foreground Mast (Pylon 1) -->
           <g id="electricity-mast" class="interactiveGroup gridGroup" @click=${() => onNodeClick('grid')}>
