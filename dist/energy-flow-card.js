@@ -1769,29 +1769,37 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
             <circle cx="${mkX}" cy="${mkY}" r="2.5" fill="${solarActive || batteryCharging || batteryDischarging || gridImporting || gridExporting || evActive ? '#10b981' : '#ef4444'}" style="transition: fill 0.6s ease;" />
           </g>
 
-          <!-- ── THUISACCU (Battery against left wing wall) ── -->
+          <!-- ── THUISACCU (Zonneplan Nexus Battery against left wing wall) ── -->
           ${showBattery ? w `
             <g id="house-battery" class="interactiveGroup batteryGroup" @click=${(e) => { e.stopPropagation(); onNodeClick('battery'); }}>
-              <!-- Main Sleek Battery Body with Silver-Metal Gradient -->
-              <rect x="280" y="340" width="30" height="70" fill="url(#battery-body-grad)" stroke="#64748b" stroke-width="1.2" rx="3.5" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));" />
+              <!-- Matte Black Zonneplan Nexus Battery Body -->
+              <rect x="280" y="338" width="30" height="72" fill="#111827" stroke="#1f2937" stroke-width="1.5" rx="3.5" style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.45));" />
               
-              <!-- Modular stack divisions -->
-              <line x1="281" y1="358" x2="309" y2="358" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
-              <line x1="281" y1="359" x2="309" y2="359" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
-              <line x1="281" y1="376" x2="309" y2="376" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
-              <line x1="281" y1="377" x2="309" y2="377" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
-              <line x1="281" y1="394" x2="309" y2="394" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
-              <line x1="281" y1="395" x2="309" y2="395" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
+              <!-- Subtle Zonneplan Branding at the top -->
+              <g transform="translate(290, 342)">
+                <!-- Tiny Zonneplan logo: cyan circle with white lightning bolt -->
+                <circle cx="5" cy="5" r="3.2" fill="#00d2ff" />
+                <polygon points="4.5,2.5 6.8,4.8 5.2,4.8 5.8,7.5 3.5,5.2 5.0,5.2" fill="#ffffff" />
+              </g>
 
-              <!-- Digital SOC Screen -->
-              <rect x="284" y="344" width="22" height="10" fill="#0f172a" rx="1.5" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" />
-              <text x="295" y="352" text-anchor="middle" fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#10b981')}" font-size="7.5px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
+              <!-- Digital SOC Screen (Minimalistic) -->
+              <rect x="284" y="354" width="22" height="10" fill="#090d16" rx="1.5" stroke="rgba(0,210,255,0.2)" stroke-width="0.5" />
+              <text x="295" y="362" text-anchor="middle" fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#00d2ff')}" font-size="7px" font-family="monospace" font-weight="bold" style="transition: fill 0.6s ease;">
                 ${soc}%
               </text>
               
-              <!-- Premium Vertical LED Level Bar -->
-              <rect x="293" y="364" width="4" height="40" fill="rgba(15,23,42,0.3)" rx="1" />
-              <rect x="293" y="${404 - 40 * (soc / 100)}" width="4" height="${40 * (soc / 100)}" fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#10b981')}" opacity="0.95" style="transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;" rx="1" />
+              <!-- Premium Zonneplan Center LED Light Strip -->
+              <!-- Background Slot -->
+              <rect x="293.5" y="368" width="3" height="36" fill="#090d16" rx="1" />
+              <!-- Active Glowing Level -->
+              <rect x="293.5" y="${404 - 36 * (soc / 100)}" width="3" height="${36 * (soc / 100)}" 
+                fill="${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#00f5ff')}" 
+                opacity="0.95" 
+                style="
+                  filter: drop-shadow(0 0 3px ${soc < 20 ? '#ef4444' : (batteryDischarging ? '#f97316' : '#00f5ff')});
+                  transition: y 0.8s ease, height 0.8s ease, fill 0.6s ease;
+                " 
+                rx="1" />
             </g>
           ` : ''}
 
