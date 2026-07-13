@@ -2879,8 +2879,26 @@ class EnergyFlowCard extends i {
         const solarPowerEnt = this.config?.entities.solar || (this.config?.entities).solar_power || '';
         const homePowerEnt = this.config?.entities.load || (this.config?.entities).home_power || '';
         const gridPowerEnt = this.config?.entities.grid || (this.config?.entities).grid_power || '';
-        const solarHistory = parseHistory(solarPowerEnt);
-        const homeHistory = parseHistory(homePowerEnt);
+        // Adaptive smoothing to filter out small jitter while preserving large changes
+        const smoothHistory = (history) => {
+            if (history.length === 0)
+                return [];
+            const maxVal = Math.max(...history.map(h => Math.abs(h.state)), 100);
+            const threshold = maxVal * 0.08; // 8% of maximum value as threshold for responsiveness
+            const smoothed = [];
+            let prevVal = history[0].state;
+            for (let i = 0; i < history.length; i++) {
+                const currentVal = history[i].state;
+                const diff = Math.abs(currentVal - prevVal);
+                const alpha = 0.12 + 0.88 * Math.min(1, diff / threshold);
+                const newVal = prevVal + alpha * (currentVal - prevVal);
+                smoothed.push({ state: newVal, time: history[i].time });
+                prevVal = newVal;
+            }
+            return smoothed;
+        };
+        const solarHistory = smoothHistory(parseHistory(solarPowerEnt));
+        const homeHistory = smoothHistory(parseHistory(homePowerEnt));
         // Get max power for Y scaling based on type
         let maxPower = 1000;
         if (chartType === 'solar') {
@@ -2890,7 +2908,7 @@ class EnergyFlowCard extends i {
             maxPower = Math.max(...homeHistory.map(p => p.state), 1000);
         }
         else if (chartType === 'grid') {
-            const gridRaw = parseHistory(gridPowerEnt);
+            const gridRaw = smoothHistory(parseHistory(gridPowerEnt));
             const importStates = gridRaw.map(p => p.state > 0 ? p.state : 0);
             const exportStates = gridRaw.map(p => p.state < 0 ? Math.abs(p.state) : 0);
             maxPower = Math.max(...importStates, ...exportStates, 1000);
@@ -2957,7 +2975,7 @@ class EnergyFlowCard extends i {
         let gridExportLinePath = '';
         let gridExportAreaPath = '';
         if (chartType === 'grid') {
-            const gridRaw = parseHistory(gridPowerEnt);
+            const gridRaw = smoothHistory(parseHistory(gridPowerEnt));
             const importPts = gridRaw.map(p => getCoords(p.time, p.state > 0 ? p.state : 0));
             const exportPts = gridRaw.map(p => getCoords(p.time, p.state < 0 ? Math.abs(p.state) : 0));
             if (importPts.length > 0) {
