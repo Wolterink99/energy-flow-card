@@ -564,6 +564,25 @@ export function renderHouseSvg({
   }
   overcastPath += ` Z`;
 
+  // Dynamic positions for HUD cards to prevent overlapping
+  let batteryX = translateX + 195;
+  let homeX = translateX + 260;
+  let evX = translateX + 370;
+
+  if (showBattery && showEV) {
+    batteryX = translateX + 120;
+    homeX = translateX + 310;
+    evX = translateX + 500;
+  } else if (showBattery) {
+    batteryX = translateX + 155;
+    homeX = translateX + 345;
+  } else if (showEV) {
+    homeX = translateX + 220;
+    evX = translateX + 410;
+  } else {
+    homeX = translateX + 260;
+  }
+
   // Vertical translation to pin the ground and house to the bottom of the viewport
   const translateY = height - 530;
 
@@ -1442,7 +1461,7 @@ export function renderHouseSvg({
         <!-- 2. Thuisaccu — ruimte gereserveerd onder de accupositie (design x=280, SVG x=translateX+280) -->
         ${showBattery ? svg`
           <g class="interactiveGroup batteryGroup" @click=${() => onNodeClick('battery')}>
-            <g transform="translate(${translateX + 195}, ${height - 75})">
+            <g transform="translate(${batteryX}, ${height - 75})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${batteryCharging || batteryDischarging ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
@@ -1459,7 +1478,7 @@ export function renderHouseSvg({
 
         <!-- 3. Huisverbruik — onder de meterkast (mkX=345, gecentreerd: translateX+345-85=translateX+260) -->
         <g class="interactiveGroup homeGroup" @click=${() => onNodeClick('home')}>
-          <g transform="translate(${translateX + 260}, ${height - 75})">
+          <g transform="translate(${homeX}, ${height - 75})">
             <rect x="0" y="0" width="170" height="65"
               class="hudCard ${homeActive ? 'hudCardActive' : ''}"
               rx="8" ry="8"
@@ -1476,7 +1495,7 @@ export function renderHouseSvg({
         <!-- 4. Laadpaal (EV) — onder de laadpaal (design x=455, gecentreerd: translateX+455-85=translateX+370) -->
         ${showEV ? svg`
           <g class="interactiveGroup evGroup" @click=${() => onNodeClick('ev')}>
-            <g transform="translate(${translateX + 370}, ${height - 75})">
+            <g transform="translate(${evX}, ${height - 75})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${evActive ? 'hudCardActive' : ''}"
                 rx="8" ry="8"
