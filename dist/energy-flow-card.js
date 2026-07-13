@@ -2324,6 +2324,12 @@ class EnergyFlowCard extends i {
         this._timeRefreshTrigger = 0;
         this.clouds = [];
         this.lastWeather = '';
+        this._handleLocationChanged = () => {
+            this.restoreSidebarAndHeader();
+            // Delayed executions to handle asynchronous Lovelace DOM rendering
+            setTimeout(() => this.restoreSidebarAndHeader(), 100);
+            setTimeout(() => this.restoreSidebarAndHeader(), 500);
+        };
         this.handleHashChange = () => {
             const hash = window.location.hash;
             this.hasActiveHash = hash !== '' && hash !== '#';
@@ -2340,6 +2346,7 @@ class EnergyFlowCard extends i {
         });
         this.resizeObserver.observe(this);
         window.addEventListener('hashchange', this.handleHashChange);
+        window.addEventListener('location-changed', this._handleLocationChanged);
         this.handleHashChange();
         this._timeRefreshInterval = setInterval(() => {
             this._timeRefreshTrigger++;
@@ -2356,12 +2363,18 @@ class EnergyFlowCard extends i {
             clearInterval(this._timeRefreshInterval);
         }
         window.removeEventListener('hashchange', this.handleHashChange);
+        window.removeEventListener('location-changed', this._handleLocationChanged);
         this.restoreSidebarAndHeader();
         super.disconnectedCallback();
     }
     updated(changedProperties) {
         super.updated(changedProperties);
-        this.hideSidebarAndHeader();
+        if (this.config?.screensaver) {
+            this.hideSidebarAndHeader();
+        }
+        else {
+            this.restoreSidebarAndHeader();
+        }
     }
     hideSidebarAndHeader() {
         if (!this.config?.screensaver)

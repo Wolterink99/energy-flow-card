@@ -240,6 +240,7 @@ export class EnergyFlowCard extends LitElement {
     });
     this.resizeObserver.observe(this);
     window.addEventListener('hashchange', this.handleHashChange);
+    window.addEventListener('location-changed', this._handleLocationChanged);
     this.handleHashChange();
     this._timeRefreshInterval = setInterval(() => {
       this._timeRefreshTrigger++;
@@ -258,14 +259,26 @@ export class EnergyFlowCard extends LitElement {
       clearInterval(this._timeRefreshInterval);
     }
     window.removeEventListener('hashchange', this.handleHashChange);
+    window.removeEventListener('location-changed', this._handleLocationChanged);
     this.restoreSidebarAndHeader();
     super.disconnectedCallback();
   }
 
   protected updated(changedProperties: Map<string | number | symbol, unknown>): void {
     super.updated(changedProperties);
-    this.hideSidebarAndHeader();
+    if (this.config?.screensaver) {
+      this.hideSidebarAndHeader();
+    } else {
+      this.restoreSidebarAndHeader();
+    }
   }
+
+  private _handleLocationChanged = (): void => {
+    this.restoreSidebarAndHeader();
+    // Delayed executions to handle asynchronous Lovelace DOM rendering
+    setTimeout(() => this.restoreSidebarAndHeader(), 100);
+    setTimeout(() => this.restoreSidebarAndHeader(), 500);
+  };
 
   private hideSidebarAndHeader(): void {
     if (!this.config?.screensaver) return;
