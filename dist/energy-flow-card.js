@@ -1571,109 +1571,29 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
           <!-- Wind Turbines in the far background (behind pylon cables and ground) -->
           <!-- Small Wind Turbine (further) -->
           <g id="wind-turbine-small" style="pointer-events: none;" opacity="0.3">
-            <path d="M 713,410 L 714.5,330 L 715.5,330 L 717,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 715px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
-              <circle cx="715" cy="330" r="2.2" fill="#64748b" />
-              <path d="M 715,330 Q 714,295 715,285 Q 716,295 715,330" fill="#cbd5e1" />
-              <path d="M 715,330 Q 714,295 715,285 Q 716,295 715,330" fill="#cbd5e1" transform="rotate(120 715 330)" />
-              <path d="M 715,330 Q 714,295 715,285 Q 716,295 715,330" fill="#cbd5e1" transform="rotate(240 715 330)" />
+            <path d="M 788,410 L 789.5,330 L 790.5,330 L 792,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 790px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
+              <circle cx="790" cy="330" r="2.2" fill="#64748b" />
+              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="#cbd5e1" />
+              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="#cbd5e1" transform="rotate(120 790 330)" />
+              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="#cbd5e1" transform="rotate(240 790 330)" />
             </g>
           </g>
           <!-- Medium Wind Turbine -->
           <g id="wind-turbine-med" style="pointer-events: none;" opacity="0.45">
-            <path d="M 751,410 L 753.5,290 L 756.5,290 L 759,410 Z" fill="#475569" opacity="0.7" />
-            <g style="transform-origin: 755px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
-              <circle cx="755" cy="290" r="3.5" fill="#64748b" />
-              <path d="M 755,290 Q 753,235 755,220 Q 757,235 755,290" fill="#cbd5e1" />
-              <path d="M 755,290 Q 753,235 755,220 Q 757,235 755,290" fill="#cbd5e1" transform="rotate(120 755 290)" />
-              <path d="M 755,290 Q 753,235 755,220 Q 757,235 755,290" fill="#cbd5e1" transform="rotate(240 755 290)" />
+            <path d="M 826,410 L 828.5,290 L 831.5,290 L 834,410 Z" fill="#475569" opacity="0.7" />
+            <g style="transform-origin: 830px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
+              <circle cx="830" cy="290" r="3.5" fill="#64748b" />
+              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="#cbd5e1" />
+              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="#cbd5e1" transform="rotate(120 830 290)" />
+              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="#cbd5e1" transform="rotate(240 830 290)" />
             </g>
           </g>
 
           <!-- Ground (grass base spanning full screen width) -->
           <rect x="${-translateX}" y="410" width="${width}" height="120" fill="url(#garden-grad)" />
 
-          <!-- Eendenvijver met domme eenden (Duck Pond with Silly Ducks) -->
-          <g id="duck-pond" style="pointer-events: none;" transform="translate(-60, -10)">
-            <!-- Shadow under the pond -->
-            <ellipse cx="210" cy="470" rx="55" ry="24" fill="rgba(0,0,0,0.22)" />
-            <!-- Outer bank / shoreline -->
-            <ellipse cx="210" cy="468" rx="52" ry="22" fill="#854d0e" />
-            <!-- Water -->
-            <ellipse cx="210" cy="468" rx="49" ry="19" fill="#38bdf8" stroke="#0284c7" stroke-width="1.8" />
-            <ellipse cx="207" cy="466" rx="43" ry="15" fill="#0ea5e9" opacity="0.6" />
-            
-            <!-- Pond plants / stones -->
-            <circle cx="162" cy="468" r="4" fill="#64748b" />
-            <circle cx="163" cy="467" r="2.5" fill="#94a3b8" />
-            <circle cx="256" cy="470" r="4.5" fill="#475569" />
-            <circle cx="257" cy="469" r="3" fill="#64748b" />
-            <circle cx="185" cy="452" r="3.2" fill="#475569" />
-            
-            <!-- Reed / Riet -->
-            <path d="M 252,458 Q 255,445 252,440" stroke="#15803d" stroke-width="1.5" fill="none" />
-            <path d="M 255,459 Q 260,448 259,444" stroke="#16a34a" stroke-width="1.2" fill="none" />
-            <path d="M 248,460 Q 247,450 245,446" stroke="#16a34a" stroke-width="1" fill="none" />
-            
-            <!-- Water reflections / ripples -->
-            <path d="M 185,465 Q 210,469 235,465" stroke="rgba(255,255,255,0.45)" stroke-width="1" fill="none" />
-            <path d="M 195,472 Q 210,475 225,472" stroke="rgba(255,255,255,0.45)" stroke-width="0.8" fill="none" />
-
-            <!-- EEND 1: Drijvende derp-eend met googly eyes -->
-            <g transform="translate(195, 458)">
-              <!-- Body -->
-              <ellipse cx="10" cy="7" rx="10" ry="7" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
-              <!-- Tail -->
-              <path d="M 0,5 Q -3,0 2,3 Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
-              <!-- Head -->
-              <circle cx="17" cy="1" r="5" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
-              <!-- Beak (derpy, pointing down-ish) -->
-              <polygon points="21,-1 27,2 21,3" fill="#ea580c" />
-              <!-- Big Googly Eyes -->
-              <circle cx="15.5" cy="-0.5" r="2.2" fill="#fff" stroke="#000" stroke-width="0.3" />
-              <circle cx="15.2" cy="-0.2" r="0.9" fill="#000" />
-              <circle cx="18.5" cy="-0.5" r="2.2" fill="#fff" stroke="#000" stroke-width="0.3" />
-              <circle cx="19.0" cy="-0.8" r="0.9" fill="#000" />
-            </g>
-
-            <!-- EEND 2: Eend die op de oever staat en omhoog staart met kruisende ogen (maximale domheid) -->
-            <g transform="translate(235, 450)">
-              <!-- Feet & Legs -->
-              <line x1="10" y1="14" x2="10" y2="20" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" />
-              <line x1="16" y1="14" x2="16" y2="20" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" />
-              <path d="M 7,20 L 12,20 M 13,20 L 18,20" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" />
-              <!-- Body -->
-              <ellipse cx="13" cy="9" rx="9" ry="7" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
-              <!-- Wing -->
-              <ellipse cx="11" cy="9" rx="5" ry="3" fill="#f59e0b" />
-              <!-- Neck -->
-              <path d="M 16,7 Q 19,0 17,-3" stroke="#fbbf24" stroke-width="4.5" stroke-linecap="round" fill="none" />
-              <!-- Head -->
-              <circle cx="16" cy="-4" r="5.2" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
-              <!-- Beak pointing straight up -->
-              <polygon points="13,-8 11,-15 17,-10" fill="#ea580c" />
-              <!-- Derp Eyes pointing in different directions -->
-              <circle cx="14" cy="-5" r="2" fill="#fff" stroke="#000" stroke-width="0.3" />
-              <circle cx="13.5" cy="-4.5" r="0.8" fill="#000" />
-              <circle cx="18" cy="-5" r="2" fill="#fff" stroke="#000" stroke-width="0.3" />
-              <circle cx="18.5" cy="-5.5" r="0.8" fill="#000" />
-            </g>
-
-            <!-- EEND 3: Eend met snavel onder water ("down under" / konten-eend) -->
-            <g transform="translate(170, 460)">
-              <!-- Water ripple around duck -->
-              <ellipse cx="10" cy="11" rx="14" ry="4" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1" />
-              <!-- Tail pointing up -->
-              <path d="M 6,10 L 10,-1 L 14,8 Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
-              <!-- Body submerged partly -->
-              <path d="M 0,10 C 0,5 6,5 10,7 C 14,5 20,5 20,10 Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5" />
-              <!-- Underwater head indication (subtle shadow) -->
-              <ellipse cx="14" cy="15" rx="5" ry="4" fill="#fbbf24" opacity="0.35" />
-              <!-- Little orange feet paddling in the air -->
-              <line x1="5" y1="5" x2="2" y2="1" stroke="#ea580c" stroke-width="1.2" stroke-linecap="round" />
-              <line x1="12" y1="5" x2="10" y2="0" stroke="#ea580c" stroke-width="1.2" stroke-linecap="round" />
-            </g>
-          </g>
+          <!-- Duck pond removed -->
           
           <!-- Driveway: from center gable (x=320) to right edge, rounded left corners -->
           <path d="M 320,410 Q 320,430 340,430 L ${width - translateX},430 L ${width - translateX},410 Z" fill="url(#driveway-grad)" />
@@ -1985,85 +1905,7 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
             </g>
           ` : ''}
 
-          <!-- Standalone Swimming Pool on the Driveway (rechts naast het huis) -->
-          <g id="swimming-pool" style="pointer-events: none;">
-            <!-- CSS Animation for the drifting duck -->
-            <style>
-              @keyframes driftPoolDuck {
-                0% { transform: translateX(0px); }
-                45% { transform: translateX(165px); }
-                50% { transform: translateX(165px) scaleX(-1); }
-                95% { transform: translateX(0px) scaleX(-1); }
-                100% { transform: translateX(0px); }
-              }
-              .pool-duck-animated {
-                animation: driftPoolDuck 14s infinite ease-in-out;
-                transform-origin: 705px 384px;
-              }
-            </style>
-
-            <!-- Pool shadow on driveway (flat, rectangular shadow matching perpendicular view) -->
-            <rect x="685" y="424" width="210" height="3" rx="1.5" fill="rgba(0,0,0,0.25)" />
-            
-            <!-- Main blue liner (clean perpendicular flat rectangle) -->
-            <rect x="695" y="388" width="190" height="36" fill="#0284c7" stroke="#0ea5e9" stroke-width="1" rx="1" />
-            
-            <!-- Intex Logo text -->
-            <text x="790" y="410" fill="rgba(255,255,255,0.4)" font-size="8px" font-family="sans-serif" font-weight="bold" letter-spacing="0.5" text-anchor="middle">INTEX</text>
-
-            <!-- Water inside pool (flat light blue line representing water level) -->
-            <rect x="695" y="387" width="190" height="2" fill="#38bdf8" stroke="#0ea5e9" stroke-width="0.5" opacity="0.95" />
-            
-            <!-- Top white frame rails -->
-            <rect x="690" y="385" width="200" height="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="1" />
-            <rect x="688" y="384" width="4" height="6" fill="#e2e8f0" rx="0.5" />
-            <rect x="888" y="384" width="4" height="6" fill="#e2e8f0" rx="0.5" />
-            
-            <!-- 5 straight vertical white support legs (flat view) -->
-            <!-- Leg 1 -->
-            <line x1="692" y1="388" x2="692" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-            <line x1="692" y1="388" x2="692" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-            <ellipse cx="692" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-            
-            <!-- Leg 2 -->
-            <line x1="741" y1="388" x2="741" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-            <line x1="741" y1="388" x2="741" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-            <ellipse cx="741" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-            <!-- Leg 3 (center) -->
-            <line x1="790" y1="388" x2="790" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-            <line x1="790" y1="388" x2="790" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-            <ellipse cx="790" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-            <!-- Leg 4 -->
-            <line x1="839" y1="388" x2="839" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-            <line x1="839" y1="388" x2="839" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-            <ellipse cx="839" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-            <!-- Leg 5 -->
-            <line x1="888" y1="388" x2="888" y2="425" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
-            <line x1="888" y1="388" x2="888" y2="425" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" opacity="0.3" />
-            <ellipse cx="888" cy="425" rx="4" ry="1.5" fill="#0f172a" />
-
-            <!-- T-joints -->
-            <rect x="738" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
-            <rect x="787" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
-            <rect x="836" y="386" width="6" height="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" rx="0.5" />
-
-            <!-- Silly Duck -->
-            <g class="${poolPumpActive ? 'pool-duck-animated' : ''}">
-              <ellipse cx="705" cy="386" rx="6" ry="1.5" fill="rgba(2,132,199,0.5)" />
-              <ellipse cx="705" cy="383" rx="7" ry="5" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
-              <path d="M 698,382 Q 696,379 700,381" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
-              <circle cx="710" cy="378" r="3.5" fill="#fbbf24" stroke="#d97706" stroke-width="0.4" />
-              <!-- Big Googly Eyes -->
-              <circle cx="709" cy="377" r="1.5" fill="#fff" stroke="#000" stroke-width="0.2" />
-              <circle cx="708.6" cy="377" r="0.6" fill="#000" />
-              <circle cx="711.5" cy="377" r="1.5" fill="#fff" stroke="#000" stroke-width="0.2" />
-              <circle cx="712.0" cy="377.6" r="0.6" fill="#000" />
-              <polygon points="713,378 718,380 713,381" fill="#ea580c" />
-            </g>
-          </g>
+          <!-- Swimming pool removed -->
 
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
           ${showSolar ? renderCable(solarPath, solarActive, getFlowSpeed(solar), COLORS.solar.stroke, COLORS.solar.glow) : ''}
