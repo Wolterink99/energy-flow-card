@@ -3684,6 +3684,10 @@ class EnergyFlowCard extends i {
             }
             else if (this.activeTab === 'today') {
                 chartHtml = this.renderUnifiedLineChart('grid');
+                totalImport = gridImportToday !== null ? gridImportToday : 0;
+                totalExport = gridExportToday !== null ? gridExportToday : 0;
+                totalImportCost = costTodayImport !== null ? costTodayImport : 0;
+                totalExportCost = costTodayExport !== null ? costTodayExport : 0;
             }
             else {
                 if (this.isLoadingHistory) ;
