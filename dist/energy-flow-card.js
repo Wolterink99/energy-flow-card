@@ -4365,7 +4365,7 @@ class EnergyFlowCard extends i {
           ${this.renderPopup()}
 
           <!-- Weather Test Panel Overlay/Drawer -->
-          ${this.config?.weather_test && !this.config.screensaver ? b `
+          ${this.config?.weather_test ? b `
             <!-- Floating Toggle Button -->
             <div style="position: absolute; left: 16px; top: 16px; z-index: 100;" @click=${(e) => e.stopPropagation()}>
               <button @click=${(e) => { e.stopPropagation(); this._toggleWeatherTestPanel(); }} style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: background 0.3s ease;">
