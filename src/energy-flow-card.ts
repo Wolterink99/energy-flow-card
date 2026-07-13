@@ -2259,6 +2259,10 @@ export class EnergyFlowCard extends LitElement {
               border-radius: 0 !important;
               border: none !important;
               box-shadow: none !important;
+              
+              /* Ambient painterly/e-ink effect: desaturate and soften brightness */
+              filter: saturate(0.55) brightness(0.82) sepia(0.12) contrast(0.95) !important;
+              transition: filter 1.0s ease-in-out;
             }
             svg {
               height: 100% !important;
