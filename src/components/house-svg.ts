@@ -500,7 +500,11 @@ export function renderHouseSvg({
     gridSub = `Terug: ${gridExportToday.toFixed(1)} kWh`;
   }
 
-  const homeSub = homeToday !== null ? `Vandaag: ${homeToday.toFixed(1)} kWh` : (homeActive ? 'Actief' : 'Standby');
+  let homeSub = homeToday !== null ? `Vandaag: ${homeToday.toFixed(1)} kWh` : (homeActive ? 'Actief' : 'Standby');
+  if (homeToday !== null && gridImportToday !== null && homeToday > 0) {
+    const selfSufficiency = Math.max(0, Math.min(100, Math.round((1 - (gridImportToday / homeToday)) * 100)));
+    homeSub = `Vandaag: ${homeToday.toFixed(1)} kWh (${selfSufficiency}% eigen)`;
+  }
 
   let batterySub = `SoC: ${soc}%`;
   if (batteryChargeToday !== null && batteryDischargeToday !== null) {

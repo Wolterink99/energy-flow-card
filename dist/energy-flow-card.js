@@ -1240,7 +1240,11 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
     else if (gridExportToday !== null) {
         gridSub = `Terug: ${gridExportToday.toFixed(1)} kWh`;
     }
-    const homeSub = homeToday !== null ? `Vandaag: ${homeToday.toFixed(1)} kWh` : (homeActive ? 'Actief' : 'Standby');
+    let homeSub = homeToday !== null ? `Vandaag: ${homeToday.toFixed(1)} kWh` : (homeActive ? 'Actief' : 'Standby');
+    if (homeToday !== null && gridImportToday !== null && homeToday > 0) {
+        const selfSufficiency = Math.max(0, Math.min(100, Math.round((1 - (gridImportToday / homeToday)) * 100)));
+        homeSub = `Vandaag: ${homeToday.toFixed(1)} kWh (${selfSufficiency}% eigen)`;
+    }
     let batterySub = `SoC: ${soc}%`;
     if (batteryChargeToday !== null && batteryDischargeToday !== null) {
         batterySub = `SoC: ${soc}% (↓${batteryChargeToday.toFixed(1)} ↑${batteryDischargeToday.toFixed(1)})`;
@@ -2290,6 +2294,7 @@ class EnergyFlowCard extends i {
         this.debugShowEV = null;
         this.debugPoolPumpActive = null;
         this._weatherTestPanelOpen = false;
+        this._timeRefreshTrigger = 0;
         this.clouds = [];
         this.lastWeather = '';
         this.handleHashChange = () => {
@@ -2309,6 +2314,9 @@ class EnergyFlowCard extends i {
         this.resizeObserver.observe(this);
         window.addEventListener('hashchange', this.handleHashChange);
         this.handleHashChange();
+        this._timeRefreshInterval = setInterval(() => {
+            this._timeRefreshTrigger++;
+        }, 10000); // refresh time display every 10 seconds
     }
     firstUpdated() {
         this.fetchHighResolutionHistory();
@@ -2316,6 +2324,9 @@ class EnergyFlowCard extends i {
     disconnectedCallback() {
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
+        }
+        if (this._timeRefreshInterval) {
+            clearInterval(this._timeRefreshInterval);
         }
         window.removeEventListener('hashchange', this.handleHashChange);
         this.restoreSidebarAndHeader();
@@ -4018,6 +4029,18 @@ class EnergyFlowCard extends i {
         else if (this.config.time_override !== undefined) {
             decimalHour = this.config.time_override;
         }
+        // Format the time for the digital clock
+        let clockTime = '';
+        if (this.debugTimeHour !== null || this.config.time_override !== undefined) {
+            const h = Math.floor(decimalHour);
+            const m = Math.floor((decimalHour - h) * 60);
+            clockTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+        else {
+            const hrs = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            clockTime = `${hrs}:${mins}`;
+        }
         // Determine time of day label
         let timeOfDay = 'afternoon';
         if (decimalHour >= 5 && decimalHour < 9)
@@ -4239,6 +4262,16 @@ class EnergyFlowCard extends i {
       ${dynamicAnimations}
       <ha-card style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
+          <!-- Digital Clock in the Top Center (Screensaver layout) -->
+          <div style="position: absolute; left: 50%; top: 24px; transform: translateX(-50%); z-index: 90; text-align: center; pointer-events: none;">
+            <div style="font-size: 38px; font-weight: 700; color: #ffffff; font-family: 'Inter', system-ui, sans-serif; letter-spacing: -0.5px; line-height: 1.0; text-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3);">
+              ${clockTime}
+            </div>
+            <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">
+              ${now.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'short' })}
+            </div>
+          </div>
+
           <!-- Floating Grafiek Button (Top Right) -->
           ${!this.config.screensaver ? b `
             <div style="position: absolute; right: 16px; top: 16px; z-index: 100;" @click=${(e) => e.stopPropagation()}>
@@ -4589,6 +4622,9 @@ __decorate([
 __decorate([
     r()
 ], EnergyFlowCard.prototype, "_weatherTestPanelOpen", void 0);
+__decorate([
+    r()
+], EnergyFlowCard.prototype, "_timeRefreshTrigger", void 0);
 // Register the custom element
 if (!customElements.get('energy-flow-card')) {
     customElements.define('energy-flow-card', EnergyFlowCard);
