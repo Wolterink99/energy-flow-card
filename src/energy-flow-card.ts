@@ -266,7 +266,7 @@ export class EnergyFlowCard extends LitElement {
 
   protected updated(changedProperties: Map<string | number | symbol, unknown>): void {
     super.updated(changedProperties);
-    if (this.config?.screensaver) {
+    if (this.config?.screensaver && this.getBoundingClientRect().width > 0) {
       this.hideSidebarAndHeader();
     } else {
       this.restoreSidebarAndHeader();
@@ -282,6 +282,7 @@ export class EnergyFlowCard extends LitElement {
 
   private hideSidebarAndHeader(): void {
     if (!this.config?.screensaver) return;
+    if (this.getBoundingClientRect().width === 0) return; // Do not hide if in background/cached view
     try {
       const doc = document;
       const homeAssistant = doc.querySelector('home-assistant');

@@ -2369,7 +2369,7 @@ class EnergyFlowCard extends i {
     }
     updated(changedProperties) {
         super.updated(changedProperties);
-        if (this.config?.screensaver) {
+        if (this.config?.screensaver && this.getBoundingClientRect().width > 0) {
             this.hideSidebarAndHeader();
         }
         else {
@@ -2379,6 +2379,8 @@ class EnergyFlowCard extends i {
     hideSidebarAndHeader() {
         if (!this.config?.screensaver)
             return;
+        if (this.getBoundingClientRect().width === 0)
+            return; // Do not hide if in background/cached view
         try {
             const doc = document;
             const homeAssistant = doc.querySelector('home-assistant');
