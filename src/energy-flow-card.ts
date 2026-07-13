@@ -698,18 +698,19 @@ export class EnergyFlowCard extends LitElement {
     const homePowerEnt = this.config?.entities.load || (this.config?.entities as any).home_power || '';
     const gridPowerEnt = this.config?.entities.grid || (this.config?.entities as any).grid_power || '';
 
-    // Adaptive smoothing to filter out small jitter while preserving large changes
+    // Adaptive smoothing with quadratic scaling to filter out small-to-medium jitter aggressively
     const smoothHistory = (history: { state: number, time: number }[]) => {
       if (history.length === 0) return [];
       const maxVal = Math.max(...history.map(h => Math.abs(h.state)), 100);
-      const threshold = maxVal * 0.08; // 8% of maximum value as threshold for responsiveness
+      const threshold = maxVal * 0.12; // Increased threshold for broader smoothing
       
       const smoothed = [];
       let prevVal = history[0].state;
       for (let i = 0; i < history.length; i++) {
         const currentVal = history[i].state;
         const diff = Math.abs(currentVal - prevVal);
-        const alpha = 0.12 + 0.88 * Math.min(1, diff / threshold);
+        // Quadratic scaling for alpha: extremely smooth for small changes, fully responsive for big jumps
+        const alpha = 0.05 + 0.95 * Math.pow(Math.min(1, diff / threshold), 2);
         const newVal = prevVal + alpha * (currentVal - prevVal);
         smoothed.push({ state: newVal, time: history[i].time });
         prevVal = newVal;
