@@ -143,11 +143,6 @@ class EnergyDashboardCard extends i {
         const val = parseFloat(this.hass.states[entityId].state);
         return isNaN(val) ? fallback : val;
     }
-    _getState(entityId) {
-        if (!entityId || !this.hass || !this.hass.states[entityId])
-            return '';
-        return this.hass.states[entityId].state;
-    }
     _formatPower(watts) {
         const abs = Math.abs(watts);
         if (abs >= 1000) {
@@ -166,43 +161,95 @@ class EnergyDashboardCard extends i {
     }
     render() {
         const cfg = this.config.entities || {};
+        // 1. Raw sensor readings
         const solarW = Math.max(0, this._getNumber(cfg.solar_power || 'sensor.totale_live_zonnestroom'));
         const solarToday = this._getNumber(cfg.solar_today || 'sensor.totale_opwek_vandaag_2');
         const gridW = this._getNumber(cfg.grid_power || 'sensor.p1_meter_power');
         const isGridImport = gridW >= 0;
+        const gridImportW = Math.max(0, gridW);
+        const gridExportW = Math.max(0, -gridW);
         const gridImportToday = this._getNumber(cfg.grid_import_today || 'sensor.p1_netstroom_afname_vandaag');
         const gridExportToday = this._getNumber(cfg.grid_export_today || 'sensor.p1_teruglevering_vandaag');
-        const batW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
-        const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 94)));
+        const batRawW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
+        const batChargeW = Math.max(0, batRawW);
+        const batDischargeW = Math.max(0, -batRawW);
+        const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 98)));
         const batChargedToday = this._getNumber(cfg.battery_charged_today || 'sensor.thuisbatterij_levering_vandaag');
-        const isBatCharging = batW > 20;
-        const isBatDischarging = batW < -20;
-        const homeW = Math.max(0, this._getNumber(cfg.home_power || 'sensor.live_huisverbruik'));
+        const isBatCharging = batChargeW > 20;
+        const isBatDischarging = batDischargeW > 20;
+        const homeRawW = Math.max(0, this._getNumber(cfg.home_power || 'sensor.live_huisverbruik'));
         const homeToday = this._getNumber(cfg.home_today || 'sensor.echt_huisverbruik_vandaag');
-        const totalConsumed = homeToday + batChargedToday;
-        const directSolar = Math.min(solarToday, totalConsumed);
-        const autarky = totalConsumed > 0 ? Math.round((directSolar / totalConsumed) * 100) : 0;
+        // 2. Physical Flow Routing Engine
+        // Determines exact flow distribution between nodes
+        let availSolar = solarW;
+        let demandHome = homeRawW;
+        let demandBatCharge = batChargeW;
+        let availBatDischarge = batDischargeW;
+        let availGridImport = gridImportW;
+        // Step A: Solar to House
+        const flowSolarToHome = Math.min(availSolar, demandHome);
+        availSolar -= flowSolarToHome;
+        demandHome -= flowSolarToHome;
+        // Step B: Solar to Battery
+        const flowSolarToBat = Math.min(availSolar, demandBatCharge);
+        availSolar -= flowSolarToBat;
+        demandBatCharge -= flowSolarToBat;
+        // Step C: Solar to Grid (Export)
+        const flowSolarToGrid = Math.min(availSolar, gridExportW);
+        // Step D: Battery to House (if discharging)
+        const flowBatToHome = Math.min(availBatDischarge, demandHome);
+        availBatDischarge -= flowBatToHome;
+        demandHome -= flowBatToHome;
+        // Step E: Battery to Grid (Powerplay export)
+        const flowBatToGrid = Math.min(availBatDischarge, Math.max(0, gridExportW - flowSolarToGrid));
+        // Step F: Grid Import to House
+        const flowGridToHome = Math.min(availGridImport, demandHome);
+        availGridImport -= flowGridToHome;
+        demandHome -= flowGridToHome;
+        // Step G: Grid Import to Battery (Dynamisch laden vanaf net!)
+        const flowGridToBat = Math.min(availGridImport, demandBatCharge);
+        // 3. House Segmented Ring calculation
         const r = 80;
-        const circ = 2 * Math.PI * r;
-        // Battery SoC Ring
-        const batProgress = (batSoC / 100) * circ;
-        const batOffset = circ - batProgress;
-        // House Segmented Ring
-        const solarToHouse = Math.min(solarW, homeW);
-        const batToHouse = isBatDischarging ? Math.min(Math.abs(batW), Math.max(0, homeW - solarToHouse)) : 0;
-        const gridToHouse = isGridImport ? Math.max(0, homeW - solarToHouse - batToHouse) : 0;
-        const totalMix = (solarToHouse + batToHouse + gridToHouse) || 1;
-        const fracSolar = solarToHouse / totalMix;
-        const fracBat = batToHouse / totalMix;
-        const fracGrid = gridToHouse / totalMix;
+        const circ = 2 * Math.PI * r; // ~502.65
+        const effectiveHome = (flowSolarToHome + flowBatToHome + flowGridToHome) || homeRawW || 1;
+        const fracSolar = Math.min(1, flowSolarToHome / effectiveHome);
+        const fracBat = Math.min(1, flowBatToHome / effectiveHome);
+        const fracGrid = Math.min(1, flowGridToHome / effectiveHome);
         const lenSolar = fracSolar * circ;
         const lenBat = fracBat * circ;
         const lenGrid = fracGrid * circ;
         const offsetSolar = 0;
         const offsetBat = -lenSolar;
         const offsetGrid = -(lenSolar + lenBat);
+        // Battery SoC progress arc
+        const batProgress = (batSoC / 100) * circ;
+        const batOffset = circ - batProgress;
+        // Autarky / Zelfvoorziening
+        const totalConsumedToday = homeToday + batChargedToday;
+        const autarky = totalConsumedToday > 0 ? Math.round((Math.min(solarToday, totalConsumedToday) / totalConsumedToday) * 100) : 0;
+        // SVG Flow Paths:
+        // Coordinates: Zon(135,115), Net(405,115), Bat(135,345), Huis(405,345)
+        // 1. Zon -> Bat (straight left down)
+        const dSolarBat = "M 135 187 L 135 273";
+        // 2. Net -> Huis (straight right down)
+        const dGridHome = "M 405 187 L 405 273";
+        // 3. Bat -> Huis (straight bottom across)
+        const dBatHome = "M 207 345 L 333 345";
+        // 4. Zon -> Net (straight top across)
+        const dSolarGrid = "M 207 115 L 333 115";
+        // 5. Zon -> Huis (smooth curved route via central bus)
+        const dSolarHome = "M 207 115 L 245 115 Q 270 115 270 140 L 270 320 Q 270 345 295 345 L 333 345";
+        // 6. Net -> Bat (smooth curved route from Net into central bus into Battery!)
+        const dGridBat = "M 333 115 L 295 115 Q 270 115 270 140 L 270 320 Q 270 345 245 345 L 207 345";
+        // 7. Bat -> Net (smooth curved route from Battery up central bus to Net)
+        const dBatGrid = "M 207 345 L 245 345 Q 270 345 270 320 L 270 140 Q 270 115 295 115 L 333 115";
+        // Helper to calculate animation duration based on power in watts
+        const getDur = (watts) => {
+            return Math.max(0.75, Math.min(3.5, 3000 / Math.max(100, watts))).toFixed(2);
+        };
         return b `
       <div class="dashboard-wrapper">
+        <!-- Header -->
         <div class="dashboard-header">
           <div class="header-title-box">
             <div class="live-indicator">
@@ -222,7 +269,9 @@ class EnergyDashboardCard extends i {
           </div>
         </div>
 
+        <!-- Grid Body -->
         <div class="dashboard-grid">
+          <!-- Left: Flowchart Panel -->
           <div class="panel-card">
             <div class="panel-title-bar">
               <h2 class="panel-title">
@@ -235,34 +284,121 @@ class EnergyDashboardCard extends i {
             </div>
 
             <div class="flow-container">
+              <!-- Animated SVG Canvas with Flow Tracks & Moving Bolletjes -->
               <svg class="flow-svg" viewBox="0 0 540 460">
-                ${solarW > 20 && isBatCharging ? w `
-                  <line x1="135" y1="175" x2="135" y2="285" stroke="#f59e0b" class="flow-line" style="animation-duration: ${Math.max(0.7, 3000 / Math.max(200, batW))}s;" />
+                <defs>
+                  <!-- Filters for glowing bolletjes -->
+                  <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <!-- 1. BASE STATIC TRACKS (Subtle dotted guide lines) -->
+                <path d="${dSolarBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${dGridHome}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${dBatHome}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${dSolarGrid}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${dSolarHome}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${dGridBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+
+                <!-- 2. ACTIVE FLOWS & MOVING BOLLETJES -->
+
+                <!-- FLOW A: Zon -> Batterij -->
+                ${flowSolarToBat > 20 ? w `
+                  <path d="${dSolarBat}" fill="none" stroke="rgba(245, 158, 11, 0.3)" stroke-width="2" />
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToBat)}s" repeatCount="indefinite" path="${dSolarBat}" />
+                  </circle>
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToBat)}s" begin="-${(parseFloat(getDur(flowSolarToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dSolarBat}" />
+                  </circle>
                 ` : ''}
 
-                ${solarToHouse > 20 ? w `
-                  <path d="M 175 155 Q 270 230 365 305" stroke="#f59e0b" class="flow-line" style="animation-duration: ${Math.max(0.7, 3000 / Math.max(200, solarToHouse))}s;" />
+                <!-- FLOW B: Zon -> Huis (Curved via central bus) -->
+                ${flowSolarToHome > 20 ? w `
+                  <path d="${dSolarHome}" fill="none" stroke="rgba(245, 158, 11, 0.3)" stroke-width="2" />
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToHome)}s" repeatCount="indefinite" path="${dSolarHome}" />
+                  </circle>
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToHome)}s" begin="-${(parseFloat(getDur(flowSolarToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dSolarHome}" />
+                  </circle>
                 ` : ''}
 
-                ${!isGridImport && Math.abs(gridW) > 20 ? w `
-                  <line x1="195" y1="115" x2="345" y2="115" stroke="#10b981" class="flow-line" style="animation-duration: ${Math.max(0.7, 3000 / Math.max(200, Math.abs(gridW)))}s;" />
+                <!-- FLOW C: Zon -> Net (Export) -->
+                ${flowSolarToGrid > 20 ? w `
+                  <path d="${dSolarGrid}" fill="none" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowSolarToGrid)}s" repeatCount="indefinite" path="${dSolarGrid}" />
+                  </circle>
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowSolarToGrid)}s" begin="-${(parseFloat(getDur(flowSolarToGrid)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dSolarGrid}" />
+                  </circle>
                 ` : ''}
 
-                ${isGridImport && isBatCharging && gridW > 20 ? w `
-                  <path d="M 365 155 Q 270 230 175 305" stroke="#3b82f6" class="flow-line" style="animation-duration: ${Math.max(0.7, 3000 / Math.max(200, batW))}s;" />
+                <!-- FLOW D: Net -> Batterij (Laden vanaf het net via centrale bus!) -->
+                ${flowGridToBat > 20 ? w `
+                  <path d="${dGridBat}" fill="none" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2" />
+                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                    <animateMotion dur="${getDur(flowGridToBat)}s" repeatCount="indefinite" path="${dGridBat}" />
+                  </circle>
+                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                    <animateMotion dur="${getDur(flowGridToBat)}s" begin="-${(parseFloat(getDur(flowGridToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dGridBat}" />
+                  </circle>
                 ` : ''}
 
-                ${gridToHouse > 20 ? w `
-                  <line x1="405" y1="175" x2="405" y2="285" stroke="${gridW > 3000 ? '#ef4444' : '#3b82f6'}" class="flow-line" style="animation-duration: ${Math.max(0.7, 3000 / Math.max(200, gridToHouse))}s;" />
+                <!-- FLOW E: Net -> Huis (Direct rechts omlaag) -->
+                ${flowGridToHome > 20 ? w `
+                  <path d="${dGridHome}" fill="none" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2" />
+                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                    <animateMotion dur="${getDur(flowGridToHome)}s" repeatCount="indefinite" path="${dGridHome}" />
+                  </circle>
+                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                    <animateMotion dur="${getDur(flowGridToHome)}s" begin="-${(parseFloat(getDur(flowGridToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dGridHome}" />
+                  </circle>
                 ` : ''}
 
-                ${batToHouse > 20 ? w `
-                  <line x1="195" y1="345" x2="345" y2="345" stroke="#10b981" class="flow-line" style="animation-duration: ${Math.max(0.7, 3000 / Math.max(200, batToHouse))}s;" />
+                <!-- FLOW F: Batterij -> Huis (Onderin horizontaal naar rechts) -->
+                ${flowBatToHome > 20 ? w `
+                  <path d="${dBatHome}" fill="none" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowBatToHome)}s" repeatCount="indefinite" path="${dBatHome}" />
+                  </circle>
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowBatToHome)}s" begin="-${(parseFloat(getDur(flowBatToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dBatHome}" />
+                  </circle>
+                ` : ''}
+
+                <!-- FLOW G: Batterij -> Net (Ontladen naar net bij piek) -->
+                ${flowBatToGrid > 20 ? w `
+                  <path d="${dBatGrid}" fill="none" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowBatToGrid)}s" repeatCount="indefinite" path="${dBatGrid}" />
+                  </circle>
                 ` : ''}
               </svg>
 
+              <!-- The 4 Instrument Nodes -->
               <div class="nodes-grid">
-                <!-- 1. ZON -->
+                <!-- 1. ZON (Top-Left) -->
                 <div class="node-dial">
                   <svg class="node-svg-ring" viewBox="0 0 180 180">
                     <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="8" />
@@ -292,15 +428,15 @@ class EnergyDashboardCard extends i {
                   </div>
                 </div>
 
-                <!-- 2. NET -->
+                <!-- 2. NET (Top-Right) -->
                 <div class="node-dial">
                   <svg class="node-svg-ring" viewBox="0 0 180 180">
                     <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="${isGridImport ? '#3b82f6' : '#10b981'}" stroke-width="8"
+                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="8"
                       stroke-dasharray="${circ}" stroke-dashoffset="0" stroke-linecap="round" />
                   </svg>
                   <div class="node-inner-disc">
-                    <div class="node-icon-box" style="color: ${isGridImport ? '#3b82f6' : '#10b981'};">
+                    <div class="node-icon-box" style="color: ${isGridImport ? '#38bdf8' : '#10b981'};">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 22h16"></path>
                         <path d="M7 22l5-19 5 19"></path>
@@ -317,15 +453,16 @@ class EnergyDashboardCard extends i {
                       ${isGridImport ? `Import ${this._formatEnergy(gridImportToday)}` : `Export ${this._formatEnergy(gridExportToday)}`}
                     </span>
                   </div>
-                  <div class="node-badge ${isGridImport ? 'status-amber' : 'status-green'}">
+                  <div class="node-badge ${isGridImport ? 'status-blue' : 'status-green'}">
                     ${isGridImport ? 'Afname' : 'Teruglevering'}
                   </div>
                 </div>
 
-                <!-- 3. BATTERIJ -->
+                <!-- 3. BATTERIJ (Bottom-Left) -->
                 <div class="node-dial">
                   <svg class="node-svg-ring" viewBox="0 0 180 180">
                     <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                    <!-- Dynamic Progress Ring for SoC % -->
                     <circle cx="90" cy="90" r="${r}" fill="none" stroke="#10b981" stroke-width="8"
                       stroke-dasharray="${circ}" stroke-dashoffset="${batOffset}" stroke-linecap="round" />
                   </svg>
@@ -342,28 +479,31 @@ class EnergyDashboardCard extends i {
                       ${batSoC.toFixed(0)}<span class="unit" style="font-size: 16px;">%</span>
                     </div>
                     <span class="node-subtext">
-                      ${batW !== 0 ? `${this._formatPower(batW).value} ${this._formatPower(batW).unit}` : 'Standby'}
+                      ${batRawW !== 0 ? `${this._formatPower(batRawW).value} ${this._formatPower(batRawW).unit}` : 'Standby'}
                     </span>
                   </div>
                   <div class="node-badge ${isBatCharging ? 'status-green' : isBatDischarging ? 'status-amber' : ''}">
-                    ${isBatCharging ? `Laden ${this._formatPower(batW).value} ${this._formatPower(batW).unit}` : isBatDischarging ? `Ontladen ${this._formatPower(batW).value} ${this._formatPower(batW).unit}` : 'Standby'}
+                    ${isBatCharging ? `Laden ${this._formatPower(batChargeW).value} ${this._formatPower(batChargeW).unit}` : isBatDischarging ? `Ontladen ${this._formatPower(batDischargeW).value} ${this._formatPower(batDischargeW).unit}` : 'Standby'}
                   </div>
                 </div>
 
-                <!-- 4. HUIS -->
+                <!-- 4. HUIS (Bottom-Right) with Segmented Ring -->
                 <div class="node-dial">
                   <svg class="node-svg-ring" viewBox="0 0 180 180">
                     <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                    <!-- Solar Segment (Yellow) -->
                     ${lenSolar > 0 ? w `
                       <circle cx="90" cy="90" r="${r}" fill="none" stroke="#f59e0b" stroke-width="8"
                         stroke-dasharray="${lenSolar} ${circ}" stroke-dashoffset="${offsetSolar}" />
                     ` : ''}
+                    <!-- Battery Segment (Green) -->
                     ${lenBat > 0 ? w `
                       <circle cx="90" cy="90" r="${r}" fill="none" stroke="#10b981" stroke-width="8"
                         stroke-dasharray="${lenBat} ${circ}" stroke-dashoffset="${offsetBat}" />
                     ` : ''}
+                    <!-- Grid Segment (Blue) -->
                     ${lenGrid > 0 ? w `
-                      <circle cx="90" cy="90" r="${r}" fill="none" stroke="#3b82f6" stroke-width="8"
+                      <circle cx="90" cy="90" r="${r}" fill="none" stroke="#38bdf8" stroke-width="8"
                         stroke-dasharray="${lenGrid} ${circ}" stroke-dashoffset="${offsetGrid}" />
                     ` : ''}
                   </svg>
@@ -376,8 +516,8 @@ class EnergyDashboardCard extends i {
                     </div>
                     <span class="node-title">Huis</span>
                     <div class="node-val">
-                      ${this._formatPower(homeW).value}
-                      <span class="unit">${this._formatPower(homeW).unit}</span>
+                      ${this._formatPower(homeRawW).value}
+                      <span class="unit">${this._formatPower(homeRawW).unit}</span>
                     </div>
                     <span class="node-subtext">Vandaag ${this._formatEnergy(homeToday)}</span>
                   </div>
@@ -882,14 +1022,14 @@ EnergyDashboardCard.styles = i$3 `
 
     .node-badge {
       position: absolute;
-      bottom: -10px;
+      bottom: 2px;
       background: #181d26;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 9999px;
-      padding: 3px 10px;
+      padding: 2px 8px;
       font-size: 10px;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       z-index: 4;
       white-space: nowrap;
     }
@@ -900,30 +1040,16 @@ EnergyDashboardCard.styles = i$3 `
       background: rgba(16, 185, 129, 0.1);
     }
 
-    .node-badge.status-red {
-      color: #ef4444;
-      border-color: rgba(239, 68, 68, 0.35);
-      background: rgba(239, 68, 68, 0.1);
+    .node-badge.status-blue {
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.1);
     }
 
     .node-badge.status-amber {
       color: #f59e0b;
       border-color: rgba(245, 158, 11, 0.35);
       background: rgba(245, 158, 11, 0.1);
-    }
-
-    /* Flow Animations */
-    .flow-line {
-      fill: none;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-dasharray: 6 10;
-      animation: dashFlow 1.5s linear infinite;
-    }
-
-    @keyframes dashFlow {
-      from { stroke-dashoffset: 32; }
-      to { stroke-dashoffset: 0; }
     }
 
     /* Chart & History Content */
@@ -986,7 +1112,6 @@ EnergyDashboardCard.styles = i$3 `
       color: #64748b;
     }
 
-    /* Chart Legend */
     .chart-legend {
       display: flex;
       align-items: center;
