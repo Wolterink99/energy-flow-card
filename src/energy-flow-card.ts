@@ -2102,8 +2102,8 @@ export class EnergyFlowCard extends LitElement {
       return;
     }
 
-    if (this.config?.tap_action) {
-      const action = this.config.tap_action;
+    const action = this.config?.tap_action || (this.config?.screensaver ? { action: 'navigate', navigation_path: '/lovelace/0' } : null);
+    if (action) {
       if (action.action === 'navigate' && action.navigation_path) {
         this.restoreSidebarAndHeader();
         window.history.pushState(null, '', action.navigation_path);
@@ -2113,6 +2113,19 @@ export class EnergyFlowCard extends LitElement {
           composed: true
         });
         this.dispatchEvent(event);
+        window.dispatchEvent(event);
+      } else {
+        const event = new CustomEvent('hass-action', {
+          detail: {
+            config: { tap_action: action },
+            action: 'tap',
+            action_config: action
+          },
+          bubbles: true,
+          composed: true
+        });
+        this.dispatchEvent(event);
+        window.dispatchEvent(event);
       }
     }
   }
