@@ -977,7 +977,9 @@ export class EnergyDashboardCard extends LitElement {
     const pZonNet = `M ${xL + R} ${yT} L ${xMid - 30} ${yT} Q ${xMid} ${yT} ${xMid} ${yT + 30} L ${xMid} ${yB - 30} Q ${xMid} ${yB} ${xMid + 30} ${yB} L ${xR - R} ${yB}`;
 
     const getDur = (watts: number) => {
-      return Math.max(0.75, Math.min(3.5, 3000 / Math.max(100, watts))).toFixed(2);
+      // Rustige, soepele animatiesnelheid over het hele bereik (2.7s bij 11kW tot 6.5s bij 100W)
+      const t = Math.min(1, Math.max(0, Math.log10(Math.max(20, watts) / 80) / Math.log10(15000 / 80)));
+      return (6.5 - t * 4.0).toFixed(2);
     };
 
     return html`
