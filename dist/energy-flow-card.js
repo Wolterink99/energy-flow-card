@@ -72,6 +72,7 @@ class EnergyDashboardCard extends i {
         this._loadingStats = false;
         this._lastFetchTime = 0;
         this._calculatedSavingsToday = 2.36;
+        this._hoveredHour = null;
     }
     setConfig(config) {
         if (!config) {
@@ -617,9 +618,19 @@ class EnergyDashboardCard extends i {
                     </svg>
                     Dynamische Stroomprijzen Vandaag
                   </span>
-                  <span class="node-status-pill pill-blue">
-                    Nu: € ${currentTariff.toFixed(3)} / kWh
-                  </span>
+                  ${this._hoveredHour !== null ? (() => {
+            const hObj = todayHours.find(h => h.hour === this._hoveredHour);
+            const pStr = hObj ? hObj.price.toFixed(3) : currentTariff.toFixed(3);
+            return b `
+      <span class="node-status-pill pill-amber" style="font-weight: 700; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);">
+        ${this._hoveredHour}:00 - € ${pStr} / kWh
+      </span>
+    `;
+        })() : b `
+    <span class="node-status-pill pill-blue">
+      Nu: € ${currentTariff.toFixed(3)} / kWh
+    </span>
+  `}
                 </div>
 
                 <!-- 24-Hour SVG Bar Chart -->
@@ -646,23 +657,46 @@ class EnergyDashboardCard extends i {
             const isPeak = th.hour === maxHour;
             th.hour === minHour;
             const fillColor = isNow ? '#38bdf8' : th.price > 0.35 ? '#ef4444' : th.price > 0.22 ? '#f59e0b' : '#10b981';
+            const isHovered = this._hoveredHour === th.hour;
+            const tooltipX = Math.max(48, Math.min(412, x + barW / 2));
+            const tooltipY = Math.max(20, y - 8);
             return w `
-                        <g>
-                          <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="2.5"
-                            fill="${fillColor}" opacity="${isNow ? 1 : 0.85}" />
+                        <g style="cursor: pointer;"
+                          @mouseenter="${() => { this._hoveredHour = th.hour; }}"
+                          @mouseleave="${() => { this._hoveredHour = null; }}">
                           
-                          ${isNow ? w `
+                          <!-- Invisible wide hit area -->
+                          <rect x="${x - 2.5}" y="15" width="17.2" height="110" fill="transparent" />
+
+                          <!-- Actual Bar -->
+                          <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="2.5"
+                            fill="${fillColor}" opacity="${isHovered ? 1 : isNow ? 1 : 0.82}"
+                            stroke="${isHovered ? '#ffffff' : 'none'}" stroke-width="${isHovered ? 1.5 : 0}" />
+                          
+                          ${isNow && !isHovered ? w `
                             <rect x="${x - 2}" y="${y - 2}" width="${barW + 4}" height="${barH + 4}" rx="4"
                               fill="none" stroke="#38bdf8" stroke-width="1.5" />
                             <text x="${x + barW / 2}" y="${y - 6}" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">NU</text>
                           ` : ''}
 
-                          ${isPeak && !isNow ? w `
+                          ${isPeak && !isNow && !isHovered ? w `
                             <text x="${x + barW / 2}" y="${y - 4}" fill="#ef4444" font-size="8" font-weight="600" text-anchor="middle">Top</text>
                           ` : ''}
 
+                          <!-- Tooltip when hovered -->
+                          ${isHovered ? w `
+                            <g transform="translate(${tooltipX}, ${tooltipY})">
+                              <rect x="-42" y="-18" width="84" height="18" rx="5"
+                                fill="#0f172a" stroke="#38bdf8" stroke-width="1.2"
+                                filter="drop-shadow(0 2px 6px rgba(0,0,0,0.6))" />
+                              <text x="0" y="-5.5" fill="#f8fafc" font-size="9.5" font-weight="700" text-anchor="middle">
+                                ${th.hour.toString().padStart(2, '0')}:00  € ${th.price.toFixed(3)}
+                              </text>
+                            </g>
+                          ` : ''}
+
                           ${(idx % 4 === 0 || idx === 23) ? w `
-                            <text x="${x + barW / 2}" y="134" fill="#64748b" font-size="9" text-anchor="middle">
+                            <text x="${x + barW / 2}" y="134" fill="${isHovered ? '#f1f5f9' : '#64748b'}" font-size="9" font-weight="${isHovered ? '700' : '400'}" text-anchor="middle">
                               ${th.hour.toString().padStart(2, '0')}
                             </text>
                           ` : ''}
@@ -1208,6 +1242,9 @@ __decorate([
 __decorate([
     r()
 ], EnergyDashboardCard.prototype, "_calculatedSavingsToday", void 0);
+__decorate([
+    r()
+], EnergyDashboardCard.prototype, "_hoveredHour", void 0);
 if (!customElements.get('energy-dashboard-card')) {
     customElements.define('energy-dashboard-card', EnergyDashboardCard);
 }
