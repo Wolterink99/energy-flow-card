@@ -854,19 +854,31 @@ export class EnergyDashboardCard extends LitElement {
       : rawHomeToday;
 
     // 2. Financial Sensor Values
-    const gridImportCostToday = this._getNumber('sensor.zonneplan_electricity_delivery_costs_today', 7.67);
-    const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 6.02);
-    const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 0.74);
+    const gridImportCostToday = this._getNumber('sensor.zonneplan_electricity_delivery_costs_today', 7.76);
+    const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 15.46);
+    const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 4.96);
     
-    // Netto factuur vandaag
+    // Netto factuur vandaag (negatief = tegoed van Zonneplan)
     const netInvoiceToday = this._getNumber('sensor.netto_energiekosten_vandaag', gridImportCostToday - gridExportRevToday - powerplayToday);
+
+    // Zonnestroom baseline aftrek (wat zon direct waard was bij export tegen ~€0.15 daltarief)
+    const avgSolarTariff = 0.15;
+    const solarExportVal = Math.max(0, Math.min(solarToday, gridExportToday) * avgSolarTariff);
+
+    // Echte Batterij Handel & Powerplay (Verkoop minus inkoop batterij + Powerplay vergoeding)
+    const batExportRevenue = Math.max(0, gridExportRevToday - solarExportVal);
+    const batImportCost = Math.min(gridImportCostToday, (batChargedToday / Math.max(0.1, gridImportToday)) * gridImportCostToday);
+    const batNetTradeProfit = Math.max(0, batExportRevenue - batImportCost);
+    const batTradeAndPowerplay = batNetTradeProfit + powerplayToday;
 
     // Battery Avoided Home Purchase Savings Today
     let batHomeSavingsToday = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag');
     if (isNaN(batHomeSavingsToday) || batHomeSavingsToday <= 0) {
       batHomeSavingsToday = this._calculatedSavingsToday;
     }
-    const batTotalValueToday = batHomeSavingsToday + powerplayToday;
+    // Totale werkelijke verdienste van de batterij vandaag voor terugverdientijd:
+    const batTotalEarningsToday = batTradeAndPowerplay + batHomeSavingsToday;
+    const batTotalValueToday = batTotalEarningsToday;
 
     // Battery Payback / ROI metrics
     const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8500);
@@ -1413,36 +1425,43 @@ export class EnergyDashboardCard extends LitElement {
                 </div>
 
                 <div class="overview-vertical-list">
-                  <!-- Blok 1: Hoe bouwt de opbrengst zich op vandaag -->
+                  <!-- Blok 1: Netto Factuurstatus Zonneplan (P1 + Powerplay) -->
                   <div class="overview-block">
+                    <div class="block-header" style="margin-bottom: 3px;">
+                      <div class="block-title" style="color: #38bdf8;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16"></path><path d="M7 22l5-19 5 19"></path><path d="M6 13h12"></path><path d="M8 8h8"></path></svg>
+                        <span>Energienota (P1 + Powerplay)</span>
+                      </div>
+                      <span style="font-size: 11px; color: #94a3b8;">Zonneplan factuur</span>
+                    </div>
                     <div class="mini-row-list" style="border-top: none; padding-top: 0;">
                       <div class="mini-row">
-                        <span>Stroom verkocht (teruglevering):</span>
+                        <span>Stroom teruggeleverd (verkoop):</span>
                         <strong style="color: #10b981;">+ € ${gridExportRevToday.toFixed(2)} <span class="sub-dim">(${gridExportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Powerplay bonus (onbalans):</span>
+                        <span>Powerplay vergoeding (onbalans):</span>
                         <strong style="color: #10b981;">+ € ${powerplayToday.toFixed(2)}</strong>
                       </div>
                       <div class="mini-row">
-                        <span>Stroom ingekocht (laden / dal):</span>
+                        <span>Stroom afgenomen (inkoop):</span>
                         <strong style="color: #ef4444;">- € ${gridImportCostToday.toFixed(2)} <span class="sub-dim">(${gridImportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="total-row">
-                        <span>Totale opbrengst vandaag:</span>
-                        <strong style="color: #10b981; font-size: 15.5px;">
+                        <span>Netto te ontvangen vandaag:</span>
+                        <strong style="color: #10b981; font-size: 14.5px;">
                           + € ${(-netInvoiceToday).toFixed(2)}
                         </strong>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Blok 2: Thuisbatterij -->
+                  <!-- Blok 2: Thuisbatterij (Handel, Powerplay & Huisbesparing) -->
                   <div class="overview-block">
                     <div class="block-header">
                       <div class="block-title" style="color: #10b981;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
-                        <span>Thuisbatterij</span>
+                        <span>Thuisbatterij Verdienste</span>
                       </div>
                       <span class="node-status-pill pill-green" style="cursor: pointer; user-select: none;" title="Klik 3x om Terugverdientijd te tonen/verbergen" @click="${() => this._handleRendementClick()}">
                         Terugverdientijd
@@ -1451,16 +1470,20 @@ export class EnergyDashboardCard extends LitElement {
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Geladen vandaag:</span>
-                        <strong>${batChargedToday.toFixed(1)} kWh</strong>
+                        <span>Handel op het net & Powerplay:</span>
+                        <strong style="color: #10b981;">+ € ${batTradeAndPowerplay.toFixed(2)} <span class="sub-dim">(${batDischargedToday.toFixed(1)} kWh ontladen)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Ontladen vandaag:</span>
-                        <strong style="color: #10b981;">${batDischargedToday.toFixed(1)} kWh</strong>
+                        <span>Laden tegen daltarief (van net):</span>
+                        <strong style="color: #94a3b8;">${batChargedToday.toFixed(1)} kWh <span class="sub-dim">(- € ${batImportCost.toFixed(2)})</span></strong>
+                      </div>
+                      <div class="mini-row">
+                        <span>Vermeden piek inkoop huis:</span>
+                        <strong style="color: #10b981;">+ € ${batHomeSavingsToday.toFixed(2)}</strong>
                       </div>
                       <div class="total-row">
-                        <span>Bespaard voor terugverdientijd (vandaag):</span>
-                        <strong style="color: #10b981; font-size: 14.5px;">+ € ${(batHomeSavingsToday + powerplayToday).toFixed(2)}</strong>
+                        <span>Verdiend voor terugverdientijd (vandaag):</span>
+                        <strong style="color: #10b981; font-size: 14.5px;">+ € ${batTotalEarningsToday.toFixed(2)}</strong>
                       </div>
                     </div>
 
@@ -1479,13 +1502,12 @@ export class EnergyDashboardCard extends LitElement {
                         </div>
                       </div>
 
-                      <div class="roi-progress-track">
-                        <div class="roi-progress-fill" style="width: ${Math.min(100, Math.max(1.5, batPaybackPct))}%;"></div>
+                      <div class="roi-bar-bg">
+                        <div class="roi-bar-fill" style="width: ${batPaybackPct.toFixed(1)}%;"></div>
                       </div>
 
-                      <div class="roi-stats-row">
-                        <span>Reeds terug: <strong style="color: #10b981;">€ ${batLifetimeSaved.toFixed(2)}</strong></span>
-                        <span>Nog te gaan: <strong style="color: #f8fafc;">€ ${batRemaining.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                      <div class="roi-footer">
+                        <span>Nog: <strong>€ ${batRemaining.toFixed(2)}</strong></span>
                         <span>Verwacht: <strong style="color: #38bdf8;">ca. ${batYearsRemaining.toFixed(1)} jaar</strong> <span style="color: #64748b; font-size: 10px;">(€ ${batDailyAvg.toFixed(2)}/d)</span></span>
                       </div>
                     </div>
@@ -1494,7 +1516,7 @@ export class EnergyDashboardCard extends LitElement {
                 </div>
               </div>
             </div>
-            </div>
+          </div>
           </div>
         </div>
       </div>
