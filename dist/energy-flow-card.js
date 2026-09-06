@@ -237,7 +237,13 @@ class EnergyDashboardCard extends i {
         const isBatCharging = batChargeW > 20;
         const isBatDischarging = batDischargeW > 20;
         const homeRawW = Math.max(0, this._getNumber(cfg.home_power || 'sensor.live_huisverbruik'));
-        const homeToday = this._getNumber(cfg.home_today || 'sensor.echt_huisverbruik_vandaag');
+        const rawHomeToday = this._getNumber(cfg.home_today || 'sensor.echt_huisverbruik_vandaag');
+        // Zuiver huisverbruik schatten zolang de fysieke 3-fase meter nog niet is geplaatst:
+        // (trekt de netto acculading af van de ruwe afname zodat de thuiscirkel niet 42kWh aangeeft)
+        const netBatStored = Math.max(0, batChargedToday - batDischargedToday);
+        const homeToday = (rawHomeToday > 25 && batChargedToday > 20)
+            ? Math.max(6.0, Math.round((solarToday + gridImportToday - gridExportToday - netBatStored) * 10) / 10)
+            : rawHomeToday;
         // 2. Financial Sensor Values
         const gridImportCostToday = this._getNumber('sensor.zonneplan_electricity_delivery_costs_today', 7.67);
         const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 6.02);
@@ -777,73 +783,88 @@ class EnergyDashboardCard extends i {
                   </span>
                 </div>
 
-                <!-- Dual Columns: Left = Stroomfactuur (Meter), Right = Thuisbatterij (Besparingen) -->
-                <div class="overview-dual-grid">
-                  <!-- Col 1: Stroomfactuur -->
-                  <div class="overview-col">
-                    <div class="col-header">
-                      <span class="col-title" style="color: #38bdf8;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                        Stroomfactuur Net
-                      </span>
+                <!-- Duidelijk overzicht onder elkaar met totalen -->
+                <div class="overview-vertical-list">
+                  <!-- Blok 1: Stroomfactuur Net (P1-meter) -->
+                  <div class="overview-block">
+                    <div class="block-header">
+                      <div class="block-title" style="color: #38bdf8;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        <span>Stroomfactuur Net (Zonneplan)</span>
+                      </div>
                       <span class="node-status-pill pill-blue">P1-meter</span>
-                    </div>
-
-                    <div class="col-kpi-val" style="color: ${netInvoiceToday <= 0 ? '#10b981' : '#f8fafc'};">
-                      € ${netInvoiceToday.toFixed(2)}
                     </div>
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Afname net:</span>
-                        <strong>€ ${gridImportCostToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(${gridImportToday.toFixed(1)} kWh)</span></strong>
+                        <span>Stroomafname van het net:</span>
+                        <strong>€ ${gridImportCostToday.toFixed(2)} <span class="sub-dim">(${gridImportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Teruglevering:</span>
-                        <strong style="color: #10b981;">- € ${gridExportRevToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(${gridExportToday.toFixed(1)} kWh)</span></strong>
+                        <span>Teruglevering aan het net:</span>
+                        <strong style="color: #10b981;">- € ${gridExportRevToday.toFixed(2)} <span class="sub-dim">(${gridExportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Powerplay korting:</span>
+                        <span>Powerplay vergoeding:</span>
                         <strong style="color: #10b981;">- € ${powerplayToday.toFixed(2)}</strong>
                       </div>
-                      <div class="mini-row" style="border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 6px; margin-top: 2px;">
-                        <span>💡 Zonder batterij:</span>
-                        <strong style="color: #94a3b8;">€ ${(netInvoiceToday + batTotalValueToday).toFixed(2)} factuur</strong>
+                      <div class="total-row">
+                        <span>Totaal Stroomfactuur (vandaag):</span>
+                        <strong style="color: ${netInvoiceToday <= 0 ? '#10b981' : '#f8fafc'}; font-size: 14.5px;">
+                          € ${netInvoiceToday.toFixed(2)} <span style="font-size: 11px; font-weight: 500;">${netInvoiceToday <= 0 ? '(te ontvangen)' : '(te betalen)'}</span>
+                        </strong>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Col 2: Thuisbatterij Waarde -->
-                  <div class="overview-col">
-                    <div class="col-header">
-                      <span class="col-title" style="color: #10b981;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
-                        Thuisbatterij
-                      </span>
-                      <span class="node-status-pill pill-green" style="user-select: none;" @click="${() => this._handleRendementClick()}">Rendement</span>
-                    </div>
-
-                    <div class="col-kpi-val" style="color: #10b981; display: flex; align-items: baseline; gap: 7px;">
-                      <span>+ € ${batTotalValueToday.toFixed(2)}</span>
-                      <span style="font-size: 13.5px; font-weight: 500; color: #34d399;">bespaard</span>
+                  <!-- Blok 2: Thuisbatterij & Energiehandel -->
+                  <div class="overview-block">
+                    <div class="block-header">
+                      <div class="block-title" style="color: #10b981;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
+                        <span>Thuisbatterij Waarde</span>
+                      </div>
+                      <span class="node-status-pill pill-green" style="cursor: pointer;" title="Klik 3x voor Terugverdientijd" @click="${() => this._handleRendementClick()}">Rendement</span>
                     </div>
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Bespaard op huis:</span>
-                        <strong>€ ${batHomeSavingsToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(vermeden piek)</span></strong>
+                        <span>Powerplay onbalansbonus:</span>
+                        <strong style="color: #10b981;">€ ${powerplayToday.toFixed(2)}</strong>
                       </div>
                       <div class="mini-row">
-                        <span>Powerplay handel:</span>
-                        <strong style="color: #10b981;">€ ${powerplayToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(onbalans)</span></strong>
+                        <span>Besparing eigen huisverbruik:</span>
+                        <strong>€ ${batHomeSavingsToday.toFixed(2)} <span class="sub-dim">(vermeden piek)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Activiteit vandaag:</span>
-                        <span>${batChargedToday.toFixed(0)} in / ${batDischargedToday.toFixed(0)} uit kWh</span>
+                        <span>Batterij activiteit vandaag:</span>
+                        <strong style="color: #cbd5e1;">${batChargedToday.toFixed(1)} in / ${batDischargedToday.toFixed(1)} uit kWh</strong>
                       </div>
-                      <div class="mini-row" style="border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 6px; margin-top: 2px;">
-                        <span style="color: #10b981;">Totale winst vandaag:</span>
-                        <strong style="color: #10b981;">+ € ${batTotalValueToday.toFixed(2)}</strong>
+                      <div class="total-row">
+                        <span>Totaal Batterij Voordeel (vandaag):</span>
+                        <strong style="color: #10b981; font-size: 14.5px;">+ € ${batTotalValueToday.toFixed(2)}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Blok 3: Zonnepanelen (Dak) -->
+                  <div class="overview-block">
+                    <div class="block-header">
+                      <div class="block-title" style="color: #f59e0b;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <span>Zonnepanelen (Dak)</span>
+                      </div>
+                      <span class="node-status-pill pill-amber">Opwekking</span>
+                    </div>
+
+                    <div class="mini-row-list">
+                      <div class="mini-row">
+                        <span>Totaal opgewekt vandaag:</span>
+                        <strong style="color: #f59e0b;">${solarToday.toFixed(1)} kWh</strong>
+                      </div>
+                      <div class="total-row">
+                        <span>Geschatte marktwaarde zonnestroom:</span>
+                        <strong style="color: #f59e0b; font-size: 14.5px;">ca. € ${(solarToday * currentTariff).toFixed(2)}</strong>
                       </div>
                     </div>
                   </div>
@@ -1813,49 +1834,36 @@ EnergyDashboardCard.styles = i$3 `
       padding-top: 8px;
     }
 
-    /* Unified Financial Overview Card */
-    .overview-dual-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    /* Unified Financial Overview Card - Vertical List with Totals */
+    .overview-vertical-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    @media (max-width: 640px) {
-      .overview-dual-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .overview-col {
+    .overview-block {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 14px;
-      padding: 14px;
+      padding: 13px 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 7px;
     }
 
-    .col-header {
+    .block-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .col-title {
-      font-size: 12.5px;
-      font-weight: 600;
-      color: #94a3b8;
+    .block-title {
+      font-size: 13px;
+      font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-
-    .col-kpi-val {
-      font-size: 26px;
-      font-weight: 700;
-      line-height: 1.1;
-      margin: 2px 0;
+      gap: 7px;
+      letter-spacing: -0.01em;
     }
 
     .mini-row-list {
@@ -1863,7 +1871,7 @@ EnergyDashboardCard.styles = i$3 `
       flex-direction: column;
       gap: 6px;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
-      padding-top: 8px;
+      padding-top: 7px;
     }
 
     .mini-row {
@@ -1877,6 +1885,25 @@ EnergyDashboardCard.styles = i$3 `
     .mini-row strong {
       color: #f1f5f9;
       font-weight: 600;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px dashed rgba(255, 255, 255, 0.12);
+      padding-top: 7px;
+      margin-top: 3px;
+      font-size: 12.5px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .sub-dim {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: #64748b;
+      margin-left: 2px;
     }
 
     
