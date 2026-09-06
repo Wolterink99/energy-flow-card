@@ -1247,7 +1247,7 @@ export class EnergyDashboardCard extends LitElement {
                     <div class="col-header">
                       <span class="col-title" style="color: #10b981;">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
-                        Thuisbatterij Winst
+                        Thuisbatterij
                       </span>
                       <span class="node-status-pill pill-green" style="cursor: pointer; user-select: none;" title="Geheim: klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">Rendement ${this._showRoi ? '▴' : ''}</span>
                     </div>
@@ -1268,6 +1268,10 @@ export class EnergyDashboardCard extends LitElement {
                       <div class="mini-row">
                         <span>Activiteit vandaag:</span>
                         <span>${batChargedToday.toFixed(0)} in / ${batDischargedToday.toFixed(0)} uit kWh</span>
+                      </div>
+                      <div class="mini-row" style="border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 6px; margin-top: 2px;">
+                        <span>💡 Zonder batterij:</span>
+                        <strong style="color: #94a3b8;">€ ${(netInvoiceToday + batHomeSavingsToday).toFixed(2)} factuur</strong>
                       </div>
                     </div>
                   </div>
@@ -1304,11 +1308,7 @@ export class EnergyDashboardCard extends LitElement {
                 </div>
                 ` : ''}
 
-                <!-- Footer insight note -->
-                <div class="insight-footer">
-                  <span>💡 Zonder thuisbatterij was je factuur vandaag <strong>€ ${(netInvoiceToday + batHomeSavingsToday).toFixed(2)}</strong> geweest.</span>
-                  <span style="color: #10b981; font-weight: 600; cursor: pointer;" title="Klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">Netto voordeel: + € ${batTotalValueToday.toFixed(2)}</span>
-                </div>
+                
               </div>
             </div>
           </div>
