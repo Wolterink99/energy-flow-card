@@ -4096,8 +4096,8 @@ class EnergyFlowCard extends i {
         // Parse states
         const solar = this.getEntityValue(entities.solar || entities.solar_power);
         const load = this.getEntityValue(entities.load || entities.home_power);
-        const rawBatteryPower = this.debugBatteryPower !== null ? this.debugBatteryPower : this.getEntityValue(entities.battery_power);
-        const soc = this.debugBatterySoc !== null ? this.debugBatterySoc : (entities.battery_soc ? this.getEntityValue(entities.battery_soc) : 0);
+        const rawBatteryPower = this.debugBatteryPower !== null ? this.debugBatteryPower : this.getEntityValue(entities.battery_power || entities.battery);
+        const soc = this.debugBatterySoc !== null ? this.debugBatterySoc : (entities.battery_soc || entities.battery_percentage ? this.getEntityValue(entities.battery_soc || entities.battery_percentage) : 0);
         const charger = this.debugEVPower !== null ? this.debugEVPower : this.getEntityValue(entities.charger);
         // Parse grid early for battery polarity auto-detection (it will be finalized later if not configured)
         let grid = 0;
@@ -4105,15 +4105,29 @@ class EnergyFlowCard extends i {
             grid = this.getEntityValue(entities.grid || entities.grid_power);
         }
         // Normalize battery sign convention:
-        // - battery_invert: true  -> sensor positief = laden (SolarEdge, Huawei)
-        // - battery_invert: false -> sensor negatief = laden (Victron, SMA)
-        // - Not defined: auto-detect if grid sensor is configured, otherwise default to negatief = laden (standard Home Assistant convention)
+        // - If battery_status / battery_state is configured (e.g. Zonneplan Charging/Discharging/Standby):
+        //   derive direction directly from the status
+        // - Else if battery_invert is defined: true -> sensor positive = charging, false -> sensor negative = charging
+        // - Else auto-detect based on energy balance
         let batteryPower = rawBatteryPower;
-        if (this.config.battery_invert !== undefined) {
+        const statusEntity = entities.battery_status || entities.battery_state;
+        if (statusEntity && this.hass?.states[statusEntity]) {
+            const statusVal = (this.hass.states[statusEntity].state || '').toLowerCase();
+            if (statusVal.includes('discharg') || statusVal.includes('ontlad')) {
+                batteryPower = -Math.abs(rawBatteryPower);
+            }
+            else if (statusVal.includes('charg') || statusVal.includes('laad') || statusVal.includes('laden')) {
+                batteryPower = Math.abs(rawBatteryPower);
+            }
+            else if (statusVal.includes('standby') || statusVal.includes('idle') || statusVal.includes('rust')) {
+                batteryPower = 0;
+            }
+        }
+        else if (this.config.battery_invert !== undefined) {
             const batteryInvert = this.config.battery_invert === true;
             batteryPower = batteryInvert ? rawBatteryPower : -rawBatteryPower;
         }
-        else if (entities.grid) {
+        else if (entities.grid || entities.grid_power) {
             // Auto-detect by calculating expected battery flow: expected = solar + grid - load - charger
             // (grid > 0 is import, grid < 0 is export)
             const expected = solar + grid - load - charger;
@@ -4228,9 +4242,19 @@ class EnergyFlowCard extends i {
             grid = load + charger - solar - batteryPower;
         }
         // Check configuration flags for layout
-        const showSolar = !!entities.solar || !!entities.solar_power;
-        const showBattery = this.debugShowBattery !== null ? this.debugShowBattery : !!entities.battery_power;
-        const showEV = this.debugShowEV !== null ? this.debugShowEV : (charger > 0);
+        const showSolar = this.config?.show_solar !== undefined
+            ? this.config.show_solar === true
+            : (!!entities.solar || !!entities.solar_power);
+        const showBattery = this.debugShowBattery !== null
+            ? this.debugShowBattery
+            : (this.config?.show_battery !== undefined
+                ? this.config.show_battery === true
+                : (!!entities.battery_power || !!entities.battery));
+        const showEV = this.debugShowEV !== null
+            ? this.debugShowEV
+            : (this.config?.show_ev !== undefined
+                ? this.config.show_ev === true
+                : (charger > 0 || !!entities.charger));
         const skyState = getSkyState(decimalHour, sunriseHour, sunsetHour);
         const dynamicBackground = `background: linear-gradient(to bottom, ${skyState.top} 0%, ${skyState.horizon} 81%, #0a2919 81.1%, #05160d 100%);`;
         // Calculate if we should show window lights

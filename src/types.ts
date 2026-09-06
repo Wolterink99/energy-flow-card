@@ -1,6 +1,9 @@
 export interface EnergyFlowCardConfig {
   type: string;
   title?: string;
+  show_battery?: boolean;
+  show_solar?: boolean;
+  show_ev?: boolean;
   // battery_invert: true  → positief = laden, negatief = ontladen (bijv. SolarEdge, Huawei)
   // battery_invert: false → negatief = laden, positief = ontladen (bijv. Victron, sommige SMA)
   // Standaard: true (positief = laden)
@@ -10,11 +13,19 @@ export interface EnergyFlowCardConfig {
   entities: {
     solar?: string | string[];
     solar_energy_today?: string;      // kWh opgewekt vandaag
+    solar_power?: string | string[];
+    solar_today?: string;
     load?: string | string[];
+    home_power?: string | string[];
+    battery?: string | string[];
     battery_power?: string | string[];
     battery_soc?: string | string[];
+    battery_percentage?: string | string[];
+    battery_status?: string;
+    battery_state?: string;
     charger?: string | string[];
     grid?: string | string[];
+    grid_power?: string | string[];
     weather?: string;
     grid_import_today?: string;       // kWh afgenomen vandaag
     grid_export_today?: string;       // kWh teruggeleverd vandaag
