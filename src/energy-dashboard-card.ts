@@ -31,6 +31,7 @@ export class EnergyDashboardCard extends LitElement {
   @state() private _lastFetchTime: number = 0;
   @state() private _calculatedSavingsToday: number = 2.36;
   @state() private _hoveredHour: number | null = null;
+  @state() private _showRoi: boolean = false;
 
   static styles = css`
     :host {
@@ -989,7 +990,7 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xL}, ${yB})">
+                <g transform="translate(${xL}, ${yB})" style="cursor: pointer;" title="Klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">
                   <text x="0" y="${R + 24}" class="node-outer-label">Batterij</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="9"
@@ -1248,7 +1249,7 @@ export class EnergyDashboardCard extends LitElement {
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
                         Thuisbatterij Winst
                       </span>
-                      <span class="node-status-pill pill-green">Rendement</span>
+                      <span class="node-status-pill pill-green" style="cursor: pointer; user-select: none;" title="Geheim: klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">Rendement ${this._showRoi ? '▴' : ''}</span>
                     </div>
 
                     <div class="col-kpi-val" style="color: #10b981;">
@@ -1272,8 +1273,9 @@ export class EnergyDashboardCard extends LitElement {
                   </div>
                 </div>
 
-                <!-- Terugverdientijd & Investering Section -->
-                <div class="roi-section" title="Klik om de aanschafprijs te bekijken of aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
+                ${this._showRoi ? html`
+                <!-- Geheime Terugverdientijd & Investering Section -->
+                <div class="roi-section" title="Klik om de aanschafprijs aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
                   <div class="roi-header">
                     <div class="roi-title">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1282,8 +1284,11 @@ export class EnergyDashboardCard extends LitElement {
                       </svg>
                       <span>Terugverdientijd Thuisbatterij</span>
                     </div>
-                    <div class="roi-badge">
-                      € ${batLifetimeSaved.toFixed(2)} / € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })} (${batPaybackPct.toFixed(1)}%)
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <div class="roi-badge">
+                        € ${batLifetimeSaved.toFixed(2)} / € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })} (${batPaybackPct.toFixed(1)}%)
+                      </div>
+                      <span style="font-size: 11px; color: #64748b; cursor: pointer; padding: 0 4px;" title="Sluiten" @click="${(e: Event) => { e.stopPropagation(); this._showRoi = false; }}">✕</span>
                     </div>
                   </div>
 
@@ -1297,11 +1302,12 @@ export class EnergyDashboardCard extends LitElement {
                     <span>Verwacht: <strong style="color: #38bdf8;">ca. ${batYearsRemaining.toFixed(1)} jaar</strong> <span style="color: #64748b; font-size: 10px;">(€ ${batDailyAvg.toFixed(2)}/d)</span></span>
                   </div>
                 </div>
+                ` : ''}
 
                 <!-- Footer insight note -->
                 <div class="insight-footer">
                   <span>💡 Zonder thuisbatterij was je factuur vandaag <strong>€ ${(netInvoiceToday + batHomeSavingsToday).toFixed(2)}</strong> geweest.</span>
-                  <span style="color: #10b981; font-weight: 600;">Netto voordeel: + € ${batTotalValueToday.toFixed(2)}</span>
+                  <span style="color: #10b981; font-weight: 600; cursor: pointer;" title="Klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">Netto voordeel: + € ${batTotalValueToday.toFixed(2)}</span>
                 </div>
               </div>
             </div>
