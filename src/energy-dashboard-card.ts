@@ -371,13 +371,20 @@ export class EnergyDashboardCard extends LitElement {
     }
 
     /* Detail Graph Views & Navigation */
+    .detail-view-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+    }
+
     .detail-header-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-      gap: 8px;
-      flex-wrap: wrap;
+      margin-bottom: 16px;
+      gap: 12px;
     }
 
     .back-btn {
@@ -483,7 +490,8 @@ export class EnergyDashboardCard extends LitElement {
 
     .detail-chart-wrapper {
       width: 100%;
-      height: 440px;
+      flex: 1;
+      min-height: 480px;
       position: relative;
     }
 
@@ -1545,18 +1553,19 @@ export class EnergyDashboardCard extends LitElement {
     const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
     const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).getTime();
 
-    // Chart dimensions inside SVG viewBox 0 0 600 460
-    const cL = 50;
-    const cR = 560;
+    // Chart dimensions inside SVG viewBox 0 0 600 480 (Full container fill)
+    const cL = 55;
+    const cR = 545;
     const cW = cR - cL;
-    const cT = 35;
-    const cH = 340;
-    const cB = cT + cH;
+    const cT = 20;
+    const cH = 410;
+    const cB = cT + cH; // 430
 
     const timeToX = (t: number) => cL + ((t - startTime) / (endTime - startTime)) * cW;
 
     // Retrieve active component details
     let viewColor = '#f59e0b';
+    let viewTitle = '';
     let kpiBadge = '';
 
     const solarToday = this._getNumber('sensor.totale_opwek_vandaag_2');
@@ -1572,37 +1581,38 @@ export class EnergyDashboardCard extends LitElement {
 
     if (this._activeDetailView === 'solar') {
       viewColor = '#f59e0b';
+      viewTitle = '☀️ Zonne-energie (24-uur)';
       kpiBadge = `Nu: ${solarW} W | Vandaag: ${solarToday.toFixed(1)} kWh`;
     } else if (this._activeDetailView === 'home') {
       viewColor = '#f1f5f9';
+      viewTitle = '🏠 Huisverbruik (24-uur)';
       kpiBadge = `Nu: ${homeW} W | Vandaag: ${homeToday.toFixed(1)} kWh`;
     } else if (this._activeDetailView === 'battery') {
       viewColor = '#10b981';
+      viewTitle = '🔋 Thuisbatterij (24-uur)';
       kpiBadge = `${batKwhNow.toFixed(1)} / ${batCapacity} kWh (${batSoC.toFixed(0)}%) | ${Math.abs(batW)} W`;
     } else if (this._activeDetailView === 'grid') {
       viewColor = '#38bdf8';
+      viewTitle = '⚡ Netstroom (24-uur)';
       kpiBadge = `Nu: ${gridW >= 0 ? '+' : ''}${gridW} W | Afname: ${gridImpToday.toFixed(1)} kWh`;
     }
 
     return html`
       <div class="detail-view-container">
-        <!-- Top Navigation Bar -->
+        <!-- Top Dedicated Header Bar with single back button -->
         <div class="detail-header-bar">
           <button class="back-btn" @click="${() => { this._activeDetailView = 'flow'; }}">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            <span>Schema</span>
+            <span>Terug naar schema</span>
           </button>
 
-          <div class="comp-tabs-group">
-            <button class="comp-tab-btn ${this._activeDetailView === 'solar' ? 'active tab-solar' : ''}" @click="${() => { this._activeDetailView = 'solar'; }}">☀️ Zon</button>
-            <button class="comp-tab-btn ${this._activeDetailView === 'home' ? 'active tab-home' : ''}" @click="${() => { this._activeDetailView = 'home'; }}">🏠 Thuis</button>
-            <button class="comp-tab-btn ${this._activeDetailView === 'battery' ? 'active tab-battery' : ''}" @click="${() => { this._activeDetailView = 'battery'; }}">🔋 Batterij</button>
-            <button class="comp-tab-btn ${this._activeDetailView === 'grid' ? 'active tab-grid' : ''}" @click="${() => { this._activeDetailView = 'grid'; }}">⚡ Net</button>
-          </div>
+          <h2 class="panel-title" style="color: ${viewColor}; margin: 0; font-size: 16px; font-weight: 600;">
+            ${viewTitle}
+          </h2>
 
-          <span class="node-status-pill" style="border-color: ${viewColor}; color: ${viewColor}; font-weight: 600;">
+          <span class="node-status-pill" style="border-color: ${viewColor}; color: ${viewColor}; font-weight: 600; font-size: 12px; padding: 5px 12px;">
             ${kpiBadge}
           </span>
         </div>
@@ -1619,9 +1629,9 @@ export class EnergyDashboardCard extends LitElement {
           </div>
         ` : ''}
 
-        <!-- 24-Hour Interactive High-Res SVG Chart -->
+        <!-- 24-Hour Interactive High-Res SVG Chart filling container -->
         <div class="detail-chart-wrapper">
-          <svg class="detail-chart-svg" viewBox="0 0 600 440"
+          <svg class="detail-chart-svg" viewBox="0 0 600 480"
             @mousemove="${(e: MouseEvent) => this._handleChartMouseMove(e, cL, cR, cT, cB, startTime, endTime)}"
             @mouseleave="${() => { this._hoverChartPoint = null; }}">
             
@@ -1645,13 +1655,13 @@ export class EnergyDashboardCard extends LitElement {
               const x = cL + (h / 24) * cW;
               return svg`
                 <line x1="${x}" y1="${cT}" x2="${x}" y2="${cB}" stroke="rgba(255, 255, 255, 0.07)" stroke-dasharray="3 4" />
-                <text x="${x}" y="${cB + 20}" fill="#64748b" font-size="10.5" font-weight="500" text-anchor="middle">
-                  ${h.toString().padStart(2, '0')}:00
+                <text x="${x}" y="${cB + 22}" fill="#94a3b8" font-size="11" font-weight="500" text-anchor="middle">
+                  ${String(h).padStart(2, '0')}:00
                 </text>
               `;
             })}
 
-            <!-- Chart Type Specific Content -->
+            <!-- Component-Specific Chart Paths -->
             ${(() => {
               if (this._activeDetailView === 'solar') {
                 const data = this._aggregateHistory5Min('sensor.totale_live_zonnestroom', startTime, endTime);
@@ -1667,12 +1677,12 @@ export class EnergyDashboardCard extends LitElement {
                 const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${cB} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${cB} Z` : '';
 
                 return svg`
-                  <!-- Y-Axis Guides -->
+                  <!-- Y-Axis Guides (Horizontal lines with y2!) -->
                   ${[0, 0.25, 0.5, 0.75, 1.0].map(pct => {
                     const y = cB - pct * cH;
                     const val = Math.round(pct * maxVal);
                     return svg`
-                      <line x1="${cL}" y1="${y}" x2="${cR}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" />
+                      <line x1="${cL}" y1="${y}" x2="${cR}" y2="${y}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" stroke-dasharray="${pct === 0 ? 'none' : '3 4'}" />
                       <text x="${cL - 8}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end">${val >= 1000 ? (val/1000).toFixed(1) + ' kW' : val + ' W'}</text>
                     `;
                   })}
@@ -1696,12 +1706,12 @@ export class EnergyDashboardCard extends LitElement {
                 const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${cB} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${cB} Z` : '';
 
                 return svg`
-                  <!-- Y-Axis Guides -->
+                  <!-- Y-Axis Guides (Horizontal lines with y2!) -->
                   ${[0, 0.25, 0.5, 0.75, 1.0].map(pct => {
                     const y = cB - pct * cH;
                     const val = Math.round(pct * maxVal);
                     return svg`
-                      <line x1="${cL}" y1="${y}" x2="${cR}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" />
+                      <line x1="${cL}" y1="${y}" x2="${cR}" y2="${y}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" stroke-dasharray="${pct === 0 ? 'none' : '3 4'}" />
                       <text x="${cL - 8}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end">${val >= 1000 ? (val/1000).toFixed(1) + ' kW' : val + ' W'}</text>
                     `;
                   })}
@@ -1726,13 +1736,13 @@ export class EnergyDashboardCard extends LitElement {
                   const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${cB} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${cB} Z` : '';
 
                   return svg`
-                    <!-- Dual Y-Axis Guides: Left = kWh, Right = % -->
+                    <!-- Dual Y-Axis Guides: Left = kWh, Right = % (Horizontal lines with y2!) -->
                     ${[0, 0.25, 0.5, 0.75, 1.0].map(pct => {
                       const y = cB - pct * cH;
                       const kwhVal = (pct * batCapacity).toFixed(0);
                       const pctVal = Math.round(pct * 100);
                       return svg`
-                        <line x1="${cL}" y1="${y}" x2="${cR}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" />
+                        <line x1="${cL}" y1="${y}" x2="${cR}" y2="${y}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" stroke-dasharray="${pct === 0 ? 'none' : '3 4'}" />
                         <text x="${cL - 8}" y="${y + 4}" fill="#10b981" font-size="10" font-weight="600" text-anchor="end">${kwhVal} kWh</text>
                         <text x="${cR + 8}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="start">${pctVal} %</text>
                       `;
@@ -1761,8 +1771,8 @@ export class EnergyDashboardCard extends LitElement {
                   const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${yZero} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${yZero} Z` : '';
 
                   return svg`
-                    <!-- Zero line -->
-                    <line x1="${cL}" y1="${yZero}" x2="${cR}" stroke="rgba(255, 255, 255, 0.2)" stroke-dasharray="4 4" />
+                    <!-- Zero line with y2 -->
+                    <line x1="${cL}" y1="${yZero}" x2="${cR}" y2="${yZero}" stroke="rgba(255, 255, 255, 0.2)" stroke-dasharray="4 4" />
                     <text x="${cL - 8}" y="${yZero + 4}" fill="#64748b" font-size="10" text-anchor="end">0 W</text>
 
                     <text x="${cL - 8}" y="${cT + 12}" fill="#10b981" font-size="10" font-weight="600" text-anchor="end">+${(maxAbs/1000).toFixed(1)} kW (Laden)</text>
@@ -1790,8 +1800,8 @@ export class EnergyDashboardCard extends LitElement {
                 const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${yZero} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${yZero} Z` : '';
 
                 return svg`
-                  <!-- Zero line -->
-                  <line x1="${cL}" y1="${yZero}" x2="${cR}" stroke="rgba(255, 255, 255, 0.2)" stroke-dasharray="4 4" />
+                  <!-- Zero line with y2 -->
+                  <line x1="${cL}" y1="${yZero}" x2="${cR}" y2="${yZero}" stroke="rgba(255, 255, 255, 0.2)" stroke-dasharray="4 4" />
                   <text x="${cL - 8}" y="${yZero + 4}" fill="#64748b" font-size="10" text-anchor="end">0 W</text>
 
                   <text x="${cL - 8}" y="${cT + 12}" fill="#38bdf8" font-size="10" font-weight="600" text-anchor="end">+${(maxAbs/1000).toFixed(1)} kW (Afname)</text>
@@ -1823,7 +1833,7 @@ export class EnergyDashboardCard extends LitElement {
     `;
   }
 
-  private _handleChartMouseMove(e: MouseEvent, cL: number, cR: number, cT: number, cB: number, startTime: number, endTime: number): void {
+    private _handleChartMouseMove(e: MouseEvent, cL: number, cR: number, cT: number, cB: number, startTime: number, endTime: number): void {
     const svgEl = e.currentTarget as SVGSVGElement;
     const rect = svgEl.getBoundingClientRect();
     const svgX = ((e.clientX - rect.left) / rect.width) * 600;
