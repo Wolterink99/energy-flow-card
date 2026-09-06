@@ -646,7 +646,7 @@ class EnergyDashboardCard extends i {
                     <line x1="30" y1="120" x2="450" y2="120" stroke="rgba(255, 255, 255, 0.12)" />
                     <text x="24" y="124" fill="#64748b" font-size="9" text-anchor="end">€ 0.00</text>
 
-                    <!-- 24 Hourly Bars -->
+                    <!-- 1. Layer of 24 Hourly Bars -->
                     ${todayHours.map((th, idx) => {
             const barW = 12.5;
             const x = 32 + idx * 17.2;
@@ -655,11 +655,8 @@ class EnergyDashboardCard extends i {
             const y = 120 - barH;
             const isNow = th.hour === currentHour;
             const isPeak = th.hour === maxHour;
-            th.hour === minHour;
-            const fillColor = isNow ? '#38bdf8' : th.price > 0.35 ? '#ef4444' : th.price > 0.22 ? '#f59e0b' : '#10b981';
             const isHovered = this._hoveredHour === th.hour;
-            const tooltipX = Math.max(48, Math.min(412, x + barW / 2));
-            const tooltipY = Math.max(20, y - 8);
+            const fillColor = isNow ? '#38bdf8' : th.price > 0.35 ? '#ef4444' : th.price > 0.22 ? '#f59e0b' : '#10b981';
             return w `
                         <g style="cursor: pointer;"
                           @mouseenter="${() => { this._hoveredHour = th.hour; }}"
@@ -683,18 +680,6 @@ class EnergyDashboardCard extends i {
                             <text x="${x + barW / 2}" y="${y - 4}" fill="#ef4444" font-size="8" font-weight="600" text-anchor="middle">Top</text>
                           ` : ''}
 
-                          <!-- Tooltip when hovered -->
-                          ${isHovered ? w `
-                            <g transform="translate(${tooltipX}, ${tooltipY})">
-                              <rect x="-42" y="-18" width="84" height="18" rx="5"
-                                fill="#0f172a" stroke="#38bdf8" stroke-width="1.2"
-                                filter="drop-shadow(0 2px 6px rgba(0,0,0,0.6))" />
-                              <text x="0" y="-5.5" fill="#f8fafc" font-size="9.5" font-weight="700" text-anchor="middle">
-                                ${th.hour.toString().padStart(2, '0')}:00  € ${th.price.toFixed(3)}
-                              </text>
-                            </g>
-                          ` : ''}
-
                           ${(idx % 4 === 0 || idx === 23) ? w `
                             <text x="${x + barW / 2}" y="134" fill="${isHovered ? '#f1f5f9' : '#64748b'}" font-size="9" font-weight="${isHovered ? '700' : '400'}" text-anchor="middle">
                               ${th.hour.toString().padStart(2, '0')}
@@ -703,6 +688,31 @@ class EnergyDashboardCard extends i {
                         </g>
                       `;
         })}
+
+                    <!-- 2. Tooltip Layer (Rendered AFTER all bars, so it is strictly IN FRONT of all bars!) -->
+                    ${this._hoveredHour !== null ? (() => {
+            const th = todayHours.find(h => h.hour === this._hoveredHour);
+            if (!th)
+                return '';
+            const idx = todayHours.indexOf(th);
+            const barW = 12.5;
+            const x = 32 + idx * 17.2;
+            const maxScale = 0.45;
+            const barH = Math.max(5, (th.price / maxScale) * 90);
+            const y = 120 - barH;
+            const tooltipX = Math.max(50, Math.min(410, x + barW / 2));
+            const tooltipY = Math.max(22, y - 8);
+            return w `
+                        <g transform="translate(${tooltipX}, ${tooltipY})" pointer-events="none">
+                          <rect x="-44" y="-20" width="88" height="20" rx="5"
+                            fill="#0b0f19" stroke="#38bdf8" stroke-width="1.5"
+                            filter="drop-shadow(0 4px 12px rgba(0,0,0,0.85))" />
+                          <text x="0" y="-6" fill="#f8fafc" font-size="10" font-weight="700" text-anchor="middle">
+                            ${th.hour.toString().padStart(2, '0')}:00  € ${th.price.toFixed(3)}
+                          </text>
+                        </g>
+                      `;
+        })() : ''}
                   </svg>
                 </div>
 
