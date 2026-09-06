@@ -377,8 +377,9 @@ export class EnergyFlowCard extends LitElement {
     const solarEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power;
     const homeEnt = this.config?.entities.load || (this.config?.entities as any).home_power;
     const gridEnt = this.config?.entities.grid || (this.config?.entities as any).grid_power;
-    console.info('[energy-flow-card] Configured entities for history:', { solarEnt, homeEnt, gridEnt });
-    if (!solarEnt && !homeEnt && !gridEnt) return;
+    const batteryEnt = this.config?.entities.battery_power || (this.config?.entities as any).battery;
+    console.info('[energy-flow-card] Configured entities for history:', { solarEnt, homeEnt, gridEnt, batteryEnt });
+    if (!solarEnt && !homeEnt && !gridEnt && !batteryEnt) return;
 
     this.isFetchingHistory = true;
     try {
@@ -389,6 +390,7 @@ export class EnergyFlowCard extends LitElement {
       if (solarEnt) entityIds.push(solarEnt);
       if (homeEnt) entityIds.push(homeEnt);
       if (gridEnt) entityIds.push(gridEnt);
+      if (batteryEnt) entityIds.push(batteryEnt);
 
       console.info('[energy-flow-card] Fetching history from REST API for:', entityIds);
       
@@ -663,7 +665,7 @@ export class EnergyFlowCard extends LitElement {
     return data;
   }
 
-  private renderUnifiedLineChart(chartType: 'unified' | 'solar' | 'home' | 'grid' = 'unified'): TemplateResult {
+  private renderUnifiedLineChart(chartType: 'unified' | 'solar' | 'home' | 'grid' | 'battery' = 'unified'): TemplateResult {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
@@ -726,6 +728,7 @@ export class EnergyFlowCard extends LitElement {
     const solarPowerEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power || '';
     const homePowerEnt = this.config?.entities.load || (this.config?.entities as any).home_power || '';
     const gridPowerEnt = this.config?.entities.grid || (this.config?.entities as any).grid_power || '';
+    const batteryPowerEnt = this.config?.entities.battery_power || (this.config?.entities as any).battery || '';
 
     const solarHistory = aggregate5MinHistory(solarPowerEnt);
     const homeHistory = aggregate5MinHistory(homePowerEnt);
@@ -741,6 +744,9 @@ export class EnergyFlowCard extends LitElement {
       const importStates = gridRaw.map(p => p.max > 0 ? p.max : 0);
       const exportStates = gridRaw.map(p => p.min < 0 ? Math.abs(p.min) : 0);
       maxPower = Math.max(...importStates, ...exportStates, 1000);
+    } else if (chartType === 'battery') {
+      const battRaw = aggregate5MinHistory(batteryPowerEnt);
+      maxPower = Math.max(...battRaw.map(p => Math.abs(p.max)), ...battRaw.map(p => Math.abs(p.min)), 1000);
     } else {
       maxPower = Math.max(...solarHistory.map(p => p.max), ...homeHistory.map(p => p.max), 1000);
     }
@@ -752,13 +758,6 @@ export class EnergyFlowCard extends LitElement {
     const chartTop = 20;
     const chartHeight = 190;
     const chartBottom = chartTop + chartHeight;
-
-    // Helper to map time & power value to SVG coordinates
-    const getCoords = (time: number, value: number) => {
-      const x = chartLeft + ((time - startTime) / (endTime - startTime)) * chartWidth;
-      const y = chartBottom - (Math.max(0, value) / maxPower) * chartHeight;
-      return { x: Math.min(chartRight, Math.max(chartLeft, x)), y: Math.min(chartBottom, Math.max(chartTop, y)) };
-    };
 
     // Helper to map time & price value to SVG coordinates
     const getPriceCoords = (time: number, price: number) => {
@@ -777,14 +776,14 @@ export class EnergyFlowCard extends LitElement {
         maxY: chartBottom - (Math.max(0, d.max) / maxPower) * chartHeight,
       }));
 
-      const line = `M ${pts[0].x} ${pts[0].meanY} ` + pts.slice(1).map(p => `L ${p.x} ${p.meanY}`).join(' ');
-      const envelope = `M ${pts[0].x} ${pts[0].maxY} ` +
-        pts.map(p => `L ${p.x} ${p.maxY}`).join(' ') +
-        pts.slice().reverse().map(p => `L ${p.x} ${p.minY}`).join(' ') +
+      const line = `M ${pts[0].x.toFixed(1)} ${pts[0].meanY.toFixed(1)} ` + pts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.meanY.toFixed(1)}`).join(' ');
+      const envelope = `M ${pts[0].x.toFixed(1)} ${pts[0].maxY.toFixed(1)} ` +
+        pts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.maxY.toFixed(1)}`).join(' ') + ' ' +
+        pts.slice().reverse().map(p => `L ${p.x.toFixed(1)} ${p.minY.toFixed(1)}`).join(' ') +
         ' Z';
-      const area = `M ${pts[0].x} ${chartBottom} ` +
-        pts.map(p => `L ${p.x} ${p.meanY}`).join(' ') +
-        ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
+      const area = `M ${pts[0].x.toFixed(1)} ${chartBottom} ` +
+        pts.map(p => `L ${p.x.toFixed(1)} ${p.meanY.toFixed(1)}`).join(' ') +
+        ` L ${pts[pts.length - 1].x.toFixed(1)} ${chartBottom} Z`;
 
       return { line, envelope, area };
     };
@@ -815,10 +814,8 @@ export class EnergyFlowCard extends LitElement {
 
     // Build Grid Import (Afname) & Grid Export (Teruglevering) Paths
     let gridImportLinePath = '';
-    let gridImportAreaPath = '';
     let gridImportEnvelopePath = '';
     let gridExportLinePath = '';
-    let gridExportAreaPath = '';
     let gridExportEnvelopePath = '';
     if (chartType === 'grid') {
       const gridRaw = aggregate5MinHistory(gridPowerEnt);
@@ -838,12 +835,39 @@ export class EnergyFlowCard extends LitElement {
       const imp = build5MinPaths(importData);
       gridImportLinePath = imp.line;
       gridImportEnvelopePath = imp.envelope;
-      gridImportAreaPath = imp.area;
 
       const exp = build5MinPaths(exportData);
       gridExportLinePath = exp.line;
       gridExportEnvelopePath = exp.envelope;
-      gridExportAreaPath = exp.area;
+    }
+
+    // Build Battery Paths
+    let batteryChargeLinePath = '';
+    let batteryChargeEnvelopePath = '';
+    let batteryDischargeLinePath = '';
+    let batteryDischargeEnvelopePath = '';
+    if (chartType === 'battery') {
+      const battRaw = aggregate5MinHistory(batteryPowerEnt);
+      const chargeData = battRaw.map(p => ({
+        time: p.time,
+        mean: p.mean > 0 ? p.mean : 0,
+        min: p.min > 0 ? p.min : 0,
+        max: p.max > 0 ? p.max : 0
+      }));
+      const dischargeData = battRaw.map(p => ({
+        time: p.time,
+        mean: p.mean < 0 ? Math.abs(p.mean) : 0,
+        min: p.max < 0 ? Math.abs(p.max) : 0,
+        max: p.min < 0 ? Math.abs(p.min) : 0
+      }));
+
+      const chg = build5MinPaths(chargeData);
+      batteryChargeLinePath = chg.line;
+      batteryChargeEnvelopePath = chg.envelope;
+
+      const dis = build5MinPaths(dischargeData);
+      batteryDischargeLinePath = dis.line;
+      batteryDischargeEnvelopePath = dis.envelope;
     }
 
     // Y Gridlines
@@ -947,30 +971,36 @@ export class EnergyFlowCard extends LitElement {
 
           <!-- Solar Envelope & Line -->
           ${(chartType === 'unified' || chartType === 'solar') && solarPaths.line ? svg`
-            <path d="${solarPaths.envelope}" fill="#fbbf24" fill-opacity="0.18" />
-            <path d="${solarPaths.area}" fill="url(#solar-area-grad)" />
+            <path d="${solarPaths.envelope}" fill="#fbbf24" fill-opacity="0.25" />
             <path d="${solarPaths.line}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Home Envelope & Line -->
           ${(chartType === 'unified' || chartType === 'home') && homePaths.line ? svg`
-            <path d="${homePaths.envelope}" fill="#a78bfa" fill-opacity="0.18" />
-            <path d="${homePaths.area}" fill="url(#home-area-grad)" />
+            <path d="${homePaths.envelope}" fill="#a78bfa" fill-opacity="0.25" />
             <path d="${homePaths.line}" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Grid Import (Afname) Area & Line -->
           ${chartType === 'grid' && gridImportLinePath ? svg`
-            <path d="${gridImportEnvelopePath}" fill="#60a5fa" fill-opacity="0.18" />
-            <path d="${gridImportAreaPath}" fill="url(#grid-import-area-grad)" />
+            <path d="${gridImportEnvelopePath}" fill="#60a5fa" fill-opacity="0.25" />
             <path d="${gridImportLinePath}" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Grid Export (Teruglevering) Area & Line -->
           ${chartType === 'grid' && gridExportLinePath ? svg`
-            <path d="${gridExportEnvelopePath}" fill="#10b981" fill-opacity="0.18" />
-            <path d="${gridExportAreaPath}" fill="url(#grid-export-area-grad)" />
+            <path d="${gridExportEnvelopePath}" fill="#10b981" fill-opacity="0.25" />
             <path d="${gridExportLinePath}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          ` : ''}
+
+          <!-- Battery Charge & Discharge Lines -->
+          ${chartType === 'battery' && batteryChargeLinePath ? svg`
+            <path d="${batteryChargeEnvelopePath}" fill="#10b981" fill-opacity="0.25" />
+            <path d="${batteryChargeLinePath}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          ` : ''}
+          ${chartType === 'battery' && batteryDischargeLinePath ? svg`
+            <path d="${batteryDischargeEnvelopePath}" fill="#f97316" fill-opacity="0.25" />
+            <path d="${batteryDischargeLinePath}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- X Axis Labels (every 4 hours) -->
@@ -1639,6 +1669,22 @@ export class EnergyFlowCard extends LitElement {
           }
         }
       }
+    } else if (this.activePopup === 'battery') {
+      title = 'Thuisbatterij';
+      subtitle = 'Opslag & Vermogen';
+      const rawBatteryPower = this.getEntityValue(entities.battery_power || (entities as any).battery);
+      const soc = entities.battery_soc || (entities as any).battery_percentage ? this.getEntityValue(entities.battery_soc || (entities as any).battery_percentage) : 0;
+      const batteryChargeToday = this.parseEntityFloat(entities.battery_charge_today);
+      const batteryDischargeToday = this.parseEntityFloat(entities.battery_discharge_today);
+
+      stat1Label = 'Actueel vermogen (SoC ' + Math.round(soc) + '%)';
+      stat1Val = Math.abs(rawBatteryPower) >= 1000 ? `${(Math.abs(rawBatteryPower) / 1000).toFixed(1)} kW` : `${Math.round(Math.abs(rawBatteryPower))} W`;
+
+      stat2Label = 'Geladen / Ontladen Vandaag';
+      stat2Val = `${batteryChargeToday !== null ? batteryChargeToday.toFixed(1) : '0'} / ${batteryDischargeToday !== null ? batteryDischargeToday.toFixed(1) : '0'} kWh`;
+      hasSecondStat = true;
+
+      chartHtml = this.renderUnifiedLineChart('battery');
     }
 
     return html`
@@ -1884,51 +1930,14 @@ export class EnergyFlowCard extends LitElement {
 
   private async handleNodeClick(nodeId: string): Promise<void> {
     console.info(`[energy-flow-card] Click registered on node: ${nodeId}`);
-
-    const actionKey = `${nodeId}_tap_action`;
-    const customAction = (this.config as any)[actionKey];
-    if (customAction) {
-      console.log(`[energy-flow-card] Executing custom action for node '${nodeId}':`, customAction);
-      
-      if (customAction.action === 'navigate' && customAction.navigation_path) {
-        const path = customAction.navigation_path;
-        if (path.startsWith('#')) {
-          window.location.hash = path;
-          return;
-        } else {
-          window.history.pushState(null, '', path);
-          const ev = new CustomEvent('location-changed', {
-            detail: { replace: false },
-            bubbles: true,
-            composed: true
-          });
-          this.dispatchEvent(ev);
-          return;
-        }
-      }
-
-      const event = new CustomEvent('hass-action', {
-        detail: {
-          config: {
-            tap_action: customAction
-          },
-          action: 'tap',
-          action_config: customAction
-        },
-        bubbles: true,
-        composed: true
-      });
-      this.dispatchEvent(event);
-      return;
-    }
     
-    if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'weather') {
+    if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'weather' || nodeId === 'battery') {
       this.activePopup = nodeId;
       this.activeTab = 'today';
       this.statsData = {};
       this.hourlyStatsData = {};
       
-      if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid') {
+      if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'battery') {
         this.fetchHighResolutionHistory();
       }
       
@@ -1959,6 +1968,11 @@ export class EnergyFlowCard extends LitElement {
         }
         if (impCost) entitiesToFetch.push(impCost);
         if (expCost) entitiesToFetch.push(expCost);
+      } else if (nodeId === 'battery') {
+        const entChg = this.config?.entities.battery_charge_today;
+        const entDis = this.config?.entities.battery_discharge_today;
+        if (entChg) entitiesToFetch.push(entChg);
+        if (entDis) entitiesToFetch.push(entDis);
       }
       
       if (entitiesToFetch.length > 0) {
@@ -1997,6 +2011,44 @@ export class EnergyFlowCard extends LitElement {
         }
       }
       
+      return;
+    }
+
+    const actionKey = `${nodeId}_tap_action`;
+    const customAction = (this.config as any)[actionKey];
+    if (customAction) {
+      console.log(`[energy-flow-card] Executing custom action for node '${nodeId}':`, customAction);
+      
+      if (customAction.action === 'navigate' && customAction.navigation_path) {
+        const path = customAction.navigation_path;
+        if (path.startsWith('#')) {
+          window.location.hash = path;
+          window.dispatchEvent(new CustomEvent('location-changed', { detail: { replace: false } }));
+          return;
+        } else {
+          window.history.pushState(null, '', path);
+          const ev = new CustomEvent('location-changed', {
+            detail: { replace: false },
+            bubbles: true,
+            composed: true
+          });
+          window.dispatchEvent(ev);
+          return;
+        }
+      }
+
+      const event = new CustomEvent('hass-action', {
+        detail: {
+          config: {
+            tap_action: customAction
+          },
+          action: 'tap',
+          action_config: customAction
+        },
+        bubbles: true,
+        composed: true
+      });
+      this.dispatchEvent(event);
       return;
     }
 
