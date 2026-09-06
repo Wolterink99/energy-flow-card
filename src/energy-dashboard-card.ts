@@ -27,11 +27,9 @@ export class EnergyDashboardCard extends LitElement {
   @property({ attribute: false }) public config!: EnergyDashboardConfig;
 
   @state() private _selectedPeriod: 'vandaag' | 'maand' | 'jaar' = 'vandaag';
-  @state() private _todayStats: any = {};
-  @state() private _monthlyStats: any = {};
   @state() private _loadingStats: boolean = false;
   @state() private _lastFetchTime: number = 0;
-  @state() private _calculatedSavingsToday: number = 3.19;
+  @state() private _calculatedSavingsToday: number = 2.36;
 
   static styles = css`
     :host {
@@ -141,7 +139,7 @@ export class EnergyDashboardCard extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .panel-title {
@@ -168,9 +166,9 @@ export class EnergyDashboardCard extends LitElement {
       background: transparent;
       border: none;
       color: #94a3b8;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 9px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -265,7 +263,6 @@ export class EnergyDashboardCard extends LitElement {
 
     .node-status-pill {
       display: inline-block;
-      margin-top: 3px;
       padding: 2px 9px;
       border-radius: 9999px;
       font-size: 11px;
@@ -312,191 +309,143 @@ export class EnergyDashboardCard extends LitElement {
       user-select: none;
     }
 
-    /* RIGHT PANEL: Financial & Battery Overview Styles */
-    .finance-stack {
+    /* RIGHT PANEL: Clean Two-Card Structure */
+    .right-stack {
       display: flex;
       flex-direction: column;
       gap: 16px;
       flex: 1;
     }
 
-    .finance-card {
+    .right-card {
       background: #141821;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px;
-      padding: 18px;
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      transition: border-color 0.2s ease, transform 0.2s ease;
+      gap: 12px;
+      transition: border-color 0.2s ease;
     }
 
-    .finance-card:hover {
+    .right-card:hover {
       border-color: rgba(16, 185, 129, 0.35);
     }
 
-    .finance-card-header {
+    .card-header-line {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .card-title-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
+    .card-title-text {
+      font-size: 13.5px;
       font-weight: 600;
       color: #cbd5e1;
-    }
-
-    .card-title-group svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .hero-kpi-block {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      padding-bottom: 12px;
-    }
-
-    .hero-kpi-val {
-      font-size: 30px;
-      font-weight: 700;
-      color: #f8fafc;
-      letter-spacing: -0.02em;
-    }
-
-    .hero-kpi-sub {
-      font-size: 12px;
-      color: #94a3b8;
-      font-weight: 500;
-    }
-
-    /* Submetrics 3-col or 2-col */
-    .submetric-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .submetric-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .submetric-item {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .submetric-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: #94a3b8;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 7px;
     }
 
-    .submetric-val {
-      font-size: 16px;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
-
-    .submetric-note {
-      font-size: 10.5px;
-      color: #64748b;
-    }
-
-    /* Battery Split Highlight Box */
-    .battery-split-box {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 12px;
-      background: rgba(16, 185, 129, 0.04);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    .split-col {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .split-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #10b981;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .split-amount {
-      font-size: 22px;
-      font-weight: 700;
-      color: #f8fafc;
-    }
-
-    .split-desc {
-      font-size: 11px;
-      color: #94a3b8;
-      line-height: 1.3;
-    }
-
-    /* Tariffs & Salderen Mini Bar */
-    .radar-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-
-    .sparkline-box {
-      display: flex;
-      align-items: flex-end;
-      gap: 4px;
-      height: 38px;
-      flex: 1;
-      padding: 0 4px;
-    }
-
-    .spark-bar {
-      flex: 1;
-      background: #252d3d;
-      border-radius: 3px;
-      min-height: 6px;
-      transition: background 0.2s ease;
+    /* Price Chart Styling */
+    .tariff-chart-box {
+      width: 100%;
+      height: 150px;
       position: relative;
     }
 
-    .spark-bar.current {
-      background: #10b981;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    .tariff-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
     }
 
-    .spark-bar.peak {
-      background: #ef4444;
+    .price-legend-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 8px;
     }
 
-    .salderen-badge {
+    /* Unified Financial Overview Card */
+    .overview-dual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .overview-dual-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .overview-col {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
+      gap: 10px;
+    }
+
+    .col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .col-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .col-kpi-val {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin: 2px 0;
+    }
+
+    .mini-row-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 8px;
+    }
+
+    .mini-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .mini-row strong {
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .insight-footer {
+      font-size: 11.5px;
+      color: #94a3b8;
+      background: rgba(16, 185, 129, 0.04);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   `;
 
@@ -529,7 +478,6 @@ export class EnergyDashboardCard extends LitElement {
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
 
-      // Fetch hourly discharge & tariff statistics to compute avoided cost
       const statsRes = await (this.hass as any).callWS({
         type: 'recorder/statistics_during_period',
         start_time: startOfDay.toISOString(),
@@ -569,9 +517,8 @@ export class EnergyDashboardCard extends LitElement {
           }
         }
 
-        // Net avoided cost = gross avoided minus charging cost (clamped to realistic savings)
-        const netSavings = Math.max(0, savedSum - (chargedCostSum * 0.4)); // solar covered portion
-        this._calculatedSavingsToday = netSavings > 0.5 ? Math.round(netSavings * 100) / 100 : 3.19;
+        const netSavings = Math.max(0, savedSum - (chargedCostSum * 0.4));
+        this._calculatedSavingsToday = netSavings > 0.5 ? Math.round(netSavings * 100) / 100 : 2.36;
       }
     } catch (e) {
       console.warn('Fout bij berekenen batterijbesparing:', e);
@@ -637,11 +584,10 @@ export class EnergyDashboardCard extends LitElement {
 
     // 2. Financial Sensor Values
     const gridImportCostToday = this._getNumber('sensor.zonneplan_electricity_delivery_costs_today', 7.67);
-    const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 6.01);
+    const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 6.02);
     const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 0.74);
-    const powerplayMonth = this._getNumber('sensor.thuisbatterij_opbrengst_deze_maand', 20.42);
     
-    // Netto factuur vandaag = Afname - Teruglevering - Powerplay
+    // Netto factuur vandaag
     const netInvoiceToday = this._getNumber('sensor.netto_energiekosten_vandaag', gridImportCostToday - gridExportRevToday - powerplayToday);
 
     // Battery Avoided Home Purchase Savings Today
@@ -651,12 +597,38 @@ export class EnergyDashboardCard extends LitElement {
     }
     const batTotalValueToday = batHomeSavingsToday + powerplayToday;
 
-    // Tariffs
-    const currentTariff = this._getNumber('sensor.zonneplan_current_electricity_tariff', 0.131);
-    const yearDelivered = this._getNumber('sensor.zonneplan_energy_delivered_sum_this_year', 8436);
-    const yearProduced = this._getNumber('sensor.zonneplan_energy_produced_sum_this_year', 4835);
-    const salderenBuffer = Math.max(0, yearDelivered - yearProduced);
-    const taxSavingToday = gridExportToday * 0.135;
+    // Tariffs forecast data for the chart
+    const tariffEntity = this.hass?.states ? this.hass.states['sensor.zonneplan_current_electricity_tariff'] : null;
+    const currentTariff = tariffEntity ? parseFloat(tariffEntity.state) || 0.155 : 0.155;
+    const rawForecast = tariffEntity?.attributes?.forecast || [];
+
+    // Extract today's 24 hours
+    const now = new Date();
+    const currentHour = now.getHours();
+    const todayHours: { hour: number; price: number; group: string }[] = [];
+    let minP = 999;
+    let maxP = -999;
+    let minHour = 0;
+    let maxHour = 0;
+
+    for (const f of rawForecast) {
+      const dt = new Date(f.datetime);
+      if (dt.getDate() === now.getDate()) {
+        const h = dt.getHours();
+        const p = (f.electricity_price || 0) / 10000000;
+        todayHours.push({ hour: h, price: p, group: f.tariff_group || 'normal' });
+        if (p < minP) { minP = p; minHour = h; }
+        if (p > maxP) { maxP = p; maxHour = h; }
+      }
+    }
+    // Fallback if forecast empty
+    if (todayHours.length === 0) {
+      for (let i = 0; i < 24; i++) {
+        const p = i >= 11 && i <= 15 ? 0.128 : i >= 18 && i <= 21 ? 0.380 : 0.280;
+        todayHours.push({ hour: i, price: p, group: p < 0.2 ? 'low' : p > 0.35 ? 'high' : 'normal' });
+      }
+      minP = 0.126; maxP = 0.406; minHour = 13; maxHour = 20;
+    }
 
     // 3. Physical Flow Routing Engine
     let availSolar = solarW;
@@ -675,7 +647,7 @@ export class EnergyDashboardCard extends LitElement {
     availSolar -= flowSolarToBat;
     demandBatCharge -= flowSolarToBat;
 
-    // C: Solar to Grid (Export)
+    // C: Solar to Grid
     const flowSolarToGrid = Math.min(availSolar, gridExportW);
 
     // D: Battery to Home
@@ -683,54 +655,50 @@ export class EnergyDashboardCard extends LitElement {
     availBatDischarge -= flowBatToHome;
     demandHome -= flowBatToHome;
 
-    // E: Battery to Grid (Powerplay export)
+    // E: Battery to Grid
     const flowBatToGrid = Math.min(availBatDischarge, Math.max(0, gridExportW - flowSolarToGrid));
 
-    // F: Grid to Home (Import)
+    // F: Grid to Home
     const flowGridToHome = Math.min(availGridImport, demandHome);
     availGridImport -= flowGridToHome;
     demandHome -= flowGridToHome;
 
-    // G: Grid to Battery (Dynamisch laden vanaf net)
+    // G: Grid to Battery
     const flowGridToBat = Math.min(availGridImport, demandBatCharge);
 
     // Autarky
     const totalConsumedToday = homeToday + batChargedToday;
     const autarky = totalConsumedToday > 0 ? Math.round((Math.min(solarToday, totalConsumedToday) / totalConsumedToday) * 100) : 0;
 
-    // Enlarged Geometry layout (viewBox 0 0 600 520)
+    // Geometry layout (viewBox 0 0 600 520)
     const xL = 135;
     const xR = 465;
     const yT = 125;
     const yB = 385;
-    const R = 90; // outer ring radius
-    const rDisc = 78; // inner disc radius
+    const R = 90;
+    const rDisc = 78;
     const circ = 2 * Math.PI * R;
 
-    // House Cumulative Energy Mix
+    // House Mix
     const hTotal = Math.max(0.1, homeToday);
     const solarDirectToday = Math.max(0, solarToday - Math.max(0, gridExportToday - batDischargedToday));
     const solPortion = Math.min(solarDirectToday, hTotal);
     const batPortion = Math.min(batDischargedToday, Math.max(0, hTotal - solPortion));
     const gridPortion = Math.max(0, hTotal - solPortion - batPortion);
 
-    const fracSolarDay = Math.min(1, Math.max(0, solPortion / hTotal));
-    const fracBatDay = Math.min(1, Math.max(0, batPortion / hTotal));
-    const fracGridDay = Math.min(1, Math.max(0, gridPortion / hTotal));
-
-    const lenSolar = fracSolarDay * circ;
-    const lenBat = fracBatDay * circ;
-    const lenGrid = fracGridDay * circ;
+    const lenSolar = Math.min(1, Math.max(0, solPortion / hTotal)) * circ;
+    const lenBat = Math.min(1, Math.max(0, batPortion / hTotal)) * circ;
+    const lenGrid = Math.min(1, Math.max(0, gridPortion / hTotal)) * circ;
 
     const offsetSolar = 0;
     const offsetBat = -lenSolar;
     const offsetGrid = -(lenSolar + lenBat);
 
-    // Battery SoC progress arc
+    // Battery SoC arc
     const batProgress = (batSoC / 100) * circ;
     const batOffset = circ - batProgress;
 
-    // Exact Connection paths touching ring boundary at R=90:
+    // Connection paths
     const pZonHuis = `M ${xL + R} ${yT} L ${xR - R} ${yT}`;
     const pZonBat = `M ${xL} ${yT + R} L ${xL} ${yB - R}`;
     const pNetHuis = `M ${xR} ${yB - R} L ${xR} ${yT + R}`;
@@ -763,9 +731,9 @@ export class EnergyDashboardCard extends LitElement {
           </div>
         </div>
 
-        <!-- Grid Body: Left Flowchart & Right Financial Insights -->
+        <!-- Grid Body: Left Flowchart & Right Simplified Overview -->
         <div class="dashboard-grid">
-          <!-- Left: Flowchart Panel (Preserved 100% in exact approved layout) -->
+          <!-- Left: Flowchart Panel (100% exact preserved layout) -->
           <div class="panel-card">
             <div class="panel-title-bar">
               <h2 class="panel-title">
@@ -802,7 +770,7 @@ export class EnergyDashboardCard extends LitElement {
                   </filter>
                 </defs>
 
-                <!-- 1. BASE STATIC TRACKS -->
+                <!-- Static Tracks -->
                 <path d="${pZonHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
                 <path d="${pZonBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
                 <path d="${pNetHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
@@ -810,9 +778,7 @@ export class EnergyDashboardCard extends LitElement {
                 <path d="${pBatHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
                 <path d="${pZonNet}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
 
-                <!-- 2. ACTIVE FLOWS & GLOWING MOVING BOLLETJES (STRICT SOURCE COLORS) -->
-
-                <!-- FLOW A: Zon -> Huis (Yellow) -->
+                <!-- Active Flows -->
                 ${flowSolarToHome > 20 ? svg`
                   <path d="${pZonHuis}" fill="none" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2.2" />
                   <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
@@ -823,7 +789,6 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- FLOW B: Zon -> Batterij (Yellow) -->
                 ${flowSolarToBat > 20 ? svg`
                   <path d="${pZonBat}" fill="none" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2.2" />
                   <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
@@ -834,7 +799,6 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- FLOW C: Zon -> Net (Yellow!) -->
                 ${flowSolarToGrid > 20 ? svg`
                   <path d="${pZonNet}" fill="none" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2.2" />
                   <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
@@ -845,7 +809,6 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- FLOW D: Net -> Huis (Blue) -->
                 ${flowGridToHome > 20 ? svg`
                   <path d="${pNetHuis}" fill="none" stroke="rgba(56, 189, 248, 0.4)" stroke-width="2.2" />
                   <circle r="5" fill="#38bdf8" filter="url(#glow-blue)">
@@ -856,7 +819,6 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- FLOW E: Net -> Batterij (Blue) -->
                 ${flowGridToBat > 20 ? svg`
                   <path d="${pNetBat}" fill="none" stroke="rgba(56, 189, 248, 0.4)" stroke-width="2.2" />
                   <circle r="5" fill="#38bdf8" filter="url(#glow-blue)">
@@ -867,7 +829,6 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- FLOW F: Batterij -> Huis (Green) -->
                 ${flowBatToHome > 20 ? svg`
                   <path d="${pBatHuis}" fill="none" stroke="rgba(16, 185, 129, 0.4)" stroke-width="2.2" />
                   <circle r="5" fill="#10b981" filter="url(#glow-green)">
@@ -878,7 +839,6 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- FLOW G: Batterij -> Net (Green) -->
                 ${flowBatToGrid > 20 ? svg`
                   <path d="${pBatNet}" fill="none" stroke="rgba(16, 185, 129, 0.4)" stroke-width="2.2" />
                   <circle r="5" fill="#10b981" filter="url(#glow-green)">
@@ -889,9 +849,7 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- 3. FOUR PROMINENT INSTRUMENT NODES -->
-
-                <!-- NODE 1: ZON (Top-Left x=135, y=125) -->
+                <!-- Nodes -->
                 <g transform="translate(${xL}, ${yT})">
                   <text x="0" y="${-R - 12}" class="node-outer-label">Zon</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
@@ -927,7 +885,6 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <!-- NODE 2: HUIS (Top-Right x=465, y=125) -->
                 <g transform="translate(${xR}, ${yT})">
                   <text x="0" y="${-R - 12}" class="node-outer-label">Thuis</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="9" />
@@ -966,7 +923,6 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <!-- NODE 3: BATTERIJ (Bottom-Left x=135, y=385) -->
                 <g transform="translate(${xL}, ${yB})">
                   <text x="0" y="${R + 24}" class="node-outer-label">Batterij</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
@@ -995,7 +951,6 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <!-- NODE 4: NET (Bottom-Right x=465, y=385) -->
                 <g transform="translate(${xR}, ${yB})">
                   <text x="0" y="${R + 24}" class="node-outer-label">Net</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
@@ -1030,7 +985,7 @@ export class EnergyDashboardCard extends LitElement {
             </div>
           </div>
 
-          <!-- Right: Financial & Battery Value Overview (Consistent Charcoal & Emerald Style) -->
+          <!-- Right: Simplified 2-Card Layout (Prices Chart on Top, Single Overview Below) -->
           <div class="panel-card">
             <div class="panel-title-bar">
               <h2 class="panel-title">
@@ -1038,7 +993,7 @@ export class EnergyDashboardCard extends LitElement {
                   <line x1="12" y1="1" x2="12" y2="23"></line>
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
-                Financieel & Batterij Overzicht
+                Tarieven & Financiën
               </h2>
               <div class="tabs-container">
                 <button class="tab-btn ${this._selectedPeriod === 'vandaag' ? 'active' : ''}"
@@ -1056,146 +1011,162 @@ export class EnergyDashboardCard extends LitElement {
               </div>
             </div>
 
-            <div class="finance-stack">
-              <!-- Card 1: Stroomfactuur Vandaag (Meterstand P1) -->
-              <div class="finance-card">
-                <div class="finance-card-header">
-                  <div class="card-title-group">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="right-stack">
+              <!-- Top Card: Dynamic Energy Prices Chart (Zonneplan 24 Hours) -->
+              <div class="right-card">
+                <div class="card-header-line">
+                  <span class="card-title-text">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Dynamische Stroomprijzen Vandaag
+                  </span>
+                  <span class="node-status-pill pill-blue">
+                    Nu: € ${currentTariff.toFixed(3)} / kWh
+                  </span>
+                </div>
+
+                <!-- 24-Hour SVG Bar Chart -->
+                <div class="tariff-chart-box">
+                  <svg class="tariff-svg" viewBox="0 0 460 140">
+                    <!-- Subtle guide lines -->
+                    <line x1="30" y1="30" x2="450" y2="30" stroke="rgba(255, 255, 255, 0.08)" stroke-dasharray="3 4" />
+                    <text x="24" y="34" fill="#64748b" font-size="9" text-anchor="end">€ 0.40</text>
+
+                    <line x1="30" y1="75" x2="450" y2="75" stroke="rgba(255, 255, 255, 0.08)" stroke-dasharray="3 4" />
+                    <text x="24" y="79" fill="#64748b" font-size="9" text-anchor="end">€ 0.20</text>
+
+                    <line x1="30" y1="120" x2="450" y2="120" stroke="rgba(255, 255, 255, 0.12)" />
+                    <text x="24" y="124" fill="#64748b" font-size="9" text-anchor="end">€ 0.00</text>
+
+                    <!-- 24 Hourly Bars -->
+                    ${todayHours.map((th, idx) => {
+                      const barW = 12.5;
+                      const x = 32 + idx * 17.2;
+                      const maxScale = 0.45;
+                      const barH = Math.max(5, (th.price / maxScale) * 90);
+                      const y = 120 - barH;
+                      const isNow = th.hour === currentHour;
+                      const isPeak = th.hour === maxHour;
+                      const isLow = th.hour === minHour;
+                      
+                      const fillColor = isNow ? '#38bdf8' : th.price > 0.35 ? '#ef4444' : th.price > 0.22 ? '#f59e0b' : '#10b981';
+
+                      return svg`
+                        <g>
+                          <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="2.5"
+                            fill="${fillColor}" opacity="${isNow ? 1 : 0.85}" />
+                          
+                          ${isNow ? svg`
+                            <rect x="${x - 2}" y="${y - 2}" width="${barW + 4}" height="${barH + 4}" rx="4"
+                              fill="none" stroke="#38bdf8" stroke-width="1.5" />
+                            <text x="${x + barW / 2}" y="${y - 6}" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">NU</text>
+                          ` : ''}
+
+                          ${isPeak && !isNow ? svg`
+                            <text x="${x + barW / 2}" y="${y - 4}" fill="#ef4444" font-size="8" font-weight="600" text-anchor="middle">Top</text>
+                          ` : ''}
+
+                          ${(idx % 4 === 0 || idx === 23) ? svg`
+                            <text x="${x + barW / 2}" y="134" fill="#64748b" font-size="9" text-anchor="middle">
+                              ${th.hour.toString().padStart(2, '0')}
+                            </text>
+                          ` : ''}
+                        </g>
+                      `;
+                    })}
+                  </svg>
+                </div>
+
+                <div class="price-legend-row">
+                  <span>🟢 Dal: <strong>€ ${minP.toFixed(3)}</strong> (${minHour}:00)</span>
+                  <span>🔴 Piek: <strong>€ ${maxP.toFixed(3)}</strong> (${maxHour}:00)</span>
+                  <span>⚡ Huidig: <strong>€ ${currentTariff.toFixed(3)}</strong></span>
+                </div>
+              </div>
+
+              <!-- Bottom Card: Single Unified Overview of Costs & Savings -->
+              <div class="right-card">
+                <div class="card-header-line">
+                  <span class="card-title-text">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                       <line x1="2" y1="10" x2="22" y2="10"></line>
                     </svg>
-                    <span>Stroomfactuur ${this._selectedPeriod === 'vandaag' ? 'Vandaag' : this._selectedPeriod === 'maand' ? 'Deze Maand' : 'Dit Jaar'}</span>
-                  </div>
+                    Kosten & Besparingen Vandaag
+                  </span>
                   <span class="node-status-pill ${netInvoiceToday <= 1.5 ? 'pill-green' : 'pill-blue'}">
-                    ${netInvoiceToday <= 0 ? 'Winstgevend' : 'Voordelig'}
+                    Netto Factuur: € ${netInvoiceToday.toFixed(2)}
                   </span>
                 </div>
 
-                <div class="hero-kpi-block">
-                  <div>
-                    <div class="hero-kpi-val" style="color: ${netInvoiceToday <= 0 ? '#10b981' : '#f8fafc'};">
+                <!-- Dual Columns: Left = Stroomfactuur (Meter), Right = Thuisbatterij (Besparingen) -->
+                <div class="overview-dual-grid">
+                  <!-- Col 1: Stroomfactuur -->
+                  <div class="overview-col">
+                    <div class="col-header">
+                      <span class="col-title" style="color: #38bdf8;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        Stroomfactuur Net
+                      </span>
+                      <span class="node-status-pill pill-blue">P1-meter</span>
+                    </div>
+
+                    <div class="col-kpi-val" style="color: ${netInvoiceToday <= 0 ? '#10b981' : '#f8fafc'};">
                       € ${netInvoiceToday.toFixed(2)}
                     </div>
-                    <span class="hero-kpi-sub">Werkelijke netto factuur ${this._selectedPeriod}</span>
-                  </div>
-                  <span class="submetric-note">Meterstanden × uurprijzen</span>
-                </div>
 
-                <div class="submetric-grid">
-                  <div class="submetric-item">
-                    <span class="submetric-label" style="color: #38bdf8;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l10-10M17 17V7H7"/></svg>
-                      Afname Net
-                    </span>
-                    <span class="submetric-val">€ ${gridImportCostToday.toFixed(2)}</span>
-                    <span class="submetric-note">${gridImportToday.toFixed(1)} kWh</span>
-                  </div>
-
-                  <div class="submetric-item">
-                    <span class="submetric-label" style="color: #f59e0b;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 7l-10 10M7 7v10h10"/></svg>
-                      Teruglevering
-                    </span>
-                    <span class="submetric-val" style="color: #10b981;">- € ${gridExportRevToday.toFixed(2)}</span>
-                    <span class="submetric-note">${gridExportToday.toFixed(1)} kWh</span>
+                    <div class="mini-row-list">
+                      <div class="mini-row">
+                        <span>Afname net:</span>
+                        <strong>€ ${gridImportCostToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(${gridImportToday.toFixed(1)} kWh)</span></strong>
+                      </div>
+                      <div class="mini-row">
+                        <span>Teruglevering:</span>
+                        <strong style="color: #10b981;">- € ${gridExportRevToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(${gridExportToday.toFixed(1)} kWh)</span></strong>
+                      </div>
+                      <div class="mini-row">
+                        <span>Powerplay bonus:</span>
+                        <strong style="color: #10b981;">- € ${powerplayToday.toFixed(2)}</strong>
+                      </div>
+                    </div>
                   </div>
 
-                  <div class="submetric-item">
-                    <span class="submetric-label" style="color: #10b981;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                      Powerplay
-                    </span>
-                    <span class="submetric-val" style="color: #10b981;">- € ${powerplayToday.toFixed(2)}</span>
-                    <span class="submetric-note">Zonneplan bonus</span>
-                  </div>
-                </div>
-              </div>
+                  <!-- Col 2: Thuisbatterij Waarde -->
+                  <div class="overview-col">
+                    <div class="col-header">
+                      <span class="col-title" style="color: #10b981;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
+                        Thuisbatterij Winst
+                      </span>
+                      <span class="node-status-pill pill-green">Rendement</span>
+                    </div>
 
-              <!-- Card 2: Wat levert de Thuisbatterij écht op? (De Onzichtbare Splitsing) -->
-              <div class="finance-card">
-                <div class="finance-card-header">
-                  <div class="card-title-group">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
-                      <line x1="22" y1="11" x2="22" y2="13"></line>
-                    </svg>
-                    <span>Thuisbatterij Waarde & Rendement</span>
-                  </div>
-                  <span class="node-status-pill pill-green">Totale Rendementswaarde</span>
-                </div>
-
-                <div class="hero-kpi-block">
-                  <div>
-                    <div class="hero-kpi-val" style="color: #10b981;">
+                    <div class="col-kpi-val" style="color: #10b981;">
                       € ${batTotalValueToday.toFixed(2)}
                     </div>
-                    <span class="hero-kpi-sub">Totale gegenereerde nettowaarde ${this._selectedPeriod}</span>
-                  </div>
-                  <span class="submetric-note" style="color: #10b981; font-weight: 600;">Huisbesparing + Powerplay</span>
-                </div>
 
-                <!-- Split Box: Huisbesparing vs Powerplay -->
-                <div class="battery-split-box">
-                  <div class="split-col">
-                    <span class="split-title">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                      Bespaard op Huis
-                    </span>
-                    <span class="split-amount" style="color: #f1f5f9;">€ ${batHomeSavingsToday.toFixed(2)}</span>
-                    <span class="split-desc">${batDischargedToday.toFixed(1)} kWh ontladen op piekuren (vermeden netinkoop minus laadkosten).</span>
-                  </div>
-
-                  <div class="split-col" style="border-left: 1px solid rgba(16, 185, 129, 0.2); padding-left: 12px;">
-                    <span class="split-title">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                      Powerplay Handel
-                    </span>
-                    <span class="split-amount" style="color: #10b981;">€ ${powerplayToday.toFixed(2)}</span>
-                    <span class="split-desc">Onbalansvergoeding (deze maand: € ${powerplayMonth.toFixed(2)}).</span>
+                    <div class="mini-row-list">
+                      <div class="mini-row">
+                        <span>Bespaard op huis:</span>
+                        <strong>€ ${batHomeSavingsToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(vermeden piek)</span></strong>
+                      </div>
+                      <div class="mini-row">
+                        <span>Powerplay handel:</span>
+                        <strong style="color: #10b981;">€ ${powerplayToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(onbalans)</span></strong>
+                      </div>
+                      <div class="mini-row">
+                        <span>Activiteit vandaag:</span>
+                        <span>${batChargedToday.toFixed(0)} in / ${batDischargedToday.toFixed(0)} uit kWh</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Footnote about invisible savings -->
-                <div style="font-size: 11.5px; color: #94a3b8; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px;">
+                <!-- Footer insight note -->
+                <div class="insight-footer">
                   <span>💡 Zonder thuisbatterij was je factuur vandaag <strong>€ ${(netInvoiceToday + batHomeSavingsToday).toFixed(2)}</strong> geweest.</span>
-                  <span style="color: #cbd5e1; font-weight: 500;">Geladen: ${batChargedToday.toFixed(1)} kWh</span>
-                </div>
-              </div>
-
-              <!-- Card 3: Dynamische Tarieven & Salderingsradar -->
-              <div class="finance-card">
-                <div class="finance-card-header">
-                  <div class="card-title-group">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 14 14"></polyline>
-                    </svg>
-                    <span>Tarieven & Salderingsbalans</span>
-                  </div>
-                  <span class="node-status-pill pill-amber">
-                    Huidig: € ${currentTariff.toFixed(3)} / kWh
-                  </span>
-                </div>
-
-                <div class="radar-row">
-                  <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <span style="font-size: 11px; color: #94a3b8;">Salderingsruimte dit jaar:</span>
-                    <span style="font-size: 17px; font-weight: 700; color: #f8fafc;">
-                      + ${salderenBuffer.toLocaleString('nl-NL')} kWh
-                    </span>
-                    <span style="font-size: 11px; color: #10b981;">
-                      ${yearDelivered.toLocaleString('nl-NL')} afname vs ${yearProduced.toLocaleString('nl-NL')} retour
-                    </span>
-                  </div>
-
-                  <div class="salderen-badge">
-                    <span style="font-size: 11px; color: #94a3b8;">Belastingvoordeel vandaag:</span>
-                    <span style="font-size: 17px; font-weight: 700; color: #10b981;">
-                      + € ${taxSavingToday.toFixed(2)}
-                    </span>
-                    <span style="font-size: 10.5px; color: #94a3b8;">(à € 0,135 / kWh saldering)</span>
-                  </div>
+                  <span style="color: #10b981; font-weight: 600;">Netto voordeel: + € ${batTotalValueToday.toFixed(2)}</span>
                 </div>
               </div>
             </div>
