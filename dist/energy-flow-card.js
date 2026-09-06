@@ -260,10 +260,6 @@ class EnergyDashboardCard extends i {
         <!-- Header -->
         <div class="dashboard-header">
           <div class="header-title-box">
-            <div class="live-indicator">
-              <span class="pulse-dot"></span>
-              LIVE 1s
-            </div>
             <h1 class="header-title">${this.config.title || 'Energie Overzicht'}</h1>
           </div>
 
@@ -288,7 +284,7 @@ class EnergyDashboardCard extends i {
                 </svg>
                 Stroombalans Live
               </h2>
-              <span style="font-size: 13px; color: #94a3b8;">Realtime energiestromen</span>
+              
             </div>
 
             <div class="flow-container">
