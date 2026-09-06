@@ -789,7 +789,7 @@ class EnergyDashboardCard extends i {
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
                         Thuisbatterij
                       </span>
-                      <span class="node-status-pill pill-green" style="cursor: pointer; user-select: none;" title="Geheim: klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">Rendement ${this._showRoi ? '▴' : ''}</span>
+                      <span class="node-status-pill pill-green" style="user-select: none;" @click="${() => this._handleRendementClick()}">Rendement</span>
                     </div>
 
                     <div class="col-kpi-val" style="color: #10b981; display: flex; align-items: baseline; gap: 7px;">
