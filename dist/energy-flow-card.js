@@ -170,9 +170,7 @@ class EnergyDashboardCard extends i {
         const gridExportW = Math.max(0, -gridW);
         const gridImportToday = this._getNumber(cfg.grid_import_today || 'sensor.p1_netstroom_afname_vandaag');
         const gridExportToday = this._getNumber(cfg.grid_export_today || 'sensor.p1_teruglevering_vandaag');
-        // Battery Standby Filtering:
-        // Zonneplan Nexus reports ~54W continuous idle/standby power when full.
-        // Filter out standby (< 70W) so it doesn't falsely indicate charging!
+        // Filter 54W standby:
         let batRawW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
         if (Math.abs(batRawW) < 70) {
             batRawW = 0;
@@ -217,18 +215,18 @@ class EnergyDashboardCard extends i {
         // Autarky / Zelfvoorziening
         const totalConsumedToday = homeToday + batChargedToday;
         const autarky = totalConsumedToday > 0 ? Math.round((Math.min(solarToday, totalConsumedToday) / totalConsumedToday) * 100) : 0;
-        // Geometry layout:
-        const xL = 125;
-        const xR = 395;
-        const yT = 110;
-        const yB = 330;
-        const R = 75; // outer ring radius
-        const rDisc = 65; // inner disc radius
-        const circ = 2 * Math.PI * R; // ~471.24
-        // 3. House Cumulative Energy Mix of TODAY (Exact match to Power Flow Card Plus)
-        // Calculate breakdown of today's total home consumption (homeToday)
+        // Enlarged Geometry layout (viewBox 0 0 600 520)
+        // Left x=145, Right x=455, Top y=130, Bottom y=390
+        // Radius R=86 (diameter 172px)
+        const xL = 135;
+        const xR = 465;
+        const yT = 125;
+        const yB = 385;
+        const R = 90; // outer ring radius (enlarged from 75 -> 86 -> 90)
+        const rDisc = 78; // inner disc radius (enlarged from 65 -> 74 -> 78) // inner disc radius (enlarged from 65)
+        const circ = 2 * Math.PI * R; // ~540.35
+        // 3. House Cumulative Energy Mix of TODAY
         const hTotal = Math.max(0.1, homeToday);
-        // Solar portion consumed directly or in house today:
         const solarDirectToday = Math.max(0, solarToday - Math.max(0, gridExportToday - batDischargedToday));
         const solPortion = Math.min(solarDirectToday, hTotal);
         const batPortion = Math.min(batDischargedToday, Math.max(0, hTotal - solPortion));
@@ -245,15 +243,15 @@ class EnergyDashboardCard extends i {
         // Battery SoC progress arc
         const batProgress = (batSoC / 100) * circ;
         const batOffset = circ - batProgress;
-        // Connection paths:
+        // Exact Connection paths touching ring boundary at R=86:
         const pZonHuis = `M ${xL + R} ${yT} L ${xR - R} ${yT}`;
         const pZonBat = `M ${xL} ${yT + R} L ${xL} ${yB - R}`;
         const pNetHuis = `M ${xR} ${yB - R} L ${xR} ${yT + R}`;
         const pNetBat = `M ${xR - R} ${yB} L ${xL + R} ${yB}`;
         const pBatNet = `M ${xL + R} ${yB} L ${xR - R} ${yB}`;
-        const xMid = (xL + xR) / 2; // 260
-        const pBatHuis = `M ${xL + R} ${yB} L ${xMid - 25} ${yB} Q ${xMid} ${yB} ${xMid} ${yB - 25} L ${xMid} ${yT + 25} Q ${xMid} ${yT} ${xMid + 25} ${yT} L ${xR - R} ${yT}`;
-        const pZonNet = `M ${xL + R} ${yT} L ${xMid - 25} ${yT} Q ${xMid} ${yT} ${xMid} ${yT + 25} L ${xMid} ${yB - 25} Q ${xMid} ${yB} ${xMid + 25} ${yB} L ${xR - R} ${yB}`;
+        const xMid = (xL + xR) / 2; // 300
+        const pBatHuis = `M ${xL + R} ${yB} L ${xMid - 30} ${yB} Q ${xMid} ${yB} ${xMid} ${yB - 30} L ${xMid} ${yT + 30} Q ${xMid} ${yT} ${xMid + 30} ${yT} L ${xR - R} ${yT}`;
+        const pZonNet = `M ${xL + R} ${yT} L ${xMid - 30} ${yT} Q ${xMid} ${yT} ${xMid} ${yT + 30} L ${xMid} ${yB - 30} Q ${xMid} ${yB} ${xMid + 30} ${yB} L ${xR - R} ${yB}`;
         const getDur = (watts) => {
             return Math.max(0.75, Math.min(3.5, 3000 / Math.max(100, watts))).toFixed(2);
         };
@@ -285,33 +283,33 @@ class EnergyDashboardCard extends i {
           <div class="panel-card">
             <div class="panel-title-bar">
               <h2 class="panel-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                 </svg>
                 Stroombalans Live
               </h2>
-              <span style="font-size: 12px; color: #94a3b8;">Realtime energiestromen</span>
+              <span style="font-size: 13px; color: #94a3b8;">Realtime energiestromen</span>
             </div>
 
             <div class="flow-container">
-              <svg class="unified-flow-svg" viewBox="0 0 520 440">
+              <svg class="unified-flow-svg" viewBox="0 0 600 520">
                 <defs>
                   <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feGaussianBlur stdDeviation="3" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
                   <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feGaussianBlur stdDeviation="3" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
                   <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feGaussianBlur stdDeviation="3" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
@@ -320,85 +318,85 @@ class EnergyDashboardCard extends i {
                 </defs>
 
                 <!-- 1. BASE STATIC TRACKS -->
-                <path d="${pZonHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${pZonBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${pNetHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${pNetBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${pBatHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${pZonNet}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${pZonHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
+                <path d="${pZonBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
+                <path d="${pNetHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
+                <path d="${pNetBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
+                <path d="${pBatHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
+                <path d="${pZonNet}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.8" stroke-dasharray="4 6" />
 
-                <!-- 2. ACTIVE FLOWS & GLOWING MOVING BOLLETJES (STRICT COLOR-BY-SOURCE) -->
+                <!-- 2. ACTIVE FLOWS & GLOWING MOVING BOLLETJES -->
 
-                <!-- FLOW A: Zon -> Huis (BRON ZON = ALTIJD GEEL) -->
+                <!-- FLOW A: Zon -> Huis -->
                 ${flowSolarToHome > 20 ? w `
-                  <path d="${pZonHuis}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                  <path d="${pZonHuis}" fill="none" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2.2" />
+                  <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
                     <animateMotion dur="${getDur(flowSolarToHome)}s" repeatCount="indefinite" path="${pZonHuis}" />
                   </circle>
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                  <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
                     <animateMotion dur="${getDur(flowSolarToHome)}s" begin="-${(parseFloat(getDur(flowSolarToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pZonHuis}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW B: Zon -> Batterij (BRON ZON = ALTIJD GEEL) -->
+                <!-- FLOW B: Zon -> Batterij -->
                 ${flowSolarToBat > 20 ? w `
-                  <path d="${pZonBat}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                  <path d="${pZonBat}" fill="none" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2.2" />
+                  <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
                     <animateMotion dur="${getDur(flowSolarToBat)}s" repeatCount="indefinite" path="${pZonBat}" />
                   </circle>
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                  <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
                     <animateMotion dur="${getDur(flowSolarToBat)}s" begin="-${(parseFloat(getDur(flowSolarToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pZonBat}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW C: Zon -> Net (BRON ZON = ALTIJD GEEL!) -->
+                <!-- FLOW C: Zon -> Net -->
                 ${flowSolarToGrid > 20 ? w `
-                  <path d="${pZonNet}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                  <path d="${pZonNet}" fill="none" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2.2" />
+                  <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
                     <animateMotion dur="${getDur(flowSolarToGrid)}s" repeatCount="indefinite" path="${pZonNet}" />
                   </circle>
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                  <circle r="5" fill="#f59e0b" filter="url(#glow-gold)">
                     <animateMotion dur="${getDur(flowSolarToGrid)}s" begin="-${(parseFloat(getDur(flowSolarToGrid)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pZonNet}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW D: Net -> Huis (BRON NET = ALTIJD BLAUW) -->
+                <!-- FLOW D: Net -> Huis -->
                 ${flowGridToHome > 20 ? w `
-                  <path d="${pNetHuis}" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                  <path d="${pNetHuis}" fill="none" stroke="rgba(56, 189, 248, 0.4)" stroke-width="2.2" />
+                  <circle r="5" fill="#38bdf8" filter="url(#glow-blue)">
                     <animateMotion dur="${getDur(flowGridToHome)}s" repeatCount="indefinite" path="${pNetHuis}" />
                   </circle>
-                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                  <circle r="5" fill="#38bdf8" filter="url(#glow-blue)">
                     <animateMotion dur="${getDur(flowGridToHome)}s" begin="-${(parseFloat(getDur(flowGridToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pNetHuis}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW E: Net -> Batterij (BRON NET = ALTIJD BLAUW) -->
+                <!-- FLOW E: Net -> Batterij -->
                 ${flowGridToBat > 20 ? w `
-                  <path d="${pNetBat}" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                  <path d="${pNetBat}" fill="none" stroke="rgba(56, 189, 248, 0.4)" stroke-width="2.2" />
+                  <circle r="5" fill="#38bdf8" filter="url(#glow-blue)">
                     <animateMotion dur="${getDur(flowGridToBat)}s" repeatCount="indefinite" path="${pNetBat}" />
                   </circle>
-                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                  <circle r="5" fill="#38bdf8" filter="url(#glow-blue)">
                     <animateMotion dur="${getDur(flowGridToBat)}s" begin="-${(parseFloat(getDur(flowGridToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pNetBat}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW F: Batterij -> Huis (BRON BATTERIJ = ALTIJD GROEN) -->
+                <!-- FLOW F: Batterij -> Huis -->
                 ${flowBatToHome > 20 ? w `
-                  <path d="${pBatHuis}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                  <path d="${pBatHuis}" fill="none" stroke="rgba(16, 185, 129, 0.4)" stroke-width="2.2" />
+                  <circle r="5" fill="#10b981" filter="url(#glow-green)">
                     <animateMotion dur="${getDur(flowBatToHome)}s" repeatCount="indefinite" path="${pBatHuis}" />
                   </circle>
-                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                  <circle r="5" fill="#10b981" filter="url(#glow-green)">
                     <animateMotion dur="${getDur(flowBatToHome)}s" begin="-${(parseFloat(getDur(flowBatToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pBatHuis}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW G: Batterij -> Net (BRON BATTERIJ = ALTIJD GROEN) -->
+                <!-- FLOW G: Batterij -> Net -->
                 ${flowBatToGrid > 20 ? w `
-                  <path d="${pBatNet}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                  <path d="${pBatNet}" fill="none" stroke="rgba(16, 185, 129, 0.4)" stroke-width="2.2" />
+                  <circle r="5" fill="#10b981" filter="url(#glow-green)">
                     <animateMotion dur="${getDur(flowBatToGrid)}s" repeatCount="indefinite" path="${pBatNet}" />
                   </circle>
                   <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
@@ -406,13 +404,13 @@ class EnergyDashboardCard extends i {
                   </circle>
                 ` : ''}
 
-                <!-- 3. THE 4 NODES WITH DAILY TOTALS & LIVE READINGS -->
+                <!-- 3. THE 4 ENLARGED NODES (R=86) -->
 
-                <!-- NODE 1: ZON (Top-Left x=125, y=110) -->
+                <!-- NODE 1: ZON (Top-Left x=145, y=130) -->
                 <g transform="translate(${xL}, ${yT})">
-                  <text x="0" y="${-R - 8}" class="node-outer-label">Zon</text>
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="8" />
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
+                  <text x="0" y="${-R - 10}" class="node-outer-label">Zon</text>
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="9" />
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="9"
                     stroke-dasharray="${circ}" stroke-dashoffset="${solarW > 0 ? 0 : circ}"
                     transform="rotate(-90)" stroke-linecap="round" />
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
@@ -443,25 +441,25 @@ class EnergyDashboardCard extends i {
                   </foreignObject>
                 </g>
 
-                <!-- NODE 2: HUIS (Top-Right x=395, y=110) -->
+                <!-- NODE 2: HUIS (Top-Right x=455, y=130) -->
                 <g transform="translate(${xR}, ${yT})">
-                  <text x="0" y="${-R - 8}" class="node-outer-label">Thuis</text>
+                  <text x="0" y="${-R - 10}" class="node-outer-label">Thuis</text>
                   <!-- Base Track -->
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="8" />
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="9" />
                   
                   <!-- Solar Today Share (Yellow) -->
                   ${lenSolar > 0 ? w `
-                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
+                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="9"
                       stroke-dasharray="${lenSolar} ${circ}" stroke-dashoffset="${offsetSolar}" transform="rotate(-90)" />
                   ` : ''}
                   <!-- Battery Today Share (Green) -->
                   ${lenBat > 0 ? w `
-                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="8"
+                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="9"
                       stroke-dasharray="${lenBat} ${circ}" stroke-dashoffset="${offsetBat}" transform="rotate(-90)" />
                   ` : ''}
                   <!-- Grid Today Share (Blue) -->
                   ${lenGrid > 0 ? w `
-                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#38bdf8" stroke-width="8"
+                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#38bdf8" stroke-width="9"
                       stroke-dasharray="${lenGrid} ${circ}" stroke-dashoffset="${offsetGrid}" transform="rotate(-90)" />
                   ` : ''}
 
@@ -488,13 +486,13 @@ class EnergyDashboardCard extends i {
                   </foreignObject>
                 </g>
 
-                <!-- NODE 3: BATTERIJ (Bottom-Left x=125, y=330) -->
+                <!-- NODE 3: BATTERIJ (Bottom-Left x=145, y=390) -->
                 <g transform="translate(${xL}, ${yB})">
-                  <text x="0" y="${R + 20}" class="node-outer-label">Batterij</text>
+                  <text x="0" y="${R + 24}" class="node-outer-label">Batterij</text>
                   <!-- Background track -->
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <!-- Dynamic Progress Ring for SoC % -->
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="8"
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="9"
                     stroke-dasharray="${circ}" stroke-dashoffset="${batOffset}"
                     transform="rotate(-90)" stroke-linecap="round" />
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
@@ -519,18 +517,18 @@ class EnergyDashboardCard extends i {
                   </foreignObject>
                 </g>
 
-                <!-- NODE 4: NET (Bottom-Right x=395, y=330) -->
+                <!-- NODE 4: NET (Bottom-Right x=455, y=390) -->
                 <g transform="translate(${xR}, ${yB})">
-                  <text x="0" y="${R + 20}" class="node-outer-label">Net</text>
+                  <text x="0" y="${R + 24}" class="node-outer-label">Net</text>
                   <!-- Outer Ring -->
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="8"
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="9"
                     stroke-dasharray="${circ}" stroke-dashoffset="0"
                     transform="rotate(-90)" stroke-linecap="round" />
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
-                      <span class="node-today-total" style="font-size: 11px; white-space: nowrap;">
+                      <span class="node-today-total" style="font-size: 11.5px; white-space: nowrap;">
                         ↓${gridImportToday.toFixed(1)} ↑${gridExportToday.toFixed(1)}
                       </span>
                       <div class="node-icon-box" style="color: ${isGridImport ? '#38bdf8' : '#10b981'};">
@@ -559,7 +557,7 @@ class EnergyDashboardCard extends i {
           <div class="panel-card">
             <div class="panel-title-bar">
               <h2 class="panel-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="18" y1="20" x2="18" y2="10"></line>
                   <line x1="12" y1="20" x2="12" y2="4"></line>
                   <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -876,7 +874,7 @@ EnergyDashboardCard.styles = i$3 `
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .panel-title {
@@ -923,11 +921,11 @@ EnergyDashboardCard.styles = i$3 `
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
 
-    /* Flowchart Canvas */
+    /* Flowchart Canvas Expanded to Gracefully Fill Container */
     .flow-container {
       position: relative;
       width: 100%;
-      min-height: 480px;
+      min-height: 520px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -936,10 +934,12 @@ EnergyDashboardCard.styles = i$3 `
 
     .unified-flow-svg {
       width: 100%;
-      max-width: 540px;
-      height: 100%;
-      min-height: 460px;
+      max-width: 740px;
+      height: auto;
+      min-height: 520px;
       overflow: visible;
+      display: block;
+      margin: 0 auto;
     }
 
     /* Disc HTML inside ForeignObject */
@@ -951,57 +951,57 @@ EnergyDashboardCard.styles = i$3 `
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 6px;
+      padding: 8px;
       user-select: none;
       cursor: pointer;
     }
 
     .node-today-total {
-      font-size: 12.5px;
+      font-size: 14px;
       font-weight: 600;
       color: #cbd5e1;
       line-height: 1.2;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .node-icon-box {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 1px 0;
+      margin: 2px 0;
     }
 
     .node-icon-box svg {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
     }
 
     .node-val {
-      font-size: 21px;
+      font-size: 26px;
       font-weight: 700;
       color: #f8fafc;
       line-height: 1.15;
       display: flex;
       align-items: baseline;
       justify-content: center;
-      gap: 2px;
-      margin: 1px 0;
+      gap: 3px;
+      margin: 2px 0;
     }
 
     .node-val .unit {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 500;
       color: #94a3b8;
     }
 
     .node-status-pill {
       display: inline-block;
-      margin-top: 2px;
-      padding: 1px 7px;
+      margin-top: 3px;
+      padding: 2px 9px;
       border-radius: 9999px;
-      font-size: 9.5px;
+      font-size: 10.5px;
       font-weight: 600;
       letter-spacing: 0.03em;
     }
@@ -1032,11 +1032,12 @@ EnergyDashboardCard.styles = i$3 `
 
     /* Node Title underneath circle */
     .node-outer-label {
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 600;
-      fill: #94a3b8;
-      text-anchor: middle;
       letter-spacing: 0.04em;
+      fill: #cbd5e1;
+      text-anchor: middle;
+      user-select: none;
     }
 
     /* Chart & History Content */
