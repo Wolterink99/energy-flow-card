@@ -1397,7 +1397,7 @@ export class EnergyDashboardCard extends LitElement {
                 </div>
               </div>
 
-              <!-- Bottom Card: Simpele en duidelijke opbouw van Opbrengst Vandaag met Terugverdientijd -->
+              <!-- Bottom Card: Opbrengst Vandaag en discrete Terugverdientijd -->
               <div class="right-card">
                 <div class="card-header-line">
                   <span class="card-title-text">
@@ -1437,15 +1437,15 @@ export class EnergyDashboardCard extends LitElement {
                     </div>
                   </div>
 
-                  <!-- Blok 2: Thuisbatterij & Terugverdientijd -->
+                  <!-- Blok 2: Thuisbatterij -->
                   <div class="overview-block">
                     <div class="block-header">
                       <div class="block-title" style="color: #10b981;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
                         <span>Thuisbatterij</span>
                       </div>
-                      <span class="node-status-pill pill-green" style="cursor: pointer;" title="Klik om aanschafprijs aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
-                        Aanschaf € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })}
+                      <span class="node-status-pill pill-green" style="cursor: pointer; user-select: none;" title="Klik 3x om Terugverdientijd te tonen/verbergen" @click="${() => this._handleRendementClick()}">
+                        Terugverdientijd
                       </span>
                     </div>
 
@@ -1458,20 +1458,24 @@ export class EnergyDashboardCard extends LitElement {
                         <span>Ontladen vandaag:</span>
                         <strong style="color: #10b981;">${batDischargedToday.toFixed(1)} kWh</strong>
                       </div>
-                      <div class="mini-row">
-                        <span>Powerplay aandeel vandaag:</span>
-                        <strong style="color: #10b981;">€ ${powerplayToday.toFixed(2)}</strong>
+                      <div class="total-row">
+                        <span>Bespaard voor terugverdientijd (vandaag):</span>
+                        <strong style="color: #10b981; font-size: 14.5px;">+ € ${(batHomeSavingsToday + powerplayToday).toFixed(2)}</strong>
                       </div>
                     </div>
 
-                    <!-- Terugverdientijd Voortgang & Besparing -->
-                    <div class="roi-section" style="margin-top: 4px;" title="Klik om de aanschafprijs aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
+                    ${this._showRoi ? html`
+                    <!-- Discrete Terugverdientijd Voortgang & Besparing (verborgen tot 3x geklikt) -->
+                    <div class="roi-section" style="margin-top: 6px;" title="Klik om de aanschafprijs aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
                       <div class="roi-header">
                         <div class="roi-title">
                           <span>Terugverdientijd (${batPaybackPct.toFixed(1)}%)</span>
                         </div>
-                        <div class="roi-badge">
-                          € ${batLifetimeSaved.toFixed(2)} / € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <div class="roi-badge">
+                            € ${batLifetimeSaved.toFixed(2)} / € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })}
+                          </div>
+                          <span style="font-size: 11px; color: #64748b; cursor: pointer; padding: 0 4px;" title="Sluiten" @click="${(e: Event) => { e.stopPropagation(); this._showRoi = false; }}">✕</span>
                         </div>
                       </div>
 
@@ -1485,6 +1489,7 @@ export class EnergyDashboardCard extends LitElement {
                         <span>Verwacht: <strong style="color: #38bdf8;">ca. ${batYearsRemaining.toFixed(1)} jaar</strong> <span style="color: #64748b; font-size: 10px;">(€ ${batDailyAvg.toFixed(2)}/d)</span></span>
                       </div>
                     </div>
+                    ` : ''}
                   </div>
                 </div>
               </div>
