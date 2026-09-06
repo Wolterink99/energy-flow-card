@@ -331,6 +331,17 @@ export class EnergyDashboardCard extends LitElement {
       border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
+    /* Mix Bar */
+    .mix-bar {
+      display: flex;
+      width: 78px;
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 3px 0;
+    }
+
     /* Chart & History Content */
     .chart-container {
       display: flex;
@@ -522,7 +533,7 @@ export class EnergyDashboardCard extends LitElement {
     const batRawW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
     const batChargeW = Math.max(0, batRawW);
     const batDischargeW = Math.max(0, -batRawW);
-    const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 99)));
+    const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 100)));
     const batChargedToday = this._getNumber(cfg.battery_charged_today || 'sensor.thuisbatterij_levering_vandaag');
     const isBatCharging = batChargeW > 20;
     const isBatDischarging = batDischargeW > 20;
@@ -571,7 +582,6 @@ export class EnergyDashboardCard extends LitElement {
     const autarky = totalConsumedToday > 0 ? Math.round((Math.min(solarToday, totalConsumedToday) / totalConsumedToday) * 100) : 0;
 
     // Geometry layout:
-    // Swapped layout:
     // Top-Left: ZON (x=125, y=110)
     // Top-Right: HUIS (x=395, y=110)
     // Bottom-Left: BATTERIJ (x=125, y=330)
@@ -584,7 +594,7 @@ export class EnergyDashboardCard extends LitElement {
     const rDisc = 65; // inner disc radius
     const circ = 2 * Math.PI * R; // ~471.24
 
-    // House Segmented Ring:
+    // House Stroommix Calculation
     const effectiveHome = (flowSolarToHome + flowBatToHome + flowGridToHome) || homeRawW || 1;
     const fracSolar = Math.min(1, flowSolarToHome / effectiveHome);
     const fracBat = Math.min(1, flowBatToHome / effectiveHome);
@@ -602,25 +612,15 @@ export class EnergyDashboardCard extends LitElement {
     const batProgress = (batSoC / 100) * circ;
     const batOffset = circ - batProgress;
 
-    // Exact connection points (touching ring boundary at radius R=75):
-    // 1. Zon -> Huis (Top Horizontal line: from (xL+R, yT) to (xR-R, yT))
+    // Connection paths:
     const pZonHuis = `M ${xL + R} ${yT} L ${xR - R} ${yT}`;
-
-    // 2. Zon -> Batterij (Left Vertical line: from (xL, yT+R) to (xL, yB-R))
     const pZonBat = `M ${xL} ${yT + R} L ${xL} ${yB - R}`;
-
-    // 3. Net -> Huis (Right Vertical line: from (xR, yB-R) to (xR, yT+R))
     const pNetHuis = `M ${xR} ${yB - R} L ${xR} ${yT + R}`;
-
-    // 4. Net -> Batterij (Bottom Horizontal line: from (xR-R, yB) to (xL+R, yB))
     const pNetBat = `M ${xR - R} ${yB} L ${xL + R} ${yB}`;
     const pBatNet = `M ${xL + R} ${yB} L ${xR - R} ${yB}`;
 
-    // 5. Batterij -> Huis (Smooth central S-curve: from (xL+R, yB) up through center x=260 to (xR-R, yT))
     const xMid = (xL + xR) / 2; // 260
     const pBatHuis = `M ${xL + R} ${yB} L ${xMid - 25} ${yB} Q ${xMid} ${yB} ${xMid} ${yB - 25} L ${xMid} ${yT + 25} Q ${xMid} ${yT} ${xMid + 25} ${yT} L ${xR - R} ${yT}`;
-
-    // 6. Zon -> Net (Smooth central S-curve: from (xL+R, yT) down through center x=260 to (xR-R, yB))
     const pZonNet = `M ${xL + R} ${yT} L ${xMid - 25} ${yT} Q ${xMid} ${yT} ${xMid} ${yT + 25} L ${xMid} ${yB - 25} Q ${xMid} ${yB} ${xMid + 25} ${yB} L ${xR - R} ${yB}`;
 
     const getDur = (watts: number) => {
@@ -664,7 +664,6 @@ export class EnergyDashboardCard extends LitElement {
             </div>
 
             <div class="flow-container">
-              <!-- Fully Coordinated SVG with mathematical sub-pixel alignment -->
               <svg class="unified-flow-svg" viewBox="0 0 520 440">
                 <defs>
                   <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
@@ -690,7 +689,7 @@ export class EnergyDashboardCard extends LitElement {
                   </filter>
                 </defs>
 
-                <!-- 1. BASE STATIC TRACKS (Subtle dotted lines connecting node edges) -->
+                <!-- 1. BASE STATIC TRACKS -->
                 <path d="${pZonHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
                 <path d="${pZonBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
                 <path d="${pNetHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
@@ -698,9 +697,9 @@ export class EnergyDashboardCard extends LitElement {
                 <path d="${pBatHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
                 <path d="${pZonNet}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
 
-                <!-- 2. ACTIVE FLOWS & GLOWING MOVING BOLLETJES -->
+                <!-- 2. ACTIVE FLOWS & GLOWING MOVING BOLLETJES (STRICT COLOR-BY-SOURCE) -->
 
-                <!-- Flow Zon -> Huis (Direct horizontal top line) -->
+                <!-- FLOW A: Zon -> Huis (BRON ZON = ALTIJD GEEL) -->
                 ${flowSolarToHome > 20 ? svg`
                   <path d="${pZonHuis}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
@@ -711,7 +710,7 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- Flow Zon -> Batterij (Direct vertical left line) -->
+                <!-- FLOW B: Zon -> Batterij (BRON ZON = ALTIJD GEEL) -->
                 ${flowSolarToBat > 20 ? svg`
                   <path d="${pZonBat}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
@@ -722,7 +721,18 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- Flow Net -> Huis (Direct vertical right line up) -->
+                <!-- FLOW C: Zon -> Net (BRON ZON = ALTIJD GEEL!) -->
+                ${flowSolarToGrid > 20 ? svg`
+                  <path d="${pZonNet}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToGrid)}s" repeatCount="indefinite" path="${pZonNet}" />
+                  </circle>
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToGrid)}s" begin="-${(parseFloat(getDur(flowSolarToGrid))/2).toFixed(2)}s" repeatCount="indefinite" path="${pZonNet}" />
+                  </circle>
+                ` : ''}
+
+                <!-- FLOW D: Net -> Huis (BRON NET = ALTIJD BLAUW) -->
                 ${flowGridToHome > 20 ? svg`
                   <path d="${pNetHuis}" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
@@ -733,7 +743,7 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- Flow Net -> Batterij (Direct horizontal bottom line left) -->
+                <!-- FLOW E: Net -> Batterij (BRON NET = ALTIJD BLAUW) -->
                 ${flowGridToBat > 20 ? svg`
                   <path d="${pNetBat}" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
@@ -744,7 +754,7 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- Flow Batterij -> Huis (Central smooth S-curve) -->
+                <!-- FLOW F: Batterij -> Huis (BRON BATTERIJ = ALTIJD GROEN) -->
                 ${flowBatToHome > 20 ? svg`
                   <path d="${pBatHuis}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
@@ -755,18 +765,7 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- Flow Zon -> Net (Central smooth S-curve) -->
-                ${flowSolarToGrid > 20 ? svg`
-                  <path d="${pZonNet}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
-                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
-                    <animateMotion dur="${getDur(flowSolarToGrid)}s" repeatCount="indefinite" path="${pZonNet}" />
-                  </circle>
-                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
-                    <animateMotion dur="${getDur(flowSolarToGrid)}s" begin="-${(parseFloat(getDur(flowSolarToGrid))/2).toFixed(2)}s" repeatCount="indefinite" path="${pZonNet}" />
-                  </circle>
-                ` : ''}
-
-                <!-- Flow Batterij -> Net (Direct horizontal bottom line right) -->
+                <!-- FLOW G: Batterij -> Net (BRON BATTERIJ = ALTIJD GROEN) -->
                 ${flowBatToGrid > 20 ? svg`
                   <path d="${pBatNet}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
@@ -777,18 +776,15 @@ export class EnergyDashboardCard extends LitElement {
                   </circle>
                 ` : ''}
 
-                <!-- 3. THE 4 NODES (Exact coordinated placement) -->
+                <!-- 3. THE 4 NODES -->
 
                 <!-- NODE 1: ZON (Top-Left x=125, y=110) -->
                 <g transform="translate(${xL}, ${yT})">
-                  <!-- Outer Ring -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="8" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
                     stroke-dasharray="${circ}" stroke-dashoffset="${solarW > 0 ? 0 : circ}"
                     transform="rotate(-90)" stroke-linecap="round" />
-                  <!-- Inner Solid Disc -->
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-                  <!-- Disc Content -->
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
                       <div class="node-icon-box" style="color: #f59e0b;">
@@ -816,8 +812,9 @@ export class EnergyDashboardCard extends LitElement {
 
                 <!-- NODE 2: HUIS (Top-Right x=395, y=110) -->
                 <g transform="translate(${xR}, ${yT})">
-                  <!-- Base Track -->
-                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                  <!-- Base Track (soft dark gray) -->
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="8" />
+                  
                   <!-- Solar Segment (Yellow) -->
                   ${lenSolar > 0 ? svg`
                     <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
@@ -833,9 +830,11 @@ export class EnergyDashboardCard extends LitElement {
                     <circle cx="0" cy="0" r="${R}" fill="none" stroke="#38bdf8" stroke-width="8"
                       stroke-dasharray="${lenGrid} ${circ}" stroke-dashoffset="${offsetGrid}" transform="rotate(-90)" />
                   ` : ''}
+
                   <!-- Inner Solid Disc -->
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-                  <!-- Disc Content -->
+                  
+                  <!-- Disc Content with clear source breakdown -->
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
                       <div class="node-icon-box" style="color: #f1f5f9;">
@@ -849,22 +848,39 @@ export class EnergyDashboardCard extends LitElement {
                         ${this._formatPower(homeRawW).value}
                         <span class="unit">${this._formatPower(homeRawW).unit}</span>
                       </div>
-                      <span class="node-subtext">Vandaag ${this._formatEnergy(homeToday)}</span>
+                      
+                      <!-- Mini 3-Color Mix Bar (Yellow = Zon, Green = Batterij, Blue = Net) -->
+                      <div class="mix-bar">
+                        ${fracSolar > 0 ? html`<div style="width: ${(fracSolar * 100).toFixed(0)}%; background: #f59e0b;" title="Zon"></div>` : ''}
+                        ${fracBat > 0 ? html`<div style="width: ${(fracBat * 100).toFixed(0)}%; background: #10b981;" title="Batterij"></div>` : ''}
+                        ${fracGrid > 0 ? html`<div style="width: ${(fracGrid * 100).toFixed(0)}%; background: #38bdf8;" title="Net"></div>` : ''}
+                      </div>
+
+                      <!-- Textual Breakdown Pill -->
+                      ${fracSolar >= 0.99 ? html`
+                        <span class="node-status-pill pill-amber">100% Zonnestroom</span>
+                      ` : fracBat >= 0.99 ? html`
+                        <span class="node-status-pill pill-green">100% Batterij</span>
+                      ` : fracGrid >= 0.99 ? html`
+                        <span class="node-status-pill pill-blue">100% Netstroom</span>
+                      ` : html`
+                        <span class="node-status-pill pill-amber" style="padding: 1px 4px; font-size: 8.5px;">
+                          ${fracSolar > 0 ? html`☀️${Math.round(fracSolar*100)}% ` : ''}
+                          ${fracBat > 0 ? html`🔋${Math.round(fracBat*100)}% ` : ''}
+                          ${fracGrid > 0 ? html`⚡${Math.round(fracGrid*100)}%` : ''}
+                        </span>
+                      `}
                     </div>
                   </foreignObject>
                 </g>
 
                 <!-- NODE 3: BATTERIJ (Bottom-Left x=125, y=330) -->
                 <g transform="translate(${xL}, ${yB})">
-                  <!-- Background track -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
-                  <!-- Dynamic Progress Ring for SoC % -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="8"
                     stroke-dasharray="${circ}" stroke-dashoffset="${batOffset}"
                     transform="rotate(-90)" stroke-linecap="round" />
-                  <!-- Inner Solid Disc -->
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-                  <!-- Disc Content -->
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
                       <div class="node-icon-box" style="color: #10b981;">
@@ -890,14 +906,11 @@ export class EnergyDashboardCard extends LitElement {
 
                 <!-- NODE 4: NET (Bottom-Right x=395, y=330) -->
                 <g transform="translate(${xR}, ${yB})">
-                  <!-- Outer Ring -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="8"
                     stroke-dasharray="${circ}" stroke-dashoffset="0"
                     transform="rotate(-90)" stroke-linecap="round" />
-                  <!-- Inner Solid Disc -->
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-                  <!-- Disc Content -->
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
                       <div class="node-icon-box" style="color: ${isGridImport ? '#38bdf8' : '#10b981'};">
@@ -961,11 +974,11 @@ export class EnergyDashboardCard extends LitElement {
 
               <div class="chart-legend">
                 <div class="legend-item">
-                  <span class="legend-color" style="background: #10b981;"></span>
+                  <span class="legend-color" style="background: #f59e0b;"></span>
                   Zonne-energie
                 </div>
                 <div class="legend-item">
-                  <span class="legend-color" style="background: #ef4444;"></span>
+                  <span class="legend-color" style="background: #38bdf8;"></span>
                   Net Import
                 </div>
                 <div class="legend-item">
@@ -982,7 +995,7 @@ export class EnergyDashboardCard extends LitElement {
                 </div>
                 <div class="chart-kpi-card">
                   <span class="chart-kpi-label">Net Vandaag</span>
-                  <span class="chart-kpi-value" style="color: ${gridImportToday > gridExportToday ? '#ef4444' : '#10b981'};">
+                  <span class="chart-kpi-value" style="color: ${gridImportToday > gridExportToday ? '#38bdf8' : '#10b981'};">
                     ${this._formatEnergy(gridImportToday)}
                   </span>
                   <span class="chart-kpi-sub">Afgenomen</span>
@@ -1039,12 +1052,12 @@ export class EnergyDashboardCard extends LitElement {
         <svg class="chart-svg" viewBox="0 0 ${w} ${h}">
           <defs>
             <linearGradient id="chartSolarGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/>
-              <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
             </linearGradient>
             <linearGradient id="chartNetGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.4"/>
-              <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
             </linearGradient>
           </defs>
 
@@ -1062,12 +1075,12 @@ export class EnergyDashboardCard extends LitElement {
 
           ${solarPoints.length > 0 ? svg`
             <path d="${solarArea}" fill="url(#chartSolarGrad)" />
-            <path d="${solarPath}" fill="none" stroke="#10b981" stroke-width="2" />
+            <path d="${solarPath}" fill="none" stroke="#f59e0b" stroke-width="2" />
           ` : ''}
 
           ${netPoints.length > 0 ? svg`
             <path d="${netArea}" fill="url(#chartNetGrad)" />
-            <path d="${netPath}" fill="none" stroke="#ef4444" stroke-width="1.5" />
+            <path d="${netPath}" fill="none" stroke="#38bdf8" stroke-width="1.5" />
           ` : ''}
 
           ${svg`
@@ -1107,8 +1120,8 @@ export class EnergyDashboardCard extends LitElement {
             const gy = h - padY - gBarH;
 
             return svg`
-              <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="2" fill="#10b981" />
-              <rect x="${x + barWidth + 2}" y="${gy}" width="${barWidth}" height="${gBarH}" rx="2" fill="#ef4444" />
+              <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="2" fill="#f59e0b" />
+              <rect x="${x + barWidth + 2}" y="${gy}" width="${barWidth}" height="${gBarH}" rx="2" fill="#38bdf8" />
               <text x="${x + barWidth}" y="${h - 4}" fill="#64748b" font-size="9" text-anchor="middle">
                 ${new Date(pt.start).getDate()}
               </text>
