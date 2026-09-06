@@ -947,24 +947,59 @@ class EnergyDashboardCard extends i {
         const batSoC = Math.min(100, Math.max(0, this._getNumber('sensor.thuisbatterij_percentage', 100)));
         const batCapacity = this._getNumber('input_number.thuisbatterij_capaciteit', 35);
         const batKwhNow = (batSoC / 100) * batCapacity;
+        let viewIcon = b ``;
         if (this._activeDetailView === 'solar') {
             viewColor = '#f59e0b';
-            viewTitle = '☀️ Zonne-energie (24-uur)';
+            viewTitle = 'Zonne-energie (24-uur)';
+            viewIcon = b `
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      `;
             kpiBadge = `Nu: ${solarW} W | Vandaag: ${solarToday.toFixed(1)} kWh`;
         }
         else if (this._activeDetailView === 'home') {
             viewColor = '#f1f5f9';
-            viewTitle = '🏠 Huisverbruik (24-uur)';
+            viewTitle = 'Huisverbruik (24-uur)';
+            viewIcon = b `
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      `;
             kpiBadge = `Nu: ${homeW} W | Vandaag: ${homeToday.toFixed(1)} kWh`;
         }
         else if (this._activeDetailView === 'battery') {
             viewColor = '#10b981';
-            viewTitle = '🔋 Thuisbatterij (24-uur)';
+            viewTitle = 'Thuisbatterij (24-uur)';
+            viewIcon = b `
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+          <line x1="22" y1="11" x2="22" y2="13"></line>
+          <polygon points="10 9 7 13 11 13 8 16 13 12 9 12 10 9" fill="#10b981" stroke="none"></polygon>
+        </svg>
+      `;
             kpiBadge = `${batKwhNow.toFixed(1)} / ${batCapacity} kWh (${batSoC.toFixed(0)}%) | ${Math.abs(batW)} W`;
         }
         else if (this._activeDetailView === 'grid') {
             viewColor = '#38bdf8';
-            viewTitle = '⚡ Netstroom (24-uur)';
+            viewTitle = 'Netstroom (24-uur)';
+            viewIcon = b `
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <path d="M4 22h16"></path>
+          <path d="M7 22l5-19 5 19"></path>
+          <path d="M6 13h12"></path>
+          <path d="M8 8h8"></path>
+        </svg>
+      `;
             kpiBadge = `Nu: ${gridW >= 0 ? '+' : ''}${gridW} W | Afname: ${gridImpToday.toFixed(1)} kWh`;
         }
         return b `
@@ -978,8 +1013,9 @@ class EnergyDashboardCard extends i {
             <span>Terug naar schema</span>
           </button>
 
-          <h2 class="panel-title" style="color: ${viewColor}; margin: 0; font-size: 16px; font-weight: 600;">
-            ${viewTitle}
+          <h2 class="panel-title" style="color: ${viewColor}; margin: 0; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            ${viewIcon}
+            <span>${viewTitle}</span>
           </h2>
 
           <span class="node-status-pill" style="border-color: ${viewColor}; color: ${viewColor}; font-weight: 600; font-size: 12px; padding: 5px 12px;">
@@ -990,11 +1026,19 @@ class EnergyDashboardCard extends i {
         <!-- Optional Battery Subtabs (Option B: Full Height Toggle) -->
         ${this._activeDetailView === 'battery' ? b `
           <div class="subtabs-bar">
-            <button class="subtab-pill ${this._batteryChartMode === 'kwh' ? 'active' : ''}" @click="${() => { this._batteryChartMode = 'kwh'; }}">
-              🔋 Accu-inhoud (kWh & %)
+            <button class="subtab-pill ${this._batteryChartMode === 'kwh' ? 'active' : ''}" @click="${() => { this._batteryChartMode = 'kwh'; }}" style="display: flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+                <line x1="22" y1="11" x2="22" y2="13"></line>
+                <polygon points="10 9 7 13 11 13 8 16 13 12 9 12 10 9" fill="currentColor" stroke="none"></polygon>
+              </svg>
+              <span>Accu-inhoud (kWh & %)</span>
             </button>
-            <button class="subtab-pill ${this._batteryChartMode === 'power' ? 'active' : ''}" @click="${() => { this._batteryChartMode = 'power'; }}">
-              ⚡ Vermogen Laden / Ontladen (Watt)
+            <button class="subtab-pill ${this._batteryChartMode === 'power' ? 'active' : ''}" @click="${() => { this._batteryChartMode = 'power'; }}" style="display: flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Vermogen Laden / Ontladen (Watt)</span>
             </button>
           </div>
         ` : ''}
