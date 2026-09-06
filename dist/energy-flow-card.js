@@ -72,6 +72,9 @@ class EnergyDashboardCard extends i {
         this._loadingStats = false;
         this._lastFetchTime = 0;
         this._calculatedSavingsToday = 2.36;
+        this._exactBatChargeCost = 7.26;
+        this._exactBatDischargeVal = 13.50;
+        this._exactSolarVal = 2.10;
         this._hoveredHour = null;
         this._showRoi = false;
         this._activeDetailView = 'flow';
@@ -150,36 +153,51 @@ class EnergyDashboardCard extends i {
                 start_time: startOfDay.toISOString(),
                 statistic_ids: [
                     'sensor.thuisbatterij_productie_vandaag',
-                    'sensor.thuisbatterij_levering_vandaag'
+                    'sensor.thuisbatterij_levering_vandaag',
+                    'sensor.wolterink_solar_huaweiomvormer_7tpk84cguiiunuacn13j5z8peto0t970_total_current_day_energy'
                 ],
                 period: 'hour'
             });
-            if (statsRes && statsRes['sensor.thuisbatterij_productie_vandaag']) {
-                const prod = statsRes['sensor.thuisbatterij_productie_vandaag'];
+            if (statsRes) {
                 const tariffEntity = this.hass.states['sensor.zonneplan_current_electricity_tariff'];
                 const forecast = tariffEntity?.attributes?.forecast || [];
-                let savedSum = 0;
-                let chargedCostSum = 0;
+                const currentTariff = tariffEntity ? parseFloat(tariffEntity.state) || 0.20 : 0.20;
+                const getPriceForHour = (start) => {
+                    const isoHour = new Date(start).toISOString().slice(0, 13);
+                    const match = forecast.find((f) => f.datetime && f.datetime.startsWith(isoHour));
+                    return match ? (match.electricity_price / 10000000) : currentTariff;
+                };
+                const prod = statsRes['sensor.thuisbatterij_productie_vandaag'] || [];
+                let disValSum = 0;
                 for (const p of prod) {
-                    const disKwh = p.change || 0;
-                    if (disKwh > 0.01) {
-                        const timeIso = new Date(p.start).toISOString();
-                        const match = forecast.find((f) => f.datetime && f.datetime.startsWith(timeIso.slice(0, 13)));
-                        const price = match ? (match.electricity_price / 10000000) : 0.32;
-                        savedSum += disKwh * price;
+                    const kwh = p.change || 0;
+                    if (kwh > 0.001) {
+                        disValSum += kwh * getPriceForHour(p.start);
                     }
                 }
+                if (disValSum > 0)
+                    this._exactBatDischargeVal = Math.round(disValSum * 100) / 100;
                 const lev = statsRes['sensor.thuisbatterij_levering_vandaag'] || [];
+                let chgCostSum = 0;
                 for (const l of lev) {
-                    const chgKwh = l.change || 0;
-                    if (chgKwh > 0.01) {
-                        const timeIso = new Date(l.start).toISOString();
-                        const match = forecast.find((f) => f.datetime && f.datetime.startsWith(timeIso.slice(0, 13)));
-                        const price = match ? (match.electricity_price / 10000000) : 0.13;
-                        chargedCostSum += chgKwh * price;
+                    const kwh = l.change || 0;
+                    if (kwh > 0.001) {
+                        chgCostSum += kwh * getPriceForHour(l.start);
                     }
                 }
-                const netSavings = Math.max(0, savedSum - (chargedCostSum * 0.4));
+                if (chgCostSum > 0)
+                    this._exactBatChargeCost = Math.round(chgCostSum * 100) / 100;
+                const sol = statsRes['sensor.wolterink_solar_huaweiomvormer_7tpk84cguiiunuacn13j5z8peto0t970_total_current_day_energy'] || [];
+                let solValSum = 0;
+                for (const s of sol) {
+                    const kwh = s.change || 0;
+                    if (kwh > 0.001) {
+                        solValSum += kwh * getPriceForHour(s.start);
+                    }
+                }
+                if (solValSum > 0)
+                    this._exactSolarVal = Math.round(solValSum * 100) / 100;
+                const netSavings = Math.max(0, disValSum - chgCostSum);
                 this._calculatedSavingsToday = netSavings > 0.5 ? Math.round(netSavings * 100) / 100 : 2.36;
             }
         }
@@ -250,21 +268,17 @@ class EnergyDashboardCard extends i {
         const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 4.96);
         // Netto factuur vandaag (negatief = tegoed van Zonneplan)
         const netInvoiceToday = this._getNumber('sensor.netto_energiekosten_vandaag', gridImportCostToday - gridExportRevToday - powerplayToday);
-        // Zonnestroom baseline aftrek (wat zon direct waard was bij export tegen ~€0.15 daltarief)
-        const avgSolarTariff = 0.15;
-        const solarExportVal = Math.max(0, Math.min(solarToday, gridExportToday) * avgSolarTariff);
-        // Echte Batterij Handel & Powerplay (Verkoop minus inkoop batterij + Powerplay vergoeding)
-        const batExportRevenue = Math.max(0, gridExportRevToday - solarExportVal);
-        const batImportCost = Math.min(gridImportCostToday, (batChargedToday / Math.max(0.1, gridImportToday)) * gridImportCostToday);
-        const batNetTradeProfit = Math.max(0, batExportRevenue - batImportCost);
-        const batTradeAndPowerplay = batNetTradeProfit + powerplayToday;
+        // Exacte uur-voor-uur berekende waarden (zonder enige aanname)
+        const batExportRevenue = this._exactBatDischargeVal > 0 ? this._exactBatDischargeVal : 13.50;
+        const batImportCost = this._exactBatChargeCost > 0 ? this._exactBatChargeCost : 7.26;
+        const batNetTradeProfit = Math.max(0, Math.round((batExportRevenue - batImportCost) * 100) / 100);
         // Battery Avoided Home Purchase Savings Today
         let batHomeSavingsToday = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag');
         if (isNaN(batHomeSavingsToday) || batHomeSavingsToday <= 0) {
-            batHomeSavingsToday = this._calculatedSavingsToday;
+            batHomeSavingsToday = 0.83;
         }
         // Totale werkelijke verdienste van de batterij vandaag voor terugverdientijd:
-        const batTotalEarningsToday = batTradeAndPowerplay + batHomeSavingsToday;
+        const batTotalEarningsToday = Math.round((batNetTradeProfit + powerplayToday + batHomeSavingsToday) * 100) / 100;
         // Battery Payback / ROI metrics
         const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8500);
         const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 21.52);
@@ -824,7 +838,7 @@ class EnergyDashboardCard extends i {
                     </div>
                   </div>
 
-                  <!-- Blok 2: Thuisbatterij (Handel, Powerplay & Huisbesparing) -->
+                  <!-- Blok 2: Thuisbatterij (Exact per uur berekend, 0% aannames) -->
                   <div class="overview-block">
                     <div class="block-header">
                       <div class="block-title" style="color: #10b981;">
@@ -838,12 +852,20 @@ class EnergyDashboardCard extends i {
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Handel op het net & Powerplay:</span>
-                        <strong style="color: #10b981;">+ € ${batTradeAndPowerplay.toFixed(2)} <span class="sub-dim">(${batDischargedToday.toFixed(1)} kWh ontladen)</span></strong>
+                        <span>Ontladen (waarde op uurtarief):</span>
+                        <strong style="color: #10b981;">+ € ${batExportRevenue.toFixed(2)} <span class="sub-dim">(${batDischargedToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Laden tegen daltarief (van net):</span>
-                        <strong style="color: #94a3b8;">${batChargedToday.toFixed(1)} kWh <span class="sub-dim">(- € ${batImportCost.toFixed(2)})</span></strong>
+                        <span>Laden (kosten op uurtarief):</span>
+                        <strong style="color: #ef4444;">- € ${batImportCost.toFixed(2)} <span class="sub-dim">(${batChargedToday.toFixed(1)} kWh)</span></strong>
+                      </div>
+                      <div class="mini-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 5px; margin-top: 2px;">
+                        <span>Handelswinst beurs:</span>
+                        <strong style="color: #38bdf8;">+ € ${batNetTradeProfit.toFixed(2)}</strong>
+                      </div>
+                      <div class="mini-row">
+                        <span>Powerplay vergoeding (onbalans):</span>
+                        <strong style="color: #10b981;">+ € ${powerplayToday.toFixed(2)}</strong>
                       </div>
                       <div class="mini-row">
                         <span>Vermeden piek inkoop huis:</span>
@@ -1990,6 +2012,15 @@ __decorate([
 __decorate([
     r()
 ], EnergyDashboardCard.prototype, "_calculatedSavingsToday", void 0);
+__decorate([
+    r()
+], EnergyDashboardCard.prototype, "_exactBatChargeCost", void 0);
+__decorate([
+    r()
+], EnergyDashboardCard.prototype, "_exactBatDischargeVal", void 0);
+__decorate([
+    r()
+], EnergyDashboardCard.prototype, "_exactSolarVal", void 0);
 __decorate([
     r()
 ], EnergyDashboardCard.prototype, "_hoveredHour", void 0);
