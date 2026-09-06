@@ -51,8 +51,7 @@ export class EnergyDashboardCard extends LitElement {
     .dashboard-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      padding: 24px;
+      padding: 16px 20px 24px 20px;
       min-height: 100%;
       background: #12151b;
     }
@@ -716,21 +715,6 @@ export class EnergyDashboardCard extends LitElement {
 
     return html`
       <div class="dashboard-wrapper">
-        <!-- Header -->
-        <div class="dashboard-header">
-          <div class="header-title-box">
-            <h1 class="header-title">${this.config.title || 'Energie Beheer'}</h1>
-          </div>
-
-          <div class="header-kpi-bar">
-            <div class="kpi-pill">
-              Autonomie: <strong>${autarky}%</strong>
-            </div>
-            <div class="kpi-pill ${netInvoiceToday <= 1.5 ? 'positive' : 'warning'}">
-              Netto stroom vandaag: <strong>€ ${netInvoiceToday.toFixed(2)}</strong>
-            </div>
-          </div>
-        </div>
 
         <!-- Grid Body: Left Flowchart & Right Simplified Overview -->
         <div class="dashboard-grid">
