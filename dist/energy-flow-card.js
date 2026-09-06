@@ -768,109 +768,87 @@ class EnergyDashboardCard extends i {
                 </div>
               </div>
 
-              <!-- Bottom Card: Single Unified Overview of Costs & Savings -->
+              <!-- Bottom Card: Wat is er vandaag gebeurd en verdiend -->
               <div class="right-card">
                 <div class="card-header-line">
                   <span class="card-title-text">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                      <line x1="2" y1="10" x2="22" y2="10"></line>
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                     </svg>
-                    Kosten & Besparingen Vandaag
+                    Winst & Rendement Vandaag
                   </span>
-                  <span class="node-status-pill ${netInvoiceToday <= 1.5 ? 'pill-green' : 'pill-blue'}">
-                    Netto Factuur: € ${netInvoiceToday.toFixed(2)}
+                  <span class="node-status-pill pill-green">
+                    Netto Winst: + € ${(-netInvoiceToday).toFixed(2)}
                   </span>
                 </div>
 
-                <!-- Duidelijk overzicht onder elkaar met totalen -->
                 <div class="overview-vertical-list">
-                  <!-- Blok 1: Stroomfactuur Net (P1-meter) -->
+                  <!-- Blok 1: Stroomhandel op het Net -->
                   <div class="overview-block">
                     <div class="block-header">
                       <div class="block-title" style="color: #38bdf8;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                        <span>Stroomfactuur Net (Zonneplan)</span>
+                        <span>Stroomhandel op het Net (P1)</span>
                       </div>
-                      <span class="node-status-pill pill-blue">P1-meter</span>
+                      <span class="node-status-pill pill-blue">Zonneplan</span>
                     </div>
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Stroomafname van het net:</span>
+                        <span>Ingekochte stroom (goedkoop/dal):</span>
                         <strong>€ ${gridImportCostToday.toFixed(2)} <span class="sub-dim">(${gridImportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Teruglevering aan het net:</span>
+                        <span>Verkochte stroom (piekuren):</span>
                         <strong style="color: #10b981;">- € ${gridExportRevToday.toFixed(2)} <span class="sub-dim">(${gridExportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Powerplay vergoeding:</span>
+                        <span>Powerplay onbalansbonus:</span>
                         <strong style="color: #10b981;">- € ${powerplayToday.toFixed(2)}</strong>
                       </div>
                       <div class="total-row">
-                        <span>Totaal Stroomfactuur (vandaag):</span>
-                        <strong style="color: ${netInvoiceToday <= 0 ? '#10b981' : '#f8fafc'}; font-size: 14.5px;">
-                          € ${netInvoiceToday.toFixed(2)} <span style="font-size: 11px; font-weight: 500;">${netInvoiceToday <= 0 ? '(te ontvangen)' : '(te betalen)'}</span>
+                        <span>Netto verdiend op het net (vandaag):</span>
+                        <strong style="color: #10b981; font-size: 15px;">
+                          + € ${(-netInvoiceToday).toFixed(2)}
                         </strong>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Blok 2: Thuisbatterij & Energiehandel -->
+                  <!-- Blok 2: Thuisbatterij Activiteit -->
                   <div class="overview-block">
                     <div class="block-header">
                       <div class="block-title" style="color: #10b981;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
-                        <span>Thuisbatterij Waarde</span>
+                        <span>Thuisbatterij Activiteit & Winst</span>
                       </div>
                       <span class="node-status-pill pill-green" style="cursor: pointer;" title="Klik 3x voor Terugverdientijd" @click="${() => this._handleRendementClick()}">Rendement</span>
                     </div>
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Powerplay onbalansbonus:</span>
+                        <span>Directe Powerplay bonus:</span>
                         <strong style="color: #10b981;">€ ${powerplayToday.toFixed(2)}</strong>
                       </div>
                       <div class="mini-row">
-                        <span>Besparing eigen huisverbruik:</span>
+                        <span>Bespaard op eigen huisverbruik:</span>
                         <strong>€ ${batHomeSavingsToday.toFixed(2)} <span class="sub-dim">(vermeden piek)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Batterij activiteit vandaag:</span>
+                        <span>Batterij doorvoer vandaag:</span>
                         <strong style="color: #cbd5e1;">${batChargedToday.toFixed(1)} in / ${batDischargedToday.toFixed(1)} uit kWh</strong>
                       </div>
                       <div class="total-row">
-                        <span>Totaal Batterij Voordeel (vandaag):</span>
-                        <strong style="color: #10b981; font-size: 14.5px;">+ € ${batTotalValueToday.toFixed(2)}</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Blok 3: Zonnepanelen (Dak) -->
-                  <div class="overview-block">
-                    <div class="block-header">
-                      <div class="block-title" style="color: #f59e0b;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                        <span>Zonnepanelen (Dak)</span>
-                      </div>
-                      <span class="node-status-pill pill-amber">Opwekking</span>
-                    </div>
-
-                    <div class="mini-row-list">
-                      <div class="mini-row">
-                        <span>Totaal opgewekt vandaag:</span>
-                        <strong style="color: #f59e0b;">${solarToday.toFixed(1)} kWh</strong>
-                      </div>
-                      <div class="total-row">
-                        <span>Geschatte marktwaarde zonnestroom:</span>
-                        <strong style="color: #f59e0b; font-size: 14.5px;">ca. € ${(solarToday * currentTariff).toFixed(2)}</strong>
+                        <span>Extra batterij bonus (onbalans + piek):</span>
+                        <strong style="color: #10b981; font-size: 15px;">+ € ${batTotalValueToday.toFixed(2)}</strong>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                ${this._showRoi ? b `
+              ${this._showRoi ? b `
                 <!-- Geheime Terugverdientijd & Investering Section -->
                 <div class="roi-section" title="Klik om de aanschafprijs aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
                   <div class="roi-header">
