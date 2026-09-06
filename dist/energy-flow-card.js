@@ -170,11 +170,18 @@ class EnergyDashboardCard extends i {
         const gridExportW = Math.max(0, -gridW);
         const gridImportToday = this._getNumber(cfg.grid_import_today || 'sensor.p1_netstroom_afname_vandaag');
         const gridExportToday = this._getNumber(cfg.grid_export_today || 'sensor.p1_teruglevering_vandaag');
-        const batRawW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
+        // Battery Standby Filtering:
+        // Zonneplan Nexus reports ~54W continuous idle/standby power when full.
+        // Filter out standby (< 70W) so it doesn't falsely indicate charging!
+        let batRawW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
+        if (Math.abs(batRawW) < 70) {
+            batRawW = 0;
+        }
         const batChargeW = Math.max(0, batRawW);
         const batDischargeW = Math.max(0, -batRawW);
         const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 100)));
         const batChargedToday = this._getNumber(cfg.battery_charged_today || 'sensor.thuisbatterij_levering_vandaag');
+        const batDischargedToday = this._getNumber(cfg.battery_discharged_today || 'sensor.thuisbatterij_productie_vandaag');
         const isBatCharging = batChargeW > 20;
         const isBatDischarging = batDischargeW > 20;
         const homeRawW = Math.max(0, this._getNumber(cfg.home_power || 'sensor.live_huisverbruik'));
@@ -211,10 +218,6 @@ class EnergyDashboardCard extends i {
         const totalConsumedToday = homeToday + batChargedToday;
         const autarky = totalConsumedToday > 0 ? Math.round((Math.min(solarToday, totalConsumedToday) / totalConsumedToday) * 100) : 0;
         // Geometry layout:
-        // Top-Left: ZON (x=125, y=110)
-        // Top-Right: HUIS (x=395, y=110)
-        // Bottom-Left: BATTERIJ (x=125, y=330)
-        // Bottom-Right: NET (x=395, y=330)
         const xL = 125;
         const xR = 395;
         const yT = 110;
@@ -222,14 +225,20 @@ class EnergyDashboardCard extends i {
         const R = 75; // outer ring radius
         const rDisc = 65; // inner disc radius
         const circ = 2 * Math.PI * R; // ~471.24
-        // House Stroommix Calculation
-        const effectiveHome = (flowSolarToHome + flowBatToHome + flowGridToHome) || homeRawW || 1;
-        const fracSolar = Math.min(1, flowSolarToHome / effectiveHome);
-        const fracBat = Math.min(1, flowBatToHome / effectiveHome);
-        const fracGrid = Math.min(1, flowGridToHome / effectiveHome);
-        const lenSolar = fracSolar * circ;
-        const lenBat = fracBat * circ;
-        const lenGrid = fracGrid * circ;
+        // 3. House Cumulative Energy Mix of TODAY (Exact match to Power Flow Card Plus)
+        // Calculate breakdown of today's total home consumption (homeToday)
+        const hTotal = Math.max(0.1, homeToday);
+        // Solar portion consumed directly or in house today:
+        const solarDirectToday = Math.max(0, solarToday - Math.max(0, gridExportToday - batDischargedToday));
+        const solPortion = Math.min(solarDirectToday, hTotal);
+        const batPortion = Math.min(batDischargedToday, Math.max(0, hTotal - solPortion));
+        const gridPortion = Math.max(0, hTotal - solPortion - batPortion);
+        const fracSolarDay = Math.min(1, Math.max(0, solPortion / hTotal));
+        const fracBatDay = Math.min(1, Math.max(0, batPortion / hTotal));
+        const fracGridDay = Math.min(1, Math.max(0, gridPortion / hTotal));
+        const lenSolar = fracSolarDay * circ;
+        const lenBat = fracBatDay * circ;
+        const lenGrid = fracGridDay * circ;
         const offsetSolar = 0;
         const offsetBat = -lenSolar;
         const offsetGrid = -(lenSolar + lenBat);
@@ -397,10 +406,11 @@ class EnergyDashboardCard extends i {
                   </circle>
                 ` : ''}
 
-                <!-- 3. THE 4 NODES -->
+                <!-- 3. THE 4 NODES WITH DAILY TOTALS & LIVE READINGS -->
 
                 <!-- NODE 1: ZON (Top-Left x=125, y=110) -->
                 <g transform="translate(${xL}, ${yT})">
+                  <text x="0" y="${-R - 8}" class="node-outer-label">Zon</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="8" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
                     stroke-dasharray="${circ}" stroke-dashoffset="${solarW > 0 ? 0 : circ}"
@@ -408,6 +418,7 @@ class EnergyDashboardCard extends i {
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
+                      <span class="node-today-total">${this._formatEnergy(solarToday)}</span>
                       <div class="node-icon-box" style="color: #f59e0b;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                           <circle cx="12" cy="12" r="5"></circle>
@@ -421,32 +432,34 @@ class EnergyDashboardCard extends i {
                           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                         </svg>
                       </div>
-                      <span class="node-title">Zon</span>
                       <div class="node-val">
                         ${this._formatPower(solarW).value}
                         <span class="unit">${this._formatPower(solarW).unit}</span>
                       </div>
-                      <span class="node-subtext">Vandaag ${this._formatEnergy(solarToday)}</span>
+                      <span class="node-status-pill ${solarW > 20 ? 'pill-amber' : 'pill-gray'}">
+                        ${solarW > 20 ? 'Opwekking' : 'Standby'}
+                      </span>
                     </div>
                   </foreignObject>
                 </g>
 
                 <!-- NODE 2: HUIS (Top-Right x=395, y=110) -->
                 <g transform="translate(${xR}, ${yT})">
-                  <!-- Base Track (soft dark gray) -->
+                  <text x="0" y="${-R - 8}" class="node-outer-label">Thuis</text>
+                  <!-- Base Track -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="8" />
                   
-                  <!-- Solar Segment (Yellow) -->
+                  <!-- Solar Today Share (Yellow) -->
                   ${lenSolar > 0 ? w `
                     <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
                       stroke-dasharray="${lenSolar} ${circ}" stroke-dashoffset="${offsetSolar}" transform="rotate(-90)" />
                   ` : ''}
-                  <!-- Battery Segment (Green) -->
+                  <!-- Battery Today Share (Green) -->
                   ${lenBat > 0 ? w `
                     <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="8"
                       stroke-dasharray="${lenBat} ${circ}" stroke-dashoffset="${offsetBat}" transform="rotate(-90)" />
                   ` : ''}
-                  <!-- Grid Segment (Blue) -->
+                  <!-- Grid Today Share (Blue) -->
                   ${lenGrid > 0 ? w `
                     <circle cx="0" cy="0" r="${R}" fill="none" stroke="#38bdf8" stroke-width="8"
                       stroke-dasharray="${lenGrid} ${circ}" stroke-dashoffset="${offsetGrid}" transform="rotate(-90)" />
@@ -455,55 +468,39 @@ class EnergyDashboardCard extends i {
                   <!-- Inner Solid Disc -->
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
                   
-                  <!-- Disc Content with clear source breakdown -->
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
+                      <span class="node-today-total">${this._formatEnergy(homeToday)}</span>
                       <div class="node-icon-box" style="color: #f1f5f9;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                           <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                       </div>
-                      <span class="node-title">Huis</span>
                       <div class="node-val">
                         ${this._formatPower(homeRawW).value}
                         <span class="unit">${this._formatPower(homeRawW).unit}</span>
                       </div>
-                      
-                      <!-- Mini 3-Color Mix Bar (Yellow = Zon, Green = Batterij, Blue = Net) -->
-                      <div class="mix-bar">
-                        ${fracSolar > 0 ? b `<div style="width: ${(fracSolar * 100).toFixed(0)}%; background: #f59e0b;" title="Zon"></div>` : ''}
-                        ${fracBat > 0 ? b `<div style="width: ${(fracBat * 100).toFixed(0)}%; background: #10b981;" title="Batterij"></div>` : ''}
-                        ${fracGrid > 0 ? b `<div style="width: ${(fracGrid * 100).toFixed(0)}%; background: #38bdf8;" title="Net"></div>` : ''}
-                      </div>
-
-                      <!-- Textual Breakdown Pill -->
-                      ${fracSolar >= 0.99 ? b `
-                        <span class="node-status-pill pill-amber">100% Zonnestroom</span>
-                      ` : fracBat >= 0.99 ? b `
-                        <span class="node-status-pill pill-green">100% Batterij</span>
-                      ` : fracGrid >= 0.99 ? b `
-                        <span class="node-status-pill pill-blue">100% Netstroom</span>
-                      ` : b `
-                        <span class="node-status-pill pill-amber" style="padding: 1px 4px; font-size: 8.5px;">
-                          ${fracSolar > 0 ? b `☀️${Math.round(fracSolar * 100)}% ` : ''}
-                          ${fracBat > 0 ? b `🔋${Math.round(fracBat * 100)}% ` : ''}
-                          ${fracGrid > 0 ? b `⚡${Math.round(fracGrid * 100)}%` : ''}
-                        </span>
-                      `}
+                      <span class="node-status-pill ${flowSolarToHome > 20 && flowGridToHome <= 20 ? 'pill-amber' : flowGridToHome > 20 ? 'pill-blue' : 'pill-green'}">
+                        ${flowSolarToHome > 20 && flowGridToHome <= 20 ? '100% Zon' : flowGridToHome > 20 && flowSolarToHome <= 20 ? 'Netverbruik' : 'Zon + Net'}
+                      </span>
                     </div>
                   </foreignObject>
                 </g>
 
                 <!-- NODE 3: BATTERIJ (Bottom-Left x=125, y=330) -->
                 <g transform="translate(${xL}, ${yB})">
+                  <text x="0" y="${R + 20}" class="node-outer-label">Batterij</text>
+                  <!-- Background track -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                  <!-- Dynamic Progress Ring for SoC % -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="8"
                     stroke-dasharray="${circ}" stroke-dashoffset="${batOffset}"
                     transform="rotate(-90)" stroke-linecap="round" />
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
+                      <span class="node-today-total" style="color: #10b981;">${batSoC.toFixed(0)} %</span>
                       <div class="node-icon-box" style="color: #10b981;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
@@ -511,15 +508,12 @@ class EnergyDashboardCard extends i {
                           <polygon points="10 9 7 13 11 13 8 16 13 12 9 12 10 9" fill="#10b981" stroke="none"></polygon>
                         </svg>
                       </div>
-                      <span class="node-title">Batterij</span>
                       <div class="node-val">
-                        ${batSoC.toFixed(0)}<span class="unit" style="font-size: 15px;">%</span>
+                        ${this._formatPower(batRawW).value}
+                        <span class="unit">${this._formatPower(batRawW).unit}</span>
                       </div>
-                      <span class="node-subtext">
-                        ${batRawW !== 0 ? `${this._formatPower(batRawW).value} ${this._formatPower(batRawW).unit}` : 'Standby'}
-                      </span>
-                      <span class="node-status-pill ${isBatCharging ? 'pill-green' : isBatDischarging ? 'pill-amber' : ''}">
-                        ${isBatCharging ? 'Laden' : isBatDischarging ? 'Ontladen' : 'Standby'}
+                      <span class="node-status-pill ${isBatCharging ? 'pill-green' : isBatDischarging ? 'pill-amber' : 'pill-gray'}">
+                        ${isBatCharging ? `Laden ${this._formatPower(batChargeW).value} ${this._formatPower(batChargeW).unit}` : isBatDischarging ? `Ontladen ${this._formatPower(batDischargeW).value} ${this._formatPower(batDischargeW).unit}` : 'Standby'}
                       </span>
                     </div>
                   </foreignObject>
@@ -527,6 +521,8 @@ class EnergyDashboardCard extends i {
 
                 <!-- NODE 4: NET (Bottom-Right x=395, y=330) -->
                 <g transform="translate(${xR}, ${yB})">
+                  <text x="0" y="${R + 20}" class="node-outer-label">Net</text>
+                  <!-- Outer Ring -->
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="8"
                     stroke-dasharray="${circ}" stroke-dashoffset="0"
@@ -534,6 +530,9 @@ class EnergyDashboardCard extends i {
                   <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
                   <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
                     <div class="node-disc-content">
+                      <span class="node-today-total" style="font-size: 11px; white-space: nowrap;">
+                        ↓${gridImportToday.toFixed(1)} ↑${gridExportToday.toFixed(1)}
+                      </span>
                       <div class="node-icon-box" style="color: ${isGridImport ? '#38bdf8' : '#10b981'};">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M4 22h16"></path>
@@ -542,14 +541,10 @@ class EnergyDashboardCard extends i {
                           <path d="M8 8h8"></path>
                         </svg>
                       </div>
-                      <span class="node-title">Net</span>
                       <div class="node-val" style="color: ${isGridImport ? '#f8fafc' : '#10b981'};">
                         ${this._formatPower(gridW).value}
                         <span class="unit">${this._formatPower(gridW).unit}</span>
                       </div>
-                      <span class="node-subtext">
-                        ${isGridImport ? `Import ${this._formatEnergy(gridImportToday)}` : `Export ${this._formatEnergy(gridExportToday)}`}
-                      </span>
                       <span class="node-status-pill ${isGridImport ? 'pill-blue' : 'pill-green'}">
                         ${isGridImport ? 'Afname' : 'Teruglevering'}
                       </span>
@@ -961,27 +956,26 @@ EnergyDashboardCard.styles = i$3 `
       cursor: pointer;
     }
 
+    .node-today-total {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
     .node-icon-box {
       width: 24px;
       height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 2px;
+      margin: 1px 0;
     }
 
     .node-icon-box svg {
       width: 20px;
       height: 20px;
-    }
-
-    .node-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #94a3b8;
-      line-height: 1.2;
     }
 
     .node-val {
@@ -993,7 +987,7 @@ EnergyDashboardCard.styles = i$3 `
       align-items: baseline;
       justify-content: center;
       gap: 2px;
-      margin: 2px 0;
+      margin: 1px 0;
     }
 
     .node-val .unit {
@@ -1002,17 +996,9 @@ EnergyDashboardCard.styles = i$3 `
       color: #94a3b8;
     }
 
-    .node-subtext {
-      font-size: 10.5px;
-      font-weight: 500;
-      color: #94a3b8;
-      line-height: 1.2;
-      white-space: nowrap;
-    }
-
     .node-status-pill {
       display: inline-block;
-      margin-top: 3px;
+      margin-top: 2px;
       padding: 1px 7px;
       border-radius: 9999px;
       font-size: 9.5px;
@@ -1038,21 +1024,19 @@ EnergyDashboardCard.styles = i$3 `
       border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
-    .pill-red {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
+    .pill-gray {
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
-    /* Mix Bar */
-    .mix-bar {
-      display: flex;
-      width: 78px;
-      height: 4px;
-      border-radius: 2px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.1);
-      margin: 3px 0;
+    /* Node Title underneath circle */
+    .node-outer-label {
+      font-size: 13px;
+      font-weight: 600;
+      fill: #94a3b8;
+      text-anchor: middle;
+      letter-spacing: 0.04em;
     }
 
     /* Chart & History Content */
