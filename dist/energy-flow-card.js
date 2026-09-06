@@ -774,8 +774,9 @@ class EnergyDashboardCard extends i {
                       <span class="node-status-pill pill-green" style="cursor: pointer; user-select: none;" title="Geheim: klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">Rendement ${this._showRoi ? '▴' : ''}</span>
                     </div>
 
-                    <div class="col-kpi-val" style="color: #10b981;">
-                      € ${batTotalValueToday.toFixed(2)}
+                    <div class="col-kpi-val" style="color: #10b981; display: flex; align-items: baseline; gap: 7px;">
+                      <span>+ € ${batTotalValueToday.toFixed(2)}</span>
+                      <span style="font-size: 13.5px; font-weight: 500; color: #34d399;">bespaard</span>
                     </div>
 
                     <div class="mini-row-list">
