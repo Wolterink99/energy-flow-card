@@ -32,6 +32,10 @@ export class EnergyDashboardCard extends LitElement {
   @state() private _calculatedSavingsToday: number = 2.36;
   @state() private _hoveredHour: number | null = null;
   @state() private _showRoi: boolean = false;
+  @state() private _activeDetailView: 'flow' | 'solar' | 'home' | 'battery' | 'grid' = 'flow';
+  @state() private _batteryChartMode: 'power' | 'kwh' = 'kwh';
+  @state() private _historyData: Record<string, any[]> = {};
+  @state() private _hoverChartPoint: { time: number; x: number; y: number; title: string; val1: string; val2?: string } | null = null;
   private _roiClickCount: number = 0;
   private _roiClickTimeout: any = null;
 
@@ -366,6 +370,139 @@ export class EnergyDashboardCard extends LitElement {
       gap: 7px;
     }
 
+    /* Detail Graph Views & Navigation */
+    .detail-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f1f5f9;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #10b981;
+    }
+
+    .comp-tabs-group {
+      display: flex;
+      align-items: center;
+      background: #141821;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .comp-tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .comp-tab-btn:hover {
+      color: #f8fafc;
+    }
+
+    .comp-tab-btn.active.tab-solar {
+      background: rgba(245, 158, 11, 0.22);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+
+    .comp-tab-btn.active.tab-home {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .comp-tab-btn.active.tab-battery {
+      background: rgba(16, 185, 129, 0.22);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+
+    .comp-tab-btn.active.tab-grid {
+      background: rgba(56, 189, 248, 0.22);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+    }
+
+    .subtabs-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .subtab-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      padding: 5px 14px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .subtab-pill:hover {
+      color: #f1f5f9;
+    }
+
+    .subtab-pill.active {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: #10b981;
+      color: #10b981;
+    }
+
+    .detail-chart-wrapper {
+      width: 100%;
+      height: 440px;
+      position: relative;
+    }
+
+    .detail-chart-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .circle-interactive {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .circle-interactive:hover {
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
+    }
+
     /* Price Chart Styling */
     .tariff-chart-box {
       width: 100%;
@@ -569,6 +706,28 @@ export class EnergyDashboardCard extends LitElement {
     try {
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+
+      // Fetch 24h history for interactive circle charts
+      try {
+        const histRes = await (this.hass as any).callWS({
+          type: 'history/history_during_period',
+          start_time: startOfDay.toISOString(),
+          entity_ids: [
+            'sensor.totale_live_zonnestroom',
+            'sensor.live_huisverbruik',
+            'sensor.p1_meter_power',
+            'sensor.thuisbatterij_vermogen',
+            'sensor.thuisbatterij_percentage'
+          ],
+          minimal_response: true,
+          significant_changes_only: false
+        });
+        if (histRes) {
+          this._historyData = histRes;
+        }
+      } catch (err) {
+        console.warn('Fout bij ophalen componentgeschiedenis:', err);
+      }
 
       const statsRes = await (this.hass as any).callWS({
         type: 'recorder/statistics_during_period',
@@ -820,6 +979,7 @@ export class EnergyDashboardCard extends LitElement {
         <div class="dashboard-grid">
           <!-- Left: Flowchart Panel (100% exact preserved layout) -->
           <div class="panel-card">
+            ${this._activeDetailView === 'flow' ? html`
             <div class="panel-title-bar">
               <h2 class="panel-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -935,7 +1095,7 @@ export class EnergyDashboardCard extends LitElement {
                 ` : ''}
 
                 <!-- Nodes -->
-                <g transform="translate(${xL}, ${yT})">
+                <g transform="translate(${xL}, ${yT})" class="circle-interactive" title="Klik voor Zonne-energie grafiek" @click="${() => { this._activeDetailView = 'solar'; }}">
                   <text x="0" y="${-R - 12}" class="node-outer-label">Zon</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="9"
@@ -970,7 +1130,7 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xR}, ${yT})">
+                <g transform="translate(${xR}, ${yT})" class="circle-interactive" title="Klik voor Huisverbruik grafiek" @click="${() => { this._activeDetailView = 'home'; }}">
                   <text x="0" y="${-R - 12}" class="node-outer-label">Thuis</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="9" />
                   ${lenSolar > 0 ? svg`
@@ -1008,7 +1168,7 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xL}, ${yB})">
+                <g transform="translate(${xL}, ${yB})" class="circle-interactive" title="Klik voor Thuisbatterij grafiek" @click="${() => { this._activeDetailView = 'battery'; }}">
                   <text x="0" y="${R + 24}" class="node-outer-label">Batterij</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="9"
@@ -1036,7 +1196,7 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xR}, ${yB})">
+                <g transform="translate(${xR}, ${yB})" class="circle-interactive" title="Klik voor Netstroom grafiek" @click="${() => { this._activeDetailView = 'grid'; }}">
                   <text x="0" y="${R + 24}" class="node-outer-label">Net</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="9"
@@ -1064,6 +1224,8 @@ export class EnergyDashboardCard extends LitElement {
                         ${isGridImport ? 'Afname' : 'Teruglevering'}
                       </span>
                     </div>
+            ` : this._renderDetailView()}
+          
                   </foreignObject>
                 </g>
               </svg>
@@ -1340,7 +1502,411 @@ export class EnergyDashboardCard extends LitElement {
     `;
   }
 
-    private _openMoreInfo(entityId: string): void {
+      private _aggregateHistory5Min(entityId: string, startTime: number, endTime: number): { time: number; mean: number; min: number; max: number }[] {
+    const raw = (this._historyData && this._historyData[entityId]) || [];
+    if (raw.length === 0) return [];
+
+    const parsed = raw.map((p: any) => {
+      const state = parseFloat(p.s !== undefined ? p.s : p.state);
+      const time = (p.lu !== undefined ? p.lu * 1000 : (p.t !== undefined ? p.t * 1000 : new Date(p.last_changed || p.last_updated).getTime()));
+      return { state: isNaN(state) ? 0 : state, time };
+    }).filter(p => p.time >= startTime && p.time <= endTime)
+      .sort((a, b) => a.time - b.time);
+
+    if (parsed.length === 0) return [];
+
+    const bucketMs = 5 * 60 * 1000;
+    const buckets: Record<number, number[]> = {};
+    parsed.forEach(p => {
+      const bTime = Math.floor(p.time / bucketMs) * bucketMs;
+      if (!buckets[bTime]) buckets[bTime] = [];
+      buckets[bTime].push(p.state);
+    });
+
+    const times = Object.keys(buckets).map(Number).sort((a, b) => a - b);
+    return times.map(t => {
+      const vals = buckets[t];
+      const min = Math.min(...vals);
+      const max = Math.max(...vals);
+      const mean = vals.reduce((sum, v) => sum + v, 0) / vals.length;
+      return { time: t, mean, min, max };
+    });
+  }
+
+  private _renderDetailView(): TemplateResult {
+    const now = new Date();
+    const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
+    const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).getTime();
+
+    // Chart dimensions inside SVG viewBox 0 0 600 460
+    const cL = 50;
+    const cR = 560;
+    const cW = cR - cL;
+    const cT = 35;
+    const cH = 340;
+    const cB = cT + cH;
+
+    const timeToX = (t: number) => cL + ((t - startTime) / (endTime - startTime)) * cW;
+
+    // Retrieve active component details
+    let viewColor = '#f59e0b';
+    let kpiBadge = '';
+
+    const solarToday = this._getNumber('sensor.totale_opwek_vandaag_2');
+    const solarW = Math.max(0, this._getNumber('sensor.totale_live_zonnestroom'));
+    const homeToday = this._getNumber('sensor.echt_huisverbruik_vandaag');
+    const homeW = Math.max(0, this._getNumber('sensor.live_huisverbruik'));
+    const gridW = this._getNumber('sensor.p1_meter_power');
+    const gridImpToday = this._getNumber('sensor.p1_netstroom_afname_vandaag');
+    const batW = this._getNumber('sensor.thuisbatterij_vermogen');
+    const batSoC = Math.min(100, Math.max(0, this._getNumber('sensor.thuisbatterij_percentage', 100)));
+    const batCapacity = this._getNumber('input_number.thuisbatterij_capaciteit', 35);
+    const batKwhNow = (batSoC / 100) * batCapacity;
+
+    if (this._activeDetailView === 'solar') {
+      viewColor = '#f59e0b';
+      kpiBadge = `Nu: ${solarW} W | Vandaag: ${solarToday.toFixed(1)} kWh`;
+    } else if (this._activeDetailView === 'home') {
+      viewColor = '#f1f5f9';
+      kpiBadge = `Nu: ${homeW} W | Vandaag: ${homeToday.toFixed(1)} kWh`;
+    } else if (this._activeDetailView === 'battery') {
+      viewColor = '#10b981';
+      kpiBadge = `${batKwhNow.toFixed(1)} / ${batCapacity} kWh (${batSoC.toFixed(0)}%) | ${Math.abs(batW)} W`;
+    } else if (this._activeDetailView === 'grid') {
+      viewColor = '#38bdf8';
+      kpiBadge = `Nu: ${gridW >= 0 ? '+' : ''}${gridW} W | Afname: ${gridImpToday.toFixed(1)} kWh`;
+    }
+
+    return html`
+      <div class="detail-view-container">
+        <!-- Top Navigation Bar -->
+        <div class="detail-header-bar">
+          <button class="back-btn" @click="${() => { this._activeDetailView = 'flow'; }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Schema</span>
+          </button>
+
+          <div class="comp-tabs-group">
+            <button class="comp-tab-btn ${this._activeDetailView === 'solar' ? 'active tab-solar' : ''}" @click="${() => { this._activeDetailView = 'solar'; }}">☀️ Zon</button>
+            <button class="comp-tab-btn ${this._activeDetailView === 'home' ? 'active tab-home' : ''}" @click="${() => { this._activeDetailView = 'home'; }}">🏠 Thuis</button>
+            <button class="comp-tab-btn ${this._activeDetailView === 'battery' ? 'active tab-battery' : ''}" @click="${() => { this._activeDetailView = 'battery'; }}">🔋 Batterij</button>
+            <button class="comp-tab-btn ${this._activeDetailView === 'grid' ? 'active tab-grid' : ''}" @click="${() => { this._activeDetailView = 'grid'; }}">⚡ Net</button>
+          </div>
+
+          <span class="node-status-pill" style="border-color: ${viewColor}; color: ${viewColor}; font-weight: 600;">
+            ${kpiBadge}
+          </span>
+        </div>
+
+        <!-- Optional Battery Subtabs (Option B: Full Height Toggle) -->
+        ${this._activeDetailView === 'battery' ? html`
+          <div class="subtabs-bar">
+            <button class="subtab-pill ${this._batteryChartMode === 'kwh' ? 'active' : ''}" @click="${() => { this._batteryChartMode = 'kwh'; }}">
+              🔋 Accu-inhoud (kWh & %)
+            </button>
+            <button class="subtab-pill ${this._batteryChartMode === 'power' ? 'active' : ''}" @click="${() => { this._batteryChartMode = 'power'; }}">
+              ⚡ Vermogen Laden / Ontladen (Watt)
+            </button>
+          </div>
+        ` : ''}
+
+        <!-- 24-Hour Interactive High-Res SVG Chart -->
+        <div class="detail-chart-wrapper">
+          <svg class="detail-chart-svg" viewBox="0 0 600 440"
+            @mousemove="${(e: MouseEvent) => this._handleChartMouseMove(e, cL, cR, cT, cB, startTime, endTime)}"
+            @mouseleave="${() => { this._hoverChartPoint = null; }}">
+            
+            <defs>
+              <linearGradient id="solar-chart-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.45" />
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.02" />
+              </linearGradient>
+              <linearGradient id="home-chart-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02" />
+              </linearGradient>
+              <linearGradient id="bat-kwh-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.45" />
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0.03" />
+              </linearGradient>
+            </defs>
+
+            <!-- Grid Guidelines & X-Axis Time Markers -->
+            ${[0, 4, 8, 12, 16, 20, 24].map(h => {
+              const x = cL + (h / 24) * cW;
+              return svg`
+                <line x1="${x}" y1="${cT}" x2="${x}" y2="${cB}" stroke="rgba(255, 255, 255, 0.07)" stroke-dasharray="3 4" />
+                <text x="${x}" y="${cB + 20}" fill="#64748b" font-size="10.5" font-weight="500" text-anchor="middle">
+                  ${h.toString().padStart(2, '0')}:00
+                </text>
+              `;
+            })}
+
+            <!-- Chart Type Specific Content -->
+            ${(() => {
+              if (this._activeDetailView === 'solar') {
+                const data = this._aggregateHistory5Min('sensor.totale_live_zonnestroom', startTime, endTime);
+                const maxVal = Math.max(1000, ...data.map(d => d.max));
+                const pts = data.map(d => ({
+                  x: timeToX(d.time),
+                  y: cB - (Math.max(0, d.mean) / maxVal) * cH,
+                  val: d.mean,
+                  time: d.time
+                }));
+
+                const linePath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)} ` + pts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') : '';
+                const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${cB} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${cB} Z` : '';
+
+                return svg`
+                  <!-- Y-Axis Guides -->
+                  ${[0, 0.25, 0.5, 0.75, 1.0].map(pct => {
+                    const y = cB - pct * cH;
+                    const val = Math.round(pct * maxVal);
+                    return svg`
+                      <line x1="${cL}" y1="${y}" x2="${cR}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" />
+                      <text x="${cL - 8}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end">${val >= 1000 ? (val/1000).toFixed(1) + ' kW' : val + ' W'}</text>
+                    `;
+                  })}
+
+                  ${areaPath ? svg`<path d="${areaPath}" fill="url(#solar-chart-grad)" />` : ''}
+                  ${linePath ? svg`<path d="${linePath}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" filter="drop-shadow(0 0 6px rgba(245, 158, 11, 0.4))" />` : ''}
+                `;
+              }
+
+              if (this._activeDetailView === 'home') {
+                const data = this._aggregateHistory5Min('sensor.live_huisverbruik', startTime, endTime);
+                const maxVal = Math.max(1000, ...data.map(d => d.max));
+                const pts = data.map(d => ({
+                  x: timeToX(d.time),
+                  y: cB - (Math.max(0, d.mean) / maxVal) * cH,
+                  val: d.mean,
+                  time: d.time
+                }));
+
+                const linePath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)} ` + pts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') : '';
+                const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${cB} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${cB} Z` : '';
+
+                return svg`
+                  <!-- Y-Axis Guides -->
+                  ${[0, 0.25, 0.5, 0.75, 1.0].map(pct => {
+                    const y = cB - pct * cH;
+                    const val = Math.round(pct * maxVal);
+                    return svg`
+                      <line x1="${cL}" y1="${y}" x2="${cR}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" />
+                      <text x="${cL - 8}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end">${val >= 1000 ? (val/1000).toFixed(1) + ' kW' : val + ' W'}</text>
+                    `;
+                  })}
+
+                  ${areaPath ? svg`<path d="${areaPath}" fill="url(#home-chart-grad)" />` : ''}
+                  ${linePath ? svg`<path d="${linePath}" fill="none" stroke="#f1f5f9" stroke-width="2.2" stroke-linecap="round" />` : ''}
+                `;
+              }
+
+              if (this._activeDetailView === 'battery') {
+                if (this._batteryChartMode === 'kwh') {
+                  const data = this._aggregateHistory5Min('sensor.thuisbatterij_percentage', startTime, endTime);
+                  const pts = data.map(d => ({
+                    x: timeToX(d.time),
+                    y: cB - (Math.min(100, Math.max(0, d.mean)) / 100) * cH,
+                    pct: d.mean,
+                    kwh: (d.mean / 100) * batCapacity,
+                    time: d.time
+                  }));
+
+                  const linePath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)} ` + pts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') : '';
+                  const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${cB} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${cB} Z` : '';
+
+                  return svg`
+                    <!-- Dual Y-Axis Guides: Left = kWh, Right = % -->
+                    ${[0, 0.25, 0.5, 0.75, 1.0].map(pct => {
+                      const y = cB - pct * cH;
+                      const kwhVal = (pct * batCapacity).toFixed(0);
+                      const pctVal = Math.round(pct * 100);
+                      return svg`
+                        <line x1="${cL}" y1="${y}" x2="${cR}" stroke="rgba(255, 255, 255, ${pct === 0 ? '0.15' : '0.05'})" />
+                        <text x="${cL - 8}" y="${y + 4}" fill="#10b981" font-size="10" font-weight="600" text-anchor="end">${kwhVal} kWh</text>
+                        <text x="${cR + 8}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="start">${pctVal} %</text>
+                      `;
+                    })}
+
+                    ${areaPath ? svg`<path d="${areaPath}" fill="url(#bat-kwh-grad)" />` : ''}
+                    ${linePath ? svg`<path d="${linePath}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" filter="drop-shadow(0 0 8px rgba(16, 185, 129, 0.5))" />` : ''}
+                    
+                    ${pts.length > 0 ? svg`
+                      <circle cx="${pts[pts.length-1].x}" cy="${pts[pts.length-1].y}" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+                    ` : ''}
+                  `;
+                } else {
+                  const data = this._aggregateHistory5Min('sensor.thuisbatterij_vermogen', startTime, endTime);
+                  const maxAbs = Math.max(1000, ...data.map(d => Math.max(Math.abs(d.max), Math.abs(d.min))));
+                  const yZero = cT + cH / 2;
+
+                  const pts = data.map(d => ({
+                    x: timeToX(d.time),
+                    y: yZero - (d.mean / maxAbs) * (cH / 2),
+                    val: d.mean,
+                    time: d.time
+                  }));
+
+                  const linePath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)} ` + pts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') : '';
+                  const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${yZero} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${yZero} Z` : '';
+
+                  return svg`
+                    <!-- Zero line -->
+                    <line x1="${cL}" y1="${yZero}" x2="${cR}" stroke="rgba(255, 255, 255, 0.2)" stroke-dasharray="4 4" />
+                    <text x="${cL - 8}" y="${yZero + 4}" fill="#64748b" font-size="10" text-anchor="end">0 W</text>
+
+                    <text x="${cL - 8}" y="${cT + 12}" fill="#10b981" font-size="10" font-weight="600" text-anchor="end">+${(maxAbs/1000).toFixed(1)} kW (Laden)</text>
+                    <text x="${cL - 8}" y="${cB - 4}" fill="#38bdf8" font-size="10" font-weight="600" text-anchor="end">-${(maxAbs/1000).toFixed(1)} kW (Ontladen)</text>
+
+                    ${areaPath ? svg`<path d="${areaPath}" fill="rgba(16, 185, 129, 0.18)" />` : ''}
+                    ${linePath ? svg`<path d="${linePath}" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" />` : ''}
+                  `;
+                }
+              }
+
+              if (this._activeDetailView === 'grid') {
+                const data = this._aggregateHistory5Min('sensor.p1_meter_power', startTime, endTime);
+                const maxAbs = Math.max(1000, ...data.map(d => Math.max(Math.abs(d.max), Math.abs(d.min))));
+                const yZero = cT + cH / 2;
+
+                const pts = data.map(d => ({
+                  x: timeToX(d.time),
+                  y: yZero - (d.mean / maxAbs) * (cH / 2),
+                  val: d.mean,
+                  time: d.time
+                }));
+
+                const linePath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)} ` + pts.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') : '';
+                const areaPath = pts.length > 0 ? `M ${pts[0].x.toFixed(1)} ${yZero} ` + pts.map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ` L ${pts[pts.length-1].x.toFixed(1)} ${yZero} Z` : '';
+
+                return svg`
+                  <!-- Zero line -->
+                  <line x1="${cL}" y1="${yZero}" x2="${cR}" stroke="rgba(255, 255, 255, 0.2)" stroke-dasharray="4 4" />
+                  <text x="${cL - 8}" y="${yZero + 4}" fill="#64748b" font-size="10" text-anchor="end">0 W</text>
+
+                  <text x="${cL - 8}" y="${cT + 12}" fill="#38bdf8" font-size="10" font-weight="600" text-anchor="end">+${(maxAbs/1000).toFixed(1)} kW (Afname)</text>
+                  <text x="${cL - 8}" y="${cB - 4}" fill="#10b981" font-size="10" font-weight="600" text-anchor="end">-${(maxAbs/1000).toFixed(1)} kW (Teruglevering)</text>
+
+                  ${areaPath ? svg`<path d="${areaPath}" fill="rgba(56, 189, 248, 0.18)" />` : ''}
+                  ${linePath ? svg`<path d="${linePath}" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" />` : ''}
+                `;
+              }
+
+              return '';
+            })()}
+
+            <!-- Interactive Crosshair Tooltip -->
+            ${this._hoverChartPoint ? svg`
+              <line x1="${this._hoverChartPoint.x}" y1="${cT}" x2="${this._hoverChartPoint.x}" y2="${cB}" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="2 3" pointer-events="none" />
+              <circle cx="${this._hoverChartPoint.x}" cy="${this._hoverChartPoint.y}" r="4" fill="#ffffff" filter="drop-shadow(0 0 6px rgba(255,255,255,0.8))" pointer-events="none" />
+              
+              <g transform="translate(${Math.max(80, Math.min(500, this._hoverChartPoint.x))}, ${Math.max(45, this._hoverChartPoint.y - 30)})" pointer-events="none">
+                <rect x="-60" y="-24" width="120" height="36" rx="6" fill="#0b0f19" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" filter="drop-shadow(0 6px 16px rgba(0,0,0,0.9))" />
+                <text x="0" y="-10" fill="#94a3b8" font-size="9.5" font-weight="500" text-anchor="middle">${this._hoverChartPoint.title}</text>
+                <text x="0" y="4" fill="#f8fafc" font-size="11" font-weight="700" text-anchor="middle">${this._hoverChartPoint.val1}</text>
+              </g>
+            ` : ''}
+
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  private _handleChartMouseMove(e: MouseEvent, cL: number, cR: number, cT: number, cB: number, startTime: number, endTime: number): void {
+    const svgEl = e.currentTarget as SVGSVGElement;
+    const rect = svgEl.getBoundingClientRect();
+    const svgX = ((e.clientX - rect.left) / rect.width) * 600;
+    const clampedX = Math.max(cL, Math.min(cR, svgX));
+
+    const t = startTime + ((clampedX - cL) / (cR - cL)) * (endTime - startTime);
+    const d = new Date(t);
+    const timeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+
+    const batCapacity = this._getNumber('input_number.thuisbatterij_capaciteit', 35);
+
+    if (this._activeDetailView === 'solar') {
+      const data = this._aggregateHistory5Min('sensor.totale_live_zonnestroom', startTime, endTime);
+      if (data.length > 0) {
+        const closest = data.reduce((prev, curr) => Math.abs(curr.time - t) < Math.abs(prev.time - t) ? curr : prev, data[0]);
+        const maxVal = Math.max(1000, ...data.map(d => d.max));
+        const y = cB - (Math.max(0, closest.mean) / maxVal) * (cB - cT);
+        this._hoverChartPoint = {
+          time: t,
+          x: clampedX,
+          y: y,
+          title: `Tijd: ${timeStr}`,
+          val1: `Opwek: ${Math.round(closest.mean)} W`
+        };
+      }
+    } else if (this._activeDetailView === 'home') {
+      const data = this._aggregateHistory5Min('sensor.live_huisverbruik', startTime, endTime);
+      if (data.length > 0) {
+        const closest = data.reduce((prev, curr) => Math.abs(curr.time - t) < Math.abs(prev.time - t) ? curr : prev, data[0]);
+        const maxVal = Math.max(1000, ...data.map(d => d.max));
+        const y = cB - (Math.max(0, closest.mean) / maxVal) * (cB - cT);
+        this._hoverChartPoint = {
+          time: t,
+          x: clampedX,
+          y: y,
+          title: `Tijd: ${timeStr}`,
+          val1: `Verbruik: ${Math.round(closest.mean)} W`
+        };
+      }
+    } else if (this._activeDetailView === 'battery') {
+      if (this._batteryChartMode === 'kwh') {
+        const data = this._aggregateHistory5Min('sensor.thuisbatterij_percentage', startTime, endTime);
+        if (data.length > 0) {
+          const closest = data.reduce((prev, curr) => Math.abs(curr.time - t) < Math.abs(prev.time - t) ? curr : prev, data[0]);
+          const y = cB - (Math.min(100, Math.max(0, closest.mean)) / 100) * (cB - cT);
+          const kwh = ((closest.mean / 100) * batCapacity).toFixed(1);
+          this._hoverChartPoint = {
+            time: t,
+            x: clampedX,
+            y: y,
+            title: `Tijd: ${timeStr}`,
+            val1: `${kwh} kWh (${Math.round(closest.mean)}%)`
+          };
+        }
+      } else {
+        const data = this._aggregateHistory5Min('sensor.thuisbatterij_vermogen', startTime, endTime);
+        if (data.length > 0) {
+          const closest = data.reduce((prev, curr) => Math.abs(curr.time - t) < Math.abs(prev.time - t) ? curr : prev, data[0]);
+          const maxAbs = Math.max(1000, ...data.map(d => Math.max(Math.abs(d.max), Math.abs(d.min))));
+          const yZero = cT + (cB - cT) / 2;
+          const y = yZero - (closest.mean / maxAbs) * ((cB - cT) / 2);
+          this._hoverChartPoint = {
+            time: t,
+            x: clampedX,
+            y: y,
+            title: `Tijd: ${timeStr}`,
+            val1: closest.mean >= 0 ? `Laden: +${Math.round(closest.mean)} W` : `Ontladen: -${Math.round(Math.abs(closest.mean))} W`
+          };
+        }
+      }
+    } else if (this._activeDetailView === 'grid') {
+      const data = this._aggregateHistory5Min('sensor.p1_meter_power', startTime, endTime);
+      if (data.length > 0) {
+        const closest = data.reduce((prev, curr) => Math.abs(curr.time - t) < Math.abs(prev.time - t) ? curr : prev, data[0]);
+        const maxAbs = Math.max(1000, ...data.map(d => Math.max(Math.abs(d.max), Math.abs(d.min))));
+        const yZero = cT + (cB - cT) / 2;
+        const y = yZero - (closest.mean / maxAbs) * ((cB - cT) / 2);
+        this._hoverChartPoint = {
+          time: t,
+          x: clampedX,
+          y: y,
+          title: `Tijd: ${timeStr}`,
+          val1: closest.mean >= 0 ? `Afname: +${Math.round(closest.mean)} W` : `Terug: -${Math.round(Math.abs(closest.mean))} W`
+        };
+      }
+    }
+  }
+
+
+  private _openMoreInfo(entityId: string): void {
     const event = new CustomEvent('hass-more-info', {
       bubbles: true,
       composed: true,
