@@ -694,68 +694,55 @@ export class EnergyFlowCard extends LitElement {
     const minPrice = isNaN(Math.min(...prices, 0.0)) ? 0.0 : Math.min(...prices, 0.0);
     const priceRange = maxPrice - minPrice || 0.40;
 
-    const parseHistory = (entId: string) => {
+    const aggregate5MinHistory = (entId: string) => {
       const raw = this.hourlyHistoryData[entId] || [];
       const parsed = raw.map((p: any) => {
         const state = parseFloat(p.s !== undefined ? p.s : p.state);
         const time = (p.t !== undefined ? p.t * 1000 : new Date(p.last_changed || p.last_updated).getTime());
         return { state: isNaN(state) ? 0 : state, time };
-      }).sort((a, b) => a.time - b.time);
+      }).filter(p => p.time >= startTime && p.time <= endTime)
+        .sort((a, b) => a.time - b.time);
 
-      if (parsed.length > 300) {
-        const factor = Math.ceil(parsed.length / 300);
-        const downsampled = [];
-        for (let i = 0; i < parsed.length; i += factor) {
-          downsampled.push(parsed[i]);
-        }
-        if (downsampled[downsampled.length - 1] !== parsed[parsed.length - 1]) {
-          downsampled.push(parsed[parsed.length - 1]);
-        }
-        return downsampled;
-      }
-      return parsed;
+      if (parsed.length === 0) return [];
+
+      const bucketMs = 5 * 60 * 1000;
+      const buckets: Record<number, number[]> = {};
+      parsed.forEach(p => {
+        const bTime = Math.floor(p.time / bucketMs) * bucketMs;
+        if (!buckets[bTime]) buckets[bTime] = [];
+        buckets[bTime].push(p.state);
+      });
+
+      const times = Object.keys(buckets).map(Number).sort((a, b) => a - b);
+      return times.map(t => {
+        const vals = buckets[t];
+        const min = Math.min(...vals);
+        const max = Math.max(...vals);
+        const mean = vals.reduce((sum, v) => sum + v, 0) / vals.length;
+        return { time: t, mean, min, max, state: mean };
+      });
     };
 
     const solarPowerEnt = this.config?.entities.solar || (this.config?.entities as any).solar_power || '';
     const homePowerEnt = this.config?.entities.load || (this.config?.entities as any).home_power || '';
     const gridPowerEnt = this.config?.entities.grid || (this.config?.entities as any).grid_power || '';
 
-    // Adaptive smoothing with quadratic scaling to filter out small-to-medium jitter aggressively
-    const smoothHistory = (history: { state: number, time: number }[]) => {
-      if (history.length === 0) return [];
-      const maxVal = Math.max(...history.map(h => Math.abs(h.state)), 100);
-      const threshold = maxVal * 0.12; // Increased threshold for broader smoothing
-      
-      const smoothed = [];
-      let prevVal = history[0].state;
-      for (let i = 0; i < history.length; i++) {
-        const currentVal = history[i].state;
-        const diff = Math.abs(currentVal - prevVal);
-        // Quadratic scaling for alpha: extremely smooth for small changes, fully responsive for big jumps
-        const alpha = 0.05 + 0.95 * Math.pow(Math.min(1, diff / threshold), 2);
-        const newVal = prevVal + alpha * (currentVal - prevVal);
-        smoothed.push({ state: newVal, time: history[i].time });
-        prevVal = newVal;
-      }
-      return smoothed;
-    };
-
-    const solarHistory = smoothHistory(parseHistory(solarPowerEnt));
-    const homeHistory = smoothHistory(parseHistory(homePowerEnt));
+    const solarHistory = aggregate5MinHistory(solarPowerEnt);
+    const homeHistory = aggregate5MinHistory(homePowerEnt);
 
     // Get max power for Y scaling based on type
     let maxPower = 1000;
     if (chartType === 'solar') {
-      maxPower = Math.max(...solarHistory.map(p => p.state), 1000);
+      maxPower = Math.max(...solarHistory.map(p => p.max), 1000);
     } else if (chartType === 'home') {
-      maxPower = Math.max(...homeHistory.map(p => p.state), 1000);
+      maxPower = Math.max(...homeHistory.map(p => p.max), 1000);
     } else if (chartType === 'grid') {
-      const gridRaw = smoothHistory(parseHistory(gridPowerEnt));
-      const importStates = gridRaw.map(p => p.state > 0 ? p.state : 0);
-      const exportStates = gridRaw.map(p => p.state < 0 ? Math.abs(p.state) : 0);
+      const gridRaw = aggregate5MinHistory(gridPowerEnt);
+      const importStates = gridRaw.map(p => p.max > 0 ? p.max : 0);
+      const exportStates = gridRaw.map(p => p.min < 0 ? Math.abs(p.min) : 0);
       maxPower = Math.max(...importStates, ...exportStates, 1000);
     } else {
-      maxPower = Math.max(...solarHistory.map(p => p.state), ...homeHistory.map(p => p.state), 1000);
+      maxPower = Math.max(...solarHistory.map(p => p.max), ...homeHistory.map(p => p.max), 1000);
     }
 
     // SVG Layout
@@ -780,23 +767,30 @@ export class EnergyFlowCard extends LitElement {
       return { x: Math.min(chartRight, Math.max(chartLeft, x)), y: Math.min(chartBottom, Math.max(chartTop, y)) };
     };
 
-    // Build Solar Line & Area Paths
-    let solarLinePath = '';
-    let solarAreaPath = '';
-    if ((chartType === 'unified' || chartType === 'solar') && solarHistory.length > 0) {
-      const pts = solarHistory.map(p => getCoords(p.time, p.state));
-      solarLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
-      solarAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length-1].x} ${chartBottom} Z`;
-    }
+    // Build 5-min paths with hard mean line and light min/max outlier envelope
+    const build5MinPaths = (data: { time: number, mean: number, min: number, max: number }[]) => {
+      if (data.length === 0) return { line: '', envelope: '', area: '' };
+      const pts = data.map(d => ({
+        x: chartLeft + ((d.time - startTime) / (endTime - startTime)) * chartWidth,
+        meanY: chartBottom - (Math.max(0, d.mean) / maxPower) * chartHeight,
+        minY: chartBottom - (Math.max(0, d.min) / maxPower) * chartHeight,
+        maxY: chartBottom - (Math.max(0, d.max) / maxPower) * chartHeight,
+      }));
 
-    // Build Home Line & Area Paths
-    let homeLinePath = '';
-    let homeAreaPath = '';
-    if ((chartType === 'unified' || chartType === 'home') && homeHistory.length > 0) {
-      const pts = homeHistory.map(p => getCoords(p.time, p.state));
-      homeLinePath = `M ${pts[0].x} ${pts[0].y} ` + pts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
-      homeAreaPath = `M ${pts[0].x} ${chartBottom} ` + pts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${pts[pts.length-1].x} ${chartBottom} Z`;
-    }
+      const line = `M ${pts[0].x} ${pts[0].meanY} ` + pts.slice(1).map(p => `L ${p.x} ${p.meanY}`).join(' ');
+      const envelope = `M ${pts[0].x} ${pts[0].maxY} ` +
+        pts.map(p => `L ${p.x} ${p.maxY}`).join(' ') +
+        pts.slice().reverse().map(p => `L ${p.x} ${p.minY}`).join(' ') +
+        ' Z';
+      const area = `M ${pts[0].x} ${chartBottom} ` +
+        pts.map(p => `L ${p.x} ${p.meanY}`).join(' ') +
+        ` L ${pts[pts.length - 1].x} ${chartBottom} Z`;
+
+      return { line, envelope, area };
+    };
+
+    const solarPaths = build5MinPaths(solarHistory);
+    const homePaths = build5MinPaths(homeHistory);
 
     // Build Price stepped path (spanning full 24h)
     let priceLinePath = '';
@@ -822,21 +816,34 @@ export class EnergyFlowCard extends LitElement {
     // Build Grid Import (Afname) & Grid Export (Teruglevering) Paths
     let gridImportLinePath = '';
     let gridImportAreaPath = '';
+    let gridImportEnvelopePath = '';
     let gridExportLinePath = '';
     let gridExportAreaPath = '';
+    let gridExportEnvelopePath = '';
     if (chartType === 'grid') {
-      const gridRaw = smoothHistory(parseHistory(gridPowerEnt));
-      const importPts = gridRaw.map(p => getCoords(p.time, p.state > 0 ? p.state : 0));
-      const exportPts = gridRaw.map(p => getCoords(p.time, p.state < 0 ? Math.abs(p.state) : 0));
+      const gridRaw = aggregate5MinHistory(gridPowerEnt);
+      const importData = gridRaw.map(p => ({
+        time: p.time,
+        mean: p.mean > 0 ? p.mean : 0,
+        min: p.min > 0 ? p.min : 0,
+        max: p.max > 0 ? p.max : 0
+      }));
+      const exportData = gridRaw.map(p => ({
+        time: p.time,
+        mean: p.mean < 0 ? Math.abs(p.mean) : 0,
+        min: p.max < 0 ? Math.abs(p.max) : 0,
+        max: p.min < 0 ? Math.abs(p.min) : 0
+      }));
 
-      if (importPts.length > 0) {
-        gridImportLinePath = `M ${importPts[0].x} ${importPts[0].y} ` + importPts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
-        gridImportAreaPath = `M ${importPts[0].x} ${chartBottom} ` + importPts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${importPts[importPts.length-1].x} ${chartBottom} Z`;
-      }
-      if (exportPts.length > 0) {
-        gridExportLinePath = `M ${exportPts[0].x} ${exportPts[0].y} ` + exportPts.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
-        gridExportAreaPath = `M ${exportPts[0].x} ${chartBottom} ` + exportPts.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${exportPts[exportPts.length-1].x} ${chartBottom} Z`;
-      }
+      const imp = build5MinPaths(importData);
+      gridImportLinePath = imp.line;
+      gridImportEnvelopePath = imp.envelope;
+      gridImportAreaPath = imp.area;
+
+      const exp = build5MinPaths(exportData);
+      gridExportLinePath = exp.line;
+      gridExportEnvelopePath = exp.envelope;
+      gridExportAreaPath = exp.area;
     }
 
     // Y Gridlines
@@ -938,26 +945,30 @@ export class EnergyFlowCard extends LitElement {
             <path d="${priceLinePath}" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.8" stroke-dasharray="3,3" />
           ` : ''}
 
-          <!-- Solar Area & Line -->
-          ${(chartType === 'unified' || chartType === 'solar') && solarLinePath ? svg`
-            <path d="${solarAreaPath}" fill="url(#solar-area-grad)" />
-            <path d="${solarLinePath}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Solar Envelope & Line -->
+          ${(chartType === 'unified' || chartType === 'solar') && solarPaths.line ? svg`
+            <path d="${solarPaths.envelope}" fill="#fbbf24" fill-opacity="0.18" />
+            <path d="${solarPaths.area}" fill="url(#solar-area-grad)" />
+            <path d="${solarPaths.line}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
-          <!-- Home Area & Line -->
-          ${(chartType === 'unified' || chartType === 'home') && homeLinePath ? svg`
-            <path d="${homeAreaPath}" fill="url(#home-area-grad)" />
-            <path d="${homeLinePath}" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Home Envelope & Line -->
+          ${(chartType === 'unified' || chartType === 'home') && homePaths.line ? svg`
+            <path d="${homePaths.envelope}" fill="#a78bfa" fill-opacity="0.18" />
+            <path d="${homePaths.area}" fill="url(#home-area-grad)" />
+            <path d="${homePaths.line}" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Grid Import (Afname) Area & Line -->
           ${chartType === 'grid' && gridImportLinePath ? svg`
+            <path d="${gridImportEnvelopePath}" fill="#60a5fa" fill-opacity="0.18" />
             <path d="${gridImportAreaPath}" fill="url(#grid-import-area-grad)" />
             <path d="${gridImportLinePath}" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
 
           <!-- Grid Export (Teruglevering) Area & Line -->
           ${chartType === 'grid' && gridExportLinePath ? svg`
+            <path d="${gridExportEnvelopePath}" fill="#10b981" fill-opacity="0.18" />
             <path d="${gridExportAreaPath}" fill="url(#grid-export-area-grad)" />
             <path d="${gridExportLinePath}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
           ` : ''}
@@ -1873,6 +1884,43 @@ export class EnergyFlowCard extends LitElement {
 
   private async handleNodeClick(nodeId: string): Promise<void> {
     console.info(`[energy-flow-card] Click registered on node: ${nodeId}`);
+
+    const actionKey = `${nodeId}_tap_action`;
+    const customAction = (this.config as any)[actionKey];
+    if (customAction) {
+      console.log(`[energy-flow-card] Executing custom action for node '${nodeId}':`, customAction);
+      
+      if (customAction.action === 'navigate' && customAction.navigation_path) {
+        const path = customAction.navigation_path;
+        if (path.startsWith('#')) {
+          window.location.hash = path;
+          return;
+        } else {
+          window.history.pushState(null, '', path);
+          const ev = new CustomEvent('location-changed', {
+            detail: { replace: false },
+            bubbles: true,
+            composed: true
+          });
+          this.dispatchEvent(ev);
+          return;
+        }
+      }
+
+      const event = new CustomEvent('hass-action', {
+        detail: {
+          config: {
+            tap_action: customAction
+          },
+          action: 'tap',
+          action_config: customAction
+        },
+        bubbles: true,
+        composed: true
+      });
+      this.dispatchEvent(event);
+      return;
+    }
     
     if (nodeId === 'solar' || nodeId === 'home' || nodeId === 'grid' || nodeId === 'weather') {
       this.activePopup = nodeId;
@@ -1949,43 +1997,6 @@ export class EnergyFlowCard extends LitElement {
         }
       }
       
-      return;
-    }
-
-    const actionKey = `${nodeId}_tap_action`;
-    const customAction = (this.config as any)[actionKey];
-    if (customAction) {
-      console.log(`[energy-flow-card] Executing custom action for node '${nodeId}':`, customAction);
-      
-      if (customAction.action === 'navigate' && customAction.navigation_path) {
-        const path = customAction.navigation_path;
-        if (path.startsWith('#')) {
-          window.location.hash = path;
-          return;
-        } else {
-          window.history.pushState(null, '', path);
-          const ev = new CustomEvent('location-changed', {
-            detail: { replace: false },
-            bubbles: true,
-            composed: true
-          });
-          this.dispatchEvent(ev);
-          return;
-        }
-      }
-
-      const event = new CustomEvent('hass-action', {
-        detail: {
-          config: {
-            tap_action: customAction
-          },
-          action: 'tap',
-          action_config: customAction
-        },
-        bubbles: true,
-        composed: true
-      });
-      this.dispatchEvent(event);
       return;
     }
 
