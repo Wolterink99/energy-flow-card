@@ -1,3 +1,4 @@
+import './energy-dashboard-card';
 import { LitElement, html, svg, TemplateResult } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { HomeAssistant, EnergyFlowCardConfig } from './types';
