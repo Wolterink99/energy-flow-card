@@ -221,6 +221,7 @@ interface SvgParams {
   temperature?: number | null;
   poolPumpActive?: boolean;
   screensaver?: boolean;
+  useDashboardCircles?: boolean;
   onNodeClick: (node: string) => void;
 }
 
@@ -360,6 +361,7 @@ export function renderHouseSvg({
   temperature = null,
   poolPumpActive = false,
   screensaver = false,
+  useDashboardCircles = true,
   onNodeClick
 }: SvgParams): TemplateResult {
   if (poolPumpActive) {}
@@ -1277,11 +1279,31 @@ export function renderHouseSvg({
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- SOLAR HUD CARD (Top right sky area, dynamically aligned)        -->
         <!-- ════════════════════════════════════════════════════════════════ -->
-        ${showSolar ? svg`
+        ${showSolar ? (useDashboardCircles ? svg`
+          <!-- Solar Circle (Dashboard Style) -->
+          <g class="interactiveGroup solarGroup" transform="translate(${translateX + 215}, ${translateY + 120})" style="cursor: pointer;" @click=${() => onNodeClick('solar')}>
+            <text x="0" y="-48" fill="#e2e8f0" font-size="11.5" font-weight="700" text-anchor="middle" letter-spacing="0.3px">Zon</text>
+            <circle cx="0" cy="0" r="42" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="5.5" />
+            ${solarActive ? svg`
+              <circle cx="0" cy="0" r="42" fill="none" stroke="#f59e0b" stroke-width="5.5"
+                stroke-dasharray="263.89" stroke-dashoffset="0" transform="rotate(-90)" stroke-linecap="round" filter="drop-shadow(0 0 6px rgba(245, 158, 11, 0.5))" />
+            ` : ''}
+            <circle cx="0" cy="0" r="34" fill="rgba(15, 23, 42, 0.88)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.2" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.5))" />
+            <text x="0" y="-16" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle">${solarToday !== null ? `${solarToday.toFixed(1)} kWh` : 'Zon'}</text>
+            <g transform="translate(0, -5)">
+              <circle cx="0" cy="0" r="3.5" fill="none" stroke="#f59e0b" stroke-width="1.3" />
+              <line x1="0" y1="-6.5" x2="0" y2="-4.8" stroke="#f59e0b" stroke-width="1.3" />
+              <line x1="0" y1="4.8" x2="0" y2="6.5" stroke="#f59e0b" stroke-width="1.3" />
+              <line x1="-6.5" y1="0" x2="-4.8" y2="0" stroke="#f59e0b" stroke-width="1.3" />
+              <line x1="4.8" y1="0" x2="6.5" y2="0" stroke="#f59e0b" stroke-width="1.3" />
+            </g>
+            <text x="0" y="11" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">${solarActive ? formatPowerAbs(solar) : '0 W'}</text>
+            <rect x="-26" y="16" width="52" height="13" rx="6.5" fill="${solarActive ? 'rgba(245, 158, 11, 0.22)' : 'rgba(255,255,255,0.06)'}" />
+            <text x="0" y="25.5" fill="${solarActive ? '#fbbf24' : '#94a3b8'}" font-size="7.5" font-weight="700" text-anchor="middle">${solarActive ? 'Opwekking' : 'Standby'}</text>
+            <circle cx="0" cy="0" r="46" fill="transparent" />
+          </g>
+        ` : svg`
           <g class="interactiveGroup solarGroup" @click=${() => onNodeClick('solar')}>
-            <!-- Solar panels are at design x=320, y=270 (inside translate group)
-                 So SVG x = translateX+320, SVG y = translateY+270
-                 Card goes LEFT of the panels at the same roof height -->
             <g transform="translate(${translateX + 130}, ${translateY + 90})">
               <rect x="0" y="0" width="170" height="65"
                 class="hudCard ${solarActive ? 'hudCardActive' : ''}"
@@ -1297,7 +1319,7 @@ export function renderHouseSvg({
               </text>
             </g>
           </g>
-        ` : ''}
+        `) : ''}
 
         <!-- ════════════════════════════════════════════════════════════════ -->
         <!-- BOTTOM HUD CARDS (using dynamic gaps & screen bottom alignment) -->
@@ -1315,7 +1337,97 @@ export function renderHouseSvg({
              Cards zijn 170px breed, gecentreerd op het element.
         ──────────────────────────────────────────────────────────────────────────── -->
 
-        <!-- 1. Stroomnet — onder de masten (mast is altijd op SVG x=20) -->
+        ${useDashboardCircles ? svg`
+        <!-- ── DASHBOARD CIRCLES (Net, Batterij, Thuis, Laadpaal) ─────────────── -->
+
+        <!-- 1. Stroomnet Cirkel -->
+        <g class="interactiveGroup gridGroup" transform="translate(105, ${height - 56})" style="cursor: pointer;" @click=${() => onNodeClick('grid')}>
+          <text x="0" y="-48" fill="#e2e8f0" font-size="11.5" font-weight="700" text-anchor="middle" letter-spacing="0.3px">Net</text>
+          <circle cx="0" cy="0" r="42" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="5.5" />
+          <circle cx="0" cy="0" r="42" fill="none" stroke="${gridImporting ? '#38bdf8' : gridExporting ? '#10b981' : 'rgba(255, 255, 255, 0.15)'}" stroke-width="5.5"
+            stroke-dasharray="263.89" stroke-dashoffset="0" transform="rotate(-90)" stroke-linecap="round" />
+          <circle cx="0" cy="0" r="34" fill="rgba(15, 23, 42, 0.88)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.2" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.5))" />
+          <text x="0" y="-16" fill="${gridImporting ? '#38bdf8' : gridExporting ? '#10b981' : '#94a3b8'}" font-size="8" font-weight="600" text-anchor="middle">
+            ${gridImportToday !== null && gridExportToday !== null ? `↓${gridImportToday.toFixed(1)} ↑${gridExportToday.toFixed(1)}` : (gridPriceLabel || 'Net')}
+          </text>
+          <g transform="translate(0, -5)">
+            <path d="M-5 4 L5 4 M-3.5 -1 L3.5 -1 M0 -6 L0 5" stroke="${gridImporting ? '#38bdf8' : '#10b981'}" stroke-width="1.3" fill="none" />
+          </g>
+          <text x="0" y="11" fill="${gridImporting ? '#f8fafc' : '#10b981'}" font-size="12" font-weight="700" text-anchor="middle">
+            ${gridImporting || gridExporting ? formatPowerAbs(grid) : '0 W'}
+          </text>
+          <rect x="-28" y="16" width="56" height="13" rx="6.5" fill="${gridImporting ? 'rgba(56, 189, 248, 0.22)' : gridExporting ? 'rgba(16, 185, 129, 0.22)' : 'rgba(255,255,255,0.06)'}" />
+          <text x="0" y="25.5" fill="${gridImporting ? '#38bdf8' : gridExporting ? '#34d399' : '#94a3b8'}" font-size="7.5" font-weight="700" text-anchor="middle">
+            ${gridExporting ? 'Teruglevering' : gridImporting ? 'Afname' : 'Standby'}
+          </text>
+          <circle cx="0" cy="0" r="46" fill="transparent" />
+        </g>
+
+        <!-- 2. Thuisaccu Cirkel -->
+        ${showBattery ? svg`
+          <g class="interactiveGroup batteryGroup" transform="translate(${batteryX + 85}, ${height - 56})" style="cursor: pointer;" @click=${() => onNodeClick('battery')}>
+            <text x="0" y="-48" fill="#e2e8f0" font-size="11.5" font-weight="700" text-anchor="middle" letter-spacing="0.3px">Batterij</text>
+            <circle cx="0" cy="0" r="42" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="5.5" />
+            <circle cx="0" cy="0" r="42" fill="none" stroke="#10b981" stroke-width="5.5"
+              stroke-dasharray="263.89" stroke-dashoffset="${263.89 * (1 - Math.min(100, Math.max(0, soc)) / 100)}"
+              transform="rotate(-90)" stroke-linecap="round" filter="drop-shadow(0 0 6px rgba(16, 185, 129, 0.5))" />
+            <circle cx="0" cy="0" r="34" fill="rgba(15, 23, 42, 0.88)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.2" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.5))" />
+            <text x="0" y="-16" fill="#10b981" font-size="9" font-weight="700" text-anchor="middle">${soc} %</text>
+            <g transform="translate(0, -5)">
+              <rect x="-5" y="-3.5" width="10" height="6.5" rx="1.2" fill="none" stroke="#10b981" stroke-width="1.2" />
+              <line x1="5" y1="-1.5" x2="6.5" y2="-1.5" stroke="#10b981" stroke-width="1.2" />
+              <polygon points="1 -2 -1 0.5 1.5 0.5 -0.5 2.5 2 0 0 0 1 -2" fill="#10b981" stroke="none" />
+            </g>
+            <text x="0" y="11" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">
+              ${batteryCharging || batteryDischarging ? formatPowerAbs(batteryPower) : '0 W'}
+            </text>
+            <rect x="-27" y="16" width="54" height="13" rx="6.5" fill="${batteryCharging ? 'rgba(16, 185, 129, 0.22)' : batteryDischarging ? 'rgba(245, 158, 11, 0.22)' : 'rgba(255,255,255,0.06)'}" />
+            <text x="0" y="25.5" fill="${batteryCharging ? '#34d399' : batteryDischarging ? '#fbbf24' : '#94a3b8'}" font-size="7.5" font-weight="700" text-anchor="middle">
+              ${batteryCharging ? 'Laden' : batteryDischarging ? 'Ontladen' : 'Standby'}
+            </text>
+            <circle cx="0" cy="0" r="46" fill="transparent" />
+          </g>
+        ` : ''}
+
+        <!-- 3. Huisverbruik Cirkel -->
+        <g class="interactiveGroup homeGroup" transform="translate(${homeX + 85}, ${height - 56})" style="cursor: pointer;" @click=${() => onNodeClick('home')}>
+          <text x="0" y="-48" fill="#e2e8f0" font-size="11.5" font-weight="700" text-anchor="middle" letter-spacing="0.3px">Thuis</text>
+          <circle cx="0" cy="0" r="42" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="5.5" />
+          <circle cx="0" cy="0" r="42" fill="none" stroke="#ffffff" stroke-width="5.5"
+            stroke-dasharray="263.89" stroke-dashoffset="0" transform="rotate(-90)" stroke-linecap="round" />
+          <circle cx="0" cy="0" r="34" fill="rgba(15, 23, 42, 0.88)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.2" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.5))" />
+          <text x="0" y="-16" fill="#cbd5e1" font-size="8.5" font-weight="600" text-anchor="middle">${homeToday !== null ? `${homeToday.toFixed(1)} kWh` : 'Thuis'}</text>
+          <g transform="translate(0, -5)">
+            <path d="M-5 -1 L0 -5.5 L5 -1 L5 3.5 L-5 3.5 Z" fill="none" stroke="#ffffff" stroke-width="1.3" />
+          </g>
+          <text x="0" y="11" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">
+            ${homeActive ? formatPowerAbs(load) : '0 W'}
+          </text>
+          <rect x="-26" y="16" width="52" height="13" rx="6.5" fill="rgba(255, 255, 255, 0.12)" />
+          <text x="0" y="25.5" fill="#f8fafc" font-size="7.5" font-weight="700" text-anchor="middle">
+            ${homeSub.includes('% eigen') ? homeSub.split('(')[1].replace(')', '') : 'Verbruik'}
+          </text>
+          <circle cx="0" cy="0" r="46" fill="transparent" />
+        </g>
+
+        <!-- 4. Laadpaal Cirkel (EV) -->
+        ${showEV ? svg`
+          <g class="interactiveGroup evGroup" transform="translate(${evX + 85}, ${height - 56})" style="cursor: pointer;" @click=${() => onNodeClick('ev')}>
+            <text x="0" y="-48" fill="#e2e8f0" font-size="11.5" font-weight="700" text-anchor="middle" letter-spacing="0.3px">Laadpaal</text>
+            <circle cx="0" cy="0" r="42" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="5.5" />
+            <circle cx="0" cy="0" r="42" fill="none" stroke="#a855f7" stroke-width="5.5"
+              stroke-dasharray="263.89" stroke-dashoffset="0" transform="rotate(-90)" stroke-linecap="round" />
+            <circle cx="0" cy="0" r="34" fill="rgba(15, 23, 42, 0.88)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.2" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.5))" />
+            <text x="0" y="-16" fill="#c084fc" font-size="8.5" font-weight="600" text-anchor="middle">${evToday !== null ? `${evToday.toFixed(1)} kWh` : 'EV'}</text>
+            <text x="0" y="11" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">${evActive ? formatPowerAbs(charger) : '0 W'}</text>
+            <rect x="-26" y="16" width="52" height="13" rx="6.5" fill="${evActive ? 'rgba(168, 85, 247, 0.22)' : 'rgba(255,255,255,0.06)'}" />
+            <text x="0" y="25.5" fill="${evActive ? '#c084fc' : '#94a3b8'}" font-size="7.5" font-weight="700" text-anchor="middle">${evActive ? 'Laden' : 'Standby'}</text>
+            <circle cx="0" cy="0" r="46" fill="transparent" />
+          </g>
+        ` : ''}
+      ` : svg`
+        <!-- ── ORIGINELE RECHTHOEKIGE KAARTJES (Voor eenvoudig terugzetten) ──── -->
+<!-- 1. Stroomnet — onder de masten (mast is altijd op SVG x=20) -->
         <g class="interactiveGroup gridGroup" @click=${() => onNodeClick('grid')}>
           <g transform="translate(20, ${height - 75})">
             <rect x="0" y="0" width="170" height="65"
@@ -1385,7 +1497,7 @@ export function renderHouseSvg({
             </g>
           </g>
         ` : ''}
-      </g>
+      `}      </g>
     </svg>
   `;
 }
