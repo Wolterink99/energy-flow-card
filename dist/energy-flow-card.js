@@ -802,7 +802,7 @@ class EnergyDashboardCard extends i {
                     Opbrengst Vandaag
                   </span>
                   <span class="node-status-pill pill-green" style="font-size: 13px; font-weight: 700;">
-                    + € ${(-netInvoiceToday).toFixed(2)}
+                    - € ${Math.abs(netInvoiceToday).toFixed(2)}
                   </span>
                 </div>
 
@@ -830,9 +830,9 @@ class EnergyDashboardCard extends i {
                         <strong style="color: #ef4444;">- € ${gridImportCostToday.toFixed(2)} <span class="sub-dim">(${gridImportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="total-row">
-                        <span>Netto te ontvangen vandaag:</span>
-                        <strong style="color: #10b981; font-size: 14.5px;">
-                          + € ${(-netInvoiceToday).toFixed(2)}
+                        <span>Totaal:</span>
+                        <strong style="color: #10b981; font-size: 15px;">
+                          - € ${Math.abs(netInvoiceToday).toFixed(2)}
                         </strong>
                       </div>
                     </div>
@@ -872,8 +872,8 @@ class EnergyDashboardCard extends i {
                         <strong style="color: #10b981;">+ € ${batHomeSavingsToday.toFixed(2)}</strong>
                       </div>
                       <div class="total-row">
-                        <span>Verdiend voor terugverdientijd (vandaag):</span>
-                        <strong style="color: #10b981; font-size: 14.5px;">+ € ${batTotalEarningsToday.toFixed(2)}</strong>
+                        <span>Totaal:</span>
+                        <strong style="color: #10b981; font-size: 15px;">+ € ${batTotalEarningsToday.toFixed(2)}</strong>
                       </div>
                     </div>
 
