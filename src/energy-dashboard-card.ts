@@ -1311,6 +1311,15 @@ export class EnergyDashboardCard extends LitElement {
     `;
   }
 
+    private _openMoreInfo(entityId: string): void {
+    const event = new CustomEvent('hass-more-info', {
+      bubbles: true,
+      composed: true,
+      detail: { entityId }
+    });
+    this.dispatchEvent(event);
+  }
+
   public getCardSize(): number {
     return 8;
   }

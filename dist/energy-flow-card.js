@@ -828,6 +828,14 @@ class EnergyDashboardCard extends i {
       </div>
     `;
     }
+    _openMoreInfo(entityId) {
+        const event = new CustomEvent('hass-more-info', {
+            bubbles: true,
+            composed: true,
+            detail: { entityId }
+        });
+        this.dispatchEvent(event);
+    }
     getCardSize() {
         return 8;
     }
