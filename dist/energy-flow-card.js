@@ -205,6 +205,13 @@ class EnergyDashboardCard extends i {
             batHomeSavingsToday = this._calculatedSavingsToday;
         }
         const batTotalValueToday = batHomeSavingsToday + powerplayToday;
+        // Battery Payback / ROI metrics
+        const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8500);
+        const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 21.52);
+        const batPaybackPct = batPurchasePrice > 0 ? Math.min(100, (batLifetimeSaved / batPurchasePrice) * 100) : 0;
+        const batRemaining = Math.max(0, batPurchasePrice - batLifetimeSaved);
+        const batDailyAvg = this._getNumber('sensor.thuisbatterij_gemiddelde_dag', 3.07);
+        const batYearsRemaining = batDailyAvg > 0 ? (batRemaining / (batDailyAvg * 365)) : 7.5;
         // Tariffs forecast data for the chart
         const tariffEntity = this.hass?.states ? this.hass.states['sensor.zonneplan_current_electricity_tariff'] : null;
         const currentTariff = tariffEntity ? parseFloat(tariffEntity.state) || 0.155 : 0.155;
@@ -783,6 +790,32 @@ class EnergyDashboardCard extends i {
                   </div>
                 </div>
 
+                <!-- Terugverdientijd & Investering Section -->
+                <div class="roi-section" title="Klik om de aanschafprijs te bekijken of aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
+                  <div class="roi-header">
+                    <div class="roi-title">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                      </svg>
+                      <span>Terugverdientijd Thuisbatterij</span>
+                    </div>
+                    <div class="roi-badge">
+                      € ${batLifetimeSaved.toFixed(2)} / € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })} (${batPaybackPct.toFixed(1)}%)
+                    </div>
+                  </div>
+
+                  <div class="roi-progress-track">
+                    <div class="roi-progress-fill" style="width: ${Math.min(100, Math.max(1.5, batPaybackPct))}%;"></div>
+                  </div>
+
+                  <div class="roi-stats-row">
+                    <span>Reeds terug: <strong style="color: #10b981;">€ ${batLifetimeSaved.toFixed(2)}</strong></span>
+                    <span>Nog te gaan: <strong style="color: #f8fafc;">€ ${batRemaining.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                    <span>Verwacht: <strong style="color: #38bdf8;">ca. ${batYearsRemaining.toFixed(1)} jaar</strong> <span style="color: #64748b; font-size: 10px;">(€ ${batDailyAvg.toFixed(2)}/d)</span></span>
+                  </div>
+                </div>
+
                 <!-- Footer insight note -->
                 <div class="insight-footer">
                   <span>💡 Zonder thuisbatterij was je factuur vandaag <strong>€ ${(netInvoiceToday + batHomeSavingsToday).toFixed(2)}</strong> geweest.</span>
@@ -1200,6 +1233,79 @@ EnergyDashboardCard.styles = i$3 `
 
     .mini-row strong {
       color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    
+    /* Terugverdientijd (ROI) Section */
+    .roi-section {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.01) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      padding: 11px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+    }
+
+    .roi-section:hover {
+      border-color: rgba(16, 185, 129, 0.45);
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%);
+    }
+
+    .roi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .roi-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .roi-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .roi-progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .roi-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      border-radius: 9999px;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+      transition: width 0.4s ease;
+    }
+
+    .roi-stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .roi-stats-row strong {
       font-weight: 600;
     }
 
