@@ -2541,6 +2541,14 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
     const windowFilter = isDay
         ? 'none'
         : (resolvedShowLights ? 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.45))' : 'none');
+    // ── Wind Turbine appearance (darker and crisp against daytime sky) ──
+    const turbineMastColor = isDay ? '#1e293b' : '#475569';
+    const turbineHubColor = isDay ? '#0f172a' : '#64748b';
+    const turbineBladeFill = isDay ? '#334155' : '#cbd5e1';
+    const turbineBladeStroke = isDay ? '#1e293b' : 'none';
+    const turbineBladeStrokeWidth = isDay ? 0.75 : 0;
+    const turbineSmallOpacity = isDay ? 0.85 : 0.35;
+    const turbineMedOpacity = isDay ? 0.95 : 0.50;
     // ── Sun trajectory (using dynamic width and height) ──
     const isSunVisible = timeHour >= 6.0 && timeHour <= 21.0 && visualWeather !== 'rainy' && visualWeather !== 'lightning' && visualWeather !== 'cloudy' && visualWeather !== 'snowy' && visualWeather !== 'foggy';
     const sunPos = { cx: width / 2, cy: height };
@@ -2929,23 +2937,23 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
 
           <!-- Wind Turbines in the far background (behind pylon cables and ground) -->
           <!-- Small Wind Turbine (further) -->
-          <g id="wind-turbine-small" style="pointer-events: none;" opacity="0.3">
-            <path d="M 788,410 L 789.5,330 L 790.5,330 L 792,410 Z" fill="#475569" opacity="0.7" />
+          <g id="wind-turbine-small" style="pointer-events: none;" opacity="${turbineSmallOpacity}">
+            <path d="M 788,410 L 789.5,330 L 790.5,330 L 792,410 Z" fill="${turbineMastColor}" opacity="0.9" />
             <g style="transform-origin: 790px 330px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration * 1.2}s linear infinite; animation-delay: -0.4s;` : ''}">
-              <circle cx="790" cy="330" r="2.2" fill="#64748b" />
-              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="#cbd5e1" />
-              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="#cbd5e1" transform="rotate(120 790 330)" />
-              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="#cbd5e1" transform="rotate(240 790 330)" />
+              <circle cx="790" cy="330" r="2.2" fill="${turbineHubColor}" />
+              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="${turbineBladeFill}" stroke="${turbineBladeStroke}" stroke-width="${turbineBladeStrokeWidth}" />
+              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="${turbineBladeFill}" stroke="${turbineBladeStroke}" stroke-width="${turbineBladeStrokeWidth}" transform="rotate(120 790 330)" />
+              <path d="M 790,330 Q 789,295 790,285 Q 791,295 790,330" fill="${turbineBladeFill}" stroke="${turbineBladeStroke}" stroke-width="${turbineBladeStrokeWidth}" transform="rotate(240 790 330)" />
             </g>
           </g>
           <!-- Medium Wind Turbine -->
-          <g id="wind-turbine-med" style="pointer-events: none;" opacity="0.45">
-            <path d="M 826,410 L 828.5,290 L 831.5,290 L 834,410 Z" fill="#475569" opacity="0.7" />
+          <g id="wind-turbine-med" style="pointer-events: none;" opacity="${turbineMedOpacity}">
+            <path d="M 826,410 L 828.5,290 L 831.5,290 L 834,410 Z" fill="${turbineMastColor}" opacity="0.95" />
             <g style="transform-origin: 830px 290px; ${turbineDuration > 0 ? `animation: spinWindTurbine ${turbineDuration}s linear infinite;` : ''}">
-              <circle cx="830" cy="290" r="3.5" fill="#64748b" />
-              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="#cbd5e1" />
-              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="#cbd5e1" transform="rotate(120 830 290)" />
-              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="#cbd5e1" transform="rotate(240 830 290)" />
+              <circle cx="830" cy="290" r="3.5" fill="${turbineHubColor}" />
+              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="${turbineBladeFill}" stroke="${turbineBladeStroke}" stroke-width="${turbineBladeStrokeWidth}" />
+              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="${turbineBladeFill}" stroke="${turbineBladeStroke}" stroke-width="${turbineBladeStrokeWidth}" transform="rotate(120 830 290)" />
+              <path d="M 830,290 Q 828,235 830,220 Q 832,235 830,290" fill="${turbineBladeFill}" stroke="${turbineBladeStroke}" stroke-width="${turbineBladeStrokeWidth}" transform="rotate(240 830 290)" />
             </g>
           </g>
 
