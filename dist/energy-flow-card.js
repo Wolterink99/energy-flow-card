@@ -482,7 +482,7 @@ class EnergyDashboardCard extends i {
                 ` : ''}
 
                 <!-- Nodes -->
-                <g transform="translate(${xL}, ${yT})" class="circle-interactive" title="Klik voor Zonne-energie grafiek" @click="${() => { this._activeDetailView = 'solar'; }}">
+                <g transform="translate(${xL}, ${yT})" class="circle-interactive" title="Klik voor Zonne-energie grafiek" @click="${() => this._openDetailView('solar')}">
                   <text x="0" y="${-R - 12}" class="node-outer-label">Zon</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="9"
@@ -517,7 +517,7 @@ class EnergyDashboardCard extends i {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xR}, ${yT})" class="circle-interactive" title="Klik voor Huisverbruik grafiek" @click="${() => { this._activeDetailView = 'home'; }}">
+                <g transform="translate(${xR}, ${yT})" class="circle-interactive" title="Klik voor Huisverbruik grafiek" @click="${() => this._openDetailView('home')}">
                   <text x="0" y="${-R - 12}" class="node-outer-label">Thuis</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="9" />
                   ${lenSolar > 0 ? w `
@@ -555,7 +555,7 @@ class EnergyDashboardCard extends i {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xL}, ${yB})" class="circle-interactive" title="Klik voor Thuisbatterij grafiek" @click="${() => { this._activeDetailView = 'battery'; }}">
+                <g transform="translate(${xL}, ${yB})" class="circle-interactive" title="Klik voor Thuisbatterij grafiek" @click="${() => this._openDetailView('battery')}">
                   <text x="0" y="${R + 24}" class="node-outer-label">Batterij</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="9"
@@ -583,7 +583,7 @@ class EnergyDashboardCard extends i {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xR}, ${yB})" class="circle-interactive" title="Klik voor Netstroom grafiek" @click="${() => { this._activeDetailView = 'grid'; }}">
+                <g transform="translate(${xR}, ${yB})" class="circle-interactive" title="Klik voor Netstroom grafiek" @click="${() => this._openDetailView('grid')}">
                   <text x="0" y="${R + 24}" class="node-outer-label">Net</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="9"
@@ -611,12 +611,12 @@ class EnergyDashboardCard extends i {
                         ${isGridImport ? 'Afname' : 'Teruglevering'}
                       </span>
                     </div>
-            ` : this._renderDetailView()}
-          
                   </foreignObject>
+                  <circle cx="0" cy="0" r="${R + 8}" fill="transparent" style="cursor: pointer;" @click="${() => this._openDetailView('grid')}" />
                 </g>
               </svg>
             </div>
+          ` : this._renderDetailView()}
           </div>
 
           <!-- Right: Simplified 2-Card Layout (Prices Chart on Top, Single Overview Below) -->
@@ -914,6 +914,12 @@ class EnergyDashboardCard extends i {
             const mean = vals.reduce((sum, v) => sum + v, 0) / vals.length;
             return { time: t, mean, min, max };
         });
+    }
+    _openDetailView(view) {
+        this._activeDetailView = view;
+        if (!this._historyData || Object.keys(this._historyData).length === 0 || (Date.now() - this._lastFetchTime > 30000)) {
+            this._fetchHistoricalData();
+        }
     }
     _renderDetailView() {
         const now = new Date();
