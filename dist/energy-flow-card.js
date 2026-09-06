@@ -754,8 +754,12 @@ class EnergyDashboardCard extends i {
                         <strong style="color: #10b981;">- € ${gridExportRevToday.toFixed(2)} <span style="font-size: 10.5px; color: #64748b;">(${gridExportToday.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Powerplay bonus:</span>
+                        <span>Powerplay korting:</span>
                         <strong style="color: #10b981;">- € ${powerplayToday.toFixed(2)}</strong>
+                      </div>
+                      <div class="mini-row" style="border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 6px; margin-top: 2px;">
+                        <span>💡 Zonder batterij:</span>
+                        <strong style="color: #94a3b8;">€ ${(netInvoiceToday + batTotalValueToday).toFixed(2)} factuur</strong>
                       </div>
                     </div>
                   </div>
@@ -788,8 +792,8 @@ class EnergyDashboardCard extends i {
                         <span>${batChargedToday.toFixed(0)} in / ${batDischargedToday.toFixed(0)} uit kWh</span>
                       </div>
                       <div class="mini-row" style="border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 6px; margin-top: 2px;">
-                        <span>💡 Zonder batterij:</span>
-                        <strong style="color: #94a3b8;">€ ${(netInvoiceToday + batHomeSavingsToday).toFixed(2)} factuur</strong>
+                        <span style="color: #10b981;">Totale winst vandaag:</span>
+                        <strong style="color: #10b981;">+ € ${batTotalValueToday.toFixed(2)}</strong>
                       </div>
                     </div>
                   </div>
