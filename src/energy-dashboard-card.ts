@@ -32,6 +32,24 @@ export class EnergyDashboardCard extends LitElement {
   @state() private _calculatedSavingsToday: number = 2.36;
   @state() private _hoveredHour: number | null = null;
   @state() private _showRoi: boolean = false;
+  private _roiClickCount: number = 0;
+  private _roiClickTimeout: any = null;
+
+  private _handleRendementClick(): void {
+    this._roiClickCount++;
+    if (this._roiClickTimeout) {
+      clearTimeout(this._roiClickTimeout);
+    }
+    if (this._roiClickCount >= 3) {
+      this._showRoi = !this._showRoi;
+      this._roiClickCount = 0;
+      this.requestUpdate();
+    } else {
+      this._roiClickTimeout = setTimeout(() => {
+        this._roiClickCount = 0;
+      }, 1500);
+    }
+  }
 
   static styles = css`
     :host {
@@ -990,7 +1008,7 @@ export class EnergyDashboardCard extends LitElement {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xL}, ${yB})" style="cursor: pointer;" title="Klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">
+                <g transform="translate(${xL}, ${yB})">
                   <text x="0" y="${R + 24}" class="node-outer-label">Batterij</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="9"

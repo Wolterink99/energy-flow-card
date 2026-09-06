@@ -74,6 +74,24 @@ class EnergyDashboardCard extends i {
         this._calculatedSavingsToday = 2.36;
         this._hoveredHour = null;
         this._showRoi = false;
+        this._roiClickCount = 0;
+        this._roiClickTimeout = null;
+    }
+    _handleRendementClick() {
+        this._roiClickCount++;
+        if (this._roiClickTimeout) {
+            clearTimeout(this._roiClickTimeout);
+        }
+        if (this._roiClickCount >= 3) {
+            this._showRoi = !this._showRoi;
+            this._roiClickCount = 0;
+            this.requestUpdate();
+        }
+        else {
+            this._roiClickTimeout = setTimeout(() => {
+                this._roiClickCount = 0;
+            }, 1500);
+        }
     }
     setConfig(config) {
         if (!config) {
@@ -510,7 +528,7 @@ class EnergyDashboardCard extends i {
                   </foreignObject>
                 </g>
 
-                <g transform="translate(${xL}, ${yB})" style="cursor: pointer;" title="Klik om terugverdientijd te openen/sluiten" @click="${() => { this._showRoi = !this._showRoi; }}">
+                <g transform="translate(${xL}, ${yB})">
                   <text x="0" y="${R + 24}" class="node-outer-label">Batterij</text>
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="9" />
                   <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="9"
