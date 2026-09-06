@@ -49,7 +49,6 @@ export interface EnergyFlowCardConfig {
   weather_override?: string;
   time_override?: number;
   weather_test?: boolean;
-  use_dashboard_circles?: boolean;
 }
 
 // Minimal Home Assistant interface declarations

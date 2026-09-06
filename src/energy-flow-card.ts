@@ -2466,7 +2466,6 @@ export class EnergyFlowCard extends LitElement {
               temperature,
               poolPumpActive,
               screensaver: this.config.screensaver,
-              useDashboardCircles: this.config?.use_dashboard_circles !== false,
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>
