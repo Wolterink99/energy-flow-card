@@ -173,44 +173,57 @@ class EnergyDashboardCard extends i {
         const batRawW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
         const batChargeW = Math.max(0, batRawW);
         const batDischargeW = Math.max(0, -batRawW);
-        const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 98)));
+        const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 99)));
         const batChargedToday = this._getNumber(cfg.battery_charged_today || 'sensor.thuisbatterij_levering_vandaag');
         const isBatCharging = batChargeW > 20;
         const isBatDischarging = batDischargeW > 20;
         const homeRawW = Math.max(0, this._getNumber(cfg.home_power || 'sensor.live_huisverbruik'));
         const homeToday = this._getNumber(cfg.home_today || 'sensor.echt_huisverbruik_vandaag');
         // 2. Physical Flow Routing Engine
-        // Determines exact flow distribution between nodes
         let availSolar = solarW;
         let demandHome = homeRawW;
         let demandBatCharge = batChargeW;
         let availBatDischarge = batDischargeW;
         let availGridImport = gridImportW;
-        // Step A: Solar to House
+        // A: Solar to Home
         const flowSolarToHome = Math.min(availSolar, demandHome);
         availSolar -= flowSolarToHome;
         demandHome -= flowSolarToHome;
-        // Step B: Solar to Battery
+        // B: Solar to Battery
         const flowSolarToBat = Math.min(availSolar, demandBatCharge);
         availSolar -= flowSolarToBat;
         demandBatCharge -= flowSolarToBat;
-        // Step C: Solar to Grid (Export)
+        // C: Solar to Grid (Export)
         const flowSolarToGrid = Math.min(availSolar, gridExportW);
-        // Step D: Battery to House (if discharging)
+        // D: Battery to Home
         const flowBatToHome = Math.min(availBatDischarge, demandHome);
         availBatDischarge -= flowBatToHome;
         demandHome -= flowBatToHome;
-        // Step E: Battery to Grid (Powerplay export)
+        // E: Battery to Grid (Powerplay export)
         const flowBatToGrid = Math.min(availBatDischarge, Math.max(0, gridExportW - flowSolarToGrid));
-        // Step F: Grid Import to House
+        // F: Grid to Home (Import)
         const flowGridToHome = Math.min(availGridImport, demandHome);
         availGridImport -= flowGridToHome;
         demandHome -= flowGridToHome;
-        // Step G: Grid Import to Battery (Dynamisch laden vanaf net!)
+        // G: Grid to Battery (Dynamisch laden vanaf net!)
         const flowGridToBat = Math.min(availGridImport, demandBatCharge);
-        // 3. House Segmented Ring calculation
-        const r = 80;
-        const circ = 2 * Math.PI * r; // ~502.65
+        // Autarky / Zelfvoorziening
+        const totalConsumedToday = homeToday + batChargedToday;
+        const autarky = totalConsumedToday > 0 ? Math.round((Math.min(solarToday, totalConsumedToday) / totalConsumedToday) * 100) : 0;
+        // Geometry layout:
+        // Swapped layout:
+        // Top-Left: ZON (x=125, y=110)
+        // Top-Right: HUIS (x=395, y=110)
+        // Bottom-Left: BATTERIJ (x=125, y=330)
+        // Bottom-Right: NET (x=395, y=330)
+        const xL = 125;
+        const xR = 395;
+        const yT = 110;
+        const yB = 330;
+        const R = 75; // outer ring radius
+        const rDisc = 65; // inner disc radius
+        const circ = 2 * Math.PI * R; // ~471.24
+        // House Segmented Ring:
         const effectiveHome = (flowSolarToHome + flowBatToHome + flowGridToHome) || homeRawW || 1;
         const fracSolar = Math.min(1, flowSolarToHome / effectiveHome);
         const fracBat = Math.min(1, flowBatToHome / effectiveHome);
@@ -224,26 +237,21 @@ class EnergyDashboardCard extends i {
         // Battery SoC progress arc
         const batProgress = (batSoC / 100) * circ;
         const batOffset = circ - batProgress;
-        // Autarky / Zelfvoorziening
-        const totalConsumedToday = homeToday + batChargedToday;
-        const autarky = totalConsumedToday > 0 ? Math.round((Math.min(solarToday, totalConsumedToday) / totalConsumedToday) * 100) : 0;
-        // SVG Flow Paths:
-        // Coordinates: Zon(135,115), Net(405,115), Bat(135,345), Huis(405,345)
-        // 1. Zon -> Bat (straight left down)
-        const dSolarBat = "M 135 187 L 135 273";
-        // 2. Net -> Huis (straight right down)
-        const dGridHome = "M 405 187 L 405 273";
-        // 3. Bat -> Huis (straight bottom across)
-        const dBatHome = "M 207 345 L 333 345";
-        // 4. Zon -> Net (straight top across)
-        const dSolarGrid = "M 207 115 L 333 115";
-        // 5. Zon -> Huis (smooth curved route via central bus)
-        const dSolarHome = "M 207 115 L 245 115 Q 270 115 270 140 L 270 320 Q 270 345 295 345 L 333 345";
-        // 6. Net -> Bat (smooth curved route from Net into central bus into Battery!)
-        const dGridBat = "M 333 115 L 295 115 Q 270 115 270 140 L 270 320 Q 270 345 245 345 L 207 345";
-        // 7. Bat -> Net (smooth curved route from Battery up central bus to Net)
-        const dBatGrid = "M 207 345 L 245 345 Q 270 345 270 320 L 270 140 Q 270 115 295 115 L 333 115";
-        // Helper to calculate animation duration based on power in watts
+        // Exact connection points (touching ring boundary at radius R=75):
+        // 1. Zon -> Huis (Top Horizontal line: from (xL+R, yT) to (xR-R, yT))
+        const pZonHuis = `M ${xL + R} ${yT} L ${xR - R} ${yT}`;
+        // 2. Zon -> Batterij (Left Vertical line: from (xL, yT+R) to (xL, yB-R))
+        const pZonBat = `M ${xL} ${yT + R} L ${xL} ${yB - R}`;
+        // 3. Net -> Huis (Right Vertical line: from (xR, yB-R) to (xR, yT+R))
+        const pNetHuis = `M ${xR} ${yB - R} L ${xR} ${yT + R}`;
+        // 4. Net -> Batterij (Bottom Horizontal line: from (xR-R, yB) to (xL+R, yB))
+        const pNetBat = `M ${xR - R} ${yB} L ${xL + R} ${yB}`;
+        const pBatNet = `M ${xL + R} ${yB} L ${xR - R} ${yB}`;
+        // 5. Batterij -> Huis (Smooth central S-curve: from (xL+R, yB) up through center x=260 to (xR-R, yT))
+        const xMid = (xL + xR) / 2; // 260
+        const pBatHuis = `M ${xL + R} ${yB} L ${xMid - 25} ${yB} Q ${xMid} ${yB} ${xMid} ${yB - 25} L ${xMid} ${yT + 25} Q ${xMid} ${yT} ${xMid + 25} ${yT} L ${xR - R} ${yT}`;
+        // 6. Zon -> Net (Smooth central S-curve: from (xL+R, yT) down through center x=260 to (xR-R, yB))
+        const pZonNet = `M ${xL + R} ${yT} L ${xMid - 25} ${yT} Q ${xMid} ${yT} ${xMid} ${yT + 25} L ${xMid} ${yB - 25} Q ${xMid} ${yB} ${xMid + 25} ${yB} L ${xR - R} ${yB}`;
         const getDur = (watts) => {
             return Math.max(0.75, Math.min(3.5, 3000 / Math.max(100, watts))).toFixed(2);
         };
@@ -284,26 +292,25 @@ class EnergyDashboardCard extends i {
             </div>
 
             <div class="flow-container">
-              <!-- Animated SVG Canvas with Flow Tracks & Moving Bolletjes -->
-              <svg class="flow-svg" viewBox="0 0 540 460">
+              <!-- Fully Coordinated SVG with mathematical sub-pixel alignment -->
+              <svg class="unified-flow-svg" viewBox="0 0 520 440">
                 <defs>
-                  <!-- Filters for glowing bolletjes -->
                   <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
                   <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
                   <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
@@ -311,218 +318,239 @@ class EnergyDashboardCard extends i {
                   </filter>
                 </defs>
 
-                <!-- 1. BASE STATIC TRACKS (Subtle dotted guide lines) -->
-                <path d="${dSolarBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${dGridHome}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${dBatHome}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${dSolarGrid}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${dSolarHome}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
-                <path d="${dGridBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <!-- 1. BASE STATIC TRACKS (Subtle dotted lines connecting node edges) -->
+                <path d="${pZonHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${pZonBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${pNetHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${pNetBat}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${pBatHuis}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
+                <path d="${pZonNet}" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3 5" />
 
-                <!-- 2. ACTIVE FLOWS & MOVING BOLLETJES -->
+                <!-- 2. ACTIVE FLOWS & GLOWING MOVING BOLLETJES -->
 
-                <!-- FLOW A: Zon -> Batterij -->
-                ${flowSolarToBat > 20 ? w `
-                  <path d="${dSolarBat}" fill="none" stroke="rgba(245, 158, 11, 0.3)" stroke-width="2" />
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
-                    <animateMotion dur="${getDur(flowSolarToBat)}s" repeatCount="indefinite" path="${dSolarBat}" />
-                  </circle>
-                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
-                    <animateMotion dur="${getDur(flowSolarToBat)}s" begin="-${(parseFloat(getDur(flowSolarToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dSolarBat}" />
-                  </circle>
-                ` : ''}
-
-                <!-- FLOW B: Zon -> Huis (Curved via central bus) -->
+                <!-- Flow Zon -> Huis (Direct horizontal top line) -->
                 ${flowSolarToHome > 20 ? w `
-                  <path d="${dSolarHome}" fill="none" stroke="rgba(245, 158, 11, 0.3)" stroke-width="2" />
+                  <path d="${pZonHuis}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
-                    <animateMotion dur="${getDur(flowSolarToHome)}s" repeatCount="indefinite" path="${dSolarHome}" />
+                    <animateMotion dur="${getDur(flowSolarToHome)}s" repeatCount="indefinite" path="${pZonHuis}" />
                   </circle>
                   <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
-                    <animateMotion dur="${getDur(flowSolarToHome)}s" begin="-${(parseFloat(getDur(flowSolarToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dSolarHome}" />
+                    <animateMotion dur="${getDur(flowSolarToHome)}s" begin="-${(parseFloat(getDur(flowSolarToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pZonHuis}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW C: Zon -> Net (Export) -->
-                ${flowSolarToGrid > 20 ? w `
-                  <path d="${dSolarGrid}" fill="none" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
-                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
-                    <animateMotion dur="${getDur(flowSolarToGrid)}s" repeatCount="indefinite" path="${dSolarGrid}" />
+                <!-- Flow Zon -> Batterij (Direct vertical left line) -->
+                ${flowSolarToBat > 20 ? w `
+                  <path d="${pZonBat}" fill="none" stroke="rgba(245, 158, 11, 0.35)" stroke-width="2" />
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToBat)}s" repeatCount="indefinite" path="${pZonBat}" />
                   </circle>
-                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
-                    <animateMotion dur="${getDur(flowSolarToGrid)}s" begin="-${(parseFloat(getDur(flowSolarToGrid)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dSolarGrid}" />
-                  </circle>
-                ` : ''}
-
-                <!-- FLOW D: Net -> Batterij (Laden vanaf het net via centrale bus!) -->
-                ${flowGridToBat > 20 ? w `
-                  <path d="${dGridBat}" fill="none" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2" />
-                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
-                    <animateMotion dur="${getDur(flowGridToBat)}s" repeatCount="indefinite" path="${dGridBat}" />
-                  </circle>
-                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
-                    <animateMotion dur="${getDur(flowGridToBat)}s" begin="-${(parseFloat(getDur(flowGridToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dGridBat}" />
+                  <circle r="4.5" fill="#f59e0b" filter="url(#glow-gold)">
+                    <animateMotion dur="${getDur(flowSolarToBat)}s" begin="-${(parseFloat(getDur(flowSolarToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pZonBat}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW E: Net -> Huis (Direct rechts omlaag) -->
+                <!-- Flow Net -> Huis (Direct vertical right line up) -->
                 ${flowGridToHome > 20 ? w `
-                  <path d="${dGridHome}" fill="none" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2" />
+                  <path d="${pNetHuis}" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
-                    <animateMotion dur="${getDur(flowGridToHome)}s" repeatCount="indefinite" path="${dGridHome}" />
+                    <animateMotion dur="${getDur(flowGridToHome)}s" repeatCount="indefinite" path="${pNetHuis}" />
                   </circle>
                   <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
-                    <animateMotion dur="${getDur(flowGridToHome)}s" begin="-${(parseFloat(getDur(flowGridToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dGridHome}" />
+                    <animateMotion dur="${getDur(flowGridToHome)}s" begin="-${(parseFloat(getDur(flowGridToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pNetHuis}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW F: Batterij -> Huis (Onderin horizontaal naar rechts) -->
+                <!-- Flow Net -> Batterij (Direct horizontal bottom line left) -->
+                ${flowGridToBat > 20 ? w `
+                  <path d="${pNetBat}" fill="none" stroke="rgba(56, 189, 248, 0.35)" stroke-width="2" />
+                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                    <animateMotion dur="${getDur(flowGridToBat)}s" repeatCount="indefinite" path="${pNetBat}" />
+                  </circle>
+                  <circle r="4.5" fill="#38bdf8" filter="url(#glow-blue)">
+                    <animateMotion dur="${getDur(flowGridToBat)}s" begin="-${(parseFloat(getDur(flowGridToBat)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pNetBat}" />
+                  </circle>
+                ` : ''}
+
+                <!-- Flow Batterij -> Huis (Central smooth S-curve) -->
                 ${flowBatToHome > 20 ? w `
-                  <path d="${dBatHome}" fill="none" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+                  <path d="${pBatHuis}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
-                    <animateMotion dur="${getDur(flowBatToHome)}s" repeatCount="indefinite" path="${dBatHome}" />
+                    <animateMotion dur="${getDur(flowBatToHome)}s" repeatCount="indefinite" path="${pBatHuis}" />
                   </circle>
                   <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
-                    <animateMotion dur="${getDur(flowBatToHome)}s" begin="-${(parseFloat(getDur(flowBatToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${dBatHome}" />
+                    <animateMotion dur="${getDur(flowBatToHome)}s" begin="-${(parseFloat(getDur(flowBatToHome)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pBatHuis}" />
                   </circle>
                 ` : ''}
 
-                <!-- FLOW G: Batterij -> Net (Ontladen naar net bij piek) -->
+                <!-- Flow Zon -> Net (Central smooth S-curve) -->
+                ${flowSolarToGrid > 20 ? w `
+                  <path d="${pZonNet}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowSolarToGrid)}s" repeatCount="indefinite" path="${pZonNet}" />
+                  </circle>
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowSolarToGrid)}s" begin="-${(parseFloat(getDur(flowSolarToGrid)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pZonNet}" />
+                  </circle>
+                ` : ''}
+
+                <!-- Flow Batterij -> Net (Direct horizontal bottom line right) -->
                 ${flowBatToGrid > 20 ? w `
-                  <path d="${dBatGrid}" fill="none" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+                  <path d="${pBatNet}" fill="none" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" />
                   <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
-                    <animateMotion dur="${getDur(flowBatToGrid)}s" repeatCount="indefinite" path="${dBatGrid}" />
+                    <animateMotion dur="${getDur(flowBatToGrid)}s" repeatCount="indefinite" path="${pBatNet}" />
+                  </circle>
+                  <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+                    <animateMotion dur="${getDur(flowBatToGrid)}s" begin="-${(parseFloat(getDur(flowBatToGrid)) / 2).toFixed(2)}s" repeatCount="indefinite" path="${pBatNet}" />
                   </circle>
                 ` : ''}
+
+                <!-- 3. THE 4 NODES (Exact coordinated placement) -->
+
+                <!-- NODE 1: ZON (Top-Left x=125, y=110) -->
+                <g transform="translate(${xL}, ${yT})">
+                  <!-- Outer Ring -->
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="8" />
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
+                    stroke-dasharray="${circ}" stroke-dashoffset="${solarW > 0 ? 0 : circ}"
+                    transform="rotate(-90)" stroke-linecap="round" />
+                  <!-- Inner Solid Disc -->
+                  <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+                  <!-- Disc Content -->
+                  <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
+                    <div class="node-disc-content">
+                      <div class="node-icon-box" style="color: #f59e0b;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                          <circle cx="12" cy="12" r="5"></circle>
+                          <line x1="12" y1="1" x2="12" y2="3"></line>
+                          <line x1="12" y1="21" x2="12" y2="23"></line>
+                          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                          <line x1="1" y1="12" x2="3" y2="12"></line>
+                          <line x1="21" y1="12" x2="23" y2="12"></line>
+                          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                      </div>
+                      <span class="node-title">Zon</span>
+                      <div class="node-val">
+                        ${this._formatPower(solarW).value}
+                        <span class="unit">${this._formatPower(solarW).unit}</span>
+                      </div>
+                      <span class="node-subtext">Vandaag ${this._formatEnergy(solarToday)}</span>
+                    </div>
+                  </foreignObject>
+                </g>
+
+                <!-- NODE 2: HUIS (Top-Right x=395, y=110) -->
+                <g transform="translate(${xR}, ${yT})">
+                  <!-- Base Track -->
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                  <!-- Solar Segment (Yellow) -->
+                  ${lenSolar > 0 ? w `
+                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#f59e0b" stroke-width="8"
+                      stroke-dasharray="${lenSolar} ${circ}" stroke-dashoffset="${offsetSolar}" transform="rotate(-90)" />
+                  ` : ''}
+                  <!-- Battery Segment (Green) -->
+                  ${lenBat > 0 ? w `
+                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="8"
+                      stroke-dasharray="${lenBat} ${circ}" stroke-dashoffset="${offsetBat}" transform="rotate(-90)" />
+                  ` : ''}
+                  <!-- Grid Segment (Blue) -->
+                  ${lenGrid > 0 ? w `
+                    <circle cx="0" cy="0" r="${R}" fill="none" stroke="#38bdf8" stroke-width="8"
+                      stroke-dasharray="${lenGrid} ${circ}" stroke-dashoffset="${offsetGrid}" transform="rotate(-90)" />
+                  ` : ''}
+                  <!-- Inner Solid Disc -->
+                  <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+                  <!-- Disc Content -->
+                  <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
+                    <div class="node-disc-content">
+                      <div class="node-icon-box" style="color: #f1f5f9;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                      </div>
+                      <span class="node-title">Huis</span>
+                      <div class="node-val">
+                        ${this._formatPower(homeRawW).value}
+                        <span class="unit">${this._formatPower(homeRawW).unit}</span>
+                      </div>
+                      <span class="node-subtext">Vandaag ${this._formatEnergy(homeToday)}</span>
+                    </div>
+                  </foreignObject>
+                </g>
+
+                <!-- NODE 3: BATTERIJ (Bottom-Left x=125, y=330) -->
+                <g transform="translate(${xL}, ${yB})">
+                  <!-- Background track -->
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                  <!-- Dynamic Progress Ring for SoC % -->
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="#10b981" stroke-width="8"
+                    stroke-dasharray="${circ}" stroke-dashoffset="${batOffset}"
+                    transform="rotate(-90)" stroke-linecap="round" />
+                  <!-- Inner Solid Disc -->
+                  <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+                  <!-- Disc Content -->
+                  <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
+                    <div class="node-disc-content">
+                      <div class="node-icon-box" style="color: #10b981;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+                          <line x1="22" y1="11" x2="22" y2="13"></line>
+                          <polygon points="10 9 7 13 11 13 8 16 13 12 9 12 10 9" fill="#10b981" stroke="none"></polygon>
+                        </svg>
+                      </div>
+                      <span class="node-title">Batterij</span>
+                      <div class="node-val">
+                        ${batSoC.toFixed(0)}<span class="unit" style="font-size: 15px;">%</span>
+                      </div>
+                      <span class="node-subtext">
+                        ${batRawW !== 0 ? `${this._formatPower(batRawW).value} ${this._formatPower(batRawW).unit}` : 'Standby'}
+                      </span>
+                      <span class="node-status-pill ${isBatCharging ? 'pill-green' : isBatDischarging ? 'pill-amber' : ''}">
+                        ${isBatCharging ? 'Laden' : isBatDischarging ? 'Ontladen' : 'Standby'}
+                      </span>
+                    </div>
+                  </foreignObject>
+                </g>
+
+                <!-- NODE 4: NET (Bottom-Right x=395, y=330) -->
+                <g transform="translate(${xR}, ${yB})">
+                  <!-- Outer Ring -->
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
+                  <circle cx="0" cy="0" r="${R}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="8"
+                    stroke-dasharray="${circ}" stroke-dashoffset="0"
+                    transform="rotate(-90)" stroke-linecap="round" />
+                  <!-- Inner Solid Disc -->
+                  <circle cx="0" cy="0" r="${rDisc}" fill="#141821" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+                  <!-- Disc Content -->
+                  <foreignObject x="${-rDisc}" y="${-rDisc}" width="${rDisc * 2}" height="${rDisc * 2}">
+                    <div class="node-disc-content">
+                      <div class="node-icon-box" style="color: ${isGridImport ? '#38bdf8' : '#10b981'};">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 22h16"></path>
+                          <path d="M7 22l5-19 5 19"></path>
+                          <path d="M6 13h12"></path>
+                          <path d="M8 8h8"></path>
+                        </svg>
+                      </div>
+                      <span class="node-title">Net</span>
+                      <div class="node-val" style="color: ${isGridImport ? '#f8fafc' : '#10b981'};">
+                        ${this._formatPower(gridW).value}
+                        <span class="unit">${this._formatPower(gridW).unit}</span>
+                      </div>
+                      <span class="node-subtext">
+                        ${isGridImport ? `Import ${this._formatEnergy(gridImportToday)}` : `Export ${this._formatEnergy(gridExportToday)}`}
+                      </span>
+                      <span class="node-status-pill ${isGridImport ? 'pill-blue' : 'pill-green'}">
+                        ${isGridImport ? 'Afname' : 'Teruglevering'}
+                      </span>
+                    </div>
+                  </foreignObject>
+                </g>
               </svg>
-
-              <!-- The 4 Instrument Nodes -->
-              <div class="nodes-grid">
-                <!-- 1. ZON (Top-Left) -->
-                <div class="node-dial">
-                  <svg class="node-svg-ring" viewBox="0 0 180 180">
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(245, 158, 11, 0.15)" stroke-width="8" />
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="#f59e0b" stroke-width="8"
-                      stroke-dasharray="${circ}" stroke-dashoffset="${solarW > 0 ? 0 : circ}" stroke-linecap="round" />
-                  </svg>
-                  <div class="node-inner-disc">
-                    <div class="node-icon-box" style="color: #f59e0b;">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                      </svg>
-                    </div>
-                    <span class="node-title">Zon</span>
-                    <div class="node-val">
-                      ${this._formatPower(solarW).value}
-                      <span class="unit">${this._formatPower(solarW).unit}</span>
-                    </div>
-                    <span class="node-subtext">Vandaag ${this._formatEnergy(solarToday)}</span>
-                  </div>
-                </div>
-
-                <!-- 2. NET (Top-Right) -->
-                <div class="node-dial">
-                  <svg class="node-svg-ring" viewBox="0 0 180 180">
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="${isGridImport ? '#38bdf8' : '#10b981'}" stroke-width="8"
-                      stroke-dasharray="${circ}" stroke-dashoffset="0" stroke-linecap="round" />
-                  </svg>
-                  <div class="node-inner-disc">
-                    <div class="node-icon-box" style="color: ${isGridImport ? '#38bdf8' : '#10b981'};">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 22h16"></path>
-                        <path d="M7 22l5-19 5 19"></path>
-                        <path d="M6 13h12"></path>
-                        <path d="M8 8h8"></path>
-                      </svg>
-                    </div>
-                    <span class="node-title">Net</span>
-                    <div class="node-val" style="color: ${isGridImport ? '#f8fafc' : '#10b981'};">
-                      ${this._formatPower(gridW).value}
-                      <span class="unit">${this._formatPower(gridW).unit}</span>
-                    </div>
-                    <span class="node-subtext">
-                      ${isGridImport ? `Import ${this._formatEnergy(gridImportToday)}` : `Export ${this._formatEnergy(gridExportToday)}`}
-                    </span>
-                  </div>
-                  <div class="node-badge ${isGridImport ? 'status-blue' : 'status-green'}">
-                    ${isGridImport ? 'Afname' : 'Teruglevering'}
-                  </div>
-                </div>
-
-                <!-- 3. BATTERIJ (Bottom-Left) -->
-                <div class="node-dial">
-                  <svg class="node-svg-ring" viewBox="0 0 180 180">
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
-                    <!-- Dynamic Progress Ring for SoC % -->
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="#10b981" stroke-width="8"
-                      stroke-dasharray="${circ}" stroke-dashoffset="${batOffset}" stroke-linecap="round" />
-                  </svg>
-                  <div class="node-inner-disc">
-                    <div class="node-icon-box" style="color: #10b981;">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
-                        <line x1="22" y1="11" x2="22" y2="13"></line>
-                        <polygon points="10 9 7 13 11 13 8 16 13 12 9 12 10 9" fill="#10b981" stroke="none"></polygon>
-                      </svg>
-                    </div>
-                    <span class="node-title">Batterij</span>
-                    <div class="node-val">
-                      ${batSoC.toFixed(0)}<span class="unit" style="font-size: 16px;">%</span>
-                    </div>
-                    <span class="node-subtext">
-                      ${batRawW !== 0 ? `${this._formatPower(batRawW).value} ${this._formatPower(batRawW).unit}` : 'Standby'}
-                    </span>
-                  </div>
-                  <div class="node-badge ${isBatCharging ? 'status-green' : isBatDischarging ? 'status-amber' : ''}">
-                    ${isBatCharging ? `Laden ${this._formatPower(batChargeW).value} ${this._formatPower(batChargeW).unit}` : isBatDischarging ? `Ontladen ${this._formatPower(batDischargeW).value} ${this._formatPower(batDischargeW).unit}` : 'Standby'}
-                  </div>
-                </div>
-
-                <!-- 4. HUIS (Bottom-Right) with Segmented Ring -->
-                <div class="node-dial">
-                  <svg class="node-svg-ring" viewBox="0 0 180 180">
-                    <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" />
-                    <!-- Solar Segment (Yellow) -->
-                    ${lenSolar > 0 ? w `
-                      <circle cx="90" cy="90" r="${r}" fill="none" stroke="#f59e0b" stroke-width="8"
-                        stroke-dasharray="${lenSolar} ${circ}" stroke-dashoffset="${offsetSolar}" />
-                    ` : ''}
-                    <!-- Battery Segment (Green) -->
-                    ${lenBat > 0 ? w `
-                      <circle cx="90" cy="90" r="${r}" fill="none" stroke="#10b981" stroke-width="8"
-                        stroke-dasharray="${lenBat} ${circ}" stroke-dashoffset="${offsetBat}" />
-                    ` : ''}
-                    <!-- Grid Segment (Blue) -->
-                    ${lenGrid > 0 ? w `
-                      <circle cx="90" cy="90" r="${r}" fill="none" stroke="#38bdf8" stroke-width="8"
-                        stroke-dasharray="${lenGrid} ${circ}" stroke-dashoffset="${offsetGrid}" />
-                    ` : ''}
-                  </svg>
-                  <div class="node-inner-disc">
-                    <div class="node-icon-box" style="color: #f1f5f9;">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                      </svg>
-                    </div>
-                    <span class="node-title">Huis</span>
-                    <div class="node-val">
-                      ${this._formatPower(homeRawW).value}
-                      <span class="unit">${this._formatPower(homeRawW).unit}</span>
-                    </div>
-                    <span class="node-subtext">Vandaag ${this._formatEnergy(homeToday)}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -905,76 +933,31 @@ EnergyDashboardCard.styles = i$3 `
       flex: 1;
     }
 
-    .flow-svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      pointer-events: none;
-    }
-
-    /* Node Grid layout inside Flow Container */
-    .nodes-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 60px 80px;
+    .unified-flow-svg {
       width: 100%;
       max-width: 540px;
       height: 100%;
       min-height: 460px;
-      align-items: center;
-      justify-items: center;
-      z-index: 2;
+      overflow: visible;
     }
 
-    /* Node Component */
-    .node-dial {
-      position: relative;
-      width: 180px;
-      height: 180px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.2s ease;
-    }
-
-    .node-dial:hover {
-      transform: scale(1.03);
-    }
-
-    .node-svg-ring {
-      position: absolute;
-      top: 0;
-      left: 0;
+    /* Disc HTML inside ForeignObject */
+    .node-disc-content {
       width: 100%;
       height: 100%;
-      transform: rotate(-90deg);
-    }
-
-    .node-inner-disc {
-      position: absolute;
-      width: 144px;
-      height: 144px;
-      background: #141821;
-      border-radius: 50%;
-      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 3;
-      padding: 8px;
+      text-align: center;
+      padding: 6px;
+      user-select: none;
+      cursor: pointer;
     }
 
     .node-icon-box {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -982,27 +965,29 @@ EnergyDashboardCard.styles = i$3 `
     }
 
     .node-icon-box svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
     }
 
     .node-title {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       color: #94a3b8;
-      margin-bottom: 2px;
+      line-height: 1.2;
     }
 
     .node-val {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 700;
       color: #f8fafc;
-      line-height: 1.1;
+      line-height: 1.15;
       display: flex;
       align-items: baseline;
-      gap: 3px;
+      justify-content: center;
+      gap: 2px;
+      margin: 2px 0;
     }
 
     .node-val .unit {
@@ -1012,44 +997,45 @@ EnergyDashboardCard.styles = i$3 `
     }
 
     .node-subtext {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 500;
       color: #94a3b8;
-      margin-top: 3px;
-      text-align: center;
+      line-height: 1.2;
       white-space: nowrap;
     }
 
-    .node-badge {
-      position: absolute;
-      bottom: 2px;
-      background: #181d26;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+    .node-status-pill {
+      display: inline-block;
+      margin-top: 3px;
+      padding: 1px 7px;
       border-radius: 9999px;
-      padding: 2px 8px;
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 600;
       letter-spacing: 0.03em;
-      z-index: 4;
-      white-space: nowrap;
     }
 
-    .node-badge.status-green {
+    .pill-green {
+      background: rgba(16, 185, 129, 0.15);
       color: #10b981;
-      border-color: rgba(16, 185, 129, 0.35);
-      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
-    .node-badge.status-blue {
+    .pill-blue {
+      background: rgba(56, 189, 248, 0.15);
       color: #38bdf8;
-      border-color: rgba(56, 189, 248, 0.35);
-      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
     }
 
-    .node-badge.status-amber {
+    .pill-amber {
+      background: rgba(245, 158, 11, 0.15);
       color: #f59e0b;
-      border-color: rgba(245, 158, 11, 0.35);
-      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .pill-red {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
     /* Chart & History Content */
