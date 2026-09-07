@@ -270,7 +270,7 @@ class EnergyDashboardCard extends i {
         // 2A. Zonneplan Energienota Variables
         const gridImportCostToday = this._getNumber('sensor.zonneplan_electricity_delivery_costs_today', 14.16);
         const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 14.27);
-        const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 1.44);
+        const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 0);
         let stroomCost = gridImportCostToday;
         let stroomKwh = gridImportToday;
         let terugleveringRev = gridExportRevToday;
@@ -301,24 +301,24 @@ class EnergyDashboardCard extends i {
         let batChargedPeriodKwh = batChargedToday;
         let batDischargedPeriodKwh = batDischargedToday;
         let batPowerplay = powerplayToday;
-        let batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag', 5.21);
+        let batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag', 0);
         if (isMonth) {
             batChargedPeriodKwh = batMonthAttrs.total_delivery_kwh || 314.6;
             batDischargedPeriodKwh = batMonthAttrs.total_production_kwh || 282.5;
             batPowerplay = parseFloat(batMonthEntity?.state || '0') || 27.02;
-            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_deze_maand', 7.24);
+            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_deze_maand', 0);
         }
         else if (isYear) {
             batChargedPeriodKwh = batYearAttrs.total_delivery_kwh || 330.6;
             batDischargedPeriodKwh = batYearAttrs.total_production_kwh || 296.1;
             batPowerplay = parseFloat(batYearEntity?.state || '0') || 30.28;
-            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_dit_jaar', 7.24);
+            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_dit_jaar', 0);
         }
         // Totale werkelijke verdienste: Powerplay bonus + Vermeden piekinkoop woning
         const batTotalEarnings = Math.round((batPowerplay + batHomeSavings) * 100) / 100;
         // Battery Payback / ROI metrics
         const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8700);
-        const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 37.52);
+        const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 0);
         const batPaybackPct = batPurchasePrice > 0 ? Math.min(100, (batLifetimeSaved / batPurchasePrice) * 100) : 0;
         const batRemaining = Math.max(0, batPurchasePrice - batLifetimeSaved);
         const batDailyAvg = this._getNumber('sensor.thuisbatterij_gemiddelde_dag', 3.07);
