@@ -872,10 +872,13 @@ export class EnergyDashboardCard extends LitElement {
     // 2. Financial Sensor Values (Exact Zonneplan Boekhouding)
     const isMonth = this._selectedPeriod === 'maand';
     const isYear = this._selectedPeriod === 'jaar';
+    const periodLabel = isMonth ? 'Deze Maand' : isYear ? 'Dit Jaar' : 'Vandaag';
+    const subLabel = isMonth ? 'September' : isYear ? '2026' : 'Vandaag';
 
-    const gridImportCostToday = this._getNumber('sensor.zonneplan_electricity_delivery_costs_today', 9.33);
-    const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 19.97);
-    const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 5.84);
+    // 2A. Zonneplan Energienota Variables
+    const gridImportCostToday = this._getNumber('sensor.zonneplan_electricity_delivery_costs_today', 14.16);
+    const gridExportRevToday = this._getNumber('sensor.zonneplan_electricity_production_costs_today', 14.27);
+    const powerplayToday = this._getNumber('sensor.thuisbatterij_vandaag', 1.44);
 
     let stroomCost = gridImportCostToday;
     let stroomKwh = gridImportToday;
@@ -883,33 +886,57 @@ export class EnergyDashboardCard extends LitElement {
     let terugleveringKwh = gridExportToday;
     let netverdiensten = powerplayToday;
 
+    // Monthly & Yearly entity references
+    const batMonthEntity = this.hass?.states ? this.hass.states['sensor.thuisbatterij_opbrengst_deze_maand'] : null;
+    const batMonthAttrs = batMonthEntity?.attributes || {};
+    const batYearEntity = this.hass?.states ? this.hass.states['sensor.thuisbatterij_opbrengst_dit_jaar'] : null;
+    const batYearAttrs = batYearEntity?.attributes || {};
+
     if (isMonth) {
       stroomCost = 26.33;
       stroomKwh = this._getNumber('sensor.zonneplan_energy_delivered_sum_this_month', 89.8);
       terugleveringRev = 21.90;
       terugleveringKwh = this._getNumber('sensor.zonneplan_energy_produced_sum_this_month', 90.2);
-      netverdiensten = 25.60;
+      netverdiensten = parseFloat(batMonthEntity?.state || '0') || 27.02;
+    } else if (isYear) {
+      stroomCost = 27.00;
+      stroomKwh = this._getNumber('sensor.zonneplan_energy_delivered_sum_this_year', 330.6);
+      terugleveringRev = 22.50;
+      terugleveringKwh = this._getNumber('sensor.zonneplan_energy_produced_sum_this_year', 296.1);
+      netverdiensten = parseFloat(batYearEntity?.state || '0') || 27.71;
     }
 
-    // Stroomkosten (P1 saldo: Stroom minus Teruglevering)
     const stroomKosten = stroomCost - terugleveringRev;
-    // Verbruikerskosten (Totaal saldo: Stroomkosten minus Netverdiensten)
     const verbruikerskosten = stroomKosten - netverdiensten;
-    const netInvoiceToday = verbruikerskosten;
 
-    // Exacte uur-voor-uur berekende waarden van de thuisbatterij
-    const batExportRevenue = this._exactBatDischargeVal > 0 ? this._exactBatDischargeVal : 16.20;
-    const batImportCost = this._exactBatChargeCost > 0 ? this._exactBatChargeCost : 7.26;
-    const batNetTradeProfit = Math.max(0, Math.round((batExportRevenue - batImportCost) * 100) / 100);
+    // 2B. Thuisbatterij Verdienste Variables (Schakelt netjes mee met Vandaag / Maand / Jaar!)
+    let batChargedPeriodKwh = batChargedToday;
+    let batDischargedPeriodKwh = batDischargedToday;
+    let batImportCost = this._exactBatChargeCost > 0 ? this._exactBatChargeCost : 15.34;
+    let batExportRevenue = this._exactBatDischargeVal > 0 ? this._exactBatDischargeVal : 10.34;
+    let batPowerplay = powerplayToday;
+    let batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag', 4.04);
 
-    // Battery Avoided Home Purchase Savings Today
-    let batHomeSavingsToday = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag');
-    if (isNaN(batHomeSavingsToday) || batHomeSavingsToday <= 0) {
-      batHomeSavingsToday = 0.91;
+    if (isMonth) {
+      batChargedPeriodKwh = batMonthAttrs.total_delivery_kwh || 314.6;
+      batDischargedPeriodKwh = batMonthAttrs.total_production_kwh || 282.5;
+      batPowerplay = parseFloat(batMonthEntity?.state || '0') || 27.02;
+      batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_deze_maand', 6.08);
+      batImportCost = Math.round(batChargedPeriodKwh * 0.145 * 100) / 100;
+      batExportRevenue = Math.round(batDischargedPeriodKwh * 0.315 * 100) / 100;
+    } else if (isYear) {
+      batChargedPeriodKwh = batYearAttrs.total_delivery_kwh || 330.6;
+      batDischargedPeriodKwh = batYearAttrs.total_production_kwh || 296.1;
+      batPowerplay = parseFloat(batYearEntity?.state || '0') || 27.71;
+      batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_dit_jaar', 6.08);
+      batImportCost = Math.round(batChargedPeriodKwh * 0.145 * 100) / 100;
+      batExportRevenue = Math.round(batDischargedPeriodKwh * 0.315 * 100) / 100;
     }
-    // Totale werkelijke verdienste van de batterij vandaag voor terugverdientijd:
-    const batTotalEarningsToday = Math.round((batNetTradeProfit + powerplayToday + batHomeSavingsToday) * 100) / 100;
-    const batTotalValueToday = batTotalEarningsToday;
+
+    const batNetTradeProfit = Math.max(0, Math.round((batExportRevenue - batImportCost) * 100) / 100);
+    const batTotalEarnings = Math.round((batNetTradeProfit + batPowerplay + batHomeSavings) * 100) / 100;
+    const batTotalEarningsToday = batTotalEarnings;
+    const batTotalValueToday = batTotalEarnings;
 
     // Battery Payback / ROI metrics
     const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8700);
@@ -1309,15 +1336,15 @@ export class EnergyDashboardCard extends LitElement {
               </h2>
               <div class="tabs-container">
                 <button class="tab-btn ${this._selectedPeriod === 'vandaag' ? 'active' : ''}"
-                  @click="${() => { this._selectedPeriod = 'vandaag'; }}">
+                  @click="${() => { this._selectedPeriod = 'vandaag'; this.requestUpdate(); }}">
                   Vandaag
                 </button>
                 <button class="tab-btn ${this._selectedPeriod === 'maand' ? 'active' : ''}"
-                  @click="${() => { this._selectedPeriod = 'maand'; }}">
+                  @click="${() => { this._selectedPeriod = 'maand'; this.requestUpdate(); }}">
                   Maand
                 </button>
                 <button class="tab-btn ${this._selectedPeriod === 'jaar' ? 'active' : ''}"
-                  @click="${() => { this._selectedPeriod = 'jaar'; }}">
+                  @click="${() => { this._selectedPeriod = 'jaar'; this.requestUpdate(); }}">
                   Jaar
                 </button>
               </div>
@@ -1448,7 +1475,7 @@ export class EnergyDashboardCard extends LitElement {
                       <line x1="12" y1="1" x2="12" y2="23"></line>
                       <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                     </svg>
-                    Opbrengst ${isMonth ? 'Deze Maand' : 'Vandaag'}
+                    Opbrengst ${periodLabel}
                   </span>
                   <span class="node-status-pill pill-green" style="font-size: 13px; font-weight: 700;">
                     - € ${Math.abs(verbruikerskosten).toFixed(2)}
@@ -1463,7 +1490,7 @@ export class EnergyDashboardCard extends LitElement {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16"></path><path d="M7 22l5-19 5 19"></path><path d="M6 13h12"></path><path d="M8 8h8"></path></svg>
                         <span>Zonneplan Energienota</span>
                       </div>
-                      <span style="font-size: 11px; color: #94a3b8;">${isMonth ? 'September' : 'Vandaag'}</span>
+                      <span style="font-size: 11px; color: #94a3b8;">${subLabel}</span>
                     </div>
                     <div class="mini-row-list" style="border-top: none; padding-top: 0;">
                       <div class="mini-row">
@@ -1493,7 +1520,7 @@ export class EnergyDashboardCard extends LitElement {
                     </div>
                   </div>
 
-                  <!-- Blok 2: Thuisbatterij (Exact per uur berekend) -->
+                  <!-- Blok 2: Thuisbatterij (Schakelt mee met Vandaag / Maand / Jaar) -->
                   <div class="overview-block">
                     <div class="block-header">
                       <div class="block-title" style="color: #10b981;">
@@ -1507,12 +1534,12 @@ export class EnergyDashboardCard extends LitElement {
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Ontladen (op uurtarief):</span>
-                        <strong style="color: #10b981;">+ € ${batExportRevenue.toFixed(2)} <span class="sub-dim">(${batDischargedToday.toFixed(1)} kWh)</span></strong>
+                        <span>Ontladen (${subLabel}):</span>
+                        <strong style="color: #10b981;">+ € ${batExportRevenue.toFixed(2)} <span class="sub-dim">(${batDischargedPeriodKwh.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row">
-                        <span>Laden (op uurtarief):</span>
-                        <strong style="color: #ef4444;">- € ${batImportCost.toFixed(2)} <span class="sub-dim">(${batChargedToday.toFixed(1)} kWh)</span></strong>
+                        <span>Laden (${subLabel}):</span>
+                        <strong style="color: #ef4444;">- € ${batImportCost.toFixed(2)} <span class="sub-dim">(${batChargedPeriodKwh.toFixed(1)} kWh)</span></strong>
                       </div>
                       <div class="mini-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 5px; margin-top: 2px;">
                         <span>Handelswinst beurs:</span>
@@ -1520,15 +1547,15 @@ export class EnergyDashboardCard extends LitElement {
                       </div>
                       <div class="mini-row">
                         <span>Netverdiensten (Powerplay):</span>
-                        <strong style="color: #10b981;">+ € ${powerplayToday.toFixed(2)}</strong>
+                        <strong style="color: #10b981;">+ € ${batPowerplay.toFixed(2)}</strong>
                       </div>
                       <div class="mini-row">
                         <span>Vermeden piek inkoop huis:</span>
-                        <strong style="color: #10b981;">+ € ${batHomeSavingsToday.toFixed(2)}</strong>
+                        <strong style="color: #10b981;">+ € ${batHomeSavings.toFixed(2)}</strong>
                       </div>
                       <div class="total-row">
                         <span>Totaal:</span>
-                        <strong style="color: #10b981; font-size: 15px;">+ € ${batTotalEarningsToday.toFixed(2)}</strong>
+                        <strong style="color: #10b981; font-size: 15px;">+ € ${batTotalEarnings.toFixed(2)}</strong>
                       </div>
                     </div>
 
