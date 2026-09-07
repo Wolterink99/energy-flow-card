@@ -918,12 +918,27 @@ export class EnergyDashboardCard extends LitElement {
     if (isMonth) {
       batChargedPeriodKwh = batMonthAttrs.total_delivery_kwh || 314.6;
       batDischargedPeriodKwh = batMonthAttrs.total_production_kwh || 282.5;
-      batPowerplay = parseFloat(batMonthEntity?.state || '0') || 27.02;
+      
+      // Bereken live maand Powerplay: afgesloten dagen + live vandaag (omdat Zonneplan maand-sensor achterloopt)
+      let monthPowerplayLive = 0;
+      if (batMonthAttrs.days) {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        for (const [dayKey, dayData] of Object.entries(batMonthAttrs.days as Record<string, any>)) {
+          if (dayKey !== todayStr && dayData && typeof dayData.result === 'number') {
+            monthPowerplayLive += dayData.result;
+          }
+        }
+        monthPowerplayLive += powerplayToday;
+      }
+      batPowerplay = monthPowerplayLive > 0 ? Math.round(monthPowerplayLive * 100) / 100 : (parseFloat(batMonthEntity?.state || '0') || 27.02);
+      netverdiensten = batPowerplay;
       batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_deze_maand', 0);
     } else if (isYear) {
       batChargedPeriodKwh = batYearAttrs.total_delivery_kwh || 330.6;
       batDischargedPeriodKwh = batYearAttrs.total_production_kwh || 296.1;
-      batPowerplay = parseFloat(batYearEntity?.state || '0') || 30.28;
+      const allTimePowerplay = this._getNumber('sensor.thuisbatterij_totaal_verdiend', 0);
+      batPowerplay = allTimePowerplay > 0 ? allTimePowerplay : (parseFloat(batYearEntity?.state || '0') || 30.28);
+      netverdiensten = batPowerplay;
       batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_dit_jaar', 0);
     }
 
@@ -1554,11 +1569,11 @@ export class EnergyDashboardCard extends LitElement {
                     <div class="roi-section" style="margin-top: 6px;" title="Klik om de aanschafprijs aan te passen" @click="${() => this._openMoreInfo('input_number.thuisbatterij_aanschafprijs')}">
                       <div class="roi-header">
                         <div class="roi-title">
-                          <span>Terugverdientijd (${batPaybackPct.toFixed(1)}%)</span>
+                          <span>Terugverdientijd (Levensduur: ${batPaybackPct.toFixed(1)}%)</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                          <div class="roi-badge">
-                            € ${batLifetimeSaved.toFixed(2)} / € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })}
+                          <div class="roi-badge" title="Totaal bespaard over de gehele levensduur van de batterij">
+                            All-time: € ${batLifetimeSaved.toFixed(2)} / € ${batPurchasePrice.toLocaleString('nl-NL', { maximumFractionDigits: 0 })}
                           </div>
                           <span style="font-size: 11px; color: #64748b; cursor: pointer; padding: 0 4px;" title="Sluiten" @click="${(e: Event) => { e.stopPropagation(); this._showRoi = false; }}">✕</span>
                         </div>
