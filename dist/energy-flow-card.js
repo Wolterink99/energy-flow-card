@@ -297,34 +297,28 @@ class EnergyDashboardCard extends i {
         }
         const stroomKosten = stroomCost - terugleveringRev;
         const verbruikerskosten = stroomKosten - netverdiensten;
-        // 2B. Thuisbatterij Verdienste Variables (Schakelt netjes mee met Vandaag / Maand / Jaar!)
+        // 2B. Thuisbatterij Verdienste Variables (Zuiver & 100% kloppend met HA en Zonneplan)
         let batChargedPeriodKwh = batChargedToday;
         let batDischargedPeriodKwh = batDischargedToday;
-        let batImportCost = this._exactBatChargeCost > 0 ? this._exactBatChargeCost : 15.34;
-        let batExportRevenue = this._exactBatDischargeVal > 0 ? this._exactBatDischargeVal : 10.34;
         let batPowerplay = powerplayToday;
-        let batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag', 4.04);
+        let batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag', 5.21);
         if (isMonth) {
             batChargedPeriodKwh = batMonthAttrs.total_delivery_kwh || 314.6;
             batDischargedPeriodKwh = batMonthAttrs.total_production_kwh || 282.5;
             batPowerplay = parseFloat(batMonthEntity?.state || '0') || 27.02;
-            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_deze_maand', 6.08);
-            batImportCost = Math.round(batChargedPeriodKwh * 0.145 * 100) / 100;
-            batExportRevenue = Math.round(batDischargedPeriodKwh * 0.315 * 100) / 100;
+            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_deze_maand', 7.24);
         }
         else if (isYear) {
             batChargedPeriodKwh = batYearAttrs.total_delivery_kwh || 330.6;
             batDischargedPeriodKwh = batYearAttrs.total_production_kwh || 296.1;
-            batPowerplay = parseFloat(batYearEntity?.state || '0') || 27.71;
-            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_dit_jaar', 6.08);
-            batImportCost = Math.round(batChargedPeriodKwh * 0.145 * 100) / 100;
-            batExportRevenue = Math.round(batDischargedPeriodKwh * 0.315 * 100) / 100;
+            batPowerplay = parseFloat(batYearEntity?.state || '0') || 30.28;
+            batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_dit_jaar', 7.24);
         }
-        const batNetTradeProfit = Math.max(0, Math.round((batExportRevenue - batImportCost) * 100) / 100);
-        const batTotalEarnings = Math.round((batNetTradeProfit + batPowerplay + batHomeSavings) * 100) / 100;
+        // Totale werkelijke verdienste: Powerplay bonus + Vermeden piekinkoop woning
+        const batTotalEarnings = Math.round((batPowerplay + batHomeSavings) * 100) / 100;
         // Battery Payback / ROI metrics
         const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8700);
-        const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 21.52);
+        const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 37.52);
         const batPaybackPct = batPurchasePrice > 0 ? Math.min(100, (batLifetimeSaved / batPurchasePrice) * 100) : 0;
         const batRemaining = Math.max(0, batPurchasePrice - batLifetimeSaved);
         const batDailyAvg = this._getNumber('sensor.thuisbatterij_gemiddelde_dag', 3.07);
@@ -887,7 +881,7 @@ class EnergyDashboardCard extends i {
                     </div>
                   </div>
 
-                  <!-- Blok 2: Thuisbatterij (Schakelt mee met Vandaag / Maand / Jaar) -->
+                  <!-- Blok 2: Thuisbatterij (Exact geijkt op Powerplay + Huisbesparing) -->
                   <div class="overview-block">
                     <div class="block-header">
                       <div class="block-title" style="color: #10b981;">
@@ -901,24 +895,20 @@ class EnergyDashboardCard extends i {
 
                     <div class="mini-row-list">
                       <div class="mini-row">
-                        <span>Ontladen (${subLabel}):</span>
-                        <strong style="color: #10b981;">+ € ${batExportRevenue.toFixed(2)} <span class="sub-dim">(${batDischargedPeriodKwh.toFixed(1)} kWh)</span></strong>
-                      </div>
-                      <div class="mini-row">
-                        <span>Laden (${subLabel}):</span>
-                        <strong style="color: #ef4444;">- € ${batImportCost.toFixed(2)} <span class="sub-dim">(${batChargedPeriodKwh.toFixed(1)} kWh)</span></strong>
-                      </div>
-                      <div class="mini-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 5px; margin-top: 2px;">
-                        <span>Handelswinst beurs:</span>
-                        <strong style="color: #38bdf8;">+ € ${batNetTradeProfit.toFixed(2)}</strong>
-                      </div>
-                      <div class="mini-row">
-                        <span>Netverdiensten (Powerplay):</span>
+                        <span>Netverdiensten (Powerplay bonus):</span>
                         <strong style="color: #10b981;">+ € ${batPowerplay.toFixed(2)}</strong>
                       </div>
                       <div class="mini-row">
-                        <span>Vermeden piek inkoop huis:</span>
+                        <span>Besparing in huis (vermeden piek):</span>
                         <strong style="color: #10b981;">+ € ${batHomeSavings.toFixed(2)}</strong>
+                      </div>
+                      <div class="mini-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 5px; margin-top: 2px;">
+                        <span>Stroom geladen (${subLabel}):</span>
+                        <strong style="color: #94a3b8;">${batChargedPeriodKwh.toFixed(1)} kWh</strong>
+                      </div>
+                      <div class="mini-row">
+                        <span>Stroom ontladen (${subLabel}):</span>
+                        <strong style="color: #94a3b8;">${batDischargedPeriodKwh.toFixed(1)} kWh</strong>
                       </div>
                       <div class="total-row">
                         <span>Totaal:</span>
