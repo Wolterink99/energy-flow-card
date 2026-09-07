@@ -296,7 +296,7 @@ class EnergyDashboardCard extends i {
         // Totale werkelijke verdienste van de batterij vandaag voor terugverdientijd:
         const batTotalEarningsToday = Math.round((batNetTradeProfit + powerplayToday + batHomeSavingsToday) * 100) / 100;
         // Battery Payback / ROI metrics
-        const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8500);
+        const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8700);
         const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 21.52);
         const batPaybackPct = batPurchasePrice > 0 ? Math.min(100, (batLifetimeSaved / batPurchasePrice) * 100) : 0;
         const batRemaining = Math.max(0, batPurchasePrice - batLifetimeSaved);

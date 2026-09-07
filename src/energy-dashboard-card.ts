@@ -912,7 +912,7 @@ export class EnergyDashboardCard extends LitElement {
     const batTotalValueToday = batTotalEarningsToday;
 
     // Battery Payback / ROI metrics
-    const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8500);
+    const batPurchasePrice = this._getNumber('input_number.thuisbatterij_aanschafprijs', 8700);
     const batLifetimeSaved = this._getNumber('sensor.thuisbatterij_totaal_bespaard', 21.52);
     const batPaybackPct = batPurchasePrice > 0 ? Math.min(100, (batLifetimeSaved / batPurchasePrice) * 100) : 0;
     const batRemaining = Math.max(0, batPurchasePrice - batLifetimeSaved);
