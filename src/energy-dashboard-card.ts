@@ -35,12 +35,272 @@ export class EnergyDashboardCard extends LitElement {
   @state() private _exactSolarVal: number = 2.10;
   @state() private _hoveredHour: number | null = null;
   @state() private _showRoi: boolean = false;
+  @state() private _isExporting: boolean = false;
   @state() private _activeDetailView: 'flow' | 'solar' | 'home' | 'battery' | 'grid' = 'flow';
   @state() private _batteryChartMode: 'power' | 'kwh' = 'kwh';
   @state() private _historyData: Record<string, any[]> = {};
   @state() private _hoverChartPoint: { time: number; x: number; y: number; title: string; val1: string; val2?: string } | null = null;
   private _roiClickCount: number = 0;
   private _roiClickTimeout: any = null;
+
+  private async _exportAllEnergyDataExcel(): Promise<void> {
+    if (!this.hass || this._isExporting) return;
+    this._isExporting = true;
+    this.requestUpdate();
+
+    try {
+      // 1. Haal alle dagstatistieken op vanaf de start van de batterij (31 augustus 2026)
+      const statsRes: any = await (this.hass as any).callWS({
+        type: 'recorder/statistics_during_period',
+        start_time: '2026-08-30T00:00:00.000Z',
+        statistic_ids: [
+          'sensor.wolterink_solar_huaweiomvormer_7tpk84cguiiunuacn13j5z8peto0t970_total_current_day_energy',
+          'sensor.p1_netstroom_afname_vandaag',
+          'sensor.p1_netstroom_teruglevering_vandaag',
+          'sensor.zonneplan_electricity_delivery_costs_today',
+          'sensor.zonneplan_electricity_production_costs_today',
+          'sensor.thuisbatterij_levering_vandaag',
+          'sensor.thuisbatterij_productie_vandaag',
+          'sensor.thuisbatterij_vandaag',
+          'sensor.thuisbatterij_huisbesparing_vandaag'
+        ],
+        period: 'day'
+      });
+
+      const daysMap: Record<string, any> = {};
+      const getVal = (item: any) => item ? (item.change !== null && item.change !== undefined ? item.change : item.state || 0) : 0;
+
+      if (statsRes) {
+        for (const [statId, items] of Object.entries(statsRes)) {
+          for (const item of (items as any[])) {
+            const dObj = new Date(item.start);
+            const dateKey = dObj.toISOString().slice(0, 10);
+            if (!daysMap[dateKey]) {
+              daysMap[dateKey] = {
+                dateKey,
+                dateFormatted: dObj.toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                monthKey: dObj.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' }),
+                yearKey: dObj.getFullYear().toString(),
+                solarKwh: 0,
+                gridImportKwh: 0,
+                gridImportCost: 0,
+                gridExportKwh: 0,
+                gridExportRev: 0,
+                batChargedKwh: 0,
+                batDischargedKwh: 0,
+                batPowerplay: 0,
+                batHomeSavings: 0
+              };
+            }
+            const val = getVal(item);
+            if (statId.includes('solar')) daysMap[dateKey].solarKwh = Math.max(0, val);
+            else if (statId.includes('afname_vandaag')) daysMap[dateKey].gridImportKwh = Math.max(0, val);
+            else if (statId.includes('delivery_costs')) daysMap[dateKey].gridImportCost = Math.max(0, val);
+            else if (statId.includes('teruglevering_vandaag')) daysMap[dateKey].gridExportKwh = Math.max(0, val);
+            else if (statId.includes('production_costs')) daysMap[dateKey].gridExportRev = Math.max(0, val);
+            else if (statId.includes('thuisbatterij_levering')) daysMap[dateKey].batChargedKwh = Math.max(0, val);
+            else if (statId.includes('thuisbatterij_productie')) daysMap[dateKey].batDischargedKwh = Math.max(0, val);
+            else if (statId.includes('thuisbatterij_vandaag')) daysMap[dateKey].batPowerplay = val;
+            else if (statId.includes('huisbesparing_vandaag')) daysMap[dateKey].batHomeSavings = val;
+          }
+        }
+      }
+
+      // Filter geldige dagen vanaf ingebruikname batterij
+      const sortedDays = Object.values(daysMap)
+        .filter((d: any) => d.dateKey >= '2026-08-30' && (d.gridImportKwh > 0 || d.batChargedKwh > 0 || d.batDischargedKwh > 0))
+        .sort((a: any, b: any) => a.dateKey.localeCompare(b.dateKey));
+
+      const formatNum = (num: number, decimals = 2) => {
+        if (num === null || num === undefined || isNaN(num)) return '0,00';
+        return num.toLocaleString('nl-NL', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      };
+
+      const toCsvLine = (arr: any[]) => arr.join(';') + '\r\n';
+
+      let csv = '\uFEFF'; // UTF-8 BOM voor directe automatische herkenning in Excel
+
+      // TITEL EN META-DATA
+      csv += toCsvLine(['RAPPORT ENERGIE EN THUISBATTERIJ HISTORIE']);
+      csv += toCsvLine(['Gegenereerd op:', new Date().toLocaleString('nl-NL')]);
+      csv += toCsvLine(['Startdatum batterij:', sortedDays.length > 0 ? sortedDays[0].dateFormatted : '31-08-2026']);
+      csv += toCsvLine(['Aanschafprijs thuisbatterij:', '€ 8.700,00']);
+      csv += toCsvLine([]);
+
+      // DEEL 1: DAGELIJKS OVERZICHT
+      csv += toCsvLine(['=== DEEL 1: DAGELIJKS OVERZICHT (ALLE DAGEN SINDS START BATTERIJ) ===']);
+      csv += toCsvLine([
+        'Datum',
+        'Zon Opwek (kWh)',
+        'Batterij Geladen (kWh)',
+        'Batterij Ontladen (kWh)',
+        'Batterij Huisbesparing (€)',
+        'Batterij Powerplay Verdienste (€)',
+        'Batterij Totaal Winst (€)',
+        'Net Stroomafname (kWh)',
+        'Net Afnamekosten (€)',
+        'Gem. Inkooptarief (€/kWh)',
+        'Net Teruglevering (kWh)',
+        'Net Terugleververgoeding (€)',
+        'Gem. Verkooptarief (€/kWh)',
+        'Geschat Woningverbruik (kWh)',
+        'Netto Energiekosten Die Dag (€)'
+      ]);
+
+      const monthGroups: Record<string, any[]> = {};
+      let grandSolar = 0, grandBatIn = 0, grandBatOut = 0, grandSavings = 0, grandPowerplay = 0, grandBatTotal = 0;
+      let grandImportKwh = 0, grandImportCost = 0, grandExportKwh = 0, grandExportRev = 0, grandHomeKwh = 0, grandNetCost = 0;
+
+      for (const d of sortedDays) {
+        const batTotal = d.batPowerplay + d.batHomeSavings;
+        const avgImport = d.gridImportKwh > 0 ? d.gridImportCost / d.gridImportKwh : 0;
+        const avgExport = d.gridExportKwh > 0 ? d.gridExportRev / d.gridExportKwh : 0;
+        const houseEst = Math.max(0, d.gridImportKwh + d.solarKwh - d.gridExportKwh + d.batDischargedKwh - d.batChargedKwh);
+        const netCost = d.gridImportCost - d.gridExportRev - d.batPowerplay;
+
+        grandSolar += d.solarKwh;
+        grandBatIn += d.batChargedKwh;
+        grandBatOut += d.batDischargedKwh;
+        grandSavings += d.batHomeSavings;
+        grandPowerplay += d.batPowerplay;
+        grandBatTotal += batTotal;
+        grandImportKwh += d.gridImportKwh;
+        grandImportCost += d.gridImportCost;
+        grandExportKwh += d.gridExportKwh;
+        grandExportRev += d.gridExportRev;
+        grandHomeKwh += houseEst;
+        grandNetCost += netCost;
+
+        if (!monthGroups[d.monthKey]) monthGroups[d.monthKey] = [];
+        monthGroups[d.monthKey].push({ ...d, batTotal, avgImport, avgExport, houseEst, netCost });
+
+        csv += toCsvLine([
+          d.dateFormatted,
+          formatNum(d.solarKwh),
+          formatNum(d.batChargedKwh),
+          formatNum(d.batDischargedKwh),
+          formatNum(d.batHomeSavings),
+          formatNum(d.batPowerplay),
+          formatNum(batTotal),
+          formatNum(d.gridImportKwh),
+          formatNum(d.gridImportCost),
+          formatNum(avgImport, 3),
+          formatNum(d.gridExportKwh),
+          formatNum(d.gridExportRev),
+          formatNum(avgExport, 3),
+          formatNum(houseEst),
+          formatNum(netCost)
+        ]);
+      }
+
+      csv += toCsvLine([]);
+
+      // DEEL 2: MAANDOVERZICHTEN
+      csv += toCsvLine(['=== DEEL 2: MAANDOVERZICHTEN (SUBTOTALEN PER MAAND) ===']);
+      csv += toCsvLine([
+        'Maand',
+        'Aantal Dagen',
+        'Zon Opwek (kWh)',
+        'Batterij Geladen (kWh)',
+        'Batterij Ontladen (kWh)',
+        'Batterij Huisbesparing (€)',
+        'Batterij Powerplay (€)',
+        'Batterij Totaal Winst (€)',
+        'Net Afname (kWh)',
+        'Net Afnamekosten (€)',
+        'Gem. Inkooptarief (€/kWh)',
+        'Net Teruglevering (kWh)',
+        'Net Teruglevering Opbrengst (€)',
+        'Gem. Verkooptarief (€/kWh)',
+        'Huisverbruik (kWh)',
+        'Netto Energiekosten (€)'
+      ]);
+
+      for (const [mName, mDays] of Object.entries(monthGroups)) {
+        let mSolar = 0, mBatIn = 0, mBatOut = 0, mSavings = 0, mPP = 0, mBatTot = 0;
+        let mImpKwh = 0, mImpCost = 0, mExpKwh = 0, mExpRev = 0, mHome = 0, mNet = 0;
+
+        for (const md of mDays) {
+          mSolar += md.solarKwh;
+          mBatIn += md.batChargedKwh;
+          mBatOut += md.batDischargedKwh;
+          mSavings += md.batHomeSavings;
+          mPP += md.batPowerplay;
+          mBatTot += md.batTotal;
+          mImpKwh += md.gridImportKwh;
+          mImpCost += md.gridImportCost;
+          mExpKwh += md.gridExportKwh;
+          mExpRev += md.gridExportRev;
+          mHome += md.houseEst;
+          mNet += md.netCost;
+        }
+
+        const mAvgImp = mImpKwh > 0 ? mImpCost / mImpKwh : 0;
+        const mAvgExp = mExpKwh > 0 ? mExpRev / mExpKwh : 0;
+
+        csv += toCsvLine([
+          mName,
+          mDays.length,
+          formatNum(mSolar),
+          formatNum(mBatIn),
+          formatNum(mBatOut),
+          formatNum(mSavings),
+          formatNum(mPP),
+          formatNum(mBatTot),
+          formatNum(mImpKwh),
+          formatNum(mImpCost),
+          formatNum(mAvgImp, 3),
+          formatNum(mExpKwh),
+          formatNum(mExpRev),
+          formatNum(mAvgExp, 3),
+          formatNum(mHome),
+          formatNum(mNet)
+        ]);
+      }
+
+      csv += toCsvLine([]);
+
+      // DEEL 3: JAAROVERZICHT & TOTAAL SINDS AANSCHAF
+      const purchasePrice = 8700;
+      const paybackPct = (grandBatTotal / purchasePrice) * 100;
+      const remaining = Math.max(0, purchasePrice - grandBatTotal);
+
+      csv += toCsvLine(['=== DEEL 3: JAAR- EN TOTAALOVERZICHT (ALL-TIME CUMULATIEF) ===']);
+      csv += toCsvLine(['Indicator', 'Waarde']);
+      csv += toCsvLine(['Totaal aantal geregistreerde dagen:', sortedDays.length]);
+      csv += toCsvLine(['Zonnepanelen Totale Opwek:', formatNum(grandSolar) + ' kWh']);
+      csv += toCsvLine(['Thuisbatterij Totaal Geladen:', formatNum(grandBatIn) + ' kWh']);
+      csv += toCsvLine(['Thuisbatterij Totaal Ontladen:', formatNum(grandBatOut) + ' kWh']);
+      csv += toCsvLine(['Thuisbatterij Huisbesparing (Vermeden Piekinkoop):', '€ ' + formatNum(grandSavings)]);
+      csv += toCsvLine(['Thuisbatterij Netverdiensten (Powerplay / Onbalans):', '€ ' + formatNum(grandPowerplay)]);
+      csv += toCsvLine(['Thuisbatterij Totale Verdienste (All-Time):', '€ ' + formatNum(grandBatTotal)]);
+      csv += toCsvLine(['Aanschafprijs Thuisbatterij:', '€ ' + formatNum(purchasePrice)]);
+      csv += toCsvLine(['Reeds Terugverdiend Percentage:', formatNum(paybackPct, 1) + ' %']);
+      csv += toCsvLine(['Nog Terug Te Verdienen:', '€ ' + formatNum(remaining)]);
+      csv += toCsvLine(['Net Stroomafname Totaal:', formatNum(grandImportKwh) + ' kWh (€ ' + formatNum(grandImportCost) + ')']);
+      csv += toCsvLine(['Net Teruglevering Totaal:', formatNum(grandExportKwh) + ' kWh (€ ' + formatNum(grandExportRev) + ')']);
+      csv += toCsvLine(['Totale Netto Energiekosten Periode:', '€ ' + formatNum(grandNetCost)]);
+
+      // 3. Download bestand in browser
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const dNow = new Date();
+      const filename = `Zonneplan_Thuisbatterij_Energie_Historie_${dNow.getFullYear()}-${String(dNow.getMonth() + 1).padStart(2, '0')}-${String(dNow.getDate()).padStart(2, '0')}.csv`;
+      a.setAttribute('download', filename);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      console.error('Fout bij exporteren van energiedata:', err);
+      alert('Er is een fout opgetreden bij het ophalen van de data uit Home Assistant: ' + (err?.message || err));
+    } finally {
+      this._isExporting = false;
+      this.requestUpdate();
+    }
+  }
 
   private _handleRendementClick(): void {
     this._roiClickCount++;
@@ -1586,6 +1846,24 @@ export class EnergyDashboardCard extends LitElement {
                       <div class="roi-footer">
                         <span>Nog: <strong>€ ${batRemaining.toFixed(2)}</strong></span>
                         <span>Verwacht: <strong style="color: #38bdf8;">ca. ${batYearsRemaining.toFixed(1)} jaar</strong> <span style="color: #64748b; font-size: 10px;">(€ ${batDailyAvg.toFixed(2)}/d)</span></span>
+                      </div>
+
+                      <!-- Export Knop in verborgen deel van Terugverdientijd -->
+                      <div class="roi-export-row" style="margin-top: 10px; display: flex; justify-content: flex-end; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 8px;">
+                        <button 
+                          class="export-excel-btn" 
+                          style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25); transition: all 0.2s ease;"
+                          title="Download alle historische dag-, maand- en jaarstatistieken vanaf het begin van de batterij in Excel"
+                          @click="${(e: Event) => { e.stopPropagation(); this._exportAllEnergyDataExcel(); }}"
+                          ?disabled="${this._isExporting}"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                          </svg>
+                          <span>${this._isExporting ? 'Bezig met exporteren...' : 'Exporteer Alle Data (Excel)'}</span>
+                        </button>
                       </div>
                     </div>
                     ` : ''}
