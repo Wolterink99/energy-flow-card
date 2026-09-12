@@ -62,7 +62,8 @@ export class EnergyDashboardCard extends LitElement {
           'sensor.thuisbatterij_levering_vandaag',
           'sensor.thuisbatterij_productie_vandaag',
           'sensor.thuisbatterij_vandaag',
-          'sensor.thuisbatterij_huisbesparing_vandaag'
+          'sensor.thuisbatterij_huisbesparing_vandaag',
+          'sensor.thuisbatterij_laadkosten_vandaag'
         ],
         period: 'day'
       });
@@ -89,7 +90,8 @@ export class EnergyDashboardCard extends LitElement {
                 batChargedKwh: 0,
                 batDischargedKwh: 0,
                 batPowerplay: 0,
-                batHomeSavings: 0
+                batHomeSavings: 0,
+                batChargeCost: 0
               };
             }
             const val = getVal(item);
@@ -102,6 +104,7 @@ export class EnergyDashboardCard extends LitElement {
             else if (statId.includes('thuisbatterij_productie')) daysMap[dateKey].batDischargedKwh = Math.max(0, val);
             else if (statId.includes('thuisbatterij_vandaag')) daysMap[dateKey].batPowerplay = val;
             else if (statId.includes('huisbesparing_vandaag')) daysMap[dateKey].batHomeSavings = val;
+            else if (statId.includes('laadkosten_vandaag')) daysMap[dateKey].batChargeCost = val;
           }
         }
       }
@@ -174,10 +177,13 @@ export class EnergyDashboardCard extends LitElement {
         if (!monthGroups[d.monthKey]) monthGroups[d.monthKey] = [];
         monthGroups[d.monthKey].push({ ...d, batTotal, avgImport, avgExport, houseEst, netCost });
 
+        const avgChargePrice = d.batChargedKwh > 0 ? (d.batChargeCost / d.batChargedKwh) : 0;
         csv += toCsvLine([
           d.dateFormatted,
           formatNum(d.solarKwh),
           formatNum(d.batChargedKwh),
+          formatNum(d.batChargeCost),
+          formatNum(avgChargePrice, 3),
           formatNum(d.batDischargedKwh),
           formatNum(d.batHomeSavings),
           formatNum(d.batPowerplay),
@@ -1107,16 +1113,19 @@ export class EnergyDashboardCard extends LitElement {
     const gridImportToday = this._getNumber(cfg.grid_import_today || 'sensor.p1_netstroom_afname_vandaag');
     const gridExportToday = this._getNumber(cfg.grid_export_today || 'sensor.p1_teruglevering_vandaag');
 
-    // Filter 54W standby:
-    let batRawW = this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
-    if (Math.abs(batRawW) < 70) {
+    // HomeWizard 3-fase meter heeft directe sub-seconde responsietijd:
+    const hwBatEntity = this.hass?.states ? this.hass.states['sensor.kwh_meter_3_phase_thuisbatterij_35_kw_vermogen'] : null;
+    let batRawW = hwBatEntity ? (parseFloat(hwBatEntity.state) || 0) : this._getNumber(cfg.battery_power || 'sensor.thuisbatterij_vermogen');
+    if (Math.abs(batRawW) < 20) {
       batRawW = 0;
     }
     const batChargeW = Math.max(0, batRawW);
     const batDischargeW = Math.max(0, -batRawW);
     const batSoC = Math.min(100, Math.max(0, this._getNumber(cfg.battery_soc || 'sensor.thuisbatterij_percentage', 100)));
-    const batChargedToday = this._getNumber(cfg.battery_charged_today || 'sensor.thuisbatterij_levering_vandaag');
-    const batDischargedToday = this._getNumber(cfg.battery_discharged_today || 'sensor.thuisbatterij_productie_vandaag');
+    const hwCharged = this._getNumber('sensor.thuisbatterij_hw_geladen_vandaag', 0);
+    const batChargedToday = hwCharged > 0.05 ? hwCharged : this._getNumber(cfg.battery_charged_today || 'sensor.thuisbatterij_levering_vandaag');
+    const hwDischarged = this._getNumber('sensor.thuisbatterij_hw_ontladen_vandaag', 0);
+    const batDischargedToday = hwDischarged > 0.05 ? hwDischarged : this._getNumber(cfg.battery_discharged_today || 'sensor.thuisbatterij_productie_vandaag');
     const isBatCharging = batChargeW > 20;
     const isBatDischarging = batDischargeW > 20;
 
@@ -1174,6 +1183,7 @@ export class EnergyDashboardCard extends LitElement {
     let batDischargedPeriodKwh = batDischargedToday;
     let batPowerplay = powerplayToday;
     let batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_vandaag', 0);
+    let batChargeCost = this._getNumber('sensor.thuisbatterij_laadkosten_vandaag', 0);
 
     if (isMonth) {
       batChargedPeriodKwh = batMonthAttrs.total_delivery_kwh || 314.6;
@@ -1193,6 +1203,7 @@ export class EnergyDashboardCard extends LitElement {
       batPowerplay = monthPowerplayLive > 0 ? Math.round(monthPowerplayLive * 100) / 100 : (parseFloat(batMonthEntity?.state || '0') || 27.02);
       netverdiensten = batPowerplay;
       batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_deze_maand', 0);
+      batChargeCost = this._getNumber('sensor.thuisbatterij_laadkosten_deze_maand', 0);
     } else if (isYear) {
       batChargedPeriodKwh = batYearAttrs.total_delivery_kwh || 330.6;
       batDischargedPeriodKwh = batYearAttrs.total_production_kwh || 296.1;
@@ -1200,6 +1211,7 @@ export class EnergyDashboardCard extends LitElement {
       batPowerplay = allTimePowerplay > 0 ? allTimePowerplay : (parseFloat(batYearEntity?.state || '0') || 30.28);
       netverdiensten = batPowerplay;
       batHomeSavings = this._getNumber('sensor.thuisbatterij_huisbesparing_dit_jaar', 0);
+      batChargeCost = this._getNumber('sensor.thuisbatterij_laadkosten_dit_jaar', 0);
     }
 
     // Totale werkelijke verdienste: Powerplay bonus + Vermeden piekinkoop woning
@@ -1810,6 +1822,12 @@ export class EnergyDashboardCard extends LitElement {
                         <span>Besparing in huis (vermeden piek):</span>
                         <strong style="color: #10b981;">+ € ${batHomeSavings.toFixed(2)}</strong>
                       </div>
+                      ${batChargeCost > 0.01 ? html`
+                      <div class="mini-row">
+                        <span>Kosten geladen stroom:</span>
+                        <strong style="color: #f43f5e;">- € ${batChargeCost.toFixed(2)}</strong>
+                      </div>
+                      ` : ''}
                       <div class="mini-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 5px; margin-top: 2px;">
                         <span>Stroom geladen (${subLabel}):</span>
                         <strong style="color: #94a3b8;">${batChargedPeriodKwh.toFixed(1)} kWh</strong>
@@ -1942,7 +1960,7 @@ export class EnergyDashboardCard extends LitElement {
     const homeW = Math.max(0, this._getNumber('sensor.live_huisverbruik'));
     const gridW = this._getNumber('sensor.p1_meter_power');
     const gridImpToday = this._getNumber('sensor.p1_netstroom_afname_vandaag');
-    const batW = this._getNumber('sensor.thuisbatterij_vermogen');
+    const batW = this._getNumber('sensor.kwh_meter_3_phase_thuisbatterij_35_kw_vermogen') || this._getNumber('sensor.thuisbatterij_vermogen');
     const batSoC = Math.min(100, Math.max(0, this._getNumber('sensor.thuisbatterij_percentage', 100)));
     const batCapacity = this._getNumber('input_number.thuisbatterij_capaciteit', 35);
     const batKwhNow = (batSoC / 100) * batCapacity;
