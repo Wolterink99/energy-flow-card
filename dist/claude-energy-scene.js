@@ -846,6 +846,14 @@ class ClaudeEnergyScene extends HTMLElement {
   getCardSize() { return 12; }
 
   connectedCallback() {
+    this._locHandler = () => this._handleLocationChanged();
+    window.addEventListener('location-changed', this._locHandler);
+    window.addEventListener('popstate', this._locHandler);
+    if (this._cfg && this._cfg.screensaver) {
+      this._hideSidebarAndHeader();
+      setTimeout(() => this._hideSidebarAndHeader(), 100);
+      setTimeout(() => this._hideSidebarAndHeader(), 500);
+    }
     if (!document.querySelector(`link[href="${FONT_URL}"]`)) {
       const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONT_URL; document.head.appendChild(l);
     }
@@ -859,10 +867,112 @@ class ClaudeEnergyScene extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._locHandler = () => this._handleLocationChanged();
+    window.addEventListener('location-changed', this._locHandler);
+    window.addEventListener('popstate', this._locHandler);
+    if (this._cfg && this._cfg.screensaver) {
+      this._hideSidebarAndHeader();
+      setTimeout(() => this._hideSidebarAndHeader(), 100);
+      setTimeout(() => this._hideSidebarAndHeader(), 500);
+    }
     (this._timers || []).forEach(clearInterval);
     if (this._ro) this._ro.disconnect();
     clearTimeout(this._popTimer);
     window.removeEventListener('keydown', this._onKey);
+    if (this._locHandler) {
+      window.removeEventListener('location-changed', this._locHandler);
+      window.removeEventListener('popstate', this._locHandler);
+    }
+    this._restoreSidebarAndHeader();
+
+  _handleLocationChanged() {
+    this._restoreSidebarAndHeader();
+    setTimeout(() => this._restoreSidebarAndHeader(), 100);
+    setTimeout(() => this._restoreSidebarAndHeader(), 500);
+  }
+
+  _hideSidebarAndHeader() {
+    if (!this._cfg || !this._cfg.screensaver) return;
+    try {
+      const doc = document;
+      const homeAssistant = doc.querySelector('home-assistant');
+      if (!homeAssistant) return;
+      const main = homeAssistant.shadowRoot && homeAssistant.shadowRoot.querySelector('home-assistant-main');
+      if (!main || !main.shadowRoot) return;
+      const mainShadow = main.shadowRoot;
+
+      const sidebar = mainShadow.querySelector('ha-sidebar');
+      if (sidebar) {
+        sidebar.style.width = '0px';
+        sidebar.style.display = 'none';
+      }
+
+      const contentContainer = mainShadow.querySelector('.content');
+      if (contentContainer) {
+        contentContainer.style.paddingLeft = '0px';
+        contentContainer.style.marginLeft = '0px';
+      }
+
+      const partialResolver = mainShadow.querySelector('partial-panel-resolver');
+      const lovelace = partialResolver && partialResolver.querySelector('ha-panel-lovelace');
+      const huiRoot = lovelace && lovelace.shadowRoot && lovelace.shadowRoot.querySelector('hui-root');
+      if (huiRoot && huiRoot.shadowRoot) {
+        const header = huiRoot.shadowRoot.querySelector('.header') || huiRoot.shadowRoot.querySelector('app-header');
+        if (header) {
+          header.style.display = 'none';
+          header.style.height = '0px';
+        }
+        const mainContainer = huiRoot.shadowRoot.querySelector('#view');
+        if (mainContainer) {
+          mainContainer.style.paddingTop = '0px';
+          mainContainer.style.marginTop = '0px';
+        }
+      }
+    } catch (e) {
+      console.warn('[claude-energy-scene] Failed to hide sidebar/header via JS:', e);
+    }
+  }
+
+  _restoreSidebarAndHeader() {
+    try {
+      const doc = document;
+      const homeAssistant = doc.querySelector('home-assistant');
+      if (!homeAssistant) return;
+      const main = homeAssistant.shadowRoot && homeAssistant.shadowRoot.querySelector('home-assistant-main');
+      if (!main || !main.shadowRoot) return;
+      const mainShadow = main.shadowRoot;
+
+      const sidebar = mainShadow.querySelector('ha-sidebar');
+      if (sidebar) {
+        sidebar.style.width = '';
+        sidebar.style.display = '';
+      }
+
+      const contentContainer = mainShadow.querySelector('.content');
+      if (contentContainer) {
+        contentContainer.style.paddingLeft = '';
+        contentContainer.style.marginLeft = '';
+      }
+
+      const partialResolver = mainShadow.querySelector('partial-panel-resolver');
+      const lovelace = partialResolver && partialResolver.querySelector('ha-panel-lovelace');
+      const huiRoot = lovelace && lovelace.shadowRoot && lovelace.shadowRoot.querySelector('hui-root');
+      if (huiRoot && huiRoot.shadowRoot) {
+        const header = huiRoot.shadowRoot.querySelector('.header') || huiRoot.shadowRoot.querySelector('app-header');
+        if (header) {
+          header.style.display = '';
+          header.style.height = '';
+        }
+        const mainContainer = huiRoot.shadowRoot.querySelector('#view');
+        if (mainContainer) {
+          mainContainer.style.paddingTop = '';
+          mainContainer.style.marginTop = '';
+        }
+      }
+    } catch (e) {
+      console.warn('[claude-energy-scene] Failed to restore sidebar/header via JS:', e);
+    }
+  }
   }
 
   /* ----- helpers ----- */
@@ -1120,6 +1230,7 @@ class ClaudeEnergyScene extends HTMLElement {
 
   /* ----- live data ----- */
   _update() {
+    if (this._cfg && this._cfg.screensaver) this._hideSidebarAndHeader();
     if (!this._built || !this._hass) return;
     const L = this._live();
     const pill = (k, text, color) => this.$$(`[data-f="${k}-pill"]`).forEach((el) => { el.textContent = text || ''; el.style.setProperty('--pc', color); });
