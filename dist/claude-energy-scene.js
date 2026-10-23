@@ -571,7 +571,7 @@ let chartUid = 0;
 
 /* ---------- CSS ---------- */
 const CSS = `
-:host { display:block; --text:#EEF0F3; --text2:#A4ACB9; --text3:#6C7584; --line:rgba(255,255,255,.08);
+:host { display:block; position:fixed !important; top:0 !important; left:0 !important; width:100vw !important; height:100vh !important; z-index:999 !important; margin:0 !important; padding:0 !important; --text:#EEF0F3; --text2:#A4ACB9; --text3:#6C7584; --line:rgba(255,255,255,.08);
   --surface:rgba(12,16,22,.80); --c-battery:${C.battery};
   font-family:Inter,'Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,Roboto,sans-serif; font-feature-settings:'tnum' 1,'cv11' 1;
   -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent; }
