@@ -846,14 +846,6 @@ class ClaudeEnergyScene extends HTMLElement {
   getCardSize() { return 12; }
 
   connectedCallback() {
-    this._locHandler = () => this._handleLocationChanged();
-    window.addEventListener('location-changed', this._locHandler);
-    window.addEventListener('popstate', this._locHandler);
-    if (this._cfg && this._cfg.screensaver) {
-      this._hideSidebarAndHeader();
-      setTimeout(() => this._hideSidebarAndHeader(), 100);
-      setTimeout(() => this._hideSidebarAndHeader(), 500);
-    }
     if (!document.querySelector(`link[href="${FONT_URL}"]`)) {
       const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = FONT_URL; document.head.appendChild(l);
     }
@@ -864,9 +856,6 @@ class ClaudeEnergyScene extends HTMLElement {
       setInterval(() => this._todayChip(), 600000),
     ];
     if (this._built) this._observe();
-  }
-
-  disconnectedCallback() {
     this._locHandler = () => this._handleLocationChanged();
     window.addEventListener('location-changed', this._locHandler);
     window.addEventListener('popstate', this._locHandler);
@@ -875,6 +864,9 @@ class ClaudeEnergyScene extends HTMLElement {
       setTimeout(() => this._hideSidebarAndHeader(), 100);
       setTimeout(() => this._hideSidebarAndHeader(), 500);
     }
+  }
+
+  disconnectedCallback() {
     (this._timers || []).forEach(clearInterval);
     if (this._ro) this._ro.disconnect();
     clearTimeout(this._popTimer);
@@ -884,6 +876,7 @@ class ClaudeEnergyScene extends HTMLElement {
       window.removeEventListener('popstate', this._locHandler);
     }
     this._restoreSidebarAndHeader();
+  }
 
   _handleLocationChanged() {
     this._restoreSidebarAndHeader();
@@ -972,7 +965,6 @@ class ClaudeEnergyScene extends HTMLElement {
     } catch (e) {
       console.warn('[claude-energy-scene] Failed to restore sidebar/header via JS:', e);
     }
-  }
   }
 
   /* ----- helpers ----- */
@@ -1230,8 +1222,8 @@ class ClaudeEnergyScene extends HTMLElement {
 
   /* ----- live data ----- */
   _update() {
-    if (this._cfg && this._cfg.screensaver) this._hideSidebarAndHeader();
     if (!this._built || !this._hass) return;
+    if (this._cfg && this._cfg.screensaver) this._hideSidebarAndHeader();
     const L = this._live();
     const pill = (k, text, color) => this.$$(`[data-f="${k}-pill"]`).forEach((el) => { el.textContent = text || ''; el.style.setProperty('--pc', color); });
     const setP = (k, w) => { const p = fmtPower(w); this._setF(`${k}-v`, p.v); this._setF(`${k}-u`, p.u); };
