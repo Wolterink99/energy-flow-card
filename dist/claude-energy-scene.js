@@ -1783,6 +1783,23 @@ class ClaudeEnergyScene extends HTMLElement {
     };
   }
 
+  
+  /* ===================== warmtepomp popup ===================== */
+  _openHeatpump() {
+    this._closeAll();
+    const m = this.$('#hpm');
+    if (!m) return;
+    const iframe = this.$('#hp-iframe');
+    if (iframe && !iframe.srcdoc) {
+      iframe.srcdoc = WARMTEPOMP_DASHBOARD_HTML;
+    }
+    m.style.display = 'flex';
+    m.setAttribute('aria-hidden', 'false');
+    if (iframe?.contentWindow && this._hass) {
+      iframe.contentWindow.postMessage({ type: 'hass-update', hass: this._hass }, '*');
+    }
+  }
+
   /* ===================== energieoverzicht ===================== */
   _openOverview() {
     this._closeAll();
