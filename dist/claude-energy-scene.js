@@ -586,6 +586,7 @@ const CSS = `
   -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent; }
 * { box-sizing:border-box; }
 button { font:inherit; color:inherit; }
+.root.idle-mode *, .root.idle-mode svg * { animation-play-state: paused !important; }
 .root { position:relative; height:var(--h,100vh); overflow:hidden; background:var(--soil,#0A0E0C); color:var(--text); user-select:none; -webkit-user-select:none; }
 .sky { position:absolute; left:0; right:0; top:0; height:var(--horizon,70%); transition:background 6s linear; }
 .stage { position:relative; height:100%; display:grid; grid-template-rows:auto minmax(0,1fr) auto; transition:transform 3s ease; }
@@ -836,6 +837,8 @@ class ClaudeEnergyScene extends HTMLElement {
     this._pop = null;
     this._ov = null;
     this._reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._isIdle = false;
+    this._boundWake = () => this._onActivity();
   }
 
   static getStubConfig() { return { screensaver: false, battery_invert: false, entities: {} }; }
@@ -882,6 +885,14 @@ class ClaudeEnergyScene extends HTMLElement {
       }
     };
     window.addEventListener('message', this._onHpMsg);
+    ['pointerdown', 'pointermove', 'touchstart', 'keydown'].forEach(ev => {
+      window.addEventListener(ev, this._boundWake, { passive: true });
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this._goIdle();
+      else this._onActivity();
+    });
+    this._resetIdle();
     if (this._cfg && this._cfg.screensaver) {
       this._hideSidebarAndHeader();
       setTimeout(() => this._hideSidebarAndHeader(), 100);
@@ -899,9 +910,33 @@ class ClaudeEnergyScene extends HTMLElement {
       window.removeEventListener('popstate', this._locHandler);
     }
     if (this._onHpMsg) window.removeEventListener('message', this._onHpMsg);
+    ['pointerdown', 'pointermove', 'touchstart', 'keydown'].forEach(ev => {
+      window.removeEventListener(ev, this._boundWake);
+    });
+    if (this._idleTimer) clearTimeout(this._idleTimer);
     this._restoreSidebarAndHeader();
   }
 
+  _resetIdle() {
+    if (this._idleTimer) clearTimeout(this._idleTimer);
+    this._idleTimer = setTimeout(() => this._goIdle(), 3 * 60 * 1000);
+  }
+  _onActivity() {
+    if (this._isIdle) {
+      this._isIdle = false;
+      const root = this.$('#root');
+      if (root) root.classList.remove('idle-mode');
+      this._update();
+    }
+    this._resetIdle();
+  }
+  _goIdle() {
+    if (!this._isIdle) {
+      this._isIdle = true;
+      const root = this.$('#root');
+      if (root) root.classList.add('idle-mode');
+    }
+  }
   _handleLocationChanged() {
     this._restoreSidebarAndHeader();
     setTimeout(() => this._restoreSidebarAndHeader(), 100);
@@ -1353,7 +1388,7 @@ class ClaudeEnergyScene extends HTMLElement {
     f.path.style.opacity = on ? '.5' : '0';
     f.path.style.stroke = color;
     f.dots.setAttribute('fill', color);
-    if (!on || this._reduced) { f.dots.innerHTML = ''; this._flowKey[k] = null; return; }
+    if (!on || this._reduced || this._isIdle) { f.dots.innerHTML = ''; this._flowKey[k] = null; return; }
     // snelheid in eenheden per seconde: rustig bij weinig vermogen (onder ~800 W langzaam), vlot maar vloeiend bij veel
     const speed = 9 + 61 * Math.sqrt(clamp(a / 10000, 0, 1));
     const cur = this._flowKey[k];

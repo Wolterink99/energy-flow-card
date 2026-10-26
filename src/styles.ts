@@ -3,6 +3,15 @@ import { css } from 'lit';
 export const styles = css`
   :host {
     display: block;
+  }
+
+  /* Eco-sleep mode: freeze all CSS & SVG animations when idle to achieve 0% CPU/GPU */
+  ha-card.idle-mode *,
+  ha-card.idle-mode svg * {
+    animation-play-state: paused !important;
+  }
+  
+  :host {
     background: transparent;
   }
 

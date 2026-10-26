@@ -225,6 +225,9 @@ export class EnergyFlowCard extends LitElement {
   @state() private debugPoolPumpActive: boolean | null = null;
   @state() private _weatherTestPanelOpen: boolean = false;
   @state() private _timeRefreshTrigger: number = 0;
+  @state() private isIdle: boolean = false;
+  private _idleTimeout?: any;
+  private _boundWakeUpListener = () => this._handleUserActivity();
   private _boundHeatpumpMessageListener = (ev: MessageEvent) => {
     if (ev.data?.type === 'close-heatpump-popup') {
       this.closePopup();
@@ -257,6 +260,14 @@ export class EnergyFlowCard extends LitElement {
     window.addEventListener('hashchange', this.handleHashChange);
     window.addEventListener('location-changed', this._handleLocationChanged);
     window.addEventListener('message', this._boundHeatpumpMessageListener);
+    ['pointerdown', 'pointermove', 'touchstart', 'keydown', 'scroll'].forEach(ev => {
+      window.addEventListener(ev, this._boundWakeUpListener, { passive: true });
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this._goIdle();
+      else this._handleUserActivity();
+    });
+    this._resetIdleTimer();
     this.handleHashChange();
     this._timeRefreshInterval = setInterval(() => {
       this._timeRefreshTrigger++;
@@ -277,6 +288,10 @@ export class EnergyFlowCard extends LitElement {
     window.removeEventListener('hashchange', this.handleHashChange);
     window.removeEventListener('location-changed', this._handleLocationChanged);
     window.removeEventListener('message', this._boundHeatpumpMessageListener);
+    ['pointerdown', 'pointermove', 'touchstart', 'keydown', 'scroll'].forEach(ev => {
+      window.removeEventListener(ev, this._boundWakeUpListener);
+    });
+    if (this._idleTimeout) clearTimeout(this._idleTimeout);
     this.restoreSidebarAndHeader();
     super.disconnectedCallback();
   }
@@ -293,6 +308,24 @@ export class EnergyFlowCard extends LitElement {
       if (iframe?.contentWindow && this.hass) {
         iframe.contentWindow.postMessage({ type: 'hass-update', hass: { states: this.hass.states } }, '*');
       }
+    }
+  }
+
+  private _resetIdleTimer(): void {
+    if (this._idleTimeout) clearTimeout(this._idleTimeout);
+    this._idleTimeout = setTimeout(() => this._goIdle(), 3 * 60 * 1000); // 3 minutes idle
+  }
+
+  private _handleUserActivity(): void {
+    if (this.isIdle) {
+      this.isIdle = false;
+    }
+    this._resetIdleTimer();
+  }
+
+  private _goIdle(): void {
+    if (!this.isIdle) {
+      this.isIdle = true;
     }
   }
 
@@ -2489,7 +2522,7 @@ export class EnergyFlowCard extends LitElement {
     return html`
       ${screensaverStyles}
       ${dynamicAnimations}
-      <ha-card class="${this.config.screensaver ? 'screensaver-active' : ''}" style="${dynamicBackground}" @click=${this.handleCardClick}>
+      <ha-card class="${this.config.screensaver ? 'screensaver-active' : ''} ${this.isIdle ? 'idle-mode' : ''}" style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
           <!-- Digital Clock in the Top Center (Screensaver layout) -->
           <div style="position: absolute; left: 50%; top: 24px; transform: translateX(-50%); z-index: 90; text-align: center; pointer-events: none;">

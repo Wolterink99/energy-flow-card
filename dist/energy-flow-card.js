@@ -2388,6 +2388,15 @@ if (!customElements.get('energy-dashboard-card')) {
 const styles = i$3 `
   :host {
     display: block;
+  }
+
+  /* Eco-sleep mode: freeze all CSS & SVG animations when idle to achieve 0% CPU/GPU */
+  ha-card.idle-mode *,
+  ha-card.idle-mode svg * {
+    animation-play-state: paused !important;
+  }
+  
+  :host {
     background: transparent;
   }
 
@@ -3640,7 +3649,7 @@ function renderHouseSvg({ containerWidth, containerHeight, carType = 'hatchback'
             animation-play-state: running;
             animation-delay: ${-(i / count) * speed}s;
             animation-direction: ${reverse ? 'reverse' : 'normal'};
-            filter: drop-shadow(0 0 5px ${glow}) drop-shadow(0 0 2px ${color});
+            filter: drop-shadow(0 0 3px ${glow});
             will-change: transform;
             transform: translate3d(0, 0, 0);
           " />
@@ -4667,6 +4676,8 @@ class EnergyFlowCard extends i {
         this.debugPoolPumpActive = null;
         this._weatherTestPanelOpen = false;
         this._timeRefreshTrigger = 0;
+        this.isIdle = false;
+        this._boundWakeUpListener = () => this._handleUserActivity();
         this._boundHeatpumpMessageListener = (ev) => {
             if (ev.data?.type === 'close-heatpump-popup') {
                 this.closePopup();
@@ -4707,6 +4718,16 @@ class EnergyFlowCard extends i {
         window.addEventListener('hashchange', this.handleHashChange);
         window.addEventListener('location-changed', this._handleLocationChanged);
         window.addEventListener('message', this._boundHeatpumpMessageListener);
+        ['pointerdown', 'pointermove', 'touchstart', 'keydown', 'scroll'].forEach(ev => {
+            window.addEventListener(ev, this._boundWakeUpListener, { passive: true });
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden)
+                this._goIdle();
+            else
+                this._handleUserActivity();
+        });
+        this._resetIdleTimer();
         this.handleHashChange();
         this._timeRefreshInterval = setInterval(() => {
             this._timeRefreshTrigger++;
@@ -4725,6 +4746,11 @@ class EnergyFlowCard extends i {
         window.removeEventListener('hashchange', this.handleHashChange);
         window.removeEventListener('location-changed', this._handleLocationChanged);
         window.removeEventListener('message', this._boundHeatpumpMessageListener);
+        ['pointerdown', 'pointermove', 'touchstart', 'keydown', 'scroll'].forEach(ev => {
+            window.removeEventListener(ev, this._boundWakeUpListener);
+        });
+        if (this._idleTimeout)
+            clearTimeout(this._idleTimeout);
         this.restoreSidebarAndHeader();
         super.disconnectedCallback();
     }
@@ -4741,6 +4767,22 @@ class EnergyFlowCard extends i {
             if (iframe?.contentWindow && this.hass) {
                 iframe.contentWindow.postMessage({ type: 'hass-update', hass: { states: this.hass.states } }, '*');
             }
+        }
+    }
+    _resetIdleTimer() {
+        if (this._idleTimeout)
+            clearTimeout(this._idleTimeout);
+        this._idleTimeout = setTimeout(() => this._goIdle(), 3 * 60 * 1000); // 3 minutes idle
+    }
+    _handleUserActivity() {
+        if (this.isIdle) {
+            this.isIdle = false;
+        }
+        this._resetIdleTimer();
+    }
+    _goIdle() {
+        if (!this.isIdle) {
+            this.isIdle = true;
         }
     }
     hideSidebarAndHeader() {
@@ -6832,7 +6874,7 @@ class EnergyFlowCard extends i {
         return b `
       ${screensaverStyles}
       ${dynamicAnimations}
-      <ha-card class="${this.config.screensaver ? 'screensaver-active' : ''}" style="${dynamicBackground}" @click=${this.handleCardClick}>
+      <ha-card class="${this.config.screensaver ? 'screensaver-active' : ''} ${this.isIdle ? 'idle-mode' : ''}" style="${dynamicBackground}" @click=${this.handleCardClick}>
         <div class="card-container">
           <!-- Digital Clock in the Top Center (Screensaver layout) -->
           <div style="position: absolute; left: 50%; top: 24px; transform: translateX(-50%); z-index: 90; text-align: center; pointer-events: none;">
@@ -7203,6 +7245,9 @@ __decorate([
 __decorate([
     r()
 ], EnergyFlowCard.prototype, "_timeRefreshTrigger", void 0);
+__decorate([
+    r()
+], EnergyFlowCard.prototype, "isIdle", void 0);
 // Register the custom element
 if (!customElements.get('energy-flow-card')) {
     customElements.define('energy-flow-card', EnergyFlowCard);
