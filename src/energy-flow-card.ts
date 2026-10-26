@@ -4,6 +4,7 @@ import { property, state } from 'lit/decorators.js';
 import { HomeAssistant, EnergyFlowCardConfig } from './types';
 import { styles } from './styles';
 import { renderHouseSvg, getSkyState } from './components/house-svg';
+import { WARMTEPOMP_DASHBOARD_HTML } from './components/warmtepomp-dashboard-html';
 
 const WEATHER_TRANSLATIONS: Record<string, string> = {
   'sunny': 'Zonnig',
@@ -224,6 +225,19 @@ export class EnergyFlowCard extends LitElement {
   @state() private debugPoolPumpActive: boolean | null = null;
   @state() private _weatherTestPanelOpen: boolean = false;
   @state() private _timeRefreshTrigger: number = 0;
+  private _boundHeatpumpMessageListener = (ev: MessageEvent) => {
+    if (ev.data?.type === 'close-heatpump-popup') {
+      this.closePopup();
+    } else if (ev.data?.type === 'ha-call-service') {
+      const { domain, service, data } = ev.data;
+      if (this.hass) {
+        (this.hass as any).callService(domain, service, data);
+      }
+    } else if (ev.data?.type === 'heatpump-ready') {
+      this.handleHeatpumpIframeLoaded();
+    }
+  };
+
 
   private resizeObserver?: ResizeObserver;
   private clouds: any[] = [];
@@ -242,6 +256,7 @@ export class EnergyFlowCard extends LitElement {
     this.resizeObserver.observe(this);
     window.addEventListener('hashchange', this.handleHashChange);
     window.addEventListener('location-changed', this._handleLocationChanged);
+    window.addEventListener('message', this._boundHeatpumpMessageListener);
     this.handleHashChange();
     this._timeRefreshInterval = setInterval(() => {
       this._timeRefreshTrigger++;
@@ -261,6 +276,7 @@ export class EnergyFlowCard extends LitElement {
     }
     window.removeEventListener('hashchange', this.handleHashChange);
     window.removeEventListener('location-changed', this._handleLocationChanged);
+    window.removeEventListener('message', this._boundHeatpumpMessageListener);
     this.restoreSidebarAndHeader();
     super.disconnectedCallback();
   }
@@ -271,6 +287,12 @@ export class EnergyFlowCard extends LitElement {
       this.hideSidebarAndHeader();
     } else {
       this.restoreSidebarAndHeader();
+    }
+    if (changedProperties.has('hass') && this.activePopup === 'heatpump') {
+      const iframe = this.shadowRoot?.querySelector('#heatpump-dashboard-iframe') as HTMLIFrameElement;
+      if (iframe?.contentWindow && this.hass) {
+        iframe.contentWindow.postMessage({ type: 'hass-update', hass: this.hass }, '*');
+      }
     }
   }
 
@@ -1037,9 +1059,35 @@ export class EnergyFlowCard extends LitElement {
     this.statsData = {};
   }
 
+    private renderHeatpumpPopup(): TemplateResult {
+    return html`
+      <div class="glass-popup-overlay" @click=${this.closePopup} style="padding: 12px; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="glass-popup-card" style="width: min(1440px, 96vw); height: min(900px, 94vh); max-height: 94vh; padding: 0; border: 1px solid rgba(255, 255, 255, 0.12); background: #0e1117; overflow: hidden; position: relative; border-radius: 22px; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.85);" @click=${(e: Event) => e.stopPropagation()}>
+          <iframe
+            id="heatpump-dashboard-iframe"
+            style="width: 100%; height: 100%; border: none; border-radius: 20px; display: block; background: #0e1117;"
+            .srcdoc=${WARMTEPOMP_DASHBOARD_HTML}
+            @load=${() => this.handleHeatpumpIframeLoaded()}
+          ></iframe>
+        </div>
+      </div>
+    `;
+  }
+
+  private handleHeatpumpIframeLoaded(): void {
+    const iframe = this.shadowRoot?.querySelector('#heatpump-dashboard-iframe') as HTMLIFrameElement;
+    if (iframe?.contentWindow && this.hass) {
+      iframe.contentWindow.postMessage({ type: 'hass-update', hass: this.hass }, '*');
+    }
+  }
+
   private renderPopup(): TemplateResult | string {
     if (!this.activePopup) return '';
     
+    if (this.activePopup === 'heatpump') {
+      return this.renderHeatpumpPopup();
+    }
+
     if (this.activePopup === 'unified_chart') {
 
       return html`
@@ -2015,6 +2063,45 @@ export class EnergyFlowCard extends LitElement {
       return;
     }
 
+        if (nodeId === 'heatpump') {
+      const actionKey = 'heatpump_tap_action';
+      const customAction = (this.config as any)[actionKey];
+      if (customAction) {
+        if (customAction.action === 'navigate' && customAction.navigation_path) {
+          const path = customAction.navigation_path;
+          if (path.startsWith('#')) {
+            window.location.hash = path;
+            window.dispatchEvent(new CustomEvent('location-changed', { detail: { replace: false } }));
+            return;
+          } else {
+            window.history.pushState(null, '', path);
+            const ev = new CustomEvent('location-changed', {
+              detail: { replace: false },
+              bubbles: true,
+              composed: true
+            });
+            window.dispatchEvent(ev);
+            return;
+          }
+        }
+        const event = new CustomEvent('hass-action', {
+          detail: {
+            config: {
+              tap_action: customAction
+            },
+            action: 'tap',
+            action_config: customAction
+          },
+          bubbles: true,
+          composed: true
+        });
+        this.dispatchEvent(event);
+        return;
+      }
+      this.activePopup = 'heatpump';
+      return;
+    }
+
     const actionKey = `${nodeId}_tap_action`;
     const customAction = (this.config as any)[actionKey];
     if (customAction) {
@@ -2466,6 +2553,13 @@ export class EnergyFlowCard extends LitElement {
               temperature,
               poolPumpActive,
               screensaver: this.config.screensaver,
+              showHeatpump: (this.config as any)?.show_heatpump !== false,
+              heatpumpActive: Boolean(
+                parseFloat(this.hass?.states['sensor.wp_compressor_frequentie']?.state || '0') > 0 ||
+                this.hass?.states['binary_sensor.wp_compressor_actief']?.state === 'on' ||
+                this.hass?.states['switch.wp_hoofdschakelaar_aan_uit']?.state === 'on' ||
+                parseFloat(this.hass?.states['sensor.kwh_meter_3_phase_power']?.state || '0') > 50
+              ),
               onNodeClick: (node) => this.handleNodeClick(node)
             })}
           </div>

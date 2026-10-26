@@ -203,6 +203,9 @@ interface SvgParams {
   showSolar: boolean;
   showBattery: boolean;
   showEV: boolean;
+  showHeatpump?: boolean;
+  heatpumpActive?: boolean;
+  heatpumpPower?: number;
   weather?: string;
   clouds?: any[];
   sunriseHour?: number;
@@ -343,6 +346,9 @@ export function renderHouseSvg({
   showSolar,
   showBattery,
   showEV,
+  showHeatpump = true,
+  heatpumpActive = false,
+  heatpumpPower = 0,
   weather = 'sunny',
   clouds = [],
   sunriseHour = 6.0,
@@ -633,6 +639,11 @@ export function renderHouseSvg({
           <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
         </linearGradient>
 
+                <linearGradient id="heatpump-casing-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#475569" />
+          <stop offset="50%" stop-color="#334155" />
+          <stop offset="100%" stop-color="#1e293b" />
+        </linearGradient>
         <linearGradient id="garden-grad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="${screensaver ? '#1f4834' : '#0f3f26'}" />
           <stop offset="100%" stop-color="${screensaver ? '#143122' : '#0a2919'}" />
@@ -1219,6 +1230,71 @@ export function renderHouseSvg({
           ` : ''}
 
           <!-- Swimming pool removed -->
+          <!-- ── HEATPUMP OUTDOOR UNIT (Side view at right house wall) ── -->
+          ${showHeatpump ? svg`
+            <g id="house-heatpump" class="interactiveGroup heatpumpGroup" style="cursor: pointer;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('heatpump'); }}>
+              <title>Warmtepomp SPRSUN (klik voor dashboard)</title>
+              
+              <!-- Transparent hit area for easy tapping -->
+              <rect x="676" y="352" width="54" height="62" fill="transparent" />
+
+              <!-- Concrete support pad / foundation slab -->
+              <rect x="685" y="406" width="40" height="5" rx="1.5" fill="#475569" stroke="#334155" stroke-width="0.8" />
+
+              <!-- Heavy duty rubber anti-vibration damping feet -->
+              <rect x="690" y="402" width="7" height="4.5" rx="1" fill="#0f172a" stroke="#1e293b" stroke-width="0.5" />
+              <rect x="715" y="402" width="7" height="4.5" rx="1" fill="#0f172a" stroke="#1e293b" stroke-width="0.5" />
+
+              <!-- Insulated connecting pipes entering the house wall -->
+              <g id="heatpump-pipes">
+                <!-- Wall penetration bracket/plate on house wall -->
+                <rect x="678.5" y="371" width="3" height="23" rx="1" fill="#334155" stroke="#1e293b" stroke-width="0.5" />
+                <!-- Flow pipe (upper) -->
+                <path d="M 688,375 L 680,375" stroke="#0f172a" stroke-width="4.5" stroke-linecap="round" />
+                <path d="M 688,375 L 680,375" stroke="#334155" stroke-width="2.5" stroke-linecap="round" />
+                <!-- Return pipe (lower) -->
+                <path d="M 688,389 L 680,389" stroke="#0f172a" stroke-width="4.5" stroke-linecap="round" />
+                <path d="M 688,389 L 680,389" stroke="#334155" stroke-width="2.5" stroke-linecap="round" />
+              </g>
+
+              <!-- Main Heat Pump Monoblock Casing (side profile) -->
+              <rect x="688" y="358" width="36" height="44" rx="3" fill="url(#heatpump-casing-grad)" stroke="#1e293b" stroke-width="1.2" style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));" />
+
+              <!-- Top protective hood/cover with subtle bevel -->
+              <path d="M 687,361 L 690,358 L 722,358 L 725,361 Z" fill="#1e293b" />
+              <line x1="688" y1="361" x2="724" y2="361" stroke="#64748b" stroke-width="0.6" opacity="0.6" />
+
+              <!-- Side louvre ventilation slots / metal grille -->
+              <g stroke="#64748b" stroke-width="1.1" stroke-linecap="round" opacity="0.85">
+                <line x1="693" y1="368" x2="719" y2="368" />
+                <line x1="693" y1="372" x2="719" y2="372" />
+                <line x1="693" y1="376" x2="719" y2="376" />
+                <line x1="693" y1="380" x2="719" y2="380" />
+                <line x1="693" y1="384" x2="719" y2="384" />
+                <line x1="693" y1="388" x2="719" y2="388" />
+                <line x1="693" y1="392" x2="719" y2="392" />
+                <line x1="693" y1="396" x2="719" y2="396" />
+              </g>
+
+              <!-- SPRSUN branding badge plate -->
+              <rect x="696" y="362" width="20" height="3.8" rx="1" fill="#0f172a" opacity="0.9" />
+              <text x="706" y="364.8" text-anchor="middle" fill="#cbd5e1" font-size="2.6px" font-family="'Outfit', sans-serif" font-weight="700" letter-spacing="0.4px">SPRSUN</text>
+
+              <!-- Status LED Indicator -->
+              <circle cx="721" cy="363.8" r="1.4"
+                fill="${heatpumpActive ? '#4ade80' : '#64748b'}"
+                style="filter: ${heatpumpActive ? 'drop-shadow(0 0 4px #4ade80)' : 'none'}; transition: fill 0.5s ease;" />
+
+              <!-- Subtle active heat / airflow shimmer waves when operating -->
+              ${heatpumpActive ? svg`
+                <g opacity="0.6" stroke="#fb923c" stroke-width="1.2" stroke-linecap="round" fill="none">
+                  <path d="M 698,354 Q 701,351 704,354" />
+                  <path d="M 708,354 Q 711,351 714,354" />
+                </g>
+              ` : ''}
+            </g>
+          ` : ''}
+
 
           <!-- ── FLOW CABLES (Rendered inside the y+70 group) ── -->
           ${showSolar ? renderCable(

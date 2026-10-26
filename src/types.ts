@@ -4,6 +4,7 @@ export interface EnergyFlowCardConfig {
   show_battery?: boolean;
   show_solar?: boolean;
   show_ev?: boolean;
+  show_heatpump?: boolean;
   // battery_invert: true  → positief = laden, negatief = ontladen (bijv. SolarEdge, Huawei)
   // battery_invert: false → negatief = laden, positief = ontladen (bijv. Victron, sommige SMA)
   // Standaard: true (positief = laden)
@@ -34,7 +35,10 @@ export interface EnergyFlowCardConfig {
     home_today?: string;              // kWh huisverbruik vandaag
     battery_charge_today?: string;    // kWh geladen vandaag
     battery_discharge_today?: string; // kWh ontladen vandaag
-    ev_today?: string;                // kWh laadpaal vandaag
+    ev_today?: string;
+    heatpump_power?: string;
+    heatpump_today?: string;
+    heatpump?: string;                // kWh laadpaal vandaag
     light?: string | string[];        // Light entity or list of light entities
     grid_price?: string;              // Huidige energieprijs sensor
     temperature?: string;             // Optionele buitentemperatuur sensor
