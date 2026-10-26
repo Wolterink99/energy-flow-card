@@ -291,7 +291,7 @@ export class EnergyFlowCard extends LitElement {
     if (changedProperties.has('hass') && this.activePopup === 'heatpump') {
       const iframe = this.shadowRoot?.querySelector('#heatpump-dashboard-iframe') as HTMLIFrameElement;
       if (iframe?.contentWindow && this.hass) {
-        iframe.contentWindow.postMessage({ type: 'hass-update', hass: this.hass }, '*');
+        iframe.contentWindow.postMessage({ type: 'hass-update', hass: { states: this.hass.states } }, '*');
       }
     }
   }
@@ -1077,7 +1077,7 @@ export class EnergyFlowCard extends LitElement {
   private handleHeatpumpIframeLoaded(): void {
     const iframe = this.shadowRoot?.querySelector('#heatpump-dashboard-iframe') as HTMLIFrameElement;
     if (iframe?.contentWindow && this.hass) {
-      iframe.contentWindow.postMessage({ type: 'hass-update', hass: this.hass }, '*');
+      iframe.contentWindow.postMessage({ type: 'hass-update', hass: { states: this.hass.states } }, '*');
     }
   }
 

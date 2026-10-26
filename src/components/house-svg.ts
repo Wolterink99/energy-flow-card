@@ -1234,9 +1234,9 @@ export function renderHouseSvg({
           ${showHeatpump ? svg`
             <g id="house-heatpump" class="interactiveGroup heatpumpGroup" style="cursor: pointer;" @click=${(e: Event) => { e.stopPropagation(); onNodeClick('heatpump'); }}>
               <title>Warmtepomp</title>
-              <rect x="682" y="370" width="26" height="42" fill="transparent" />
-              <rect x="684" y="407" width="18" height="3" rx="1" fill="#1e293b" />
-              <rect x="685" y="375" width="16" height="32" rx="2" fill="#475569" stroke="#334155" stroke-width="0.8" />
+              <rect x="680" y="378" width="20" height="34" fill="transparent" />
+              <rect x="681" y="407" width="12" height="3" rx="0.8" fill="#1e293b" />
+              <rect x="682" y="383" width="10" height="24" rx="1.5" fill="#3a4252" stroke="#252b37" stroke-width="0.8" />
             </g>
           ` : ''}
 
