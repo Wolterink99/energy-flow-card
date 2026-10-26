@@ -524,38 +524,10 @@ function sceneSVG() {
       <path d="M${pt(H.eaveR)}l9 0" stroke="var(--board)" stroke-width="6"/>
     <!-- warmtepomp buitenunit rechts naast de zijgevel -->
     <g data-pop="heatpump" class="hit" style="cursor:pointer">
-      <title>Warmtepomp SPRSUN (klik voor dashboard)</title>
-      <rect x="946" y="488" width="68" height="74" fill="transparent"/>
-      <!-- fundering & trillingsdempers -->
-      <rect x="955" y="555" width="52" height="6" rx="2" fill="#2a3242" stroke="#1d232e" stroke-width="1"/>
-      <rect x="962" y="549" width="9" height="6" rx="1.5" fill="#15181f"/>
-      <rect x="991" y="549" width="9" height="6" rx="1.5" fill="#15181f"/>
-      <!-- leidingen door de muur -->
-      <rect x="946" y="508" width="4" height="30" rx="1.5" fill="#3a4252"/>
-      <path d="M958 514 H948" stroke="#15181f" stroke-width="6" stroke-linecap="round"/>
-      <path d="M958 513 H948" stroke="#3a4252" stroke-width="2" stroke-linecap="round"/>
-      <path d="M958 532 H948" stroke="#15181f" stroke-width="6" stroke-linecap="round"/>
-      <path d="M958 531 H948" stroke="#3a4252" stroke-width="2" stroke-linecap="round"/>
-      <!-- omkasting zijaanzicht -->
-      <rect x="958" y="492" width="46" height="58" rx="4" fill="#252d3d" stroke="#1d232e" stroke-width="1.5"/>
-      <path d="M956 496 L960 492 L1002 492 L1006 496 Z" fill="#1d232e"/>
-      <!-- ventilatierooster / lamellen -->
-      <g stroke="#4a5568" stroke-width="1.3" stroke-linecap="round">
-        <line x1="964" y1="504" x2="998" y2="504"/>
-        <line x1="964" y1="509" x2="998" y2="509"/>
-        <line x1="964" y1="514" x2="998" y2="514"/>
-        <line x1="964" y1="519" x2="998" y2="519"/>
-        <line x1="964" y1="524" x2="998" y2="524"/>
-        <line x1="964" y1="529" x2="998" y2="529"/>
-        <line x1="964" y1="534" x2="998" y2="534"/>
-        <line x1="964" y1="539" x2="998" y2="539"/>
-        <line x1="964" y1="544" x2="998" y2="544"/>
-      </g>
-      <!-- merkplaatje SPRSUN -->
-      <rect x="967" y="496" width="28" height="5" rx="1.5" fill="#15181f"/>
-      <text x="981" y="499.8" text-anchor="middle" fill="#cbd5e1" font-size="3.2px" font-weight="700" letter-spacing="0.3px">SPRSUN</text>
-      <!-- status led -->
-      <circle id="hp-led" cx="1000" cy="498" r="1.8" fill="#4ade80"/>
+      <title>Warmtepomp</title>
+      <rect x="948" y="505" width="34" height="58" fill="transparent"/>
+      <rect x="952" y="556" width="22" height="4" rx="1" fill="#1e2430"/>
+      <rect x="953" y="515" width="20" height="41" rx="2.5" fill="#475569" stroke="#334155" stroke-width="1"/>
     </g>
 
     </g>
