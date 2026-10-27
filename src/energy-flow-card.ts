@@ -4,6 +4,7 @@ import { property, state } from 'lit/decorators.js';
 import { HomeAssistant, EnergyFlowCardConfig } from './types';
 import { styles } from './styles';
 import { renderHouseSvg, getSkyState } from './components/house-svg';
+import { renderOverkappingSvg } from './components/overkapping-svg';
 import { WARMTEPOMP_DASHBOARD_HTML } from './components/warmtepomp-dashboard-html';
 
 const WEATHER_TRANSLATIONS: Record<string, string> = {
@@ -226,6 +227,8 @@ export class EnergyFlowCard extends LitElement {
   @state() private _weatherTestPanelOpen: boolean = false;
   @state() private _timeRefreshTrigger: number = 0;
   @state() private isIdle: boolean = false;
+  @state() private currentView: 'house' | 'overkapping' = 'house';
+  @state() private isTransitioning: boolean = false;
   private _idleTimeout?: any;
   private _boundWakeUpListener = () => this._handleUserActivity();
   private _boundHeatpumpMessageListener = (ev: MessageEvent) => {
@@ -327,6 +330,23 @@ export class EnergyFlowCard extends LitElement {
     if (!this.isIdle) {
       this.isIdle = true;
     }
+  }
+
+  private switchView(view: 'house' | 'overkapping'): void {
+    if (this.currentView === view || this.isTransitioning) return;
+    this.isTransitioning = true;
+    setTimeout(() => {
+      this.currentView = view;
+      this.isTransitioning = false;
+    }, 450);
+  }
+
+  private toggleOverkappingLight(entityId: string): void {
+    if (!this.hass) return;
+    const currentState = this.hass.states[entityId]?.state;
+    const service = currentState === 'on' ? 'turn_off' : 'turn_on';
+    const [domain] = entityId.split('.');
+    (this.hass as any).callService(domain, service, { entity_id: entityId });
   }
 
   private _handleLocationChanged = (): void => {

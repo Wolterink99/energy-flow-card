@@ -4677,6 +4677,8 @@ class EnergyFlowCard extends i {
         this._weatherTestPanelOpen = false;
         this._timeRefreshTrigger = 0;
         this.isIdle = false;
+        this.currentView = 'house';
+        this.isTransitioning = false;
         this._boundWakeUpListener = () => this._handleUserActivity();
         this._boundHeatpumpMessageListener = (ev) => {
             if (ev.data?.type === 'close-heatpump-popup') {
@@ -4784,6 +4786,23 @@ class EnergyFlowCard extends i {
         if (!this.isIdle) {
             this.isIdle = true;
         }
+    }
+    switchView(view) {
+        if (this.currentView === view || this.isTransitioning)
+            return;
+        this.isTransitioning = true;
+        setTimeout(() => {
+            this.currentView = view;
+            this.isTransitioning = false;
+        }, 450);
+    }
+    toggleOverkappingLight(entityId) {
+        if (!this.hass)
+            return;
+        const currentState = this.hass.states[entityId]?.state;
+        const service = currentState === 'on' ? 'turn_off' : 'turn_on';
+        const [domain] = entityId.split('.');
+        this.hass.callService(domain, service, { entity_id: entityId });
     }
     hideSidebarAndHeader() {
         if (!this.config?.screensaver)
@@ -7248,6 +7267,12 @@ __decorate([
 __decorate([
     r()
 ], EnergyFlowCard.prototype, "isIdle", void 0);
+__decorate([
+    r()
+], EnergyFlowCard.prototype, "currentView", void 0);
+__decorate([
+    r()
+], EnergyFlowCard.prototype, "isTransitioning", void 0);
 // Register the custom element
 if (!customElements.get('energy-flow-card')) {
     customElements.define('energy-flow-card', EnergyFlowCard);
