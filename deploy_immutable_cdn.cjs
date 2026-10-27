@@ -22,6 +22,7 @@ ws.on('message', (data) => {
     const ts = Date.now();
     const newEnergyCardUrl = `https://cdn.jsdelivr.net/gh/Wolterink99/energy-flow-card@${commitHash}/dist/energy-flow-card.js?v=${ts}`;
     const newClaudeSceneUrl = `https://cdn.jsdelivr.net/gh/Wolterink99/energy-flow-card@${commitHash}/dist/claude-energy-scene.js?v=${ts}`;
+    const newHuisTuin3DUrl = `https://cdn.jsdelivr.net/gh/Wolterink99/energy-flow-card@${commitHash}/dist/huis-tuin-3d.js?v=${ts}`;
 
     console.log(`Updating energy-flow-card resource to: ${newEnergyCardUrl}`);
     ws.send(JSON.stringify({
@@ -40,9 +41,18 @@ ws.on('message', (data) => {
       url: newClaudeSceneUrl,
       res_type: 'module'
     }));
+
+    console.log(`Updating huis-tuin-3d resource to: ${newHuisTuin3DUrl}`);
+    ws.send(JSON.stringify({
+      id: 3,
+      type: 'lovelace/resources/update',
+      resource_id: 'a34224acefd640c0b574762c8622c224',
+      url: newHuisTuin3DUrl,
+      res_type: 'module'
+    }));
   } else if (msg.type === 'result') {
     console.log(`Result for request ${msg.id}:`, msg.success ? 'SUCCESS' : msg.error);
-    if (msg.id === 2) {
+    if (msg.id === 3) {
       ws.close();
     }
   }
