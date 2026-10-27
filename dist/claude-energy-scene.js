@@ -925,17 +925,33 @@ header { display:grid; grid-template-columns:1fr auto 1fr; align-items:start; ga
 }
 .overkapping-btn:hover { border-color: rgba(56,189,248,0.5); background: rgba(56,189,248,0.15); transform: translateY(-1px); }
 .overkapping-btn svg { width: 16px; height: 16px; color: #38bdf8; flex: none; }
-.scene-layer, .overkapping-layer {
-  position: absolute; inset: 0; width: 100%; height: 100%;
+#scene, #ok-layer {
+  grid-row: 2;
+  grid-column: 1;
+  width: 100%;
+  height: 100%;
+}
+#scene {
   transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease;
   transform-origin: 50% 60%;
 }
-.scene-layer svg, .overkapping-layer svg {
-  position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
+#scene.fly-out {
+  transform: scale(2.2) translateY(140px);
+  opacity: 0;
+  pointer-events: none;
 }
-.scene-layer.fly-out { transform: scale(2.2) translateY(140px); opacity: 0; pointer-events: none; }
-.overkapping-layer { opacity: 0; transform: scale(0.65) translateY(-50px); pointer-events: none; }
-.overkapping-layer.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+#ok-layer {
+  opacity: 0;
+  transform: scale(0.65) translateY(-50px);
+  pointer-events: none;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease;
+  transform-origin: 50% 60%;
+}
+#ok-layer.active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
 
 /* tijdelijk simulatiepaneel */
 .simbtn { position:absolute; left:clamp(12px,1.6vw,24px); top:clamp(12px,1.6vh,20px); z-index:6; display:inline-flex; align-items:center; gap:8px;
@@ -1077,20 +1093,20 @@ class ClaudeEnergyScene extends HTMLElement {
   }
   _toggleView() {
     this._view = this._view === 'house' ? 'overkapping' : 'house';
-    const houseLayer = this.$('#house-layer');
+    const houseScene = this.$('#scene');
     const okLayer = this.$('#ok-layer');
     const okBtnText = this.$('#ok-btn-text');
     
     if (this._view === 'overkapping') {
       if (okBtnText) okBtnText.textContent = 'Terug naar Huis';
-      if (houseLayer) houseLayer.classList.add('fly-out');
+      if (houseScene) houseScene.classList.add('fly-out');
       if (okLayer) {
         okLayer.innerHTML = overkappingSVG(this._hass);
         okLayer.classList.add('active');
       }
     } else {
       if (okBtnText) okBtnText.textContent = 'Naar Overkapping';
-      if (houseLayer) houseLayer.classList.remove('fly-out');
+      if (houseScene) houseScene.classList.remove('fly-out');
       if (okLayer) {
         okLayer.classList.remove('active');
         setTimeout(() => { if (this._view === 'house') okLayer.innerHTML = ''; }, 850);
@@ -1266,10 +1282,8 @@ class ClaudeEnergyScene extends HTMLElement {
             </button>
           </div>
         </header>
-        <div class="scene" id="scene">
-          <div class="scene-layer" id="house-layer">${sceneSVG()}<div class="labels" id="labels">${labelCards()}</div></div>
-          <div class="overkapping-layer" id="ok-layer"></div>
-        </div>
+        <div class="scene" id="scene">${sceneSVG()}<div class="labels" id="labels">${labelCards()}</div></div>
+        <div class="scene overkapping-layer" id="ok-layer"></div>
 
         <div class="dock" id="dock">${dockCards()}</div>
       </div>
@@ -1592,7 +1606,7 @@ class ClaudeEnergyScene extends HTMLElement {
     const cur = this._flowKey[k];
     if (cur && cur.fwd === forward && Math.abs(speed / cur.speed - 1) < 0.18) return;
     // fase van de stippen behouden bij een snelheidswissel, zodat ze niet terugspringen
-    const T = this._svg.getCurrentTime ? this._svg.getCurrentTime() : 0;
+    const T = (this._svg && this._svg.getCurrentTime) ? this._svg.getCurrentTime() : 0;
     let len = f.len;
     try { len = f.path.getTotalLength() || f.len; } catch (e) { /* element nog niet zichtbaar */ }
     const dur = len / speed, n = Math.max(2, Math.round(len / 70));
