@@ -567,6 +567,121 @@ function sceneSVG() {
 </svg>`;
 }
 
+
+function overkappingSVG(hass) {
+  const st = (id) => (hass && hass.states && hass.states[id]) || null;
+  const isOn = (id) => { const s = st(id); return s && s.state === 'on'; };
+  const numVal = (id) => { const s = st(id); return s ? parseFloat(s.state) || 0 : 0; };
+  
+  const allLights = isOn('light.overkapping_verlichting') || isOn('light.overkapping_wandlampen_aqaralumi_lumi_switch_l0agl1');
+  const barStrip = isOn('light.overkapping_barledstrip_ikea_tretakt_smart_plug');
+  const dartRing = isOn('light.overkapping_dartbordring_ikea_tretakt_smart_plug');
+  const pcW = numVal('sensor.overkapping_dartbaan2_pc_power_inspelning_smart_plug_vermogen');
+  const anyLight = allLights || barStrip || dartRing;
+  const warmGlow = anyLight ? 0.65 : 0.08;
+
+  return `<svg viewBox="0 ${VB.y} 1600 ${VB.h}" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="okTerrace" width="36" height="18" patternUnits="userSpaceOnUse">
+        <rect width="36" height="18" fill="#1e2430"/>
+        <path d="M 0,0 L 36,0 M 0,9 L 36,9 M 0,18 L 36,18 M 18,0 L 18,9 M 9,9 L 9,18 M 27,9 L 27,18" stroke="#121720" stroke-width="1.2"/>
+      </pattern>
+      <pattern id="okSlats" width="120" height="9" patternUnits="userSpaceOnUse">
+        <rect width="120" height="8" fill="#3b2d27"/>
+        <line x1="0" y1="8.5" x2="120" y2="8.5" stroke="#1c1410" stroke-width="1.2"/>
+      </pattern>
+      <radialGradient id="okWarmGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.8"/>
+        <stop offset="45%" stop-color="#f59e0b" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Achtertuin gras & schutting -->
+    <rect x="-2400" y="460" width="6400" height="300" fill="var(--grass)"/>
+    <rect x="240" y="320" width="1120" height="200" fill="#2d3748" opacity=".7"/>
+    <path d="M 240,360 H 1360 M 240,410 H 1360 M 240,460 H 1360" stroke="#1a202c" stroke-width="1.5"/>
+
+    <!-- Terras keramische tegels -->
+    <polygon points="320,580 1280,580 1240,470 360,470" fill="url(#okTerrace)" stroke="#111620" stroke-width="2"/>
+
+    <!-- Overkapping houten lamellen achterwanden -->
+    <rect x="390" y="270" width="360" height="210" fill="url(#okSlats)" stroke="#150f0c" stroke-width="2"/>
+    <rect x="850" y="270" width="360" height="210" fill="url(#okSlats)" stroke="#150f0c" stroke-width="2"/>
+
+    <!-- Warme sfeergloed binnenruimte -->
+    <rect x="390" y="270" width="820" height="210" fill="#f59e0b" opacity="${warmGlow}" style="mix-blend-mode:screen;pointer-events:none;transition:opacity .5s"/>
+
+    <!-- DARTBAAN HOEK (Links) -->
+    <g class="hit" data-ok-light="light.overkapping_dartbordring_ikea_tretakt_smart_plug">
+      <rect x="520" y="315" width="80" height="105" rx="5" fill="#1a1512" stroke="#4a3525" stroke-width="2.5"/>
+      <circle cx="560" cy="367" r="32" fill="#b91c1c"/>
+      <circle cx="560" cy="367" r="24" fill="#0f172a" stroke="#fbbf24" stroke-width="1"/>
+      <circle cx="560" cy="367" r="4.5" fill="#10b981"/>
+      <circle cx="560" cy="367" r="1.8" fill="#ef4444"/>
+      <!-- LED ring dartbord -->
+      <circle cx="560" cy="367" r="34" fill="none" stroke="${dartRing ? '#00f5ff' : '#475569'}" stroke-width="3.5" style="transition:stroke .3s;filter:${dartRing ? 'drop-shadow(0 0 8px #00f5ff)' : 'none'}"/>
+      <!-- Dart PC scherm -->
+      <rect x="420" y="340" width="46" height="34" rx="3" fill="#0f172a" stroke="#334155" stroke-width="1.8"/>
+      <rect x="423" y="343" width="40" height="28" rx="1.5" fill="${pcW > 0.5 ? '#1e3a5f' : '#05070a'}"/>
+      <text x="443" y="360" text-anchor="middle" fill="${pcW > 0.5 ? '#38bdf8' : '#334155'}" font-size="10" font-family="monospace" font-weight="bold">${pcW > 0.5 ? Math.round(pcW) + 'W' : 'OFF'}</text>
+      <rect x="441" y="374" width="4" height="18" fill="#334155"/>
+      <ellipse cx="443" cy="392" rx="14" ry="3" fill="#1e293b"/>
+    </g>
+
+    <!-- BAR MET BARKRUKKEN (Rechts) -->
+    <g class="hit" data-ok-light="light.overkapping_barledstrip_ikea_tretakt_smart_plug">
+      <!-- Barkast / barblad -->
+      <polygon points="910,480 1200,480 1200,380 910,380" fill="#241812" stroke="#120c09" stroke-width="2"/>
+      <rect x="895" y="370" width="320" height="15" rx="3" fill="#5c4033" stroke="#241812" stroke-width="1.5"/>
+      <!-- Bar LED strip -->
+      <rect x="905" y="385" width="300" height="5" fill="${barStrip ? '#00f5ff' : '#334155'}" style="transition:fill .3s;filter:${barStrip ? 'drop-shadow(0 4px 12px #00f5ff)' : 'none'}"/>
+      <!-- Barkrukken -->
+      <ellipse cx="965" cy="412" rx="18" ry="6" fill="#1a202c"/>
+      <line x1="965" y1="412" x2="960" y2="480" stroke="#0f172a" stroke-width="3"/>
+      <line x1="965" y1="412" x2="970" y2="480" stroke="#0f172a" stroke-width="3"/>
+      <ellipse cx="1135" cy="412" rx="18" ry="6" fill="#1a202c"/>
+      <line x1="1135" y1="412" x2="1130" y2="480" stroke="#0f172a" stroke-width="3"/>
+      <line x1="1135" y1="412" x2="1140" y2="480" stroke="#0f172a" stroke-width="3"/>
+    </g>
+
+    <!-- CONSTRUCTIE: Robuuste zwarte staanders & modern plat dak -->
+    <rect x="370" y="245" width="22" height="235" fill="#1a202c" stroke="#0a0e14" stroke-width="2" rx="2"/>
+    <rect x="789" y="245" width="22" height="235" fill="#1a202c" stroke="#0a0e14" stroke-width="2" rx="2"/>
+    <rect x="1208" y="245" width="22" height="235" fill="#1a202c" stroke="#0a0e14" stroke-width="2" rx="2"/>
+    <!-- Boei & dakoverstek -->
+    <rect x="340" y="215" width="920" height="38" fill="#1a222d" stroke="#090d14" stroke-width="2.5" rx="3"/>
+    <rect x="340" y="215" width="920" height="6" fill="#94a3b8"/>
+
+    <!-- HANGLAMPEN -->
+    <!-- Hanglamp links -->
+    <g class="hit" data-ok-light="light.overkapping_plafondlampkachel_ikea_tradfri_bulb_e27_ww_globe_806lm">
+      <line x1="580" y1="250" x2="580" y2="295" stroke="#0f172a" stroke-width="2.5"/>
+      <path d="M 560,308 L 600,308 L 580,295 Z" fill="#0f172a"/>
+      <circle cx="580" cy="312" r="8" fill="${allLights ? '#fff' : '#64748b'}" style="filter:${allLights ? 'drop-shadow(0 0 14px #fbbf24)' : 'none'}"/>
+      ${allLights ? '<circle cx="580" cy="320" r="55" fill="url(#okWarmGlow)" pointer-events="none"/>' : ''}
+    </g>
+    <!-- Hanglamp rechts -->
+    <g class="hit" data-ok-light="light.overkapping_plafondlampbar_ikea_tradfri_bulb_e27_ww_globe_806lm">
+      <line x1="1050" y1="250" x2="1050" y2="295" stroke="#0f172a" stroke-width="2.5"/>
+      <path d="M 1030,308 L 1070,308 L 1050,295 Z" fill="#0f172a"/>
+      <circle cx="1050" cy="312" r="8" fill="${allLights ? '#fff' : '#64748b'}" style="filter:${allLights ? 'drop-shadow(0 0 14px #fbbf24)' : 'none'}"/>
+      ${allLights ? '<circle cx="1050" cy="320" r="55" fill="url(#okWarmGlow)" pointer-events="none"/>' : ''}
+    </g>
+
+    <!-- BADGE ONDERAAN VOOR DE OVERKAPPING -->
+    <g transform="translate(680, 520)">
+      <rect x="0" y="0" width="240" height="48" rx="14" fill="rgba(15,23,42,.92)" stroke="rgba(255,255,255,.15)"/>
+      <g class="hit" data-ok-light="light.overkapping_verlichting">
+        <circle cx="28" cy="24" r="14" fill="${anyLight ? 'rgba(251,191,36,.22)' : 'rgba(255,255,255,.06)'}" stroke="${anyLight ? '#fbbf24' : 'rgba(255,255,255,.2)'}" stroke-width="1.2"/>
+        <circle cx="28" cy="24" r="5" fill="${anyLight ? '#fbbf24' : '#64748b'}"/>
+      </g>
+      <text x="54" y="21" fill="#fff" font-size="12" font-weight="600">Overkapping &amp; Tuin</text>
+      <text x="54" y="36" fill="${anyLight ? '#fbbf24' : 'rgba(255,255,255,.5)'}" font-size="10.5">${anyLight ? 'Verlichting aan' : 'Verlichting uit'} · Tik voor schakelen</text>
+    </g>
+  </svg>`;
+}
+
 /* ---------- grafieken ---------- */
 function niceTicks(min, max, count = 4) {
   if (!(max > min)) { max = min + 1; }
@@ -616,7 +731,7 @@ header { display:grid; grid-template-columns:1fr auto 1fr; align-items:start; ga
 .chip .cv { font-size:15px; font-weight:500; letter-spacing:-.01em; line-height:1.3; white-space:nowrap; }
 .chip .cv small { font-size:11px; color:var(--text2); font-weight:500; margin-left:3px; }
 .scene { position:relative; min-height:0; }
-.scene > svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.scene svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
 .hit { cursor:pointer; }
 .lane { fill:none; stroke:var(--lane); stroke-width:2.5; }
 .lane-on { fill:none; stroke-width:2.5; opacity:0; transition:opacity .6s, stroke .6s; }
@@ -800,6 +915,28 @@ header { display:grid; grid-template-columns:1fr auto 1fr; align-items:start; ga
   .seg button { padding:6px 9px; font-size:12px; } .kpi .v { font-size:18px; } .sh-tools { margin-left:0; width:100%; } }
 @media (prefers-reduced-motion: reduce) { .cloud, #rain line, #snow circle, #hail circle, .tw, .sway, .fogband, #rays, #bat-led.pulse, #ev-led.pulse { animation:none !important; } }
 
+
+/* Overkapping switch button & transition */
+.overkapping-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 20px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: var(--text); font-size: 13px;
+  font-weight: 600; cursor: pointer; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  transition: all .25s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-top: 4px;
+}
+.overkapping-btn:hover { border-color: rgba(56,189,248,0.5); background: rgba(56,189,248,0.15); transform: translateY(-1px); }
+.overkapping-btn svg { width: 16px; height: 16px; color: #38bdf8; flex: none; }
+.scene-layer, .overkapping-layer {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease;
+  transform-origin: 50% 60%;
+}
+.scene-layer svg, .overkapping-layer svg {
+  position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
+}
+.scene-layer.fly-out { transform: scale(2.2) translateY(140px); opacity: 0; pointer-events: none; }
+.overkapping-layer { opacity: 0; transform: scale(0.65) translateY(-50px); pointer-events: none; }
+.overkapping-layer.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+
 /* tijdelijk simulatiepaneel */
 .simbtn { position:absolute; left:clamp(12px,1.6vw,24px); top:clamp(12px,1.6vh,20px); z-index:6; display:inline-flex; align-items:center; gap:8px;
   padding:7px 12px; border-radius:10px; background:var(--surface); border:1px solid var(--line); color:var(--text2); font-size:12px; font-weight:500; cursor:pointer;
@@ -837,6 +974,7 @@ class ClaudeEnergyScene extends HTMLElement {
     this._pop = null;
     this._ov = null;
     this._reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._view = 'house';
     this._isIdle = false;
     this._boundWake = () => this._onActivity();
   }
@@ -937,6 +1075,41 @@ class ClaudeEnergyScene extends HTMLElement {
       if (root) root.classList.add('idle-mode');
     }
   }
+  _toggleView() {
+    this._view = this._view === 'house' ? 'overkapping' : 'house';
+    const houseLayer = this.$('#house-layer');
+    const okLayer = this.$('#ok-layer');
+    const okBtnText = this.$('#ok-btn-text');
+    
+    if (this._view === 'overkapping') {
+      if (okBtnText) okBtnText.textContent = 'Terug naar Huis';
+      if (houseLayer) houseLayer.classList.add('fly-out');
+      if (okLayer) {
+        okLayer.innerHTML = overkappingSVG(this._hass);
+        okLayer.classList.add('active');
+      }
+    } else {
+      if (okBtnText) okBtnText.textContent = 'Naar Overkapping';
+      if (houseLayer) houseLayer.classList.remove('fly-out');
+      if (okLayer) {
+        okLayer.classList.remove('active');
+        setTimeout(() => { if (this._view === 'house') okLayer.innerHTML = ''; }, 850);
+      }
+    }
+  }
+
+  _toggleLight(entityId) {
+    if (!this._hass) return;
+    const s = this._hass.states[entityId];
+    const service = s && s.state === 'on' ? 'turn_off' : 'turn_on';
+    const [domain] = entityId.split('.');
+    this._hass.callService(domain, service, { entity_id: entityId });
+    setTimeout(() => {
+      const okLayer = this.$('#ok-layer');
+      if (okLayer && this._view === 'overkapping') okLayer.innerHTML = overkappingSVG(this._hass);
+    }, 250);
+  }
+
   _handleLocationChanged() {
     this._restoreSidebarAndHeader();
     setTimeout(() => this._restoreSidebarAndHeader(), 100);
@@ -1085,9 +1258,18 @@ class ClaudeEnergyScene extends HTMLElement {
           <div class="clock"><div class="time" id="time">--:--</div><div class="date" id="date"></div></div>
           <div class="hright">
             <button class="weather" id="weather" aria-label="Weer"><div><div class="w-temp" id="w-temp">–</div><div class="w-sub" id="w-sub"></div></div><span class="ic" id="w-icon"></span></button>
+            <button class="overkapping-btn" id="ok-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6a3 3 0 0 1 6 0v6"/>
+              </svg>
+              <span id="ok-btn-text">Naar Overkapping</span>
+            </button>
           </div>
         </header>
-        <div class="scene" id="scene">${sceneSVG()}<div class="labels" id="labels">${labelCards()}</div></div>
+        <div class="scene" id="scene">
+          <div class="scene-layer" id="house-layer">${sceneSVG()}<div class="labels" id="labels">${labelCards()}</div></div>
+          <div class="overkapping-layer" id="ok-layer"></div>
+        </div>
 
         <div class="dock" id="dock">${dockCards()}</div>
       </div>
@@ -1136,7 +1318,22 @@ class ClaudeEnergyScene extends HTMLElement {
       this._flows[k] = { path: p, dots: this.$(`#fd-${k}`), len };
     });
 
-    this.$('#root').addEventListener('click', (e) => this._onClick(e));
+    const okBtn = this.$('#ok-btn');
+    if (okBtn) {
+      okBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._toggleView();
+      });
+    }
+    this.$('#root').addEventListener('click', (e) => {
+      const path = e.composedPath();
+      const okLight = path.find(n => n.dataset && n.dataset.okLight);
+      if (okLight) {
+        this._toggleLight(okLight.dataset.okLight);
+        return;
+      }
+      this._onClick(e);
+    });
     ['#modal', '#ovm'].forEach((id) => {
       const m = this.$(id);
       m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-close]')) this._closeAll(); });
@@ -1373,6 +1570,7 @@ class ClaudeEnergyScene extends HTMLElement {
     if (!this._sceneDone) { this._sceneDone = true; this._scene(); requestAnimationFrame(() => this._layout()); }
     this._windows();
     if (this._pop) this._popupLive();
+    if (this._view === 'overkapping') { const okLayer = this.$('#ok-layer'); if (okLayer) okLayer.innerHTML = overkappingSVG(this._hass); }
     const hpm = this.$('#hpm');
     if (hpm && hpm.style.display === 'flex' && this._hass) {
       const iframe = this.$('#hp-iframe');
