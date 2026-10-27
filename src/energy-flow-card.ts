@@ -2556,7 +2556,8 @@ export class EnergyFlowCard extends LitElement {
 
           <!-- Floating Grafiek Button (Top Right) -->
           ${!this.config.screensaver ? html`
-            <div style="position: absolute; right: 16px; top: 16px; z-index: 100;" @click=${(e: Event) => e.stopPropagation()}>
+            <div style="position: absolute; right: 16px; top: 16px; z-index: 100; display: flex; gap: 8px; align-items: center;" @click=${(e: Event) => e.stopPropagation()}>
+              <button @click=${(e: Event) => { e.stopPropagation(); this.switchView(this.currentView === 'house' ? 'overkapping' : 'house'); }} style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.22); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.25s ease;"><ha-icon icon="${this.currentView === 'house' ? 'mdi:patio-heater' : 'mdi:home'}" style="--mdc-icon-size: 15px; width: 15px; height: 15px; color: #38bdf8;"></ha-icon>${this.currentView === 'house' ? 'Naar Overkapping' : 'Terug naar Huis'}</button>
               <button @click=${(e: Event) => { e.stopPropagation(); this.openUnifiedChartPopup(); }} style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: background 0.2s ease;">
                 <ha-icon icon="mdi:chart-line" style="--mdc-icon-size: 14px; width: 14px; height: 14px; color: #10b981;"></ha-icon>
                 Prestaties Grafiek
@@ -2570,8 +2571,19 @@ export class EnergyFlowCard extends LitElement {
             </div>
           ` : ''}
 
-          <div class="sceneWrapper">
-            ${renderHouseSvg({
+          <div class="sceneWrapper" style="transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; ${this.isTransitioning ? 'opacity: 0; transform: scale(1.15) translateY(20px);' : 'opacity: 1; transform: scale(1) translateY(0);'}">
+            ${this.currentView === 'overkapping' ? renderOverkappingSvg({
+              width: this.cardWidth,
+              height: this.cardHeight,
+              isDay: (decimalHour >= sunriseHour && decimalHour <= sunsetHour),
+              lightsOn: this.hass?.states['light.overkapping_verlichting']?.state === 'on' || this.hass?.states['light.overkapping_wandlampen_aqaralumi_lumi_switch_l0agl1']?.state === 'on',
+              barStripOn: this.hass?.states['light.overkapping_barledstrip_ikea_tretakt_smart_plug']?.state === 'on',
+              dartRingOn: this.hass?.states['light.overkapping_dartbordring_ikea_tretakt_smart_plug']?.state === 'on',
+              spotjesOn: this.hass?.states['light.overkapping_spotjes_ikea_tretakt_smart_plug']?.state === 'on',
+              pcPowerWatts: parseFloat(this.hass?.states['sensor.overkapping_dartbaan2_pc_power_inspelning_smart_plug_vermogen']?.state || '0'),
+              onToggleLight: (entityId: string) => this.toggleOverkappingLight(entityId),
+              onReturnToHouse: () => this.switchView('house')
+            }) : renderHouseSvg({
               containerWidth: this.cardWidth,
               containerHeight: this.cardHeight,
               timeHour: decimalHour,
